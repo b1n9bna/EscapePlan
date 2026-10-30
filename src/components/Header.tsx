@@ -1,9 +1,9 @@
 import React from 'react';
-import { Compass, BookOpen, Calculator, CheckSquare, ShieldCheck } from 'lucide-react';
+import { Gamepad2, Compass, BookOpen, Calculator, CheckSquare, ShieldCheck } from 'lucide-react';
 
 interface HeaderProps {
-  activeTab: 'quiz' | 'subclasses' | 'reality' | 'diy';
-  setActiveTab: (tab: 'quiz' | 'subclasses' | 'reality' | 'diy') => void;
+  activeTab: 'sim' | 'quiz' | 'subclasses' | 'reality' | 'diy';
+  setActiveTab: (tab: 'sim' | 'quiz' | 'subclasses' | 'reality' | 'diy') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
@@ -12,8 +12,8 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Slogan */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('quiz')}>
-            <span className="text-2xl p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-sm">
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('sim')}>
+            <span className="text-2xl p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 shadow-sm">
               🧭
             </span>
             <div>
@@ -26,66 +26,77 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                面向技术人的开源全球移居自测与手搓 DIY 路线图
+                面向大众的全球移居平行人生模拟器与手搓 DIY 路线图
               </p>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="flex space-x-1 sm:space-x-2">
+          <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar py-2">
+            <button
+              onClick={() => setActiveTab('sim')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                activeTab === 'sim'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+            >
+              <Gamepad2 className="w-4 h-4 text-indigo-300" />
+              <span>人生模拟</span>
+            </button>
+
             <button
               onClick={() => setActiveTab('quiz')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'quiz'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
               <Compass className="w-4 h-4" />
-              <span>移居自测</span>
+              <span>精神体检</span>
             </button>
 
             <button
               onClick={() => setActiveTab('subclasses')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'subclasses'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              <span>政策图谱与算分</span>
+              <span>政策与算分</span>
             </button>
 
             <button
               onClick={() => setActiveTab('reality')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'reality'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
               <Calculator className="w-4 h-4" />
-              <span className="hidden sm:inline">现实税后推演</span>
-              <span className="sm:hidden">税后沙盒</span>
+              <span>税后沙盒</span>
             </button>
 
             <button
               onClick={() => setActiveTab('diy')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'diy'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
               <CheckSquare className="w-4 h-4" />
-              <span>手搓路线图</span>
+              <span>手搓路线</span>
             </button>
           </nav>
 
           {/* Right GitHub & Privacy Badge */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="hidden lg:flex items-center space-x-1 text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full">
+            <div className="hidden xl:flex items-center space-x-1 text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>纯本地运算 · 零隐私上传</span>
             </div>

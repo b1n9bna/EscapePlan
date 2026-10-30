@@ -92,5 +92,45 @@ export const CITY_BENCHMARKS: Record<string, CityCostBenchmark> = {
       "不提供绿卡路径，每5年需重新申请居留或换签",
       "4-5月泰北有传统‘烧山季’空气污染，需迁徙至普吉或曼谷避烟"
     ]
+  },
+  sydney: {
+    city: "悉尼 / 墨尔本 (Australia)",
+    country: "澳大利亚",
+    currency: "AUD",
+    currencyRateToRMB: 4.8,
+    grossAnnualDefault: 95000, // 9.5万澳币年薪 (蓝领/技术/护理常见年薪)
+    taxAndInsuranceRate: 0.26, // 约26% (所得税+Medicare税)
+    medianRent1BedMonthly: 2200, // 2200澳币/月
+    foodAndLivingMonthly: 1200, // 1200澳币/月
+    domesticEquivalentMonthlyRMB: 27000,
+    pros: [
+      "最低时薪全球一流，工作时间受严格法律保护，哪怕做普通服务业也能体面生活",
+      "阳光海滩大草坪，户外生活质量极其优渥",
+      "Medicare 公民医疗全面保障，育儿补贴优厚"
+    ],
+    cons: [
+      "大城市租房周薪制且竞争激烈，好房往往要竞价提交申请",
+      "人工极其昂贵，叫修水管、搬家、换锁必须学会 DIY 自己动手"
+    ]
+  },
+  valencia: {
+    city: "瓦伦西亚 / 巴塞罗那 (Spain)",
+    country: "西班牙",
+    currency: "EUR",
+    currencyRateToRMB: 7.8,
+    grossAnnualDefault: 32000, // 3.2万欧 (非盈利存款换算或远程收入)
+    taxAndInsuranceRate: 0.20, // 约20% (或数字游民贝克汉姆法案24%)
+    medianRent1BedMonthly: 750, // 750欧 (瓦伦西亚市中心舒适公寓)
+    foodAndLivingMonthly: 450, // 450欧地中海生鲜美食天天大餐
+    domesticEquivalentMonthlyRMB: 21000,
+    pros: [
+      "物价在全欧洲极其感人：车厘子、海鲜、伊比利亚火腿白菜价，红酒几欧一瓶",
+      "气候常年日照超过 300 天，地中海海风与极其松弛的社交节奏",
+      "取消了每年住满 183 天的硬性移民监限制，行动极度自由"
+    ],
+    cons: [
+      "下午 2 点到 5 点 Siesta 午休全城关门，办事效率极其磨叽",
+      "在当地找本土高薪工作机会较少，适合自带被动收入或远程工作者"
+    ]
   }
 };

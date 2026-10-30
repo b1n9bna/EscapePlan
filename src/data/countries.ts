@@ -434,5 +434,114 @@ export const COUNTRIES_DATA: CountryData[] = [
         ]
       }
     ]
+  },
+  {
+    id: "australia",
+    name: "澳大利亚",
+    englishName: "Australia",
+    flag: "🇦🇺",
+    tagline: "阳光大草坪，蓝领时薪世界天花板，打工度假(WHV)与护理幼教技工移民圣地",
+    badge: "蓝领尊贵 · 气候宜人",
+    overallFriendliness: "友好",
+    languageRequirement: "日常英语流利；技术移民通常需雅思 4 个 7 或 PTE 65+ (七炸)",
+    capital: "堪培拉 / 悉尼 / 墨尔本",
+    medianTechSalary: "85,000 ~ 130,000 澳币 (时薪普遍 $35~$65/小时，约40万~62万 RMB)",
+    subclasses: [
+      {
+        id: "aus-whv-462",
+        name: "打工度假签证 (WHV 462)",
+        englishName: "Work and Holiday Visa (Subclass 462)",
+        type: "job_offer",
+        difficulty: "低",
+        processingTime: "抽签后 1 ~ 4 周出签",
+        prSpeed: "单次 1 年；在特定区域打工可续二签、三签，最长呆满 3 年！",
+        summary: "专为 18~30 岁年轻人定制的人生探索神签。可在澳合法全职工作、旅行、上短期语言班。每年对中国大陆开放 5,000 个配额，通过摇号抽取。",
+        annualCostEst: "启动仅需约 5,000 澳币存款证明 (约2.4万RMB)，到澳第一周即可自给自足",
+        officialLink: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-462",
+        requirements: [
+          "递交时年满 18 周岁，且未满 31 周岁",
+          "持有中国护照，具备高等教育学历（大专或本科在读2年以上）",
+          "基础英语证明：雅思 4.5 分以上，或托福/PTE 对应成绩",
+          "银行存款 5,000 澳币及往返机票资金证明"
+        ],
+        pros: [
+          "全澳任何雇主均可合法雇佣，不限行业（咖啡馆、农场、办公室、酒店）",
+          "时薪极高（法定最低时薪超 $23.23 澳币，农场肉厂周薪常破 $1,500 澳币）",
+          "年轻人的全球化探索跳板，可转学生签、技工学签或雇主担保"
+        ],
+        cons: [
+          "受限于‘为同一雇主工作不得超过 6 个月’的规则",
+          "每年配额需通过移民局官网抽签，存在概率运气成分"
+        ]
+      },
+      {
+        id: "aus-skilled-priority",
+        name: "紧缺技工/幼教/护理 190/189 移民通道",
+        englishName: "Skilled Nominated Visa (Subclass 190 / 189)",
+        type: "point_based",
+        difficulty: "中等",
+        processingTime: "获邀后 6 ~ 12 个月",
+        prSpeed: "一步到位全家获得澳洲永久居留绿卡 (PR)",
+        summary: "澳洲极度紧缺幼教老师 (Early Childhood)、注册护士 (Registered Nurse)、以及电工木工等蓝领技师。此类紧缺职业在各州担保中享有极低分数优先获邀特权。",
+        annualCostEst: "技工/护理 TAFE 学费每年约 1.2万~1.8万 澳币 (约5.7万~8.6万 RMB)",
+        officialLink: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-nominated-190",
+        requirements: [
+          "职业位于澳洲中长期紧缺职业清单 (MLTSSL) 或州担保清单",
+          "通过对应职业评估机构认证 (如 AITSL 教师认证, ANMAC 护士认证, TRA 技工认证)",
+          "EOI 打分达到 65 分以上，并获得州政府提名"
+        ],
+        pros: [
+          "幼教与护理是目前全澳获邀率最高、最不受配额缩减影响的铁饭碗",
+          "一步到位拿全家绿卡，享受 Medicare 终身免费医疗与子女公立教育",
+          "蓝领手艺人社会地位极高，人工费极其昂贵"
+        ],
+        cons: [
+          "职业评估对英语要求较高（幼教通常要求雅思 7788，护理需 4 个 7）",
+          "需耐得住实习与专业培训期"
+        ]
+      }
+    ]
+  },
+  {
+    id: "spain",
+    name: "西班牙",
+    englishName: "Spain",
+    flag: "🇪🇸",
+    tagline: "欧洲气候最好的海滨度假天堂，非盈利居留存钱即可移居，生活极度松弛",
+    badge: "非盈利首选 · 慢生活之都",
+    overallFriendliness: "极高",
+    languageRequirement: "无需英语或西语考试即可下签！生活需掌握基础西语",
+    capital: "马德里 / 巴塞罗那 / 瓦伦西亚",
+    medianTechSalary: "适合带被动收入/储蓄前往，或远程赚欧元美金 (月生活费 1,000~1,800 欧非常宽裕)",
+    subclasses: [
+      {
+        id: "spain-non-lucrative",
+        name: "西班牙非盈利性居留 (No Lucrativa)",
+        englishName: "Non-Lucrative Residence Visa",
+        type: "entrepreneur",
+        difficulty: "低",
+        processingTime: "1 ~ 3 个月",
+        prSpeed: "居留满 5 年可申请西班牙永久居留 (PR)；满 10 年可入籍",
+        summary: "性价比极高的欧洲合法移居通道。不要求买房、不要求投资、不要求做题考语言！只要证明银行有足够的合法存款或被动收入维持在西生活即可获发居留许可。",
+        annualCostEst: "单人要求银行存款证明约 2.8万 欧元 (约22万 RMB) 以上即可",
+        officialLink: "https://www.exteriores.gob.es/Consulados/pekin/zh/ServiciosConsulares/Paginas/index.aspx?scco=China&scd=230&scca=Visados&scdt=Visado+de+residencia+no+lucrativa",
+        requirements: [
+          "主申请人证明每月拥有不低于西班牙 IPREM 指数 400% 的非工资性收入或流动存款 (2024标准约 2,400 欧/月，年备约 28,800 欧)",
+          "购买西班牙全额商业医疗保险",
+          "无犯罪记录证明 (海牙认证 Apostille)",
+          "提供符合要求的健康体检证明"
+        ],
+        pros: [
+          "零门槛：不限年龄、不考语言、不要求投资几十万买房",
+          "可携带配偶及未成年子女一同移居，孩子可免费就读西班牙优质公立学校",
+          "2024最新西班牙最高法院判决：废除了每年必须在西住满 183 天的硬性移民监！出入更自由！",
+          "申根国 29 国畅行无阻"
+        ],
+        cons: [
+          "持该签证期间不可以受雇于西班牙本土公司打工（但可在海外有远程/投资收入）",
+          "第一张签证给 1 年，续签为 2+2 年模式"
+        ]
+      }
+    ]
   }
 ];

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Header } from './components/Header';
+import { LifeSimulator } from './components/LifeSimulator';
 import { QuizSection } from './components/QuizSection';
 import { SubclassMatrix } from './components/SubclassMatrix';
 import { RealityCheckSection } from './components/RealityCheckSection';
@@ -7,7 +8,7 @@ import { DIYGuideSection } from './components/DIYGuideSection';
 import { Footer } from './components/Footer';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'quiz' | 'subclasses' | 'reality' | 'diy'>('quiz');
+  const [activeTab, setActiveTab] = useState<'sim' | 'quiz' | 'subclasses' | 'reality' | 'diy'>('sim');
   const [initialSubclassCountry, setInitialSubclassCountry] = useState<string>('japan');
   const [initialDIYCountry, setInitialDIYCountry] = useState<string>('japan');
 
@@ -34,6 +35,13 @@ export function App() {
 
       {/* Main Content Area */}
       <main className="flex-1">
+        {activeTab === 'sim' && (
+          <LifeSimulator
+            onNavigateToSubclasses={handleNavigateToSubclasses}
+            onNavigateToDIY={handleNavigateToDIY}
+          />
+        )}
+
         {activeTab === 'quiz' && (
           <QuizSection
             onNavigateToSubclasses={handleNavigateToSubclasses}

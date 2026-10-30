@@ -236,5 +236,125 @@ export const DIY_ROADMAPS: Record<string, CountryRoadmap> = {
         ]
       }
     ]
+  },
+  australia: {
+    countryId: "australia",
+    countryName: "澳大利亚 (WHV 打工度假 / 紧缺技工护理)",
+    flag: "🇦🇺",
+    overallTimeEst: "WHV 摇号后 1 个月出签 ➜ 落地立即开启打工存钱",
+    stages: [
+      {
+        id: "au-s1",
+        stageName: "阶段一：WHV 抢名额与资金证明准备",
+        stageSubtitle: "每年 5000 个配额的准入准备",
+        icon: "FileCheck",
+        tasks: [
+          {
+            id: "au-t1",
+            title: "考取基础英语成绩 (雅思 4.5 / PTE 30+)",
+            duration: "1 ~ 2 周备考",
+            costEst: "考试费约 1,500 ~ 2,000 RMB",
+            isCrucial: true,
+            description: "澳洲打工度假签对语言要求极低，只需等同于雅思 4.5 分（PTE 30分）即可满足！四级及格者通常裸考即过。",
+            warningTip: "成绩单必须在递交申请之日前的 12 个月内有效！"
+          },
+          {
+            id: "au-t2",
+            title: "开具 5,000 澳币 (约 2.4 万 RMB) 存款证明",
+            duration: "1 天",
+            costEst: "银行打印费 0~20 RMB",
+            isCrucial: true,
+            description: "借记卡流水或存款证明，证明你有足够的生活费支持初抵澳洲的生活与返程机票。",
+            warningTip: "建议开 3.5 万 ~ 5 万 RMB 更加稳妥，且附带银行英文翻译件。"
+          }
+        ]
+      },
+      {
+        id: "au-s2",
+        stageName: "阶段二：落地澳洲黄金一周",
+        stageSubtitle: "办税号 TFN、开本地银行卡与白卡/咖啡证书",
+        icon: "CheckCircle",
+        tasks: [
+          {
+            id: "au-t3",
+            title: "申请澳大利亚税号 (TFN - Tax File Number)",
+            duration: "落地后在线申请，约 1~2 周邮寄到住址",
+            costEst: "免费 (ATO 官网在线申请)",
+            isCrucial: true,
+            description: "抵澳后立刻登录 ATO (澳洲税务局) 官网在线免费申请 TFN。在澳洲合法打工必须向雇主提供 TFN，否则会被代扣最高 47% 的惩罚性预扣税！",
+            warningTip: "必须人在澳洲境内才能提交在线申请，提前在境外无法申请！"
+          },
+          {
+            id: "au-t4",
+            title: "考取特定行业上岗证书 (白卡 White Card / RSA 酒类服务)",
+            duration: "在线学习半天完成",
+            costEst: "约 $40 ~ $90 澳币",
+            isCrucial: false,
+            description: "若想做建筑/装修蓝领，必须持有 White Card 白卡；若想在酒吧、西餐厅当服务员，必须持有对应州的 RSA 证书。",
+            warningTip: "务必在澳洲政府 RTO 认证的正规培训机构官网报名考试。"
+          }
+        ]
+      }
+    ]
+  },
+  spain: {
+    countryId: "spain",
+    countryName: "西班牙 (非盈利居留 No Lucrativa)",
+    flag: "🇪🇸",
+    overallTimeEst: "国内公证与签证约 2 ~ 3 个月 ➜ 赴西按指纹拿居留卡 (TIE)",
+    stages: [
+      {
+        id: "es-s1",
+        stageName: "阶段一：国内非盈利资产与被动收入证明",
+        stageSubtitle: "向领事馆证明‘我不去抢西班牙人饭碗，我自备足够资金去消费’",
+        icon: "FileCheck",
+        tasks: [
+          {
+            id: "es-t1",
+            title: "准备近 1 年银行流水与存款证明 (主申请人建议备 30~50 万 RMB)",
+            duration: "1 ~ 3 天",
+            costEst: "免费",
+            isCrucial: true,
+            description: "西班牙官方标准为每月拥有 IPREM 指数 400% 的资金 (约 2,400 欧/月，年备约 28,800 欧)。如果有房租租金收入、理财分红或股票分红流水更具说服力。",
+            warningTip: "领事馆非常看重资金的合法稳定沉淀，切忌在递签前突然突击转入一大笔来源不明的资金！"
+          },
+          {
+            id: "es-t2",
+            title: "无犯罪记录证明公证与海牙认证 (Apostille)",
+            duration: "1 ~ 2 周",
+            costEst: "公证费约 200 RMB + 海牙认证约 50~100 RMB",
+            isCrucial: true,
+            description: "户籍地派出所开具无犯罪记录，公证处出具西语翻译公证书，并在中国外交部或省外办办理【海牙认证附加证明书 (Apostille)】即可在西直接生效！",
+            warningTip: "无犯罪证明自出具之日起通常只有 3 个月有效期，注意递签时间节点！"
+          }
+        ]
+      },
+      {
+        id: "es-s2",
+        stageName: "阶段二：使馆递签与抵西按指纹拿卡",
+        stageSubtitle: "全家登录与领取 TIE 外国人居留卡",
+        icon: "CheckCircle",
+        tasks: [
+          {
+            id: "es-t3",
+            title: "购买西班牙本土全额商业医疗保险 (Sin Copago 无免赔)",
+            duration: "1 天",
+            costEst: "单人约 500 ~ 1,200 欧/年 (依年龄而定)",
+            isCrucial: true,
+            description: "必须由西班牙本土合规保险公司 (如 Sanitas, Asisa, Adeslas) 出具的包含住院、急诊且无自付额 (Sin Copago) 的保单。",
+            warningTip: "不可使用普通旅游意外险替代！必须是正规一年期私人医保。"
+          },
+          {
+            id: "es-t4",
+            title: "抵西 1 个月内预约警察局 (Cita) 按指纹领取 TIE 卡",
+            duration: "按指纹后约 30 天取卡",
+            costEst: "工本规费约 16 欧元",
+            isCrucial: true,
+            description: "入境西班牙后，凭租房合同在住址所属市政厅登记住址证明 (Empadronamiento)，随后预约国家警察局录入十指指纹，领取实体 TIE 居留卡！",
+            warningTip: "马德里和巴塞罗那警察局放号极为紧张，可考虑在瓦伦西亚、塞维利亚或南部城市办理更轻松。"
+          }
+        ]
+      }
+    ]
   }
 };
