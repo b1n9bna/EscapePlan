@@ -16,16 +16,22 @@ export interface FamilyOrigin {
   initialSavings: number;
 }
 
+export interface CharacterAttributes {
+  inferiority: number; // 自卑创伤 (0: 极其坦荡, 100: 极度自卑敏感)
+  academicCapital: number; // 做题应试资本 (0: 毫无兴趣, 100: 顶尖做题机器)
+  kinshipGuilt: number; // 宗族愧疚与重负 (0: 毫无包袱, 100: 负罪爆表)
+  rebellion: number; // 反叛与逆鳞 (0: 规矩温顺, 100: 随时掀翻棋盘)
+  resilience: number; // 生存韧劲与手腕 (0: 脆弱娇嫩, 100: 野草百炼成钢)
+  savings: number; // 现金储蓄 (RMB)
+}
+
 export interface LifeChoice {
   text: string;
   detail: string;
   reaction: string;
-  savingsDelta: number;
-  autonomyDelta: number; // 个体主权
-  kinshipDelta: number; // 宗族重力
-  institutionalDelta: number; // 体制依附
-  resilienceDelta: number; // 生存韧劲
+  delta: Partial<CharacterAttributes>;
   addTags?: string[];
+  trackTrigger?: "vocational" | "academic";
 }
 
 export interface LifeEventNode {
@@ -169,79 +175,58 @@ const REGIONS = [
 const PARENT_PROFILES = [
   {
     parents: "县自然资源局科员 + 公立小学高级教师",
-    detail: "标准体制内中层，恪守本分，信奉“稳定压倒一切”，对你的人生有极强规划与控制欲。",
-    institutionalBase: 35,
-    kinshipBase: 25
+    detail: "标准体制内中层，恪守本分，信奉“稳定压倒一切”，对你的人生有极强规划与控制欲。"
   },
   {
     parents: "农贸市场活禽/生肉摊档夫妻",
-    detail: "起早贪黑双手生冻疮，用零钞毛票供你上学，说话门门大嗓门，信奉实利与真金白银。",
-    institutionalBase: -15,
-    kinshipBase: 20
+    detail: "起早贪黑双手生冻疮，用零钞毛票供你上学，说话门门大嗓门，信奉实利与真金白银。"
   },
   {
     parents: "珠三角五金模具厂两栖打工族",
-    detail: "长年住工厂铁架床宿舍，逢年过节才拎着年货回老家，总带着未能陪伴你的愧疚与自责。",
-    institutionalBase: -10,
-    kinshipBase: 30
+    detail: "长年住工厂铁架床宿舍，逢年过节才拎着年货回老家，总带着未能陪伴你的愧疚与自责。"
   },
   {
     parents: "下岗开黑车/跑滴滴 + 早市面点摊",
-    detail: "经历过90年代企业买断的创伤，早早白了头发，把所有未能实现的阶层跨越死死寄托在你身上。",
-    institutionalBase: 15,
-    kinshipBase: 25
+    detail: "经历过90年代企业买断的创伤，早早白了头发，把所有未能实现的阶层跨越死死寄托在你身上。"
   },
   {
     parents: "乡镇卫生院大夫 + 初中教导员",
-    detail: "地方上体面受敬重的人家，清贫但讲规矩，最害怕子女“做出格的事”让家族蒙羞。",
-    institutionalBase: 30,
-    kinshipBase: 20
+    detail: "地方上体面受敬重的人家，清贫但讲规矩，最害怕子女“做出格的事”让家族蒙羞。"
   },
   {
     parents: "小服装厂破产转型开菜鸟驿站 + 社区团购",
-    detail: "曾见过小老板的体面，后来背了债务缩回仓库理快递，每天在货架间疲于奔命。",
-    institutionalBase: -5,
-    kinshipBase: 15
+    detail: "曾见过小老板的体面，后来背了债务缩回仓库理快递，每天在货架间疲于奔命。"
   },
   {
     parents: "建筑工地铁瓦工师傅 + 守家务农母亲",
-    detail: "父亲一身风湿与老茧，每年年底最怕包工头卷款跑路，母亲在老家守着几分责任田。",
-    institutionalBase: -20,
-    kinshipBase: 35
+    detail: "父亲一身风湿与老茧，每年年底最怕包工头卷款跑路，母亲在老家守着几分责任田。"
   },
   {
     parents: "省城高校后勤管理员 + 市立医院护士长",
-    detail: "每天见识教授和专家的光鲜，深知文凭是唯一翻盘阶梯，从小对你推行军事化作息。",
-    institutionalBase: 25,
-    kinshipBase: 15
+    detail: "每天见识教授和专家的光鲜，深知文凭是唯一翻盘阶梯，从小对你推行军事化作息。"
   }
 ];
 
 const SIBLINGS_PROFILES = [
   {
     siblings: "独生子女（独享亦独扛）",
-    detail: "父母将所有关注与资源倾注在你身上，但未来老人的照护、医疗和养老没有任何同胞替你分担。",
-    kinshipBase: 25
+    detail: "父母将所有关注与资源倾注在你身上，但未来老人的照护、医疗和养老没有任何同胞替你分担。"
   },
   {
     siblings: "重男轻女家庭的长姐（下有小5岁的弟弟）",
-    detail: "从小被灌输“做姐姐要有担当”，过年新衣服永远优先弟弟，心里常年扎着一根不被看见的刺。",
-    kinshipBase: 40
+    detail: "从小被灌输“做姐姐要有担当”，过年新衣服永远优先弟弟，心里常年扎着一根不被看见的刺。"
   },
   {
     siblings: "夹心层的二儿子/二女儿",
-    detail: "老大备受器重，老幺备受娇宠，你夹在中间如同隐形人，最早就学会了察言观色与独自消化委屈。",
-    kinshipBase: 10
+    detail: "老大备受器重，老幺备受娇宠，你夹在中间如同隐形人，最早就学会了察言观色与独自消化委屈。"
   },
   {
     siblings: "长兄为父（下有正读中学的妹妹）",
-    detail: "母亲常年病弱，父亲在外打工，你早早就学会了做饭和照看妹妹，习惯了压抑自己的欲望。",
-    kinshipBase: 35
+    detail: "母亲常年病弱，父亲在外打工，你早早就学会了做饭和照看妹妹，习惯了压抑自己的欲望。"
   },
   {
     siblings: "重组家庭（父母离异各自再婚，由祖父母抚养）",
-    detail: "过年不知该去哪个家，在爷爷奶奶漏风的老平房里长大，骨子里极度渴望拥有属于自己的固定锚点。",
-    kinshipBase: -10
+    detail: "过年不知该去哪个家，在爷爷奶奶漏风的老平房里长大，骨子里极度渴望拥有属于自己的固定锚点。"
   }
 ];
 
@@ -315,8 +300,7 @@ export function generateRandomFamily(): {
 }
 
 // ============================================================================
-// 前半链：K-12 应试铁笼（6 ~ 18 岁 深度扩展）
-// 小学 3 关 ➔ 初中 3 关 ➔ 高中 3 关，共 9 大核心关隘
+// 前半链：K-12 应试与分流（6 ~ 17 岁关隘选择）
 // ============================================================================
 
 export const K12_EVENTS: LifeEventNode[] = [
@@ -333,33 +317,21 @@ export const K12_EVENTS: LifeEventNode[] = [
         text: "低头不语，午饭时悄悄躲到操场乒乓球台底下吃完",
         detail: "你早早学会了用自尊裹紧自己的贫瘠，把自卑磨成了内敛的硬壳。",
         reaction: "你开始学着城里同学的语调一字一句纠正发音，夜里在被窝里练普通话咬字。",
-        savingsDelta: 0,
-        autonomyDelta: 10,
-        kinshipDelta: 5,
-        institutionalDelta: 5,
-        resilienceDelta: 15,
+        delta: { inferiority: 20, academicCapital: 10, resilience: 10 },
         addTags: ["自卑敏感", "早熟自尊"]
       },
       {
         text: "大方把咸菜分给同桌：‘我家自己腌的，尝尝很香’",
         detail: "你身上带着野草般的坦荡，贫穷没有第一时间压弯你的腰。",
         reaction: "同桌吃了一口被辣得直吸气，反倒和你成了下课一起拍卡片的朋友。",
-        savingsDelta: 0,
-        autonomyDelta: 15,
-        kinshipDelta: -5,
-        institutionalDelta: -5,
-        resilienceDelta: 20,
-        addTags: ["草莽韧劲", "社交直觉"]
+        delta: { inferiority: -15, resilience: 25, rebellion: 10 },
+        addTags: ["草莽坦荡", "野生韧劲"]
       },
       {
         text: "回家赌气摔饭盒，逼母亲一定要给你买商场里那个45块钱的保温桶",
         detail: "母亲叹着气数出抽屉里带折痕的零钱，父亲在院子里重重抽了一口旱烟。",
         reaction: "第二天你如愿拿到了新饭盒，但母亲接下来整整两周每顿饭只就着白菜汤咽冷馍。",
-        savingsDelta: -45,
-        autonomyDelta: 5,
-        kinshipDelta: 20,
-        institutionalDelta: 10,
-        resilienceDelta: -10,
+        delta: { inferiority: 15, kinshipGuilt: 25, savings: -45 },
         addTags: ["愧疚阴影", "面子执念"]
       }
     ]
@@ -378,33 +350,21 @@ export const K12_EVENTS: LifeEventNode[] = [
         text: "在走廊笔直站着，拿出课本默默把课文全篇背了下来",
         detail: "你没有哭，但那些路过同学投来的探寻目光，像小刀一样刻在你的骨髓里。",
         reaction: "从那天起，你暗暗发誓要用成绩让所有人闭嘴。期末考试你考了年级第一名。",
-        savingsDelta: 0,
-        autonomyDelta: 20,
-        kinshipDelta: 10,
-        institutionalDelta: 5,
-        resilienceDelta: 20,
+        delta: { academicCapital: 25, inferiority: 15, resilience: 15 },
         addTags: ["骨气自尊", "应试报复心"]
       },
       {
         text: "中午趁老师不注意，跑去学校后山水沟里抓小龙虾和小泥鳅卖给菜市场小贩凑钱",
         detail: "满身泥浆，指甲缝里全是黑泥，但你真的用塑料袋换回了皱巴巴的八张十元纸币。",
         reaction: "当你把钱啪地拍在讲台上时，班主任愣住了。你第一次体会到金钱带来的尊严反击。",
-        savingsDelta: 80,
-        autonomyDelta: 25,
-        kinshipDelta: -10,
-        institutionalDelta: -20,
-        resilienceDelta: 30,
+        delta: { resilience: 30, rebellion: 25, inferiority: -10, savings: 80 },
         addTags: ["江湖野性", "商业萌芽"]
       },
       {
         text: "放学回家趴在床上大哭，母亲四处找隔壁二婶借钱，换来二婶夹枪带棒的冷嘲热讽",
         detail: "你听着厨房里母亲向邻里陪笑讨好的低三下四，第一次痛恨自己家里的无能与贫穷。",
         reaction: "钱交上了，但你开始恐惧一切需要交费的集体活动，在班级里变得愈发沉默寡言。",
-        savingsDelta: -80,
-        autonomyDelta: -15,
-        kinshipDelta: 25,
-        institutionalDelta: 15,
-        resilienceDelta: -10,
+        delta: { inferiority: 25, kinshipGuilt: 20, savings: -80 },
         addTags: ["自卑创伤", "亲邻冷眼"]
       }
     ]
@@ -423,22 +383,14 @@ export const K12_EVENTS: LifeEventNode[] = [
         text: "推门进去平静地说：‘爸妈，我不去实验中学，我去普通初中照样能考第一’",
         detail: "你替父母解了围，也替自己挑上了一副重担。你亲手掐断了家里借高利贷的可能。",
         reaction: "父亲眼里闪过复杂的愧疚与如释重负。三年后在城南初中的恶劣环境里，你成了淤泥里唯一的独苗。",
-        savingsDelta: 0,
-        autonomyDelta: 25,
-        kinshipDelta: 20,
-        institutionalDelta: -10,
-        resilienceDelta: 30,
+        delta: { resilience: 30, academicCapital: 15, kinshipGuilt: 10, rebellion: 10 },
         addTags: ["懂事担当", "逆境狂草"]
       },
       {
         text: "父母最终去向城里做建材的舅舅借了一万二，低三下四给对方递软中华送土特产",
         detail: "你顺利拿到了实验中学的录取通知书，但舅舅家表弟从此可以在任何场合肆意嘲弄你。",
         reaction: "你背负着全家的体面与债务跨入重点初中，每一次考试掉出前五十名你都会胃疼失眠。",
-        savingsDelta: -12000,
-        autonomyDelta: -15,
-        kinshipDelta: 30,
-        institutionalDelta: 25,
-        resilienceDelta: 10,
+        delta: { academicCapital: 25, kinshipGuilt: 30, inferiority: 15, savings: -12000 },
         addTags: ["负债读书", "寄人篱下"]
       }
     ]
@@ -457,22 +409,14 @@ export const K12_EVENTS: LifeEventNode[] = [
         text: "在班主任办公室一口咬定是自己单方面骚扰对方，把所有处分一个人全扛下来",
         detail: "你被罚在教学楼前扫地两周，父母被叫到学校当面训话，父亲回家抽了你两皮带。",
         reaction: "女孩在放学路上偷偷塞给你一块大白兔奶糖，你第一次在残酷的应试铁幕下体会到了人性的温存与义气。",
-        savingsDelta: 0,
-        autonomyDelta: 30,
-        kinshipDelta: -15,
-        institutionalDelta: -30,
-        resilienceDelta: 25,
+        delta: { rebellion: 30, resilience: 20, kinshipGuilt: 10 },
         addTags: ["义气担当", "看透虚伪"]
       },
       {
         text: "顺从老师的威逼利诱，把纸条推给同班起哄的混混同学，当场写下深刻检讨划清界限",
         detail: "老师表扬你‘知错就改、思想纯洁’，但那个女孩从此再也没多看你一眼。",
         reaction: "你保全了自己的三好学生指标，但你在镜子里看着自己谄媚的笑脸，感到一阵深深的厌恶。",
-        savingsDelta: 0,
-        autonomyDelta: -25,
-        kinshipDelta: 15,
-        institutionalDelta: 30,
-        resilienceDelta: -10,
+        delta: { academicCapital: 10, inferiority: 20, rebellion: -20 },
         addTags: ["自保妥协", "顺民规训"]
       }
     ]
@@ -480,7 +424,7 @@ export const K12_EVENTS: LifeEventNode[] = [
 
   // 5. 初三上学期 · 14岁
   {
-    id: "k12_age_14_split",
+    id: "k12_age_14",
     age: 14,
     stageName: "初三上学期 · 14岁",
     title: "快慢班与铁丝网的优劣淘汰",
@@ -491,28 +435,20 @@ export const K12_EVENTS: LifeEventNode[] = [
         text: "绝不摆烂：自费买全套奥赛拔高卷，下课拿着错题硬闯重点班办公室堵特级老师问问题",
         detail: "慢班的混混同学嘲笑你‘装什么逼’，重点班的学生对你侧目而视，你全然不顾。",
         reaction: "期中统考，你以慢班学生的身份杀进了全校前八名，校长亲自把你特批调回火箭班。",
-        savingsDelta: -200,
-        autonomyDelta: 25,
-        kinshipDelta: 5,
-        institutionalDelta: 10,
-        resilienceDelta: 35,
+        delta: { academicCapital: 30, resilience: 30, inferiority: -10, savings: -200 },
         addTags: ["狠人底色", "逆风破局"]
       },
       {
         text: "心灰意冷，开始跟着同桌去校外黑网吧通宵打反恐精英和传奇，在烟味中麻醉自己",
         detail: "黑网吧昏暗的荧光幕和敲击键盘的快感，填补了被学校体制定为‘次品’的巨大落差。",
         reaction: "你的模拟考成绩一路下滑，但你在游戏公会里成了大哥，开始见识到学校围墙外的混乱生态。",
-        savingsDelta: -500,
-        autonomyDelta: 15,
-        kinshipDelta: -20,
-        institutionalDelta: -35,
-        resilienceDelta: 15,
+        delta: { academicCapital: -35, rebellion: 25, resilience: 15, savings: -500 },
         addTags: ["网瘾逃避", "体制边缘"]
       }
     ]
   },
 
-  // 6. 初三中考 · 15岁 (50%普职分流生死决断)
+  // 6. 初三中考分水岭 · 15岁 (决定是职高技校还是普高)
   {
     id: "k12_age_15",
     age: 15,
@@ -524,214 +460,229 @@ export const K12_EVENTS: LifeEventNode[] = [
       {
         text: "咬死不签：‘我要考普高，哪怕只能去最差的普高借读’",
         detail: "你拒绝了提前认命。接下来的三个月，你每天嚼风油精提神，草稿纸写满了整整两大编织袋。",
-        reaction: "中考放榜那天，你的分数刚好压过县三中普高录取线3分，你攥着准考证在洗手间狠狠哭了一场。",
-        savingsDelta: 0,
-        autonomyDelta: 20,
-        kinshipDelta: 10,
-        institutionalDelta: 10,
-        resilienceDelta: 25,
-        addTags: ["拼命做题家", "守住普高"]
+        reaction: "中考放榜那天，你的分数压过了县三中普高录取线，你守住了通往高考的独木桥！",
+        delta: { academicCapital: 25, resilience: 25, rebellion: 15 },
+        addTags: ["守住普高", "拼命做题家"],
+        trackTrigger: "academic"
       },
       {
         text: "在协议书上签字：选了免学费的公办中专技术方向（汽修/护理/机械）",
         detail: "家里实在经不起继续供书的折腾，你决定提早三年学一门能果腹的硬核手艺。",
-        reaction: "父母松了一口气。邻里七嘴八舌议论你‘没出息’，但你看着手上的扳手与实训室，心里异常踏实。",
-        savingsDelta: 1000,
-        autonomyDelta: 10,
-        kinshipDelta: -10,
-        institutionalDelta: -25,
-        resilienceDelta: 30,
-        addTags: ["职教蓝领", "手艺人底色"]
+        reaction: "父母松了一口气。邻里议论你‘没出息’，但你看着手上的扳手与实训室，心里异常踏实。",
+        delta: { resilience: 35, academicCapital: -20, inferiority: 10, savings: 1000 },
+        addTags: ["职教蓝领", "手艺人底色"],
+        trackTrigger: "vocational"
       },
       {
         text: "父母掏出养老钱走关系托人，交了两万八赞助费进私立高价高中",
         detail: "这笔巨款让家里接下来一年连肉都不敢买，老旧冰箱空空荡荡。",
         reaction: "走入私立高中的第一天，你背上的书包如同装满了铅块，你知道自己没有资格考砸一次。",
-        savingsDelta: -28000,
-        autonomyDelta: -20,
-        kinshipDelta: 35,
-        institutionalDelta: 15,
-        resilienceDelta: 5,
-        addTags: ["巨额学债", "心理重负"]
+        delta: { kinshipGuilt: 40, inferiority: 20, savings: -28000 },
+        addTags: ["巨额学债", "心理重负"],
+        trackTrigger: "academic"
       }
     ]
   },
 
-  // 7. 高一分科 · 16岁
+  // 7. 高中分流 · 16岁
   {
     id: "k12_age_16",
     age: 16,
-    stageName: "高一文理分科 · 16岁",
-    title: "文理分科的现实算盘与梦想绞杀",
+    stageName: "高中分流阶段 · 16岁",
+    title: "专业分科与现实算盘",
     scene:
-      "高一下学期填报文理分科表。你其实热爱历史与写作，语文常年全校前三；但父亲在电话里怒斥：‘学文科出来有什么用？能当饭吃吗？学好数理化，走遍天下都不怕！工科毕业能进厂进国企，文科只能要饭！’",
+      "如果是普高生，你面临文理分科：热爱文史却被父亲痛斥‘文科出来要饭，必须学理！’\n如果是职高技校生，你面临实训选组：是去流水线顶岗实习，还是留在机房钻研高级数控与电气线路？",
     choices: [
       {
-        text: "顺从家庭意志，勾选理科（物理/化学），埋葬自己的文史爱好",
-        detail: "你把书包里的史书收进铁盒子里锁起来，换成厚厚的《五年高考三年模拟》理综题集。",
-        reaction: "高二的电磁感应和有机化学让你苦不堪言，但你在痛苦中磨练出了纯粹工具人式的死记硬背本领。",
-        savingsDelta: 0,
-        autonomyDelta: -25,
-        kinshipDelta: 25,
-        institutionalDelta: 20,
-        resilienceDelta: 15,
-        addTags: ["理科工具人", "埋葬爱好"]
+        text: "普高选理科埋葬爱好 / 职高选硬核电气数控技术",
+        detail: "你把个人的浪漫彻底杀死，把自己打磨成这个工业体系最需要的一颗标准螺丝钉。",
+        reaction: "虽然痛苦枯燥，但你的专业/理综成绩步步爬升，成为同批人中最具工具价值的一个。",
+        delta: { academicCapital: 25, resilience: 20, rebellion: -15 },
+        addTags: ["硬核工具人", "埋葬爱好"]
       },
       {
-        text: "坚持本心勾选文科（历史/政治/地理），准备走法学或考公万能路线",
-        detail: "‘我自己的三年我自己过。文科不仅能考公务员，未来也是体制内的刀笔吏！’",
-        reaction: "虽然父亲长吁短叹，但你在文科班如鱼得水，深刻理解了社会运行的规则与政治话语体系。",
-        savingsDelta: 0,
-        autonomyDelta: 30,
-        kinshipDelta: -15,
-        institutionalDelta: 10,
-        resilienceDelta: 20,
-        addTags: ["文史通透", "笔杆子基因"]
+        text: "普高坚持选文科 / 职高选择服务类与外语辅助自学",
+        detail: "‘我自己的三年我自己过。’哪怕未来没有靠山，你也想保全一双能看清社会规则的眼睛。",
+        reaction: "你在文史/语言领域如鱼得水，深刻理解了社会的运行潜规则，反叛之火愈烧愈旺。",
+        delta: { rebellion: 30, resilience: 15, academicCapital: 10 },
+        addTags: ["文史通透", "清醒反叛"]
       }
     ]
   },
 
-  // 8. 高二高三 · 17岁
+  // 8. 高三冲刺 · 17岁
   {
-    id: "k12_age_17_grind",
+    id: "k12_age_17",
     age: 17,
-    stageName: "高三衡水模式 · 17岁",
-    title: "县中跑操与倒计时的窒息感",
+    stageName: "高三/职高毕业冲刺 · 17岁",
+    title: "炼钢炉的倒计时与生理极限",
     scene:
-      "进入高三，整座县中变成了高速运转的炼钢炉。早晨5点半起床跑操，手里举着手掌大的单词卡片边跑边喊；中午打饭限定10分钟，晚自习学到凌晨12点。黑板上方红色的‘距高考还有88天’如同滴血的刺刀。同桌在一次摸底考试崩溃撕了卷子，在晚自习号啕大哭被家长接走退学休养。",
+      "进入冲刺之年。普高黑板上‘距高考还有88天’如同滴血的刺刀，早晨5点半跑操背单词，同桌在晚自习号啕大哭被退学；\n职高这边，工厂的大巴车已经开到校门口，班主任催促大家签三方顶岗实习协议，只有极少数人还在准备对口高职高考。",
     choices: [
       {
-        text: "把自己变成一台毫无感情的做题机器，掐掉所有情绪，一天只睡5小时",
+        text: "把自己变成一台毫无感情的做题机器 / 考前疯狂刷题冲刺对口大专高职",
         detail: "你用极度的自律封锁了所有脆弱，大冬天洗冷水脸，风油精擦在眼皮底下。",
-        reaction: "三次模拟考你的名次纹丝不动稳定在第一梯队，但你的胃炎和神经衰弱已经成了常态。",
-        savingsDelta: 0,
-        autonomyDelta: 10,
-        kinshipDelta: 15,
-        institutionalDelta: 25,
-        resilienceDelta: 30,
-        addTags: ["冷血做题机", "神经衰弱"]
+        reaction: "你的模拟考成绩锁死在第一梯队，但慢性浅表性胃炎和偏头痛成了甩不掉的附骨之疽。",
+        delta: { academicCapital: 30, resilience: 25, inferiority: -5 },
+        addTags: ["冷血做题机", "自律苦修"]
       },
       {
         text: "保持最低底线学习，每天晚自习抽出半小时去操场看黄昏晚霞与云朵",
-        detail: "‘如果考上好大学的前提是变成疯子，那我宁可做一个心智健全的普通人。’",
-        reaction: "班主任批评你‘缺乏冲刺的狼性’，但你保全了内心的完整与松弛，成绩处于中上水平。",
-        savingsDelta: 0,
-        autonomyDelta: 35,
-        kinshipDelta: -10,
-        institutionalDelta: -20,
-        resilienceDelta: 20,
+        detail: "‘如果通关的前提是变成疯子，那我宁可做一个心智健全的普通人。’",
+        reaction: "班主任批评你‘缺乏冲刺的狼性’，但你保全了内心的完整与松弛，成绩处于中常水平。",
+        delta: { rebellion: 30, inferiority: -20, resilience: 15 },
         addTags: ["精神完整", "松弛防线"]
-      }
-    ]
-  },
-
-  // 9. 高三高考志愿 · 18岁 (K-12 终考大典)
-  {
-    id: "k12_age_18_gaokao",
-    age: 18,
-    stageName: "高考金榜志愿 · 18岁",
-    title: "出分之夜的志愿博弈与阶层落位",
-    scene:
-      "凌晨查分网站瘫痪了半小时终于刷出成绩。全家人屏住呼吸。分数划定了一条生死线：你可以选择留在省内报定向/警校/师范（离家近保分配），或者去沿海大都市报普通双非工科/文科，亦或以高分拿下 211/985 重点院校硬核专业。",
-    choices: [
-      {
-        text: "顺从父亲：填报省内定向/师范类/公费体制苗子专业",
-        detail: "‘听爸的，安稳过一辈子，将来考个编制离家近，咱们家经不起任何风浪折腾。’",
-        reaction: "录取通知书到了，全家人在县城饭馆摆了一桌，你在亲戚的敬酒声中感到一种平静而温和的窒息。",
-        savingsDelta: 0,
-        autonomyDelta: -25,
-        kinshipDelta: 30,
-        institutionalDelta: 35,
-        resilienceDelta: -5,
-        addTags: ["体制预备役", "安稳宿命"]
-      },
-      {
-        text: "瞒着家里偷偷修改第一志愿：填报沿海城市双非大学工科/软件",
-        detail: "你想去离家一千多公里的大海边，哪怕学费更贵、哪怕未来一切都要靠自己去闯。",
-        reaction: "父亲得知后把茶杯砸得粉碎，整整一个月没和你说一句话。但你收拾行李箱的双手在兴奋地发抖。",
-        savingsDelta: -3000,
-        autonomyDelta: 35,
-        kinshipDelta: -20,
-        institutionalDelta: -15,
-        resilienceDelta: 25,
-        addTags: ["破门出走", "代码与工具"]
-      },
-      {
-        text: "十几年县中血拼兑现：稳稳拿下 211/985 重点大学硬核王牌专业",
-        detail: "红榜在县城主干道挂出，全族人把你看作改变门楣的英雄。",
-        reaction: "村支书和校长送来一万块奖金。但这顶皇冠沉重无比，从此你只能往上爬，不能跌下来。",
-        savingsDelta: 10000,
-        autonomyDelta: 15,
-        kinshipDelta: 20,
-        institutionalDelta: 20,
-        resilienceDelta: 20,
-        addTags: ["重点大学光环", "家族脸面"]
       }
     ]
   }
 ];
 
 // ============================================================================
-// 18 岁成人礼与高考阶段命运裁定
+// 18岁 高考出分系统裁决（依据过去12年积累自动计算命运！）
 // ============================================================================
 
-export interface GaokaoDossier {
+export interface GaokaoCalculation {
+  degreeTrack: "985_211" | "double_non" | "junior_college" | "vocational_work";
   title: string;
+  scoreText: string;
   verdict: string;
-  academicCapital: string;
-  psychologicalArmor: string;
+  academicCapitalDesc: string;
+  psychologicalDossier: string;
+  firstStepChoice: {
+    prompt: string;
+    options: {
+      text: string;
+      detail: string;
+      delta: Partial<CharacterAttributes>;
+      addTags?: string[];
+    }[];
+  };
 }
 
-export function evaluate18YearOldGaokao(
-  autonomy: number,
-  kinship: number,
-  institutional: number,
+export function calculateGaokaoOutcome(
+  attrs: CharacterAttributes,
   tags: string[]
-): GaokaoDossier {
-  const kinshipDesc = kinship >= 50 ? "身后的父母与宗族期盼如同千斤重担。" : "你与原生家庭的情感羁绊相对疏离。";
-  const instDesc = institutional >= 30 ? "体制与铁饭碗对你拥有天然的引力。" : "你对体制内的条框抱有本能的戒心。";
-
-  if (tags.includes("重点大学光环")) {
-    return {
-      title: "【顶级做题家 · 家族荣光勋章】",
-      verdict:
-        `你在长达十二年的应试绞肉机里杀出了重围。你证明了自己在这个体制下的极佳适应力，但也过早地将家族的荣辱背在了单薄的肩膀上。${kinshipDesc}`,
-      academicCapital: "名校文凭金身已备，你是县城熟人网传颂的范本，但也成了只能赢不能输的苦行僧。",
-      psychologicalArmor: `极高的应试耐受力，但对阶层跌落有着病态的恐惧。${instDesc}`
-    };
-  }
-
+): GaokaoCalculation {
+  // If user went into vocational track earlier
   if (tags.includes("职教蓝领") || tags.includes("手艺人底色")) {
     return {
-      title: "【早熟工匠 · 务实草莽之身】",
+      degreeTrack: "junior_college",
+      title: "【高等职业技术学院 · 实用大专技能生】",
+      scoreText: "对口升学统考通过，录取至省属公办职业技术学院（机电/护理/工程）",
       verdict:
-        `你在十五岁那年提前看透了应试天梯的虚妄与自家的窘迫。你没有成为象牙塔里的娇花，而是早早握紧了具体的扳手与图纸。${kinshipDesc}`,
-      academicCapital: "学历虽无光环，但你避开了盲目考研与高额学债，拥有最扎实的现实谋生韧性。",
-      psychologicalArmor: `粗粝、耐磨、无视虚浮的面子，懂得用汗水换真金白银。${instDesc}`
+        "你在十五岁那年提前脱离了应试内卷的绞肉机。你没有考上体面的本科，但你避开了昂贵的学费和眼高手低的做题家通病。一门扎实的硬手艺，是你面对未来唯一的饭碗。",
+      academicCapitalDesc: "学历在白领简历里常被无视，但实操能力远超普通本科生，没有背负巨额学债。",
+      psychologicalDossier: `自卑创伤：${attrs.inferiority}%。曾因中专职高出身在亲戚聚会里抬不起头，但也早早看透了社会的虚浮。`,
+      firstStepChoice: {
+        prompt: "面对大专三年的时光，你的规划是：",
+        options: [
+          {
+            text: "在实训车间把高级电工/汽修/护士资格证全部考到手，周末在校外门店跟老师傅打零工攒钱",
+            detail: "放弃虚无的专升本幻想，把技能磨到无可挑剔，手里积攒下真金白银。",
+            delta: { resilience: 30, savings: 8000, inferiority: -10 },
+            addTags: ["蓝领实干", "硬核技能"]
+          },
+          {
+            text: "心有不甘，在图书馆天天早起背英语单词，准备全力冲刺专升本考试",
+            detail: "你受够了被人轻视的眼神，你无论如何也想穿一次本科学位服。",
+            delta: { academicCapital: 20, inferiority: 15, resilience: 15 },
+            addTags: ["专升本执念", "逆袭渴望"]
+          }
+        ]
+      }
     };
   }
 
-  if (autonomy >= 55 || tags.includes("破门出走")) {
+  // If Academic Track: calculate based on Academic Capital
+  if (attrs.academicCapital >= 60) {
     return {
-      title: "【破茧逆鳞 · 野性突围者】",
+      degreeTrack: "985_211",
+      title: "【985/211重点大学 · 顶级做题家金身】",
+      scoreText: "高考总分 642 分（全省排位前 1.2%），稳稳斩获重点大学王牌硬核理工/经管专业！",
       verdict:
-        `十二年的规训没能磨平你的棱角。你在志愿表上亲手按下了离开故土的引爆按钮，你的青春伴随着父亲破碎的茶杯奔向广阔人间。${kinshipDesc}`,
-      academicCapital: "普通综合大学底座，前方无任何靠山铺路，全凭一双赤手空拳博取生机。",
-      psychologicalArmor: `骨头极硬，对控制极度敏锐，天生具备出逃与叛离的引力。${instDesc}`
+        "你在长达十二年的应试炼钢炉里杀出了重围！红榜挂满了县城主干道，校长亲自登门送上奖学金，全族人把你看作改写门楣的英雄。你用十二年的自我压抑换来了这枚勋章，但从此你只能往上爬，不能跌下来。",
+      academicCapitalDesc: "顶级文凭金身已备，拥有校友网与顶级校招入场券，也是背负两代人全部期望的苦行僧。",
+      psychologicalDossier: `宗族负荷：${attrs.kinshipGuilt}%，自卑创伤：${attrs.inferiority}%。你虽然赢得了考试，但骨子里深恐阶层跌落。`,
+      firstStepChoice: {
+        prompt: "面对名校志愿与专业，你的最后决断：",
+        options: [
+          {
+            text: "选最赚钱、最内卷的硬核计算机/电子信息/金融专业，一心只想搞钱改变阶层",
+            detail: "你深知家里毫无背景，唯有最热门的专业能让你在毕业五年内换回真金白银。",
+            delta: { resilience: 20, academicCapital: 20, savings: 10000 },
+            addTags: ["重点大学光环", "大厂做题家"]
+          },
+          {
+            text: "选省内公费师范/定向选调苗子专业，服从分配，为全家换取铁饭碗安全感",
+            detail: "听从父母的苦苦劝说，用名校文凭下沉换取县城或地级市最高的体制内地位。",
+            delta: { kinshipGuilt: 25, rebellion: -20, savings: 8000 },
+            addTags: ["重点大学光环", "体制预备役"]
+          }
+        ]
+      }
     };
   }
 
+  if (attrs.academicCapital >= 30) {
+    return {
+      degreeTrack: "double_non",
+      title: "【沿海普通公办本科（双非） · 夹缝里的大多数】",
+      scoreText: "高考总分 518 分（超一本线12分），录取至沿海二线城市普通公办综合大学",
+      verdict:
+        "不高不低的分数，折射出你十二年来既不甘摆烂又未曾彻底发疯的真实写照。你跨入了本科的门槛，但没有名校光环加持，你必须在接下来的四年里独自面对更加残酷的丛林法则。",
+      academicCapitalDesc: "普通本科文凭，够得着大多数企业的投简历门槛，但无法在简历初筛中脱颖而出。",
+      psychologicalDossier: `反叛指数：${attrs.rebellion}%，自卑创伤：${attrs.inferiority}%。你渴望大城市的自由，但口袋空空。`,
+      firstStepChoice: {
+        prompt: "进入大学校园，你的生存重心定为：",
+        options: [
+          {
+            text: "瞒着家里在沿海城市疯狂兼职实习、自学敲代码和外语，早早融入市场求生",
+            detail: "不靠学校教的书本，在大学四年就用社会真实需求锻造自己的生存獠牙。",
+            delta: { resilience: 30, rebellion: 20, savings: 5000 },
+            addTags: ["双非文理", "破门出走"]
+          },
+          {
+            text: "踏实考教资、考普通话、备战考研二战三战，试图通过二次升学翻盘",
+            detail: "你不敢轻易涉足社会风浪，把所有精力投在象牙塔考研自习室的厚厚书本里。",
+            delta: { academicCapital: 25, kinshipGuilt: 15 },
+            addTags: ["双非文理", "考研执念"]
+          }
+        ]
+      }
+    };
+  }
+
+  // Low academic capital in academic track -> Ordinary junior college
   return {
-    title: "【安稳之锚 · 体制蓄水池预备役】",
+    degreeTrack: "junior_college",
+    title: "【省会普通公办大专 · 现实的冷水】",
+    scoreText: "高考总分 412 分，未达本科线，被省城一所老牌专科院校录取",
     verdict:
-      `你选择了一条最顺应父母与乡土期待的河流。你没有掀起风浪，在熟人网络规划的跑道里稳稳落地。${kinshipDesc}`,
-    academicCapital: "省内定向或稳定专业，一眼能望到退休的体面轨迹。",
-    psychologicalArmor: `对安全感极度依赖，习惯了集体的庇护，离开熟人圈会产生剧烈的失重感。${instDesc}`
+      "出分那一晚，客厅里死一般沉寂。母亲默默抹眼泪，父亲在阳台连续抽了半包劣质烟。你十二年的应试天梯在这一刻提前落下了闸门。你终于承认：自己不是做题的天才。但生活还要继续。",
+    academicCapitalDesc: "大专文凭，在遍地本科生的时代显得有些单薄，唯有硬核技能能防身。",
+    psychologicalDossier: `自卑创伤：${attrs.inferiority + 20}%。家人的叹息如针扎，但你也彻底放下了做题家的包袱。`,
+    firstStepChoice: {
+      prompt: "拿着大专通知书，你的第一步打算：",
+      options: [
+        {
+          text: "坦然接纳现实：大专学一门实用护理/软件开发手艺，周末打三份兼职不再向家里要钱",
+          detail: "贫穷和挫败不再能轻易击垮你，你把身段放到最低，在社会泥土里摸爬滚打。",
+          delta: { resilience: 35, inferiority: -10, savings: 3000 },
+          addTags: ["大专实用", "早熟自立"]
+        },
+        {
+          text: "全家凑出三万块复读费，去隔壁市高考集中营复读一年，背水一战",
+          detail: "你承受不起同辈和亲友异样的眼光，你决定再拿一年的青春在题海里赌一把。",
+          delta: { academicCapital: 25, kinshipGuilt: 30, savings: -30000 },
+          addTags: ["复读背水", "巨额学债"]
+        }
+      ]
+    }
   };
 }
 
 // ============================================================================
-// 后半链：象牙塔与现实绞杀（18 ~ 27 岁）
+// 后半链：象牙塔到社会前五年（20 ~ 27 岁）
 // ============================================================================
 
 export const CAREER_EVENTS: LifeEventNode[] = [
@@ -748,33 +699,21 @@ export const CAREER_EVENTS: LifeEventNode[] = [
         text: "周末兼职打三份工（发传单、奶茶店、周末家教），拼命存下每一个铜板",
         detail: "你用肉身的疲惫置换金钱的安全感，两年来没有参加过任何一次超过人均50块的聚餐。",
         reaction: "银行卡上的数字终于破了五位数。虽然在寝室聚会里你是最沉默的那一个，但你有底气不再向家里要一分钱。",
-        savingsDelta: 8000,
-        autonomyDelta: 20,
-        kinshipDelta: -10,
-        institutionalDelta: -10,
-        resilienceDelta: 25,
+        delta: { resilience: 25, savings: 8000, inferiority: -10, rebellion: 10 },
         addTags: ["拼命攒钱", "边缘独行"]
       },
       {
         text: "泡在图书馆和自习室：拼国家奖学金、考雅思/专业硬核证书",
         detail: "你相信只要把专业实力磨到极致，社会的规则就不会轻易将你埋没。",
         reaction: "你的专业绩点冲到年级前三，拿下了八千块国奖，但体检时发现腰椎已经开始出现生理曲度变直。",
-        savingsDelta: 8000,
-        autonomyDelta: 15,
-        kinshipDelta: 10,
-        institutionalDelta: 10,
-        resilienceDelta: 15,
+        delta: { academicCapital: 25, savings: 8000, resilience: 15 },
         addTags: ["硬核做题", "自律苦修"]
       },
       {
         text: "参与社团学生会，学习酒桌应酬与组织材料，积极争取入党推优",
         detail: "你敏锐察觉到了规则的运行逻辑，开始学着把棱角磨平，学着讲得体的套话与场面话。",
         reaction: "辅导员对你越来越赞许，甚至在年底的留校与推优指标上留了你的名字。你感到自己正在成为机器的一部分。",
-        savingsDelta: 1000,
-        autonomyDelta: -20,
-        kinshipDelta: 15,
-        institutionalDelta: 35,
-        resilienceDelta: 10,
+        delta: { rebellion: -25, kinshipGuilt: 15, resilience: 15, savings: 1000 },
         addTags: ["体制圆滑", "熟稔规则"]
       }
     ]
@@ -793,33 +732,21 @@ export const CAREER_EVENTS: LifeEventNode[] = [
         text: "回老家备战考编/三支一扶/县城事业单位，全职脱产啃老二战",
         detail: "回到熟悉的县城房间，每天在母亲做饭的油烟味中刷行测与申论，不敢出门见高中同学。",
         reaction: "父母对外宣布你在‘备战国家大事’，但你感到自己的青春正像一盆放置在背阴处的冷水，一天天蒸发。",
-        savingsDelta: -5000,
-        autonomyDelta: -25,
-        kinshipDelta: 30,
-        institutionalDelta: 35,
-        resilienceDelta: -10,
+        delta: { kinshipGuilt: 30, rebellion: -25, savings: -5000, inferiority: 15 },
         addTags: ["脱产考编", "深陷故土"]
       },
       {
         text: "拎着编织袋直奔一线城市城中村（深圳城中村/北京回龙观/上海松江），进入私企/大厂外包996",
         detail: "住在隔断出来的单间，窗外对着邻居家的空调外机，每天通勤三个小时挤在窒息的地铁早高峰。",
         reaction: "第一个月拿到转正工资七千五，扣除房租和杂费只剩一半。你第一次真正感知到什么是被城市榨取。",
-        savingsDelta: 3500,
-        autonomyDelta: 25,
-        kinshipDelta: -15,
-        institutionalDelta: -15,
-        resilienceDelta: 20,
+        delta: { rebellion: 25, resilience: 20, savings: 3500 },
         addTags: ["大城市漂流", "996螺丝钉"]
       },
       {
         text: "靠一门硬技术/专业执照入行（汽修技师、医疗护工、咖啡连锁管培、独立手艺）",
         detail: "不图虚名，用体力与具体的专业技能换取现钱，每天下班手上都带着机油或消毒水味道。",
         reaction: "没有白领的光鲜，但你几乎没有失业焦虑。看着手里一点点积攒起来的硬通货，你感到一种粗粝的安全感。",
-        savingsDelta: 6000,
-        autonomyDelta: 20,
-        kinshipDelta: -10,
-        institutionalDelta: -25,
-        resilienceDelta: 30,
+        delta: { resilience: 30, rebellion: 15, savings: 6000, inferiority: -10 },
         addTags: ["蓝领实干", "硬核技能"]
       }
     ]
@@ -838,22 +765,14 @@ export const CAREER_EVENTS: LifeEventNode[] = [
         text: "录音取证，据理力争：‘不给N+1合法补偿，我明天就去劳动仲裁大厅立案’",
         detail: "你没有像同批同事那样哭着签字走人。你在冷风里骑车去劳动局打印材料，连打了三天热线。",
         reaction: "HR最终妥协，多赔了一个月工资把你打发走。虽然丢了工作，但你第一次发现规则并非不可撼动。",
-        savingsDelta: 8500,
-        autonomyDelta: 25,
-        kinshipDelta: -5,
-        institutionalDelta: -20,
-        resilienceDelta: 25,
+        delta: { rebellion: 30, resilience: 25, savings: 8500 },
         addTags: ["硬骨头仲裁", "识破职场"]
       },
       {
         text: "忍气吞声签字走人，并在当晚电话里对父母报喜不报忧：‘公司很好，年终还有奖金’",
         detail: "挂断电话，你在零下五度的天桥上把冷掉的煎饼果子一口口咽下去，眼泪掉在塑料袋里。",
         reaction: "你把所有苦难咽进胃里化作慢性浅表性胃炎。为了省钱，你把出租屋退掉，搬进了不见天日的地下室隔间。",
-        savingsDelta: -2000,
-        autonomyDelta: -10,
-        kinshipDelta: 20,
-        institutionalDelta: 10,
-        resilienceDelta: 10,
+        delta: { inferiority: 20, kinshipGuilt: 15, savings: -2000 },
         addTags: ["报喜不报忧", "隐忍硬扛"]
       }
     ]
@@ -872,22 +791,14 @@ export const CAREER_EVENTS: LifeEventNode[] = [
         text: "刷信用卡套现随礼1000元，并坐夜班绿皮车回老家参加婚礼",
         detail: "酒席上，二叔和七姑八大姨拉着你的手盘问：‘在大城市一个月挣多少？买房没有？有没有编制？’",
         reaction: "你在敬酒的假笑中耗尽了所有的社交能量。回程火车上，你看着下个月账单，发誓三年内绝不再回老家过节。",
-        savingsDelta: -2500,
-        autonomyDelta: -15,
-        kinshipDelta: 25,
-        institutionalDelta: 15,
-        resilienceDelta: -5,
+        delta: { kinshipGuilt: 25, inferiority: 15, savings: -2500 },
         addTags: ["人情透支", "宗族审判"]
       },
       {
         text: "装作工作脱不开身，微信私发200元红包与祝福，拒绝回乡",
         detail: "同桌收了红包回了客套的表情，但高中群里关于你的讨论悄悄冷落下来，母亲打电话骂你‘不知人情冷暖’。",
         reaction: "你彻底被老家的核心熟人圈除名了。但那个长假，你在出租屋里安安静静看完了两本外语原版书，感到从未有过的清静。",
-        savingsDelta: -200,
-        autonomyDelta: 30,
-        kinshipDelta: -30,
-        institutionalDelta: -10,
-        resilienceDelta: 20,
+        delta: { rebellion: 35, kinshipGuilt: -30, savings: -200 },
         addTags: ["斩断故交", "精神离土"]
       }
     ]
@@ -906,22 +817,14 @@ export const CAREER_EVENTS: LifeEventNode[] = [
         text: "去医院做穿刺检查，请假一周，开始把作息硬性切回11点前睡觉，拒绝无意义摸鱼加班",
         detail: "总监在周会上当众点名批评你‘缺乏创业狼性，对待团队没有奉献精神’，并将你从核心项目踢出。",
         reaction: "虽然绩效被打了C，但结节复查为良性。你站在深夜空无一人的天桥上，看着满城霓虹，心里嘲笑他们的狂热。",
-        savingsDelta: -1500,
-        autonomyDelta: 25,
-        kinshipDelta: -5,
-        institutionalDelta: -25,
-        resilienceDelta: 20,
+        delta: { rebellion: 25, resilience: 20, savings: -1500 },
         addTags: ["保命哲学", "看破内卷"]
       },
       {
         text: "把报告塞进抽屉最深处假装没看见，吞两颗止痛片继续在深夜两点写PPT",
         detail: "‘大家都这么熬，我如果停下来，下个月的房租和老家父母的降压药钱谁来出？’",
         reaction: "年底你拿到了‘卓越奋斗者’奖杯和一万二奖金，但你发现自己晨起时心慌手抖的次数越来越频繁。",
-        savingsDelta: 12000,
-        autonomyDelta: -20,
-        kinshipDelta: 15,
-        institutionalDelta: 20,
-        resilienceDelta: 5,
+        delta: { rebellion: -20, kinshipGuilt: 20, savings: 12000 },
         addTags: ["肉体燃料", "自毁型奋斗"]
       }
     ]
@@ -940,22 +843,14 @@ export const CAREER_EVENTS: LifeEventNode[] = [
         text: "接过存折按揭签字，背上30年房贷，完成全家族的阶层跨越执念",
         detail: "签完字那一刻，你看着红色的购房合同，感到这辈子的人生路径已经被打上了水泥钢筋。",
         reaction: "从此你不敢离职、不敢生病、不敢轻易换工作。每个月工资一到账就自动划扣8200元，你彻底被锁死在城市机器上。",
-        savingsDelta: -20000,
-        autonomyDelta: -35,
-        kinshipDelta: 35,
-        institutionalDelta: 30,
-        resilienceDelta: -15,
+        delta: { kinshipGuilt: 40, rebellion: -40, savings: -20000, resilience: -15 },
         addTags: ["三十年房奴", "全家锁死"]
       },
       {
         text: "坚决推开存折：‘你们把老房抵押了，万一生大病住哪？我绝不为了所谓面子买高位期房’",
         detail: "父亲气得浑身发抖，拍桌子怒吼‘你这是大逆不道！我们在亲戚面前头都抬不起来！’",
         reaction: "母亲抹着眼泪叹气。你背上背包连夜坐车返回出租屋，两代人的鸿沟在这一晚彻底裂成无法弥合的东非大裂谷。",
-        savingsDelta: 0,
-        autonomyDelta: 40,
-        kinshipDelta: -35,
-        institutionalDelta: -20,
-        resilienceDelta: 25,
+        delta: { rebellion: 45, kinshipGuilt: -35, resilience: 25 },
         addTags: ["割席决绝", "不当接盘侠"]
       }
     ]
@@ -974,22 +869,14 @@ export const CAREER_EVENTS: LifeEventNode[] = [
         text: "托尽所有高中同学和关系，带着全部存款赶回省城医院陪护病床",
         detail: "你用尽了所有的脸面托到了一张加床。你在充满来苏水味道的走廊里陪护了两周，给母亲端屎端尿，放弃了海外出走的机会。",
         reaction: "母亲的手在输液管下枯瘦泛黄。看着窗外的灰蒙天空，你清楚自己这辈子注定要死死绑在这片泥土里了。",
-        savingsDelta: -35000,
-        autonomyDelta: -30,
-        kinshipDelta: 40,
-        institutionalDelta: 25,
-        resilienceDelta: 10,
+        delta: { kinshipGuilt: 45, rebellion: -30, savings: -35000 },
         addTags: ["孝道羁绊", "肉身归巢"]
       },
       {
         text: "把手里攒下的积蓄大半汇回老家托亲友照看，自己咬牙办理出国公证与离境手续",
         detail: "‘如果我也留在这里，全家最终不过是一起沉入泥潭。我必须在外面踩出一块浮木。’",
         reaction: "在去往机场的大巴上，看着后视镜里越来越小的故乡地平线，眼泪止不住地涌出，你成为了家族名义上的逃兵。",
-        savingsDelta: -25000,
-        autonomyDelta: 45,
-        kinshipDelta: -20,
-        institutionalDelta: -35,
-        resilienceDelta: 35,
+        delta: { rebellion: 50, kinshipGuilt: -20, savings: -25000, resilience: 35 },
         addTags: ["断脐出海", "背负骂名"]
       }
     ]
@@ -997,7 +884,7 @@ export const CAREER_EVENTS: LifeEventNode[] = [
 ];
 
 // ============================================================================
-// 27 岁命运解构与诊断引擎（扩充至 6 种丰富典型画像）
+// 27 岁五年社会大清算：命运解构书（6大画像）
 // ============================================================================
 
 export interface LifeDiagnosis {
@@ -1011,15 +898,12 @@ export interface LifeDiagnosis {
 }
 
 export function evaluate27YearOldLife(
-  autonomy: number,
-  kinship: number,
-  institutional: number,
-  savings: number,
+  attrs: CharacterAttributes,
   tags: string[]
 ): LifeDiagnosis {
   const savingsNote =
-    savings > 20000
-      ? `你手握约 ${savings.toLocaleString()} 元结余，这是你唯一的盘缠底牌。`
+    attrs.savings > 20000
+      ? `你手握约 ¥${attrs.savings.toLocaleString()} 元结余，这是你唯一的盘缠底牌。`
       : `你手中几乎没有流动现金积蓄，只能靠纯粹的体力或决绝走险。`;
 
   // 1. 蓝领手艺/实干型出海
@@ -1028,60 +912,60 @@ export function evaluate27YearOldLife(
       type: "emigrate_craftsman",
       title: "【草莽工匠 · 降维拓荒者】",
       portrait: `你在国内常常处于学历鄙视链底层，被呼来喝去，受尽体面社会的隐性歧视。但你拥有一双不惧脏累、能修理世界的手。${savingsNote}`,
-      kinshipEvaluation: `宗族重力指数：${kinship}/100。你很早就懂得替家里扛事，但故乡除了吸血无法给你任何体面。`,
-      systemEvaluation: `体制依附度：${institutional}/100（极低）。你从不迷信办公室白领神话，你深知汗水在哪都能换面包。`,
+      kinshipEvaluation: `宗族愧疚度：${attrs.kinshipGuilt}/100。你很早就懂得替家里扛事，但故乡除了吸血无法给你任何体面。`,
+      systemEvaluation: `体制依附度：极低。你从不迷信办公室白领神话，你深知汗水在哪都能换面包。`,
       fateVerdict: `你天生属于海外蓝领高收入国度（澳洲/德国双元/日本技工）。去那些尊重技艺与体力劳动的土地，你的一双手能买下一栋带花园的平房，彻底实现阶层倒挂。`,
       recommendation: `果断申请蓝领工签、WHV或双元制，在体力红利市场完成降维打击。`
     };
   }
 
   // 2. 深度深陷房贷与孝道的透支型留下
-  if (tags.includes("三十年房奴") || (kinship >= 65 && tags.includes("孝道羁绊"))) {
+  if (tags.includes("三十年房奴") || (attrs.kinshipGuilt >= 60 && tags.includes("孝道羁绊"))) {
     return {
       type: "stay_exhausted",
       title: "【血肉干电池 · 宗族负重者】",
-      portrait: `你是典型的“中国好儿子/好女儿”，但也是被两代人吸得最干的骆驼。房贷、老人的医药费、弟弟妹妹的指望，如同一根根铜丝穿透了你的肩胛骨。${savingsNote}`,
-      kinshipEvaluation: `宗族重力指数：${kinship}/100（濒临爆表）。离开这片土地对你而言不是地理问题，而是道德受审的死刑。`,
-      systemEvaluation: `体制依附度：${institutional}/100。你需要稳定的现金流来按月止血，不敢有半步差池。`,
+      portrait: `你是典型的“中国好儿女”，但也是被两代人吸得最干的骆驼。房贷、老人的医药费、弟弟妹妹的指望，如同一根根铜丝穿透了你的肩胛骨。${savingsNote}`,
+      kinshipEvaluation: `宗族愧疚度：${attrs.kinshipGuilt}/100（重度超标）。离开这片土地对你而言不是地理问题，而是道德受审的死刑。`,
+      systemEvaluation: `体制依附度：中高。你需要稳定的现金流来按月止血，不敢有半步差池。`,
       fateVerdict: `你已经交出了自己的佩剑。你属于这片土地的基石，平凡而沉重。你会在漫长的叹息中老去，但在亲族眼里，你是那个用血肉托起全家的圣人。`,
       recommendation: `留下来，认认真真搞钱防守，学会在亲族面前建立财务底线，谨防被无底洞拖垮。`
     };
   }
 
-  // 3. 体制内舒适/如鱼得水型留下
-  if (kinship >= 45 && institutional >= 30) {
-    return {
-      type: "stay_comfortable",
-      title: "【宿命之木 · 熟人温室型】",
-      portrait: `你在人情网络与体制秩序中长大。虽然你也曾抱怨过它的形式主义与酒局应酬，但你骨子里最得心应手的，恰恰是熟人社会的潜规则。${savingsNote}`,
-      kinshipEvaluation: `宗族重力指数：${kinship}/100（高）。逢年过节的走动、长辈的关系条子、生病时的熟人医生，正是你抗击世界风浪的坚固护甲。`,
-      systemEvaluation: `体制依附度：${institutional}/100（极高）。你离不开确定的保障与集体的归属。`,
-      fateVerdict: `千万不要轻易出逃。把一条热带鱼扔进冰冷深海只会冻死，你属于东亚内陆温暖稠密的人情池塘。留下来，深耕你的人脉网。`,
-      recommendation: `考编、进体制、或在省城成熟企业按部就班，借力打力安稳过一生。`
-    };
-  }
-
-  // 4. 彻底断脐决绝型出海
-  if (autonomy >= 55 || tags.includes("断脐出海") || tags.includes("割席决绝") || tags.includes("破门出走")) {
+  // 3. 彻底断脐决绝型出海
+  if (attrs.rebellion >= 55 || tags.includes("断脐出海") || tags.includes("割席决绝") || tags.includes("破门出走")) {
     return {
       type: "emigrate_autonomous",
       title: "【断脐孤舟 · 精神异邦人】",
       portrait: `你的骨骼天生无法承受东亚宗族社会的重力。那些被常人视作安全感的“孝道、编制、学区房、老家面子”，对你而言是窒息的绞索。${savingsNote}`,
-      kinshipEvaluation: `宗族重力指数：${kinship}/100（脱敏）。你早已在精神上断脐，能够冷酷地切除毫无边界的情感勒索。`,
-      systemEvaluation: `体制依附度：${institutional}/100（极低）。你拒绝成为任何宏大叙事的燃料，宁可在陌生文明做局外人，也不愿在故土被按头审判。`,
+      kinshipEvaluation: `宗族愧疚度：${attrs.kinshipGuilt}/100（脱敏）。你早已在精神上断脐，能够冷酷地切除毫无边界的情感勒索。`,
+      systemEvaluation: `体制依附度：极低。你拒绝成为任何宏大叙事的燃料，宁可在陌生文明做局外人，也不愿在故土被按头审判。`,
       fateVerdict: `你天生适合出海。异国很冷、语言很硬、终生为客，但只要头顶没有宗族的审判与35岁的断头台，你就能在甲板上睡得无比安稳。`,
       recommendation: `果断割舍沉没成本，带上你的技能与存款，奔赴异邦。`
     };
   }
 
+  // 4. 体制内舒适/如鱼得水型留下
+  if (attrs.kinshipGuilt >= 40 && attrs.rebellion < 40) {
+    return {
+      type: "stay_comfortable",
+      title: "【宿命之木 · 熟人温室型】",
+      portrait: `你在人情网络与体制秩序中长大。虽然你也曾抱怨过它的形式主义与酒局应酬，但你骨子里最得心应手的，恰恰是熟人社会的潜规则。${savingsNote}`,
+      kinshipEvaluation: `宗族愧疚度：${attrs.kinshipGuilt}/100（高）。逢年过节的走动、长辈的关系条子、生病时的熟人医生，正是你抗击世界风浪的坚固护甲。`,
+      systemEvaluation: `体制依附度：高。你离不开确定的保障与集体的归属。`,
+      fateVerdict: `千万不要轻易出逃。把一条热带鱼扔进冰冷深海只会冻死，你属于东亚内陆温暖稠密的人情池塘。留下来，深耕你的人脉网。`,
+      recommendation: `考编、进体制、或在省城成熟企业按部就班，借力打力安稳过一生。`
+    };
+  }
+
   // 5. 空心名校/大厂做题家迷茫型
-  if (tags.includes("重点大学光环") && autonomy < 50) {
+  if (tags.includes("重点大学光环") && attrs.rebellion < 50) {
     return {
       type: "lost_scholar",
       title: "【空心做题家 · 进退维谷者】",
       portrait: `你是一路赢上来的天之骄子，但社会的前五年把你的优越感剥得一干二净。在大厂你面临35岁优化，在体制外你没有硬核生存手艺，你被卡在中间不上不下。${savingsNote}`,
-      kinshipEvaluation: `宗族重力指数：${kinship}/100。你承载着家族唯一的面子，因此你最害怕“承认自己不过是个普通人”。`,
-      systemEvaluation: `体制依附度：${institutional}/100（中等摇摆）。你既鄙视官僚，又极度渴望一份长期的安全感。`,
+      kinshipEvaluation: `宗族愧疚度：${attrs.kinshipGuilt}/100。你承载着家族唯一的面子，因此你最害怕“承认自己不过是个普通人”。`,
+      systemEvaluation: `体制依附度：中等摇摆。你既鄙视官僚，又极度渴望一份长期的安全感。`,
       fateVerdict: `你必须完成一次彻底的精神脱胎换骨。要么放下名校身段去异邦重新归零读书/重修技能，要么彻底向体制投降考公回流。`,
       recommendation: `若出海，选择高性价比技术移民或二硕跳板；若留，尽早考取带编制岗位。`
     };
@@ -1092,8 +976,8 @@ export function evaluate27YearOldLife(
     type: "migrant_bird",
     title: "【飞渡候鸟 · 渡海借风型】",
     portrait: `你既不是传统的孝道殉道者，也不是决绝的文化背叛者。你是一只极度务实的候鸟，看清了国内的拥挤，但也舍不下熟悉的饭局与根须。${savingsNote}`,
-    kinshipEvaluation: `宗族重力指数：${kinship}/100（平衡）。你在意亲人，但不愿为无底洞埋葬自己；你需要靠外部的物理距离维系体面。`,
-    systemEvaluation: `体制依附度：${institutional}/100（审慎）。你懂得体制的残酷，因此渴望去海外赚取外币、拿到技能杠杆与免死金牌。`,
+    kinshipEvaluation: `宗族愧疚度：${attrs.kinshipGuilt}/100（平衡）。你在意亲人，但不愿为无底洞埋葬自己；你需要靠外部的物理距离维系体面。`,
+    systemEvaluation: `体制依附度：审慎。你懂得体制的残酷，因此渴望去海外赚取外币、拿到技能杠杆与免死金牌。`,
     fateVerdict: `去异邦闯荡五到八年，赚回你在国内十年都攒不下的现金与技能壁垒。当你羽翼丰满，带着一身盐霜归来时，你将握有支配人生的主动权。`,
     recommendation: `出境打工或进修，设定明确的撤退或跳板时间表。`
   };
@@ -1206,7 +1090,7 @@ export const PARALLEL_LIVES_MILESTONES: DualTrackStage[] = [
 ];
 
 // ============================================================================
-// 63 岁终局一生判词（扩展至 8 种细分命运终篇）
+// 63 岁终局一生判词（6~8 大终极归宿）
 // ============================================================================
 
 export interface LifetimeVerdict {
@@ -1217,8 +1101,7 @@ export interface LifetimeVerdict {
 
 export function generateFinalLifetimeVerdict(
   path: "emigrate" | "stay",
-  autonomy: number,
-  kinship: number,
+  attrs: CharacterAttributes,
   tags: string[] = []
 ): LifetimeVerdict {
   if (path === "emigrate") {
@@ -1233,7 +1116,7 @@ export function generateFinalLifetimeVerdict(
     }
 
     // 2. 彻底断脐孤舟
-    if (autonomy >= 60 || tags.includes("断脐出海")) {
+    if (attrs.rebellion >= 50 || tags.includes("断脐出海")) {
       return {
         summaryTitle: "【西行孤舟 · 断脐成神】",
         tagline: "“生为客，死为客，天地之间一微尘。”",
@@ -1262,7 +1145,7 @@ export function generateFinalLifetimeVerdict(
     }
 
     // 5. 体制与熟人安魂型
-    if (kinship >= 50) {
+    if (attrs.kinshipGuilt >= 40) {
       return {
         summaryTitle: "【归巢之木 · 守土安魂】",
         tagline: "“生于斯，长于斯，死于斯，泥土才是最后的归宿。”",

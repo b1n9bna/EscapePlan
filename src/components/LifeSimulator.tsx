@@ -3,16 +3,17 @@ import {
   generateRandomFamily,
   K12_EVENTS,
   CAREER_EVENTS,
-  evaluate18YearOldGaokao,
+  calculateGaokaoOutcome,
   evaluate27YearOldLife,
   PARALLEL_LIVES_MILESTONES,
   generateFinalLifetimeVerdict,
   TARGET_COUNTRIES
 } from '../data/simulation';
 import type {
+  CharacterAttributes,
   LifeChoice,
+  GaokaoCalculation,
   LifeDiagnosis,
-  GaokaoDossier,
   CountryOption
 } from '../data/simulation';
 import {
@@ -23,7 +24,12 @@ import {
   Check,
   ExternalLink,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  HeartPulse,
+  Brain,
+  Shield,
+  Zap,
+  Flame
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -45,31 +51,33 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 }) => {
   // Gameplay Stages:
   // 'setup'
-  // ➔ 'growth' (ages 6 to 18)
+  // ➔ 'growth' (ages 6 to 17)
   // ➔ 'growth_outcome'
-  // ➔ 'gaokao_checkpoint' (age 18 adult milestone verdict)
+  // ➔ 'gaokao_calculated' (Age 18 - system computes outcome based on past choices)
   // ➔ 'growth' (ages 20 to 27)
-  // ➔ 'diagnosis' (age 27 fork)
+  // ➔ 'diagnosis' (Age 27 fork)
   // ➔ 'parallel' (ages 30 to 63)
-  // ➔ 'verdict' (retirement at 63)
+  // ➔ 'verdict' (Age 63 retirement)
   const [gameState, setGameState] = useState<
-    'setup' | 'growth' | 'growth_outcome' | 'gaokao_checkpoint' | 'diagnosis' | 'parallel' | 'verdict'
+    'setup' | 'growth' | 'growth_outcome' | 'gaokao_calculated' | 'diagnosis' | 'parallel' | 'verdict'
   >('setup');
 
-  // Player Baseline
+  // Player Character & Dynamic Attributes
   const [charData, setCharData] = useState(() => generateRandomFamily());
   const [isRolling, setIsRolling] = useState(false);
 
-  // Hidden/Manifest Metrics
-  const [savings, setSavings] = useState(charData.family.initialSavings);
-  const [autonomy, setAutonomy] = useState(50);
-  const [kinshipTies, setKinshipTies] = useState(65);
-  const [institutional, setInstitutional] = useState(45);
-  const [resilience, setResilience] = useState(50);
+  const [attrs, setAttrs] = useState<CharacterAttributes>(() => ({
+    inferiority: 35, // 自卑创伤
+    academicCapital: 30, // 做题应试资本
+    kinshipGuilt: 40, // 宗族愧疚与重负
+    rebellion: 30, // 反叛逆鳞
+    resilience: 30, // 生存韧劲
+    savings: charData.family.initialSavings // 储蓄
+  }));
+
   const [tags, setTags] = useState<string[]>([]);
 
   // Sequential Events for ages 6 to 27
-  const allGrowthEvents = [...K12_EVENTS, ...CAREER_EVENTS];
   const [currentEventIdx, setCurrentEventIdx] = useState(0);
 
   // Chronicle History (Persistent timeline)
@@ -79,8 +87,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     reaction: string;
   } | null>(null);
 
-  // Age 18 Gaokao Checkpoint
-  const [gaokaoDossier, setGaokaoDossier] = useState<GaokaoDossier | null>(null);
+  // 18yo Calculated Gaokao Outcome
+  const [gaokaoCalc, setGaokaoCalc] = useState<GaokaoCalculation | null>(null);
 
   // Age 27 Diagnosis
   const [diagnosis, setDiagnosis] = useState<LifeDiagnosis | null>(null);
@@ -99,11 +107,14 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setTimeout(() => {
       const fresh = generateRandomFamily();
       setCharData(fresh);
-      setSavings(fresh.family.initialSavings);
-      setAutonomy(50);
-      setKinshipTies(65);
-      setInstitutional(45);
-      setResilience(50);
+      setAttrs({
+        inferiority: 35,
+        academicCapital: 30,
+        kinshipGuilt: 40,
+        rebellion: 30,
+        resilience: 30,
+        savings: fresh.family.initialSavings
+      });
       setTags([]);
       setIsRolling(false);
       setGameState('setup');
@@ -112,29 +123,43 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // Begin Life at Age 6
   const handleStartLife = () => {
-    setSavings(charData.family.initialSavings);
-    setAutonomy(50);
-    setKinshipTies(65);
-    setInstitutional(45);
-    setResilience(50);
+    setAttrs({
+      inferiority: 35,
+      academicCapital: 30,
+      kinshipGuilt: 40,
+      rebellion: 30,
+      resilience: 30,
+      savings: charData.family.initialSavings
+    });
     setTags([]);
     setCurrentEventIdx(0);
     setHistoryNotes([]);
     setCurrentPendingReaction(null);
-    setGaokaoDossier(null);
+    setGaokaoCalc(null);
     setGameState('growth');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Helper to apply attribute deltas
+  const applyDeltas = (delta: Partial<CharacterAttributes>) => {
+    setAttrs((prev) => ({
+      inferiority: Math.min(100, Math.max(0, prev.inferiority + (delta.inferiority || 0))),
+      academicCapital: Math.min(100, Math.max(0, prev.academicCapital + (delta.academicCapital || 0))),
+      kinshipGuilt: Math.min(100, Math.max(0, prev.kinshipGuilt + (delta.kinshipGuilt || 0))),
+      rebellion: Math.min(100, Math.max(0, prev.rebellion + (delta.rebellion || 0))),
+      resilience: Math.min(100, Math.max(0, prev.resilience + (delta.resilience || 0))),
+      savings: prev.savings + (delta.savings || 0)
+    }));
+  };
+
   // User selects an option in the growth phase
   const handleChooseGrowth = (choice: LifeChoice) => {
-    const currentEvt = allGrowthEvents[currentEventIdx];
+    const isK12 = currentEventIdx < K12_EVENTS.length;
+    const currentEvt = isK12
+      ? K12_EVENTS[currentEventIdx]
+      : CAREER_EVENTS[currentEventIdx - K12_EVENTS.length];
 
-    setSavings((prev) => prev + choice.savingsDelta);
-    setAutonomy((prev) => Math.min(100, Math.max(0, prev + choice.autonomyDelta)));
-    setKinshipTies((prev) => Math.min(100, Math.max(0, prev + choice.kinshipDelta)));
-    setInstitutional((prev) => Math.min(100, Math.max(0, prev + choice.institutionalDelta)));
-    setResilience((prev) => Math.min(100, Math.max(0, prev + choice.resilienceDelta)));
+    applyDeltas(choice.delta);
 
     const nextTags = choice.addTags
       ? Array.from(new Set([...tags, ...(choice.addTags || [])]))
@@ -156,32 +181,54 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // Move from choice reaction to the next growth node or checkpoint
   const handleNextGrowthNode = () => {
-    // If just finished K-12 (index === K12_EVENTS.length - 1, which is Age 18 Gaokao)
+    // If just finished K-12 (index === K12_EVENTS.length - 1, which is Age 17 sprint)
     if (currentEventIdx === K12_EVENTS.length - 1) {
-      const dossier = evaluate18YearOldGaokao(autonomy, kinshipTies, institutional, tags);
-      setGaokaoDossier(dossier);
-      setGameState('gaokao_checkpoint');
+      // Calculate Gaokao outcome from past choices!
+      const outcome = calculateGaokaoOutcome(attrs, tags);
+      setGaokaoCalc(outcome);
+      setGameState('gaokao_calculated');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
-    if (currentEventIdx < allGrowthEvents.length - 1) {
+    const totalEvents = K12_EVENTS.length + CAREER_EVENTS.length;
+    if (currentEventIdx < totalEvents - 1) {
       setCurrentEventIdx((prev) => prev + 1);
       setCurrentPendingReaction(null);
       setGameState('growth');
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } else {
       // Finished age 27! Calculate 27yo diagnosis
-      const diag = evaluate27YearOldLife(autonomy, kinshipTies, institutional, savings, tags);
+      const diag = evaluate27YearOldLife(attrs, tags);
       setDiagnosis(diag);
       setGameState('diagnosis');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  // Transition from 18yo Gaokao checkpoint to college & career
-  const handleProceedFromGaokao = () => {
-    setCurrentEventIdx(K12_EVENTS.length); // first career event (age 20)
+  // User makes a follow-up response to their 18yo Gaokao calculated outcome
+  const handleGaokaoFollowup = (opt: {
+    text: string;
+    detail: string;
+    delta: Partial<CharacterAttributes>;
+    addTags?: string[];
+  }) => {
+    applyDeltas(opt.delta);
+    if (opt.addTags) {
+      setTags((prev) => Array.from(new Set([...prev, ...(opt.addTags || [])])));
+    }
+
+    const note: LifeHistoryNote = {
+      age: 18,
+      stageName: "高考成人礼 · 18岁",
+      title: gaokaoCalc ? gaokaoCalc.title : "高考放榜",
+      choiceText: opt.text,
+      reaction: opt.detail
+    };
+    setHistoryNotes((prev) => [...prev, note]);
+
+    // Proceed to college (event index for CAREER_EVENTS start)
+    setCurrentEventIdx(K12_EVENTS.length);
     setCurrentPendingReaction(null);
     setGameState('growth');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -219,7 +266,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // Copy full chronicle
   const handleCopyChronicle = () => {
-    const verdict = generateFinalLifetimeVerdict(chosenPath, autonomy, kinshipTies, tags);
+    const verdict = generateFinalLifetimeVerdict(chosenPath, attrs, tags);
     const text = `【逃跑计划 · 六十三载人生手札】
 人物：${charData.name}（${charData.gender}）
 籍贯：${charData.family.region}
@@ -235,6 +282,37 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Helpers for text descriptions of core attributes
+  const getInferiorityDesc = (val: number) => {
+    if (val >= 60) return "深刻自卑敏感（深恐被人轻视）";
+    if (val >= 35) return "自尊内敛（把贫瘠磨成硬壳）";
+    return "坦荡野性（野草不轻易弯腰）";
+  };
+
+  const getAcademicDesc = (val: number) => {
+    if (val >= 60) return "应试做题机器（杀出名校金身）";
+    if (val >= 35) return "中规中矩（普高夹缝求生）";
+    return "看淡应试（转战具体手艺生计）";
+  };
+
+  const getGuiltDesc = (val: number) => {
+    if (val >= 60) return "宗族重负（全家的期望与无形锁链）";
+    if (val >= 35) return "隐性愧疚（挂念父母衰老）";
+    return "精神断脐（只为自己负责）";
+  };
+
+  const getRebellionDesc = (val: number) => {
+    if (val >= 60) return "逆鳞初成（随时准备掀桌）";
+    if (val >= 35) return "清醒游离（身体在工位灵魂在逃跑）";
+    return "顺从规则（信奉集体与秩序）";
+  };
+
+  const getResilienceDesc = (val: number) => {
+    if (val >= 60) return "百炼成钢（四海皆可摸爬滚打）";
+    if (val >= 35) return "粗糙经磨（能吃常人苦）";
+    return "温室幼苗（未见大风大浪）";
   };
 
   // =========================================================================
@@ -345,7 +423,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
               <ArrowRight className="w-5 h-5" />
             </button>
             <p className="text-center text-xs text-stone-500 font-serif mt-2.5">
-              从小学、初中、中考分流、高中血拼到毕业五年，每一次抉择都将决定你的骨骼
+              从小学、中考分流到高考出分，过去的每一步因果都将自动算定你的大学与出路
             </p>
           </div>
         </div>
@@ -354,74 +432,98 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   }
 
   // =========================================================================
-  // VIEW 2: 18-YEAR-OLD GAOKAO CHECKPOINT (十八岁成人礼与高考命运裁决)
+  // VIEW 2: 18-YEAR-OLD GAOKAO CALCULATED OUTCOME (高考出分系统因果裁定)
   // =========================================================================
-  if (gameState === 'gaokao_checkpoint' && gaokaoDossier) {
+  if (gameState === 'gaokao_calculated' && gaokaoCalc) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="text-center mb-8">
           <span className="text-xs font-serif px-3 py-1 rounded-full bg-amber-950/50 text-amber-300 border border-amber-800/50 inline-flex items-center gap-1.5 mb-3">
             <GraduationCap className="w-3.5 h-3.5" />
-            十八岁 · 高考成年礼命运审判
+            十八岁 · 高考放榜与成人命运审判
           </span>
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight mb-2">
-            十二载应试铁笼终章
+            十二载因果终局出炉
           </h1>
           <p className="text-base text-stone-400 font-serif">
-            从六岁到十八岁，你的第一个人生阶梯在此凝固
+            你无法自选高分，这一刻的成绩单由你过去的十二年亲手铸成
           </p>
         </div>
 
-        <div className="bg-[#18181C] border border-amber-900/50 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6">
+        <div className="bg-[#18181C] border border-amber-900/60 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6">
+          {/* Headline Result */}
           <div className="text-center pb-6 border-b border-stone-800">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-amber-400 mb-3">
-              {gaokaoDossier.title}
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-amber-400 mb-2">
+              {gaokaoCalc.title}
             </h2>
-            <p className="text-stone-300 font-serif text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
-              {gaokaoDossier.verdict}
+            <div className="text-sm font-sans font-semibold text-emerald-400 mb-3 bg-emerald-950/30 inline-block px-3 py-1 rounded-full border border-emerald-800/40">
+              {gaokaoCalc.scoreText}
+            </div>
+            <p className="text-stone-300 font-serif text-base sm:text-lg leading-relaxed max-w-xl mx-auto bg-[#131316] p-5 rounded-2xl border border-stone-800">
+              {gaokaoCalc.verdict}
             </p>
           </div>
 
+          {/* Breakdown Dossier */}
           <div className="space-y-3 font-serif text-sm sm:text-base text-stone-300 leading-relaxed">
             <div className="bg-[#141417] p-4.5 rounded-2xl border border-stone-800">
               <span className="text-amber-400 font-semibold block mb-1">
-                文凭与社会资本：
+                学历资产与现实门槛：
               </span>
-              <p className="text-stone-200">{gaokaoDossier.academicCapital}</p>
+              <p className="text-stone-200">{gaokaoCalc.academicCapitalDesc}</p>
             </div>
 
             <div className="bg-[#141417] p-4.5 rounded-2xl border border-stone-800">
               <span className="text-sky-400 font-semibold block mb-1">
-                心理盔甲与隐性烙印：
+                心理剖面与代际重荷：
               </span>
-              <p className="text-stone-200">{gaokaoDossier.psychologicalArmor}</p>
+              <p className="text-stone-200">{gaokaoCalc.psychologicalDossier}</p>
             </div>
           </div>
 
-          <div>
-            <span className="text-xs font-serif text-stone-500 block mb-2">
-              十八岁时你身上已结成的骨茧：
+          {/* Core Latent Metrics Snapshot */}
+          <div className="bg-[#121215] p-4.5 rounded-2xl border border-stone-800 space-y-2 text-xs font-serif text-stone-400">
+            <div className="flex justify-between">
+              <span>【自卑与创伤】</span>
+              <span className="text-stone-200">{getInferiorityDesc(attrs.inferiority)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>【做题应试资本】</span>
+              <span className="text-amber-300">{getAcademicDesc(attrs.academicCapital)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>【宗族愧疚重荷】</span>
+              <span className="text-stone-200">{getGuiltDesc(attrs.kinshipGuilt)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>【反叛与逆鳞】</span>
+              <span className="text-rose-400">{getRebellionDesc(attrs.rebellion)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>【生存韧劲】</span>
+              <span className="text-emerald-400">{getResilienceDesc(attrs.resilience)}</span>
+            </div>
+          </div>
+
+          {/* Follow-up Choice based on this concrete outcome */}
+          <div className="pt-4 border-t border-stone-800 space-y-3">
+            <span className="text-sm font-serif font-semibold text-stone-200 block">
+              {gaokaoCalc.firstStepChoice.prompt}
             </span>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((t) => (
-                <span
-                  key={t}
-                  className="px-2.5 py-1 rounded-lg bg-stone-800 text-stone-300 text-xs font-serif border border-stone-700"
-                >
-                  #{t}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="pt-6 border-t border-stone-800">
-            <button
-              onClick={handleProceedFromGaokao}
-              className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 shadow-lg"
-            >
-              迈入象牙塔与现实绞杀场（走向20~27岁）
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            {gaokaoCalc.firstStepChoice.options.map((opt, optIdx) => (
+              <button
+                key={optIdx}
+                onClick={() => handleGaokaoFollowup(opt)}
+                className="w-full text-left p-4 sm:p-5 rounded-2xl bg-[#1D1D22] hover:bg-[#25252C] border border-stone-700/80 hover:border-amber-500/60 transition-all group"
+              >
+                <div className="text-base sm:text-lg font-serif font-semibold text-stone-100 group-hover:text-amber-300 transition-colors mb-1.5">
+                  ➔ {opt.text}
+                </div>
+                <div className="text-xs sm:text-sm font-serif text-stone-400 leading-relaxed">
+                  {opt.detail}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -432,13 +534,17 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   // VIEW 3: GROWTH PHASE (6 ~ 27 岁：关隘推进与持续手札)
   // =========================================================================
   if (gameState === 'growth' || gameState === 'growth_outcome') {
-    const currentEvent = allGrowthEvents[currentEventIdx];
+    const isK12 = currentEventIdx < K12_EVENTS.length;
+    const currentEvent = isK12
+      ? K12_EVENTS[currentEventIdx]
+      : CAREER_EVENTS[currentEventIdx - K12_EVENTS.length];
+    const totalEvents = K12_EVENTS.length + CAREER_EVENTS.length;
 
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between pb-4 mb-6 border-b border-stone-800">
-          <div>
+        {/* Top Header Bar with Live Character Dossier */}
+        <div className="bg-[#151518] border border-stone-800 rounded-2xl p-4 mb-6 space-y-3">
+          <div className="flex items-center justify-between border-b border-stone-800/80 pb-2.5">
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-serif font-bold text-stone-100">
                 {charData.name}
@@ -447,23 +553,50 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
                 {currentEvent ? `${currentEvent.age} 岁` : ''} · {charData.family.region}
               </span>
             </div>
-            <div className="flex flex-wrap gap-1.5 mt-1">
+            <div className="text-right">
+              <span className="text-xs text-stone-500 font-serif mr-1.5">现金储备</span>
+              <span className="text-emerald-400 font-sans font-semibold text-base">
+                ¥{attrs.savings.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          {/* Core Psychological State Bar (用户核心系统项可视化展示) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-serif pt-1">
+            <div className="flex items-center gap-1.5 text-stone-300">
+              <HeartPulse className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+              <span className="truncate">自卑：{getInferiorityDesc(attrs.inferiority).split("（")[0]}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-stone-300">
+              <Brain className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate">做题：{getAcademicDesc(attrs.academicCapital).split("（")[0]}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-stone-300">
+              <Shield className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+              <span className="truncate">宗族负荷：{getGuiltDesc(attrs.kinshipGuilt).split("（")[0]}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-stone-300">
+              <Flame className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <span className="truncate">反叛逆鳞：{getRebellionDesc(attrs.rebellion).split("（")[0]}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-stone-300">
+              <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="truncate">生存韧劲：{getResilienceDesc(attrs.resilience).split("（")[0]}</span>
+            </div>
+          </div>
+
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1 border-t border-stone-800/60">
               {tags.map((t) => (
                 <span
                   key={t}
-                  className="text-xs font-serif px-2 py-0.5 rounded bg-stone-800 text-stone-400"
+                  className="text-xs font-serif px-2 py-0.5 rounded bg-stone-900 text-stone-400 border border-stone-800"
                 >
-                  {t}
+                  #{t}
                 </span>
               ))}
             </div>
-          </div>
-          <div className="text-right">
-            <span className="text-xs text-stone-500 block font-serif">个人结余</span>
-            <span className="text-emerald-400 font-sans font-semibold text-base">
-              ¥{savings.toLocaleString()}
-            </span>
-          </div>
+          )}
         </div>
 
         {/* Chronicle History (Scrollable Past Decisions) */}
@@ -500,7 +633,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
                 【{currentEvent.stageName}】
               </span>
               <span className="text-xs font-serif text-stone-500">
-                人生关隘 {currentEventIdx + 1} / {allGrowthEvents.length}
+                人生关隘 {currentEventIdx + 1} / {totalEvents}
               </span>
             </div>
 
@@ -552,8 +685,8 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
                   className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2"
                 >
                   {currentEventIdx === K12_EVENTS.length - 1
-                    ? '高考放榜：查阅十八岁成人礼命运裁决'
-                    : currentEventIdx < allGrowthEvents.length - 1
+                    ? '高考放榜：查阅系统为你算出的考分与大学'
+                    : currentEventIdx < totalEvents - 1
                     ? '走向下一个节点'
                     : '步入二十七岁：人生命运清算'}
                   <ChevronRight className="w-5 h-5" />
@@ -594,41 +727,6 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
             <p className="text-stone-300 font-serif text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
               {diagnosis.portrait}
             </p>
-          </div>
-
-          {/* Value Dimensions Matrix */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#121215] p-5 rounded-2xl border border-stone-800">
-            <div>
-              <span className="text-xs text-stone-500 font-serif block mb-1">
-                个体主权 vs 宗族重力
-              </span>
-              <div className="flex items-center justify-between text-sm font-serif">
-                <span className="text-stone-300">主权: {autonomy}%</span>
-                <span className="text-amber-400 font-semibold">重力: {kinshipTies}%</span>
-              </div>
-              <div className="w-full bg-stone-800 h-2 rounded-full mt-1.5 overflow-hidden">
-                <div
-                  className="bg-amber-500 h-full rounded-full transition-all"
-                  style={{ width: `${kinshipTies}%` }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <span className="text-xs text-stone-500 font-serif block mb-1">
-                体制依附 vs 生存韧劲
-              </span>
-              <div className="flex items-center justify-between text-sm font-serif">
-                <span className="text-stone-300">体制: {institutional}%</span>
-                <span className="text-emerald-400 font-semibold">韧劲: {resilience}%</span>
-              </div>
-              <div className="w-full bg-stone-800 h-2 rounded-full mt-1.5 overflow-hidden">
-                <div
-                  className="bg-emerald-500 h-full rounded-full transition-all"
-                  style={{ width: `${resilience}%` }}
-                />
-              </div>
-            </div>
           </div>
 
           {/* Deep Narrative Breakdowns */}
@@ -840,7 +938,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   // VIEW 6: RETIREMENT VERDICT AT AGE 63 (六十三载终局与一生判词)
   // =========================================================================
   if (gameState === 'verdict') {
-    const verdict = generateFinalLifetimeVerdict(chosenPath, autonomy, kinshipTies, tags);
+    const verdict = generateFinalLifetimeVerdict(chosenPath, attrs, tags);
 
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
@@ -883,12 +981,12 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
               </span>
             </div>
             <div>
-              <span className="text-stone-500 block text-xs mb-1">个体主权度</span>
-              <span className="text-amber-400 font-sans font-semibold">{autonomy}%</span>
+              <span className="text-stone-500 block text-xs mb-1">反叛逆鳞</span>
+              <span className="text-rose-400 font-sans font-semibold">{attrs.rebellion}%</span>
             </div>
             <div>
-              <span className="text-stone-500 block text-xs mb-1">故土重力度</span>
-              <span className="text-amber-400 font-sans font-semibold">{kinshipTies}%</span>
+              <span className="text-stone-500 block text-xs mb-1">宗族愧疚</span>
+              <span className="text-amber-400 font-sans font-semibold">{attrs.kinshipGuilt}%</span>
             </div>
           </div>
 
