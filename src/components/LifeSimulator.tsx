@@ -4,6 +4,7 @@ import {
   BIRTHPLACE_SLIDES,
   PROVINCE_GROUPS,
   HOT_PROVINCES,
+  getEcosystemsByProvince,
   generateTimelineForCharacter,
   generateCareerTimeline,
   calculateGaokaoOutcome,
@@ -1380,17 +1381,31 @@ ${logEntries
                 </div>
               </div>
             </div>
-            <button
-              onClick={() => setShowProvincePicker(true)}
-              className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
-                isLight
-                  ? "bg-white hover:bg-stone-100 border-amber-300 text-amber-900 shadow-sm"
-                  : "bg-white/[0.06] hover:bg-white/[0.1] border-amber-500/40 text-amber-300 shadow-sm"
-              }`}
-              title="切换出生省份"
-            >
-              换省份
-            </button>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                onClick={() => handleRestart(charData.family.province)}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all flex items-center gap-1 active:scale-95 ${
+                  isLight
+                    ? "bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-950 shadow-sm font-semibold"
+                    : "bg-amber-500/20 hover:bg-amber-500/30 border-amber-500/40 text-amber-300 shadow-sm font-semibold"
+                }`}
+                title="同省重抽：切换到本省另一个截然不同的出生地、医院与家庭背景"
+              >
+                <RotateCcw className="w-3 h-3 text-amber-500" />
+                <span>换本省剧本</span>
+              </button>
+              <button
+                onClick={() => setShowProvincePicker(true)}
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all active:scale-95 ${
+                  isLight
+                    ? "bg-white hover:bg-stone-100 border-stone-300 text-stone-700 shadow-sm"
+                    : "bg-white/[0.06] hover:bg-white/[0.1] border-white/[0.1] text-stone-300 shadow-sm"
+                }`}
+                title="选择全国34省级行政区"
+              >
+                选其他省份
+              </button>
+            </div>
           </div>
 
           {/* Quick Hot Province Selector */}
@@ -3337,10 +3352,21 @@ ${logEntries
                             )}
                           </div>
 
-                          <div className={`font-bold text-base font-narrative-serif leading-tight ${
-                            isLight ? "text-stone-900" : "text-stone-100"
-                          }`}>
-                            {prov.province}
+                          <div className="flex items-center justify-between">
+                            <div className={`font-bold text-base font-narrative-serif leading-tight ${
+                              isLight ? "text-stone-900" : "text-stone-100"
+                            }`}>
+                              {prov.province}
+                            </div>
+                            {getEcosystemsByProvince(prov.province).length > 1 && (
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                                isLight
+                                  ? "bg-amber-100 text-amber-900 border border-amber-200"
+                                  : "bg-amber-500/15 text-amber-300 border border-amber-500/20"
+                              }`}>
+                                {getEcosystemsByProvince(prov.province).length}套剧本
+                              </span>
+                            )}
                           </div>
 
                           <div className={`text-xs mt-1.5 font-medium truncate ${
@@ -3403,10 +3429,21 @@ ${logEntries
                                 </span>
                               )}
                             </div>
-                            <div className={`font-bold text-sm sm:text-base font-narrative-serif leading-tight ${
-                              isLight ? "text-stone-900" : "text-stone-100"
-                            }`}>
-                              {prov.province}
+                            <div className="flex items-center justify-between">
+                              <div className={`font-bold text-sm sm:text-base font-narrative-serif leading-tight ${
+                                isLight ? "text-stone-900" : "text-stone-100"
+                              }`}>
+                                {prov.province}
+                              </div>
+                              {getEcosystemsByProvince(prov.province).length > 1 && (
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                                  isLight
+                                    ? "bg-amber-100 text-amber-900"
+                                    : "bg-amber-500/15 text-amber-300"
+                                }`}>
+                                  {getEcosystemsByProvince(prov.province).length}套剧本
+                                </span>
+                              )}
                             </div>
                             <div className={`text-[11px] mt-1 truncate ${
                               isLight ? "text-stone-500 group-hover:text-amber-800" : "text-stone-400 group-hover:text-amber-300"
@@ -3426,7 +3463,7 @@ ${logEntries
               isLight ? "bg-stone-50 border-stone-200" : "bg-[#13151F] border-white/[0.07]"
             }`}>
               <span className={`text-xs ${isLight ? "text-stone-500" : "text-stone-400"}`}>
-                34省级行政区全收录 · 随选随生
+                34省级行政区全覆盖 · 107套专属风土剧本 · 随选随换
               </span>
               <div className="flex items-center gap-2">
                 <button
