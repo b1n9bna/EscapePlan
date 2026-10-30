@@ -169,7 +169,10 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     currentAge,
     charData.family.motherTrait
   );
-  const siblingStatus = getSiblingDynamicStatus(charData.family.siblings, currentAge);
+  const siblingStatus = getSiblingDynamicStatus(
+    charData.family.siblingType || 'only_child',
+    currentAge
+  );
 
   const currentNode = timeline[timelineIndex] || timeline[0];
   const isChoiceNode = currentNode.type === 'choice' && currentNode.choices && currentNode.choices.length > 0;
@@ -1027,22 +1030,19 @@ ${parallelNotes.join('\n')}
               <div className="bg-[#151722] border-2 border-amber-800/70 rounded-2xl p-4 sm:p-5 shadow-lg space-y-3 animate-fadeIn">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-300">
                   <Compass className="w-4 h-4 text-amber-400" />
-                  人生关隘抉择 · 面对当前境况，你的抉择是：
+                  请做出你的抉择
                 </div>
-                <div className="grid grid-cols-1 gap-2.5 pt-1">
+                <div className="grid grid-cols-1 gap-2 pt-1">
                   {currentNode.choices.map((choice, cIdx) => (
                     <button
                       key={cIdx}
                       onClick={() => handleSelectChoice(choice)}
-                      className="p-3 sm:p-3.5 rounded-xl border border-stone-800 bg-[#0E0F14] hover:border-amber-500/60 hover:bg-amber-950/20 text-left transition-all active:scale-[0.99] group"
+                      className="p-3 sm:p-3.5 rounded-xl border border-stone-800 bg-[#0E0F14] hover:border-amber-500/70 hover:bg-amber-950/20 text-left transition-all active:scale-[0.99] group flex items-center justify-between"
                     >
-                      <div className="text-xs sm:text-sm font-medium text-stone-100 group-hover:text-amber-300 flex items-center justify-between">
-                        <span>{choice.text}</span>
-                        <ChevronRight className="w-4 h-4 text-stone-500 group-hover:text-amber-400 transition-transform group-hover:translate-x-0.5" />
-                      </div>
-                      <div className="text-xs text-stone-400 mt-1 leading-normal">
-                        {choice.detail}
-                      </div>
+                      <span className="text-xs sm:text-sm font-medium text-stone-100 group-hover:text-amber-300 leading-snug">
+                        {choice.text}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-stone-500 group-hover:text-amber-400 transition-transform group-hover:translate-x-0.5 shrink-0 ml-2" />
                     </button>
                   ))}
                 </div>
@@ -1119,12 +1119,14 @@ ${parallelNotes.join('\n')}
 
           {/* Siblings */}
           <div className="bg-[#0E0F14] border border-stone-800/90 rounded-xl p-3.5 space-y-1.5 text-xs">
-            <div className="text-stone-300 font-semibold flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-stone-400" />
-              同胞现状（{charData.family.siblings}）
+            <div className="text-amber-400 font-semibold flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5" />
+                同胞：{siblingStatus.label}
+              </span>
             </div>
             <div className="text-stone-300 text-[12px] leading-relaxed pt-1">
-              {siblingStatus}
+              {siblingStatus.status}
             </div>
           </div>
 

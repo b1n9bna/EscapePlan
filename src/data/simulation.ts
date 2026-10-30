@@ -6,6 +6,10 @@
 export interface FamilyOrigin {
   region: string;
   regionDetail: string;
+  hospitalName: string; // 降生医院全称（与地域严格一致，绝不串台）
+  primarySchoolName: string; // 当地小学名称
+  highSchoolName: string; // 当地高中名称
+  cityOrCounty: string; // "地级市生活区" / "县城" / "乡镇"
   fatherAge: number; // 降生时父亲年龄（如28~32）
   fatherJob: string;
   fatherTrait: string;
@@ -15,7 +19,9 @@ export interface FamilyOrigin {
   housing: string;
   wealthTier: string;
   wealthDetail: string;
-  siblings: string;
+  siblingType: 'only_child' | 'elder_sister' | 'elder_brother' | 'younger_brother' | 'younger_sister' | 'middle_child';
+  siblingAgeOffset: number;
+  siblings: string; // 0岁建档时同胞描述（严格符合出生时点，无时空悖论）
   siblingsDetail: string;
   emotionalTone: string;
   toneDetail: string;
@@ -68,83 +74,78 @@ export interface DualTrackStage {
   stayedScene: string;
   emigratedReflection: string;
   stayedReflection: string;
-  choice: {
+  choice?: {
     text: string;
     detail: string;
     reaction: string;
   };
+  statsDeltaStayed?: Partial<CharacterAttributes>;
+  statsDeltaEmigrated?: Partial<CharacterAttributes>;
 }
 
 export interface CountryOption {
   id: string;
   name: string;
   flag: string;
-  city: string;
-  tagline: string;
-  costDesc: string;
-  cultureDistance: string;
+  cost: string;
+  timeline: string;
+  difficulty: "低" | "中" | "高";
+  suitabilityScore: number;
+  summary: string;
+  recommendReason: string;
+  matchRate: number;
 }
 
 export const TARGET_COUNTRIES: CountryOption[] = [
   {
     id: "japan",
-    name: "日本",
+    name: "日本 (Japan)",
     flag: "🇯🇵",
-    city: "东京 · 荒川区",
-    tagline: "治安极佳、极度原子化、少子老龄化缺工、语言门槛明确",
-    costDesc: "初始启动金约 6~10 万 RMB",
-    cultureDistance: "东亚文化同源，表面客气疏离，适合不喜复杂社交的个体"
-  },
-  {
-    id: "australia",
-    name: "澳大利亚",
-    flag: "🇦🇺",
-    city: "墨尔本 · 西区",
-    tagline: "蓝领收入极高、阳光海洋、严格打分制与WHV青年跳板",
-    costDesc: "初始启动金约 10~15 万 RMB",
-    cultureDistance: "多元移民社会，工会强劲，体力劳动受尊重"
+    cost: "¥10万 - 25万",
+    timeline: "6 - 12 个月",
+    difficulty: "低",
+    suitabilityScore: 92,
+    summary: "高度人才/特定技能/IT派遣通道清晰，文化与饮食适应成本极低，适合低成本启动。",
+    recommendReason: "对普通做题家极其友好，IT与蓝领技能缺口巨大，治安极佳且离故土航程近。",
+    matchRate: 94
   },
   {
     id: "germany",
-    name: "德国",
+    name: "德国 (Germany)",
     flag: "🇩🇪",
-    city: "杜塞尔多夫 · 北威州",
-    tagline: "工匠双元制、免学费、劳动法严苛、重视规则与秩序",
-    costDesc: "自保金约 8~12 万 RMB",
-    cultureDistance: "生活节奏严谨，德语要求硬核，社会福利托底坚实"
-  },
-  {
-    id: "spain",
-    name: "西班牙",
-    flag: "🇪🇸",
-    city: "瓦伦西亚",
-    tagline: "生活成本欧洲最低梯队、阳光地中海、非盈利/数字游民友好",
-    costDesc: "初始启动金约 8~15 万 RMB",
-    cultureDistance: "热情松弛，午休文化浓厚，适合低欲望慢节奏生活"
+    cost: "¥12万 - 30万",
+    timeline: "8 - 18 个月",
+    difficulty: "中",
+    suitabilityScore: 86,
+    summary: "新机会卡 (Chancenkarte) 与欧盟蓝卡，免学费公立教育与扎实社会福利。",
+    recommendReason: "工科底色匹配度高，技术人享有尊严，公费育儿与医疗能彻底卸下后顾之忧。",
+    matchRate: 88
   },
   {
     id: "canada",
-    name: "加拿大",
+    name: "加拿大 (Canada)",
     flag: "🇨🇦",
-    city: "卡尔加里 / 温尼伯",
-    tagline: "地广人稀、医疗教育托底、省提名红利与漫长严冬",
-    costDesc: "初始启动金约 12~18 万 RMB",
-    cultureDistance: "老牌移民国，包容度高，耐得住寂寞与严寒"
+    cost: "¥30万 - 60万",
+    timeline: "1 - 3 年",
+    difficulty: "高",
+    suitabilityScore: 78,
+    summary: "EE 联邦技术移民与省提名 (PNP)，传统移民大国，护照含金量极高。",
+    recommendReason: "多元包容度最高，适合愿意深度融入英语社会、追求子女广阔空间的家庭。",
+    matchRate: 75
   },
   {
     id: "thailand",
-    name: "泰国",
+    name: "泰国 (Thailand)",
     flag: "🇹🇭",
-    city: "清迈 · 宁曼路周边",
-    tagline: "低成本避风港、慢节奏疗愈、长期签证需技巧、适合自由职业",
-    costDesc: "初始启动金约 3~5 万 RMB",
-    cultureDistance: "包容文化，物价低廉，不能直接打普通工"
+    cost: "¥5万 - 15万",
+    timeline: "1 - 3 个月",
+    difficulty: "低",
+    suitabilityScore: 89,
+    summary: "LTR 长期居留/精英签证/DTV 数字游民签证，低成本慢节奏旅居中继站。",
+    recommendReason: "低物价生活成本仅为一线城市的1/3，气候温暖阳光充沛，适合调养身心。",
+    matchRate: 90
   }
 ];
-
-// ============================================================================
-// 原生家庭多轴矩阵数据库
-// ============================================================================
 
 export interface BirthplaceSlide {
   region: string;
@@ -153,64 +154,262 @@ export interface BirthplaceSlide {
   icon: string;
 }
 
-export const BIRTHPLACE_SLIDES: BirthplaceSlide[] = [
+// 8 大地域生态强绑定（医院、学校、阶层、职业、住宅全方位闭环）
+export const REGION_ECOSYSTEMS = [
+  {
+    region: "华北重工业地级市生活区",
+    landscape: "钢厂子弟校 · 泛灰白杨树 · 家属大院",
+    tagline: "空气里常年有微尘，看病求职全靠几十年的熟人网络",
+    icon: "🏗️",
+    hospitalName: "市职工总院产科",
+    primarySchoolName: "钢厂子弟第一小学",
+    highSchoolName: "市第一高级中学",
+    cityOrCounty: "地级市工矿生活区",
+    parents: [
+      {
+        fatherJob: "钢厂热轧车间机修电工",
+        fatherAge: 30,
+        fatherTrait: "老烟枪，性格木讷严肃，双手常有机油味，信奉踏实手艺",
+        motherJob: "市自来水公司抄表员",
+        motherAge: 28,
+        motherTrait: "精打细算持家，掌管家里存折，常叮嘱你要好好念书考进好单位",
+        housing: "老重工国企职工集资筒子楼（52㎡，水磨石地面，推开窗是对面焦化厂高炉）",
+        wealthIndex: 1
+      },
+      {
+        fatherJob: "市自然资源局普通科员",
+        fatherAge: 31,
+        fatherTrait: "性格谨慎规矩，信奉仕途与编制，最在意外界评价与家庭体面",
+        motherJob: "市直公立小学语文教师",
+        motherAge: 29,
+        motherTrait: "极重规矩与早起作息，容不得学习马虎，常拿你与同事孩子比较",
+        housing: "地级市九十年代机关家属院两居室（步梯四楼，墙面白灰微有脱落）",
+        wealthIndex: 2
+      },
+      {
+        fatherJob: "下岗后开二手出租车师傅",
+        fatherAge: 32,
+        fatherTrait: "经历过单位改制买断的阵痛，一身烟草味与不服输的市井硬骨头",
+        motherJob: "家属区早市面点摊摊主",
+        motherAge: 30,
+        motherTrait: "凌晨三点起床揉面炸油条，双手满是油花烫痕，最盼着你能出人头地",
+        housing: "地级市老旧职工宿舍顶楼（无保温层，冬冷夏热，天花板偶有渗水）",
+        wealthIndex: 0
+      }
+    ]
+  },
   {
     region: "豫东平原农耕大县",
     landscape: "平原麦浪 · 窑厂红砖 · 宗祠香火",
     tagline: "全县七十万人，全靠县一中题海杀向省城",
-    icon: "🌾"
+    icon: "🌾",
+    hospitalName: "县人民医院妇产科",
+    primarySchoolName: "县实验小学",
+    highSchoolName: "县第一高级中学",
+    cityOrCounty: "平原农耕县城",
+    parents: [
+      {
+        fatherJob: "农贸市场粮油副食批发摊主",
+        fatherAge: 29,
+        fatherTrait: "满手茧子，说话嗓门大，信奉真金白银与实在，为人豪爽讲义气",
+        motherJob: "县农贸市场摊位打理人",
+        motherAge: 27,
+        motherTrait: "起早贪黑整理零钞，一分钱都精打细算存着给你未来读书用",
+        housing: "县城农贸市场后街自建红砖三层平房（底层潮湿堆放杂物，顶层晒干菜）",
+        wealthIndex: 2
+      },
+      {
+        fatherJob: "县交通局公路养护段普通职工",
+        fatherAge: 30,
+        fatherTrait: "平时少言寡语，习惯抽旱烟，最常念叨的是‘考上大学吃国家粮’",
+        motherJob: "乡镇小学代课教师",
+        motherAge: 28,
+        motherTrait: "每天夜里在煤油灯或日光灯下批改作业，对你的字迹要求极严",
+        housing: "城关镇老公路局家属平房小院（院里搭着丝瓜架与蜂窝煤棚）",
+        wealthIndex: 1
+      },
+      {
+        fatherJob: "平原农耕种粮兼农机修理户",
+        fatherAge: 28,
+        fatherTrait: "日出而作日落而息，长年在田间地头劳作，背负化肥种子农药赊账",
+        motherJob: "留守操持几亩麦田与家禽",
+        motherAge: 26,
+        motherTrait: "省吃俭用把最好的鸡蛋与白面留给你，双手满是泥土老茧",
+        housing: "村口自建红砖平房（土院子，下雨时泥泞不堪）",
+        wealthIndex: 0
+      }
+    ]
   },
   {
     region: "浙东民营制造百强县",
     landscape: "轰鸣注塑作坊 · 模具五金 · 货运卡车",
     tagline: "崇尚宗族抱团经商发财，不读书就早早进厂接单",
-    icon: "⚙️"
+    icon: "⚙️",
+    hospitalName: "百强县第二人民医院",
+    primarySchoolName: "镇中心小学",
+    highSchoolName: "县高级中学",
+    cityOrCounty: "制造重镇",
+    parents: [
+      {
+        fatherJob: "小型五金注塑作坊小老板",
+        fatherAge: 32,
+        fatherTrait: "满脑子接单发货与周转账期，手机24小时不静音，崇尚实用买卖",
+        motherJob: "作坊出纳兼管伙食采购",
+        motherAge: 30,
+        motherTrait: "一手理账一手带娃，脾气雷厉风行，常教导你‘算账千万不能亏’",
+        housing: "沿街自建四层半贴瓷砖自建楼（一层做作坊，二层堆货，三层自住）",
+        wealthIndex: 2
+      },
+      {
+        fatherJob: "模具车间冲压老师傅",
+        fatherAge: 30,
+        fatherTrait: "技术扎实但收入全靠计件，沉默寡言，常年戴着护目镜与劳保手套",
+        motherJob: "同厂电子流水线装配工",
+        motherAge: 28,
+        motherTrait: "两班倒常年站立操作，下班后腿脚浮肿，一心希望你不用吃这种苦",
+        housing: "工业园区边缘安置房步梯六楼（无电梯，楼道里常有塑料焦味）",
+        wealthIndex: 1
+      }
+    ]
   },
   {
     region: "东北老重工业收缩矿城",
     landscape: "熄灭的红砖大烟囱 · 铁道扳道房 · 筒子楼",
     tagline: "年轻人跑光，整座小城靠老人的买断退休金维持体面",
-    icon: "🏭"
-  },
-  {
-    region: "湘西丘陵丘壑农业镇",
-    landscape: "梯田柑橘树 · 吊脚旧楼 · 泥泞机耕路",
-    tagline: "父母常年留守珠三角制鞋厂，留给家里的是老屋柴火烟",
-    icon: "🍊"
-  },
-  {
-    region: "华北重工业地级市生活区",
-    landscape: "钢厂子弟校 · 泛灰白杨树 · 家属大院",
-    tagline: "空气里常年有微尘，看病求职全靠几十年的高中同学网",
-    icon: "🏗️"
-  },
-  {
-    region: "川渝盆地边缘山水县城",
-    landscape: "茶馆竹椅 · 麻将脆响 · 嘉陵江雾气",
-    tagline: "火锅油碟与安逸哲学，但年轻人只能去成渝或南下打工",
-    icon: "🍵"
-  },
-  {
-    region: "苏北运河畔平原农工县",
-    landscape: "纵横运河驳船 · 农药厂排污渠 · 麦茬地",
-    tagline: "极度崇尚读书做官，应试竞争激烈到令人窒息",
-    icon: "🚢"
+    icon: "🏭",
+    hospitalName: "矿务局职工总医院产科",
+    primarySchoolName: "矿务局职工第一子弟校",
+    highSchoolName: "市第一完全中学",
+    cityOrCounty: "工矿收缩城",
+    parents: [
+      {
+        fatherJob: "矿务局选煤厂机修电工",
+        fatherAge: 31,
+        fatherTrait: "经历了多次改制风波，爱喝二两散装白酒，总把当年矿上的辉煌挂在嘴边",
+        motherJob: "矿区医院后勤洗衣房老职工",
+        motherAge: 29,
+        motherTrait: "患有轻微关节炎，心软热心肠，经常给邻里街坊送自家腌的酸菜",
+        housing: "八十年代红砖矿工集资房（暖气管道常年有铁锈味，楼道堆满秋菜）",
+        wealthIndex: 1
+      },
+      {
+        fatherJob: "铁道车辆段调度巡检员",
+        fatherAge: 33,
+        fatherTrait: "一身铁路深蓝工装，为人谨慎严肃，看重生活规律与编制稳定",
+        motherJob: "铁路子弟中学后勤管理员",
+        motherAge: 30,
+        motherTrait: "性格要强，最盼着你通过高考考去关内大城市，不要留在收缩的矿城",
+        housing: "铁路分局家属院步梯房（窗外不时传来内燃机车沉闷的鸣笛）",
+        wealthIndex: 2
+      }
+    ]
   },
   {
     region: "岭南宗族聚居近郊大村",
     landscape: "祠堂青砖 · 舞狮红榜 · 自建握手楼出租房",
     tagline: "宗族人情盘根错节，分红虽有但祖训如铁，出省即视为背叛",
-    icon: "🏮"
+    icon: "🏮",
+    hospitalName: "区妇幼保健院",
+    primarySchoolName: "宗族义资中心小学",
+    highSchoolName: "区第一实验中学",
+    cityOrCounty: "岭南近郊宗族村",
+    parents: [
+      {
+        fatherJob: "村水产海鲜批发档主兼宗亲会执事",
+        fatherAge: 32,
+        fatherTrait: "逢年过节主持宗祠祭祀，讲求宗族门面与人情往来，凡事以宗族为先",
+        motherJob: "村口早茶档点心师兼出纳",
+        motherAge: 30,
+        motherTrait: "忙碌精明，说话语速极快，一门心思操心自建房收租与同辈竞争",
+        housing: "祠堂背后的自建五层贴马赛克握手楼（底商出租给小吃档，顶层自住）",
+        wealthIndex: 2
+      },
+      {
+        fatherJob: "近郊汽配维修档口师傅",
+        fatherAge: 29,
+        fatherTrait: "满手油污但手艺过硬，平时爱在榕树下喝功夫茶，信奉靠双手吃饭",
+        motherJob: "街道便民小超市收银员",
+        motherAge: 27,
+        motherTrait: "性格温和顺从，每天早起煲老火靓汤，最牵挂你的身体平安",
+        housing: "握手楼逼仄二楼（终年不见充足阳光，推窗是对面楼的抽油烟机）",
+        wealthIndex: 1
+      }
+    ]
+  },
+  {
+    region: "湘西丘陵丘壑农业镇",
+    landscape: "梯田柑橘树 · 吊脚旧楼 · 泥泞机耕路",
+    tagline: "父母常年留守珠三角制鞋厂，留给家里的是老屋柴火烟",
+    icon: "🍊",
+    hospitalName: "镇中心卫生院",
+    primarySchoolName: "镇中心完全小学",
+    highSchoolName: "县民族中学",
+    cityOrCounty: "山区农业镇",
+    parents: [
+      {
+        fatherJob: "长年在外务工（珠三角制鞋厂切料工）",
+        fatherAge: 28,
+        fatherTrait: "一年只在春节回家待十天，沉默寡言，手里总是夹着舍不得抽完的便宜烟",
+        motherJob: "同厂流水线裁缝女工",
+        motherAge: 26,
+        motherTrait: "打电话时总忍不住抹泪，满怀亏欠，按月寄回微薄的血汗生活费",
+        housing: "半山腰老平房（由年迈祖父母代为照看，门前晒着包谷与红辣椒）",
+        wealthIndex: 3
+      }
+    ]
+  },
+  {
+    region: "川渝盆地边缘山水县城",
+    landscape: "茶馆竹椅 · 麻将脆响 · 嘉陵江雾气",
+    tagline: "火锅油碟与安逸哲学，但年轻人只能去成渝或南下打工",
+    icon: "🍵",
+    hospitalName: "县中医院妇产科",
+    primarySchoolName: "县实验小学",
+    highSchoolName: "县第一中学",
+    cityOrCounty: "山水江滨县城",
+    parents: [
+      {
+        fatherJob: "水运码头短途厢式货车司机",
+        fatherAge: 31,
+        fatherTrait: "性格火爆但心底极软，跑车时常含着胖大海，最爱在茶馆听评书",
+        motherJob: "老街临江火锅店采办结账员",
+        motherAge: 29,
+        motherTrait: "能说会道，善于张罗市井人情，把屋子收拾得利落温馨",
+        housing: "沿江坡地九十年代步梯房顶楼（夏热冬湿，推开窗可见江雾与过往轮船）",
+        wealthIndex: 1
+      }
+    ]
+  },
+  {
+    region: "苏北运河畔平原农工县",
+    landscape: "纵横运河驳船 · 农药厂排污渠 · 麦茬地",
+    tagline: "极度崇尚读书做官，应试竞争激烈到令人窒息",
+    icon: "🚢",
+    hospitalName: "县第二人民医院产房",
+    primarySchoolName: "县直第二实验小学",
+    highSchoolName: "县高级中学",
+    cityOrCounty: "运河工农县城",
+    parents: [
+      {
+        fatherJob: "运河驳船机修装配工",
+        fatherAge: 30,
+        fatherTrait: "常年与柴油机和河水打交道，信奉‘万般皆下品惟有读书高’的死理",
+        motherJob: "县农药化肥厂质检分析员",
+        motherAge: 28,
+        motherTrait: "对你的成绩排名盯得极紧，逢期末必定拿奖状贴满堂屋整面灰墙",
+        housing: "运河堤坝后街联排自建两层砖楼（门口常停运粮手扶拖拉机）",
+        wealthIndex: 1
+      }
+    ]
   }
 ];
 
-const HOUSING_CONDITIONS = [
-  "老旧破产国企职工集资筒子楼（52㎡，公用水房，灰墙脱落）",
-  "农贸市场后街自建红砖三层平房（底层潮湿杂物间，顶层晒干菜）",
-  "县城九十年代步梯房顶楼（无保温层，冬冷夏热，墙皮渗水）",
-  "城中村紧挨电线杆的逼仄握手楼（终年不见天日，推开窗是对面油烟机）",
-  "地级市边缘安置房小区（绿化带种满大葱，电梯常年停运故障）"
-];
+export const BIRTHPLACE_SLIDES: BirthplaceSlide[] = REGION_ECOSYSTEMS.map(e => ({
+  region: e.region,
+  landscape: e.landscape,
+  tagline: e.tagline,
+  icon: e.icon
+}));
 
 const WEALTH_TIERS = [
   {
@@ -231,109 +430,43 @@ const WEALTH_TIERS = [
   }
 ];
 
-const PARENT_PROFILES = [
+// 同胞时序真实模型（彻底杜绝0岁出现3岁弟弟的时空悖论）
+const SIBLINGS_OPTIONS = [
   {
-    fatherJob: "县自然资源局普通科员",
-    fatherAge: 29,
-    fatherTrait: "老烟枪，性格木讷严肃，信奉仕途与编制，最在意外界评价与体面",
-    motherJob: "公立小学语文教师",
-    motherAge: 27,
-    motherTrait: "掌管家里账本，精打细算，习惯推行严格的规律作息",
-    housingIndex: 0,
-    wealthIndex: 1
-  },
-  {
-    fatherJob: "农贸市场生肉水产摊档主",
-    fatherAge: 30,
-    fatherTrait: "满手刀茧，说话大嗓门，信奉真金白银与实利，为人坦率豪爽",
-    motherJob: "农贸市场摊位打理人",
-    motherAge: 28,
-    motherTrait: "起早贪黑整理零钞，一分钱都想省下来留给你念书",
-    housingIndex: 1,
-    wealthIndex: 2
-  },
-  {
-    fatherJob: "沿海模具五金厂冲压工",
-    fatherAge: 28,
-    fatherTrait: "长年在外打工住铁架宿舍，每次打电话只懂问‘钱够不够花’",
-    motherJob: "同厂流水线装配工",
-    motherAge: 26,
-    motherTrait: "逢年过节才拎着特产回乡，满怀无法时刻陪伴你的愧疚与小心翼翼",
-    housingIndex: 1,
-    wealthIndex: 3
-  },
-  {
-    fatherJob: "下岗工人（开出租/跑货运）",
-    fatherAge: 32,
-    fatherTrait: "经历了单位改制转型的阵痛，一身烟酒气与不服输的硬骨头",
-    motherJob: "清晨早市油炸面点摊摊主",
-    motherAge: 30,
-    motherTrait: "凌晨三点揉面炸油条，双手满是烫痕，总盼着你能靠读书出人头地",
-    housingIndex: 2,
-    wealthIndex: 0
-  },
-  {
-    fatherJob: "乡镇卫生院全科内科大夫",
-    fatherAge: 31,
-    fatherTrait: "一身洗得发白的白大褂，性情清贫认真，把家族名声与操守看得极重",
-    motherJob: "乡初中英语教师",
-    motherAge: 29,
-    motherTrait: "极度严格，容不得学习上粗心大意，同辈教育压力大",
-    housingIndex: 0,
-    wealthIndex: 1
-  },
-  {
-    fatherJob: "个体服装批发商（后转开快递驿站）",
-    fatherAge: 33,
-    fatherTrait: "经历过早期做生意的起落，背着小额贷款，常谈及人脉与市场",
-    motherJob: "社区杂货店店主兼配送",
-    motherAge: 30,
-    motherTrait: "疲于奔命进货理账，整天应付催单电话，脾气偶显急躁",
-    housingIndex: 4,
-    wealthIndex: 0
-  },
-  {
-    fatherJob: "建筑工地铁架泥瓦工师傅",
-    fatherAge: 29,
-    fatherTrait: "长年在脚手架上流汗，年底最担心工钱拖欠，沉默朴实",
-    motherJob: "老家留守务农母亲",
-    motherAge: 27,
-    motherTrait: "操持几亩麦田与家禽，省吃俭用把最好的伙食留给你",
-    housingIndex: 1,
-    wealthIndex: 3
-  },
-  {
-    fatherJob: "省城高校后勤水电维修工",
-    fatherAge: 30,
-    fatherTrait: "见惯了大学里教授名流的优渥，深知阶层落差，逼你必须用功考大学",
-    motherJob: "市立医院合同制护工/护士",
-    motherAge: 28,
-    motherTrait: "三班倒常年缺觉，说话干脆利落但带着焦虑，催你争气",
-    housingIndex: 4,
-    wealthIndex: 1
-  }
-];
-
-const SIBLINGS_PROFILES = [
-  {
+    type: "only_child" as const,
     siblings: "独生子女（独享亦独扛）",
-    detail: "父母将所有关注与资源倾注在你身上，未来老人的照护、医疗和养老没有任何同胞分担。"
+    detail: "父母将全部关爱与资源倾注在你身上；未来老人的照护、医疗和养老没有任何同胞分担。",
+    ageOffset: 0
   },
   {
-    siblings: "有姐姐（比你大4岁）",
-    detail: "姐姐从小被灌输照顾家庭，比你早几年进入社会，偶尔默默寄钱贴补家用。"
+    type: "elder_sister" as const,
+    siblings: "有姐姐（现年4岁，比你大4岁）",
+    detail: "姐姐从小懂事，比你年长4岁，放学后常牵着你的手，未来能替你分担家庭照顾。",
+    ageOffset: 4
   },
   {
-    siblings: "有弟弟（比你小3岁）",
-    detail: "家里对弟弟格外关切，资源常有偏向，你很早就习惯了凡事靠自己。"
+    type: "elder_brother" as const,
+    siblings: "有哥哥（现年3岁，比你大3岁）",
+    detail: "哥哥比你大3岁，在街坊大院里野跑玩耍，遇到外面孩子欺负总替你出头。",
+    ageOffset: 3
   },
   {
-    siblings: "夹心层二儿子/二女儿",
-    detail: "老大备受器重，老幺备受娇宠，你夹在中间如同隐形人，最早就学会了察言观色与独自消化委屈。"
+    type: "younger_brother" as const,
+    siblings: "目前独生（母亲正怀二胎，3岁时弟弟降生）",
+    detail: "此时你是家中独苗；三年后将迎来二胎弟弟，全家的关爱与资源将面临重新分配。",
+    ageOffset: -3
   },
   {
-    siblings: "重组家庭（由祖父母照看）",
-    detail: "在爷爷奶奶的老平房里长大，骨子里极度渴望拥有属于自己的固定锚点。"
+    type: "younger_sister" as const,
+    siblings: "目前独生（母亲正怀二胎，3岁时妹妹降生）",
+    detail: "此时你是家中独苗；三年后将迎来二胎妹妹，家里将添一份温柔的欢声笑语。",
+    ageOffset: -3
+  },
+  {
+    type: "middle_child" as const,
+    siblings: "夹心层（上有长姐，下有幼弟）",
+    detail: "上有年长姐姐，下有年幼弟弟，你夹在中间最早就学会了察言观色与独自消化委屈。",
+    ageOffset: 0
   }
 ];
 
@@ -377,11 +510,16 @@ export function generateRandomFamily(): {
       : GIVEN_NAMES_FEMALE[Math.floor(Math.random() * GIVEN_NAMES_FEMALE.length)];
   const name = `${sur}${given}`;
 
-  const slide = BIRTHPLACE_SLIDES[Math.floor(Math.random() * BIRTHPLACE_SLIDES.length)];
-  const parent = PARENT_PROFILES[Math.floor(Math.random() * PARENT_PROFILES.length)];
-  const housing = HOUSING_CONDITIONS[parent.housingIndex];
+  // 1. 抽取地域生态（医院、学校、生活区全绑定）
+  const eco = REGION_ECOSYSTEMS[Math.floor(Math.random() * REGION_ECOSYSTEMS.length)];
+
+  // 2. 严格从该生态中抽取原生父母与居住条件（彻底避免“地级市出生却去县医院工作”的荒谬串台）
+  const parent = eco.parents[Math.floor(Math.random() * eco.parents.length)];
+  const housing = parent.housing;
   const wealth = WEALTH_TIERS[parent.wealthIndex];
-  const sibling = SIBLINGS_PROFILES[Math.floor(Math.random() * SIBLINGS_PROFILES.length)];
+
+  // 3. 抽取同胞配置（时序真实）
+  const sibConfig = SIBLINGS_OPTIONS[Math.floor(Math.random() * SIBLINGS_OPTIONS.length)];
   const tone = EMOTIONAL_TONES[Math.floor(Math.random() * EMOTIONAL_TONES.length)];
 
   const initialSavingsMap = [0, 200, 800, 1500];
@@ -391,8 +529,12 @@ export function generateRandomFamily(): {
     name,
     gender,
     family: {
-      region: slide.region,
-      regionDetail: `${slide.landscape} | ${slide.tagline}`,
+      region: eco.region,
+      regionDetail: `${eco.landscape} | ${eco.tagline}`,
+      hospitalName: eco.hospitalName,
+      primarySchoolName: eco.primarySchoolName,
+      highSchoolName: eco.highSchoolName,
+      cityOrCounty: eco.cityOrCounty,
       fatherAge: parent.fatherAge,
       fatherJob: parent.fatherJob,
       fatherTrait: parent.fatherTrait,
@@ -402,11 +544,13 @@ export function generateRandomFamily(): {
       housing,
       wealthTier: wealth.tier,
       wealthDetail: wealth.detail,
-      siblings: sibling.siblings,
-      siblingsDetail: sibling.detail,
+      siblingType: sibConfig.type,
+      siblingAgeOffset: sibConfig.ageOffset,
+      siblings: sibConfig.siblings,
+      siblingsDetail: sibConfig.detail,
       emotionalTone: tone.tone,
       toneDetail: tone.detail,
-      backgroundStory: `你出生于${slide.region}。父亲当时${parent.fatherAge}岁，是一名${parent.fatherJob}；母亲${parent.motherAge}岁，从事${parent.motherJob}。一家人挤在${housing}。`,
+      backgroundStory: `你出生于${eco.region}。父亲当时${parent.fatherAge}岁，是一名${parent.fatherJob}；母亲${parent.motherAge}岁，从事${parent.motherJob}。一家人挤在${housing}。`,
       initialSavings
     }
   };
@@ -431,10 +575,10 @@ export function getHappinessDesc(val: number): string {
 }
 
 export function getCognitionDesc(val: number): string {
-  if (val >= 80) return "敏锐通透 · 善思善断";
-  if (val >= 60) return "思维清晰 · 踏实好学";
-  if (val >= 40) return "按部就班 · 中规中矩";
-  return "经验局限 · 认知盲区";
+  if (val >= 80) return "见解独到 · 应试拔尖";
+  if (val >= 60) return "领悟扎实 · 踏实开窍";
+  if (val >= 40) return "循规蹈矩 · 平平稳稳";
+  return "思维混沌 · 缺乏主见";
 }
 
 export function getSocialDesc(val: number): string {
@@ -492,33 +636,136 @@ export function getMotherDynamicStatus(baseAge: number, currentAge: number, _tra
   return { age, status };
 }
 
-export function getSiblingDynamicStatus(siblingsType: string, currentAge: number): string {
-  if (siblingsType.includes("独生")) {
-    if (currentAge < 18) return "独自享受父母全部关爱，也独自承担两代人全部期望。";
-    if (currentAge < 30) return "独生子女，未来的家庭养老与照护重担全落在你一人肩上。";
-    return "独生子女，独自面对长辈的老去与生老病死。";
+// 严格时序同胞状态函数（彻底杜绝 0~2 岁就出现 3 岁弟弟的逻辑悖论，且绝不使用“弟弟/妹妹”这种斜杠AI味文案）
+export function getSiblingDynamicStatus(
+  siblingType: string,
+  currentAge: number
+): { label: string; status: string } {
+  if (siblingType === "only_child") {
+    return {
+      label: "独生子女",
+      status:
+        currentAge < 18
+          ? "独生子女，独享父母全部关爱与家庭资源，也独自承载着全家沉甸甸的期望。"
+          : "独生子女，未来父母的看护、医疗与养老责任全由你一人承担，经不起大的闪失。"
+    };
   }
-  if (siblingsType.includes("姐")) {
-    if (currentAge < 12) return "姐姐在上中学，放学后经常帮你检查作业或带着你玩。";
-    if (currentAge < 20) return "姐姐已在沿海工厂/商场务工，每月寄钱补贴家用。";
-    if (currentAge < 30) return "姐姐在老家或省城成家立业，时常照看父母日常。";
-    return "姐姐步入晚年，与你共同分担着老人的照护与操持。";
+
+  if (siblingType === "younger_brother") {
+    if (currentAge < 3) {
+      return {
+        label: "尚无同胞（母亲正怀二胎）",
+        status: "此时你是家中独苗，独享父母全部关照；母亲腹中正怀着二胎弟弟。"
+      };
+    }
+    if (currentAge === 3) {
+      return {
+        label: "弟弟（刚满月）",
+        status: "弟弟刚刚降生不久，全家人围着襁褓团团转，父母反复叮嘱你要懂事让着弟弟。"
+      };
+    }
+    const broAge = currentAge - 3;
+    if (currentAge < 12) {
+      return {
+        label: `弟弟（现年${broAge}岁）`,
+        status: `弟弟今年${broAge}岁，正在读小学，每天跟在你身后，父母常嘱咐你凡事多让着弟弟。`
+      };
+    }
+    if (currentAge < 18) {
+      return {
+        label: `弟弟（现年${broAge}岁）`,
+        status: `弟弟今年${broAge}岁，正在读初中，家里的零食和学费开支逐渐向弟弟倾斜。`
+      };
+    }
+    return {
+      label: `弟弟（现年${broAge}岁）`,
+      status: `弟弟今年${broAge}岁，面临中高考与成人择业，父母常在电话里盼着你在外多帮衬弟弟。`
+    };
   }
-  if (siblingsType.includes("弟") || siblingsType.includes("妹")) {
-    if (currentAge < 12) return "弟弟/妹妹年纪尚小，父母常嘱咐你多照看让着他们。";
-    if (currentAge < 20) return "弟弟/妹妹正在上学，家庭日常开销与学费支出偏紧。";
-    if (currentAge < 30) return "弟弟/妹妹步入社会，开始面临就业与婚房压力。";
-    return "兄弟姐妹各自成家，逢年过节相聚回忆当年的艰辛。";
+
+  if (siblingType === "younger_sister") {
+    if (currentAge < 3) {
+      return {
+        label: "尚无同胞（母亲正怀二胎）",
+        status: "此时你是家中独苗，独享父母全部关照；母亲腹中正怀着二胎妹妹。"
+      };
+    }
+    if (currentAge === 3) {
+      return {
+        label: "妹妹（刚满月）",
+        status: "妹妹刚刚降生不久，全家人围着襁褓细心照看，家里平添了许多欢声笑语。"
+      };
+    }
+    const sisAge = currentAge - 3;
+    if (currentAge < 12) {
+      return {
+        label: `妹妹（现年${sisAge}岁）`,
+        status: `妹妹今年${sisAge}岁，乖巧可爱，常常拉着你的衣角要你带她玩。`
+      };
+    }
+    if (currentAge < 18) {
+      return {
+        label: `妹妹（现年${sisAge}岁）`,
+        status: `妹妹今年${sisAge}岁，正在念初中，父母时常督促你要给她树立一个好榜样。`
+      };
+    }
+    return {
+      label: `妹妹（现年${sisAge}岁）`,
+      status: `妹妹今年${sisAge}岁，步入成人阶段，与你在异地经常通电话互诉心事。`
+    };
   }
-  return "与亲族同辈保持着传统的走动与联系。";
+
+  if (siblingType === "elder_sister") {
+    const sisAge = currentAge + 4;
+    if (currentAge < 12) {
+      return {
+        label: `姐姐（现年${sisAge}岁）`,
+        status: `姐姐比你大4岁（现年${sisAge}岁），每天放学后默默帮你检查作业、带你回家。`
+      };
+    }
+    if (currentAge < 18) {
+      return {
+        label: `姐姐（现年${sisAge}岁）`,
+        status: `姐姐已初中/高中毕业外出务工，每月将微薄工资寄回家贴补家用，时常嘱咐你安心念书。`
+      };
+    }
+    return {
+      label: `姐姐（现年${sisAge}岁）`,
+      status: `姐姐在老家成家立业，在父母身边尽孝，替你在故乡分担着照顾老人的操劳。`
+    };
+  }
+
+  if (siblingType === "elder_brother") {
+    const broAge = currentAge + 3;
+    if (currentAge < 12) {
+      return {
+        label: `哥哥（现年${broAge}岁）`,
+        status: `哥哥比你大3岁（现年${broAge}岁），带着你在街坊和大院里玩耍，在外头替你出头。`
+      };
+    }
+    if (currentAge < 18) {
+      return {
+        label: `哥哥（现年${broAge}岁）`,
+        status: `哥哥正在读高中或职校，性格逐渐沉稳，开始分担家里的体力活。`
+      };
+    }
+    return {
+      label: `哥哥（现年${broAge}岁）`,
+      status: `哥哥在老家或省城成家打拼，共同承担起未来长辈的赡养义务。`
+    };
+  }
+
+  // 默认 / 夹心层
+  return {
+    label: "夹心层同胞",
+    status:
+      currentAge < 15
+        ? "上有比你年长的哥姐，下有年幼的弟妹，你在中间最早就学会了察言观色与自我独立。"
+        : "兄弟姐妹各自成家立业，逢年过节在父母家相聚回忆当年的艰辛。"
+  };
 }
 
-// ============================================================================
-// 统一生命纪元时间线（0 ~ 27 岁：自然事件流 + 关键抉择）
-// ============================================================================\n\n// ============================================================================
 // 用户认可的 5 维心智与社会特质定性评语（左侧状态仪表板使用）
-// ============================================================================
-
 export function getInferiorityDesc(val: number): string {
   if (val >= 60) return "深刻自卑敏感";
   if (val >= 35) return "自尊内敛";
@@ -549,10 +796,6 @@ export function getResilienceDesc(val: number): string {
   return "抗压偏弱";
 }
 
-// ============================================================================
-// 动态多剧情事件池引擎（0 ~ 27 岁：告别单一剧本，多支线海量丰富）
-// ============================================================================
-
 export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
   // --------------------------------------------------------------------------
   // 0岁 · 降生（3 种不同地理与阶层背景的降生画卷）
@@ -564,7 +807,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       stageName: "婴儿期 · 0岁",
       title: "初临人间与第一声啼哭",
       scene:
-        "秋风渐起的黄昏，你出生在县医院泛黄的被单上。助产士轻轻拍打你的后背，你发出第一声响亮的啼哭。父亲在产房外来回踱步，手里捏着被汗水浸湿的缴费单；母亲虚弱地将你揽入怀中，为你取下伴随一生的名字。这一年，你正式来到人间。",
+        "秋风渐起的黄昏，你出生在{hospital}泛黄的被单上。助产士轻轻拍打你的后背，你发出第一声响亮的啼哭。父亲在产房外来回踱步，手里捏着被汗水浸湿的缴费单；母亲虚弱地将你揽入怀中，为你取下伴随一生的名字。这一年，你正式来到{cityOrCounty}。",
       type: "natural",
       naturalDelta: { health: 5, happiness: 5 },
       naturalTags: ["初临人间", "乡土落脚"]
@@ -575,7 +818,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       stageName: "婴儿期 · 0岁",
       title: "雪夜红砖病房与机器轰鸣",
       scene:
-        "大雪漫天的隆冬清晨，你出生在职工医院的老旧病房里。窗外红砖大烟囱喷出滚滚白汽，供热蒸汽管道不时发出轰鸣。接生大夫向门外报喜，全车间的叔伯工友凑了几个红包与一篮红鸡蛋。你在工业小城的余晖中落户人间。",
+        "大雪漫天的隆冬清晨，你出生在{hospital}的老旧病房里。窗外红砖大烟囱喷出滚滚白汽，供热蒸汽管道不时发出轰鸣。接生大夫向门外报喜，全车间的叔伯工友凑了几个红包与一篮红鸡蛋。你在{cityOrCounty}落户人间。",
       type: "natural",
       naturalDelta: { health: 5, happiness: 5 },
       naturalTags: ["初临人间", "工矿血脉"]
@@ -586,7 +829,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       stageName: "婴儿期 · 0岁",
       title: "南方多雨之夜与握手楼租屋",
       scene:
-        "南方闷热多雨的午夜，你在出租屋邻近的私立小诊所呱呱坠地。隔壁冲压车间的震动隔着薄墙传来。父亲骑着借来的三轮车载着母亲和你穿过狭窄的握手楼巷道。在异乡漂泊的茫然中，你的到来成了这间出租屋里唯一的期盼。",
+        "南方闷热多雨的午夜，你在{hospital}呱呱坠地。隔壁冲压车间的震动隔着薄墙传来。父亲骑着借来的三轮车载着母亲和你穿过狭窄的握手楼巷道。在异乡漂泊的茫然中，你的到来成了这间出租屋里唯一的期盼。",
       type: "natural",
       naturalDelta: { health: 5, happiness: 5 },
       naturalTags: ["初临人间", "异乡客籍"]
@@ -2292,32 +2535,71 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
 // 智能动态时间线生成器（根据角色地域、阶层、性别与随机种子，生成完全独一无二的28岁人生旅程）
 // ============================================================================
 
+
+
+// ============================================================================
+// 动态多剧情时间线生成引擎（深度融合地域、医院、学校与时序同胞因果）
+// ============================================================================
+
 export function generateTimelineForCharacter(
   family: FamilyOrigin,
   gender: "男" | "女"
 ): LifeEventNode[] {
   const result: LifeEventNode[] = [];
 
-  // Deterministic or randomized seed based on family details
   const seed = (family.region.length * 7 + family.fatherAge * 3 + (gender === "男" ? 1 : 2)) % 3;
 
   for (let age = 0; age <= 27; age++) {
+    // 0岁：严格契合出生地医院与生活区，绝不出现“地级市生活区却在县医院出生”的矛盾
+    if (age === 0) {
+      result.push({
+        id: `age_0_${family.region}`,
+        age: 0,
+        stageName: "婴儿期 · 0岁",
+        title: "初临人间与第一声啼哭",
+        scene: `秋风渐起的午后，你出生在${family.hospitalName}泛黄的被单上。助产士轻轻拍打你的后背，你发出第一声响亮的啼哭。产房外走廊里，父亲来回踱步，手里捏着汗湿的缴费单；母亲虚弱地将你揽入怀中，为你取下伴随一生的名字。这一年，你正式来到${family.cityOrCounty}。`,
+        type: "natural",
+        naturalDelta: { health: 5, happiness: 5 },
+        naturalTags: ["初临人间"]
+      });
+      continue;
+    }
+
+    // 3岁：若配置了三年后添弟或添妹，精准在此年龄节点触发降生事件，因果完全闭环！
+    if (age === 3 && family.siblingType === "younger_brother") {
+      result.push({
+        id: "age_3_younger_brother",
+        age: 3,
+        stageName: "幼儿期 · 3岁",
+        title: "添弟之喜与悄然倾斜的天平",
+        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个弟弟。全家人围着襁褓团团转，爷爷奶奶笑逐颜开。父亲在走廊给亲友分发红鸡蛋与喜糖；母亲虚弱地揽着你轻声叮嘱：“你做姐姐了，以后要懂事，多让着弟弟。”你踮起脚尖看着摇篮里那个红皱皱的小婴儿，第一次隐约体会到了家里重心的转移。`,
+        type: "natural",
+        naturalDelta: { inferiority: 10, kinshipGuilt: 15, resilience: 10 },
+        naturalTags: ["家中添弟"]
+      });
+      continue;
+    }
+
+    if (age === 3 && family.siblingType === "younger_sister") {
+      result.push({
+        id: "age_3_younger_sister",
+        age: 3,
+        stageName: "幼儿期 · 3岁",
+        title: "添妹之喜与全家的欢欣",
+        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个妹妹。小小的病房里摆满了亲友送来的婴儿衣物，母亲虚弱地将妹妹抱给你看：“看，这是你的小妹妹。”你伸出小手碰了碰她粉嫩的脸蛋，家里从此多了一份轻柔的欢声笑语。`,
+        type: "natural",
+        naturalDelta: { happiness: 10, kinshipGuilt: 10 },
+        naturalTags: ["家中添妹"]
+      });
+      continue;
+    }
+
     const pool = AGE_EVENT_POOLS[age];
     if (!pool || pool.length === 0) continue;
 
-    // Pick variant:
-    // If region contains specific keywords, prioritize matching scenario
     let selected = pool[0];
 
-    if (age === 0) {
-      if (family.region.includes("工") || family.region.includes("东北") || family.region.includes("华北")) {
-        selected = pool[1] || pool[0];
-      } else if (family.region.includes("浙东") || family.region.includes("岭南") || family.region.includes("城中村")) {
-        selected = pool[2] || pool[0];
-      } else {
-        selected = pool[0];
-      }
-    } else if (age === 6) {
+    if (age === 6) {
       if (family.wealthTier.includes("入不敷出") || family.wealthTier.includes("留守")) {
         selected = pool[2] || pool[0];
       } else if (family.region.includes("百强") || family.region.includes("地级市")) {
@@ -2333,52 +2615,67 @@ export function generateTimelineForCharacter(
       } else {
         selected = pool[0];
       }
-    } else if (age === 22) {
-      if (family.fatherJob.includes("科员") || family.fatherJob.includes("高校")) {
-        selected = pool[1] || pool[0];
-      } else if (family.wealthTier.includes("入不敷出")) {
-        selected = pool[2] || pool[0];
-      } else {
-        selected = pool[0];
-      }
+    } else if (age === 18) {
+      selected = pool[seed % pool.length] || pool[0];
+    } else if (age === 20) {
+      selected = pool[seed % pool.length] || pool[0];
+    } else if (age === 24) {
+      selected = pool[seed % pool.length] || pool[0];
     } else if (age === 27) {
-      if (family.fatherJob.includes("科员") || family.motherJob.includes("教师")) {
-        selected = pool[1] || pool[0];
-      } else if (family.wealthTier.includes("小康") || family.initialSavings >= 800) {
-        selected = pool[2] || pool[0];
-      } else {
-        selected = pool[0];
-      }
+      selected = pool[seed % pool.length] || pool[0];
     } else {
-      // For other ages, sample based on seed + age to ensure rich multi-flavor diversity
-      const idx = (seed + age) % pool.length;
-      selected = pool[idx];
+      selected = pool[(seed + age) % pool.length] || pool[0];
     }
 
-    result.push(selected);
+    // 动态置换场景中的医院、学校与具体称谓，保持极致沉浸
+    let resolvedScene = selected.scene
+      .replace(/\{hospital\}/g, family.hospitalName)
+      .replace(/\{cityOrCounty\}/g, family.cityOrCounty)
+      .replace(/\{primarySchool\}/g, family.primarySchoolName)
+      .replace(/\{highSchool\}/g, family.highSchoolName);
+
+    if (family.region.includes("市") || family.region.includes("矿") || family.region.includes("区")) {
+      resolvedScene = resolvedScene
+        .replace(/县医院/g, family.hospitalName)
+        .replace(/县一中/g, family.highSchoolName)
+        .replace(/县实验小学/g, family.primarySchoolName);
+    }
+
+    const resolvedSiblingName = family.siblingType.includes("brother") ? "弟弟" : family.siblingType.includes("sister") ? "妹妹" : "同胞";
+    resolvedScene = resolvedScene.replace(/\{sibling\}/g, resolvedSiblingName);
+
+    result.push({
+      ...selected,
+      scene: resolvedScene
+    });
   }
 
   return result;
 }
 
-// 默认兜底预设时间线
 export const LIFE_SIMULATION_TIMELINE: LifeEventNode[] = generateTimelineForCharacter(
   {
-    region: "豫东平原农耕大县",
-    regionDetail: "",
-    fatherAge: 29,
-    fatherJob: "县自然资源局普通科员",
-    fatherTrait: "",
-    motherAge: 27,
-    motherJob: "公立小学语文教师",
-    motherTrait: "",
-    housing: "",
-    wealthTier: "紧绷温饱",
-    wealthDetail: "",
-    siblings: "独生子女",
-    siblingsDetail: "",
-    emotionalTone: "",
-    toneDetail: "",
+    region: "华北重工业地级市生活区",
+    regionDetail: "钢厂子弟校 · 泛灰白杨树 · 家属大院 | 空气里常年有微尘",
+    hospitalName: "市职工总院产科",
+    primarySchoolName: "钢厂子弟第一小学",
+    highSchoolName: "市第一高级中学",
+    cityOrCounty: "地级市工矿生活区",
+    fatherAge: 30,
+    fatherJob: "钢厂热轧车间机修电工",
+    fatherTrait: "老烟枪，性格木讷严肃，双手常有机油味",
+    motherAge: 28,
+    motherJob: "市自来水公司抄表员",
+    motherTrait: "精打细算持家，掌管家里存折",
+    housing: "老重工国企职工集资筒子楼（52㎡）",
+    wealthTier: "紧绷温饱（经不起任何风浪）",
+    wealthDetail: "月收入仅够柴米油盐与学杂费",
+    siblingType: "only_child",
+    siblingAgeOffset: 0,
+    siblings: "独生子女（独享亦独扛）",
+    siblingsDetail: "父母将所有关注倾注在你身上",
+    emotionalTone: "务实生计型",
+    toneDetail: "家里凡事以现实利益与风险为先",
     backgroundStory: "",
     initialSavings: 200
   },
@@ -2388,9 +2685,6 @@ export const LIFE_SIMULATION_TIMELINE: LifeEventNode[] = generateTimelineForChar
 export const K12_EVENTS = LIFE_SIMULATION_TIMELINE.slice(6, 18);
 export const CAREER_EVENTS = LIFE_SIMULATION_TIMELINE.slice(18);
 
-// ============================================================================
-// 18岁：高考出分系统因果裁定
-// ============================================================================
 
 export interface GaokaoCalculation {
   degreeTrack: "985_211" | "double_non" | "junior_college";
