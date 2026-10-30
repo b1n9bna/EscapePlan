@@ -488,17 +488,17 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // 4 Core Attributes + Latent Traits + Dual Financial Accounts
   const [attrs, setAttrs] = useState<CharacterAttributes>(() => ({
-    health: 85,
-    happiness: 80,
-    cognition: 25,
-    social: 25,
+    health: 55,
+    happiness: 50,
+    cognition: 20,
+    social: 15,
     savings: charData.family.initialSavings,
     familySavings: charData.family.initialFamilySavings,
-    inferiority: 20,
-    academicCapital: 20,
+    inferiority: 25,
+    academicCapital: 15,
     kinshipGuilt: 25,
-    rebellion: 25,
-    resilience: 25
+    rebellion: 15,
+    resilience: 30
   }));
 
   const [tags, setTags] = useState<string[]>([]);
@@ -662,17 +662,17 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setTimeline(dynamicTimeline);
 
     const initialAttrs: CharacterAttributes = {
-      health: 85,
-      happiness: 80,
-      cognition: 25,
-      social: 25,
+      health: 55,
+      happiness: 50,
+      cognition: 20,
+      social: 15,
       savings: charData.family.initialSavings,
       familySavings: charData.family.initialFamilySavings,
-      inferiority: 20,
-      academicCapital: 20,
+      inferiority: 25,
+      academicCapital: 15,
       kinshipGuilt: 25,
-      rebellion: 25,
-      resilience: 25
+      rebellion: 15,
+      resilience: 30
     };
     setAttrs(initialAttrs);
     setTags(['初临人间']);
