@@ -195,6 +195,115 @@ export interface ProvinceGroupItem {
   }[];
 }
 
+export interface HotProvinceItem {
+  id: string;
+  province: string;
+  shortLabel: string;
+  icon: string;
+  highlightBadge: string;
+  tagline: string;
+}
+
+// 🔥 热门特色省份榜首阵容：湖湘霸蛮、中原麦浪、南粤出海、齐鲁重器、苏南太保...
+export const HOT_PROVINCES: HotProvinceItem[] = [
+  {
+    id: "hunan",
+    province: "湖南省",
+    shortLabel: "马栏山文创 · 三一中联 · 五一广场新消费",
+    icon: "🌶️",
+    highlightBadge: "霸蛮火辣 · 长沙顶流",
+    tagline: "敢为人先吃得苦霸得蛮，星城顶流文创与大国重器，猛火湘菜红火出圈"
+  },
+  {
+    id: "henan",
+    province: "河南省",
+    shortLabel: "千万考生 · 麦浪淘金 · 郑州富士康",
+    icon: "🌾",
+    highlightBadge: "高考地狱 · 麦浪淘金",
+    tagline: "百万做题家独木桥，中原粮仓沉浮，进厂出海逆天改命"
+  },
+  {
+    id: "guangdong",
+    province: "广东省",
+    shortLabel: "世界工厂 · 宗族围村 · 跨境弄潮",
+    icon: "🏮",
+    highlightBadge: "改开前沿 · 务实搏杀",
+    tagline: "宗族人情与工业轰鸣，喝早茶搞钱出海，不问出处唯看手腕"
+  },
+  {
+    id: "shandong",
+    province: "山东省",
+    shortLabel: "体制考公 · 胶东大厂 · 大国重器",
+    icon: "🍎",
+    highlightBadge: "体制巅峰 · 齐鲁重器",
+    tagline: "考公考编家族至高荣光，青烟大厂工业硬核，踏实规矩厚重"
+  },
+  {
+    id: "jiangsu",
+    province: "江苏省",
+    shortLabel: "十三太保 · 模具五金 · 考卷内卷",
+    icon: "🚢",
+    highlightBadge: "苏南霸主 · 十三太保",
+    tagline: "县域经济神话，南通泰州卷王题海，五金精密与外企高地"
+  },
+  {
+    id: "sichuan",
+    province: "四川省",
+    shortLabel: "少不入川 · 盆地茶馆 · 火锅江湖",
+    icon: "🍵",
+    highlightBadge: "天府之国 · 豁达安逸",
+    tagline: "江风茶馆与大厂副业，巴适安逸与川商闯荡，安贫乐道大天地"
+  },
+  {
+    id: "zhejiang",
+    province: "浙江省",
+    shortLabel: "义乌搏杀 · 阿里电商 · 民营高地",
+    icon: "⚙️",
+    highlightBadge: "民营高地 · 义乌出海",
+    tagline: "白天当老板晚上睡地板，全球买卖跨境电商，草根财富神话"
+  },
+  {
+    id: "beijing",
+    province: "北京市",
+    shortLabel: "部委选调 · 中关村算法 · 皇城根胡同",
+    icon: "🚲",
+    highlightBadge: "部委中枢 · 科技心脏",
+    tagline: "红墙柳荫与算法加班，顶层设计与海淀鸡娃，阶层跃迁修罗场"
+  },
+  {
+    id: "shanghai",
+    province: "上海市",
+    shortLabel: "外资量化 · 先进制程 · 石库门里弄",
+    icon: "🏙️",
+    highlightBadge: "金融魔都 · 国际规则",
+    tagline: "契约分明精致体面，外资量化与半导体，咖啡香里的残酷竞争"
+  },
+  {
+    id: "chongqing",
+    province: "重庆市",
+    shortLabel: "山城单轨 · 赛博立体 · 老火锅江湖",
+    icon: "🌶️",
+    highlightBadge: "赛博重镇 · 豪爽耿直",
+    tagline: "梯坎棒棒与摩天高楼，雾都两江与汽车重工，敢爱敢恨仗义人生"
+  },
+  {
+    id: "shaanxi",
+    province: "陕西省",
+    shortLabel: "古都三秦 · 军工航天 · 关中面食",
+    icon: "🏺",
+    highlightBadge: "军工硬核 · 华夏厚度",
+    tagline: "航空航天重工扎堆，十三朝古都历史回响，安稳踏实科研人生"
+  },
+  {
+    id: "liaoning",
+    province: "辽宁省",
+    shortLabel: "共和国长子 · 战机重工 · 东北往事",
+    icon: "🏭",
+    highlightBadge: "长子风骨 · 铁骨柔情",
+    tagline: "大国战机航母摇篮，下岗阵痛与热血重生，黑土地上的幽默与执着"
+  }
+];
+
 export const PROVINCE_GROUPS: ProvinceGroupItem[] = [
   {
     group: "华北",
@@ -231,7 +340,7 @@ export const PROVINCE_GROUPS: ProvinceGroupItem[] = [
     provinces: [
       { id: "henan", province: "河南省", shortLabel: "中原平原麦浪", icon: "🌾" },
       { id: "hubei", province: "湖北省", shortLabel: "江汉排涝水乡", icon: "🐟" },
-      { id: "hunan", province: "湖南省", shortLabel: "湘江留守丘陵", icon: "🍊" }
+      { id: "hunan", province: "湖南省", shortLabel: "马栏山文创 · 三一重工 · 星城烟火", icon: "🌶️" }
     ]
   },
   {
@@ -1062,8 +1171,8 @@ export const REGION_ECOSYSTEMS = [
     "provinceGroup": "华中",
     "region": "湖南省 · 湘江重工与丘陵留守山坳",
     "landscape": "橘子洲头江雾 · 机械重工吊臂 · 吊脚旧楼红辣椒",
-    "tagline": "吃得苦霸得蛮耐得烦，父母南下珠三角进厂，老家只剩柴火青烟",
-    "icon": "🍊",
+    "tagline": "吃得苦霸得蛮耐得烦，星城烟火与大国重器，老家只剩柴火青烟",
+    "icon": "🌶️",
     "hospitalName": "镇中心卫生院妇产科",
     "primarySchoolName": "镇中心完全第一小学",
     "highSchoolName": "县民族高级中学",

@@ -2173,6 +2173,20 @@ export const PROVINCIAL_GAOKAO_ROUTES: Record<string, ProvincialTierRoutes> = {
           "小炒传人",
           "市井赢家"
         ]
+      },
+      {
+        "text": "【长株潭新能源 · 比亚迪/吉利雨花整车智能电驱装配领班】：扎根雨花经开区现代制造基地，执掌新能源三电系统总装精密质检",
+        "detail": "在中部最密集的汽车制造重镇攻坚克难，从工位标兵成长为带班技术骨干，稳稳在星城按揭安家。",
+        "delta": {
+          "resilience": 20,
+          "savings": 9500,
+          "cognition": 15
+        },
+        "addTags": [
+          "星沙汽配",
+          "智能三电",
+          "新星城人"
+        ]
       }
     ]
   },

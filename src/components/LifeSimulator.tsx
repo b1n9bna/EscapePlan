@@ -3,6 +3,7 @@ import {
   generateRandomFamily,
   BIRTHPLACE_SLIDES,
   PROVINCE_GROUPS,
+  HOT_PROVINCES,
   generateTimelineForCharacter,
   generateCareerTimeline,
   calculateGaokaoOutcome,
@@ -480,7 +481,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Cinematic Birthplace Reel Animator
   const [isSpinning, setIsSpinning] = useState(false);
   const [showProvincePicker, setShowProvincePicker] = useState(false);
-  const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>('全部');
+  const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>('🔥 热门推荐');
   const [slideIndex, setSlideIndex] = useState(() => {
     const idx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === charData.family.region);
     return idx !== -1 ? idx : Math.floor(Math.random() * BIRTHPLACE_SLIDES.length);
@@ -1390,6 +1391,60 @@ ${logEntries
             >
               换省份
             </button>
+          </div>
+
+          {/* Quick Hot Province Selector */}
+          <div className={`p-2.5 sm:p-3 rounded-xl border flex flex-wrap items-center gap-1.5 text-xs transition-colors ${
+            isLight ? "bg-amber-50/60 border-amber-200/80" : "bg-[#16141a] border-amber-500/20"
+          }`}>
+            <span className={`text-xs font-semibold shrink-0 flex items-center gap-1 mr-1 ${
+              isLight ? "text-amber-900" : "text-amber-300"
+            }`}>
+              <span>🔥</span>
+              <span>热门剧本：</span>
+            </span>
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 py-0.5">
+              {HOT_PROVINCES.slice(0, 8).map(hot => {
+                const isSelected = charData.family.province === hot.province;
+                const isHunan = hot.province === '湖南省';
+                return (
+                  <button
+                    key={hot.id}
+                    onClick={() => handleRestart(hot.province)}
+                    className={`px-2.5 py-1 rounded-lg border text-xs whitespace-nowrap font-medium transition-all shrink-0 active:scale-95 flex items-center gap-1 ${
+                      isSelected
+                        ? isLight
+                          ? "bg-amber-600 text-white border-amber-600 shadow-sm font-bold ring-1 ring-amber-600"
+                          : "bg-amber-500 text-stone-950 border-amber-400 shadow-sm font-bold ring-1 ring-amber-400"
+                        : isHunan
+                          ? isLight
+                            ? "bg-red-50 hover:bg-red-100 text-red-900 border-red-300 font-semibold shadow-sm"
+                            : "bg-red-950/40 hover:bg-red-900/50 text-red-300 border-red-500/40 font-semibold shadow-sm"
+                          : isLight
+                            ? "bg-white hover:bg-stone-100 text-stone-700 border-stone-200"
+                            : "bg-white/[0.04] hover:bg-white/[0.08] text-stone-300 border-white/[0.05]"
+                    }`}
+                    title={`${hot.province}：${hot.shortLabel}`}
+                  >
+                    <span>{hot.icon}</span>
+                    <span>{hot.province.replace('省', '').replace('市', '')}</span>
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => {
+                  setSelectedGroupFilter('🔥 热门推荐');
+                  setShowProvincePicker(true);
+                }}
+                className={`px-2.5 py-1 rounded-lg border text-xs whitespace-nowrap font-medium transition-all shrink-0 ${
+                  isLight
+                    ? "bg-stone-100 hover:bg-stone-200 text-stone-600 border-stone-300"
+                    : "bg-white/[0.05] hover:bg-white/[0.1] text-stone-300 border-white/[0.08]"
+                }`}
+              >
+                更多省份 ▾
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
@@ -3199,7 +3254,7 @@ ${logEntries
             <div className={`px-5 sm:px-6 py-2.5 border-b flex items-center gap-1.5 overflow-x-auto text-xs shrink-0 no-scrollbar ${
               isLight ? "bg-stone-100/60 border-stone-200" : "bg-[#11131B] border-white/[0.05]"
             }`}>
-              {['全部', '华北', '东北', '华东', '华中', '华南', '西南', '西北', '港澳台'].map(grp => (
+              {['🔥 热门推荐', '全部', '华中', '华东', '华南', '华北', '东北', '西南', '西北', '港澳台'].map(grp => (
                 <button
                   key={grp}
                   onClick={() => setSelectedGroupFilter(grp)}
@@ -3220,7 +3275,94 @@ ${logEntries
 
             {/* Province Grid Body */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-              {PROVINCE_GROUPS
+              {/* Hot Provinces Section (shown when '🔥 热门推荐' or '全部' is selected) */}
+              {(selectedGroupFilter === '🔥 热门推荐' || selectedGroupFilter === '全部') && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#D4A359] flex items-center gap-1.5">
+                      <span>🔥</span>
+                      <span>【现象级热门体验省份 · 湖湘霸蛮 / 中原麦浪 / 广佛出海 / 齐鲁重器】</span>
+                    </span>
+                    <div className={`flex-1 h-[1px] ${isLight ? "bg-stone-200" : "bg-white/[0.06]"}`} />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {HOT_PROVINCES.map((prov, idx) => {
+                      const isCurrent = charData.family.province === prov.province ||
+                        charData.family.region.startsWith(prov.province);
+                      const isHunan = prov.province === '湖南省';
+
+                      return (
+                        <button
+                          key={prov.id}
+                          onClick={() => {
+                            handleRestart(prov.province);
+                          }}
+                          className={`p-3.5 rounded-xl border text-left transition-all relative group active:scale-[0.98] ${
+                            isCurrent
+                              ? isLight
+                                ? "bg-amber-100/95 border-amber-500 shadow-md ring-2 ring-amber-500"
+                                : "bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/60"
+                              : isHunan
+                                ? isLight
+                                  ? "bg-gradient-to-br from-amber-50/90 to-red-50/60 hover:from-amber-100/90 hover:to-red-100/70 border-amber-400/80 shadow-sm"
+                                  : "bg-gradient-to-br from-[#241a15] to-[#1a1c28] hover:from-[#2e2019] hover:to-[#222536] border-amber-500/50 hover:border-amber-400 shadow-sm"
+                                : isLight
+                                  ? "bg-stone-50 hover:bg-amber-50 hover:border-amber-400 border-stone-200 text-stone-800"
+                                  : "bg-[#151722] hover:bg-[#1C1F2D] hover:border-amber-500/40 border-white/[0.06] text-stone-200"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-2xl group-hover:scale-110 transition-transform">{prov.icon}</span>
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide ${
+                                isHunan
+                                  ? isLight ? "bg-red-600 text-white" : "bg-red-500 text-white font-bold"
+                                  : isLight ? "bg-amber-100 text-amber-900 border border-amber-300" : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                              }`}>
+                                {prov.highlightBadge}
+                              </span>
+                            </div>
+                            {isCurrent ? (
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                isLight ? "bg-amber-600 text-white" : "bg-amber-500 text-stone-950"
+                              }`}>
+                                当前
+                              </span>
+                            ) : (
+                              <span className={`text-[10px] font-mono-num ${
+                                isLight ? "text-stone-400" : "text-stone-500"
+                              }`}>
+                                #{idx + 1}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className={`font-bold text-base font-narrative-serif leading-tight ${
+                            isLight ? "text-stone-900" : "text-stone-100"
+                          }`}>
+                            {prov.province}
+                          </div>
+
+                          <div className={`text-xs mt-1.5 font-medium truncate ${
+                            isLight ? "text-amber-900" : "text-amber-300"
+                          }`}>
+                            {prov.shortLabel}
+                          </div>
+
+                          <div className={`text-[11px] mt-1 leading-snug line-clamp-2 ${
+                            isLight ? "text-stone-500 group-hover:text-stone-700" : "text-stone-400 group-hover:text-stone-300"
+                          }`}>
+                            {prov.tagline}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Regional Province Groups (shown when a specific region or '全部' is selected) */}
+              {selectedGroupFilter !== '🔥 热门推荐' && PROVINCE_GROUPS
                 .filter(g => selectedGroupFilter === '全部' || g.group === selectedGroupFilter)
                 .map(groupItem => (
                   <div key={groupItem.group} className="space-y-2.5">
