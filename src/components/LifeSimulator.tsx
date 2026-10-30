@@ -6,6 +6,7 @@ import {
   generateCareerTimeline,
   calculateGaokaoOutcome,
   generateAdultMilestones,
+  getTailoredCareerSubtrackNodes,
   generateFinalLifetimeVerdict,
   detectCrisisWarning,
   ENDING_CODEX_DEFS,
@@ -693,6 +694,21 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setGaokaoCalc(calc);
       setShowGaokaoModal(true);
       return;
+    }
+
+    // ★★★ 二十一岁大四毕业抉择：精准定制后续 22~27 岁专属职场/学术轨迹 ★★★
+    // 彻底杜绝“本科工作两年又突然硕士毕业签约”的严重逻辑矛盾！
+    if (currentNode.age === 21) {
+      const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
+      const tailoredNodes = getTailoredCareerSubtrackNodes(
+        currentTrack,
+        choice.text,
+        charData.family
+      );
+      if (tailoredNodes && tailoredNodes.length > 0) {
+        const upTo21 = timeline.slice(0, timelineIndex + 1);
+        setTimeline([...upTo21, ...tailoredNodes]);
+      }
     }
 
     // ★★★ 二十七岁关键岔路口抉择：因果无缝延展至 30~63 岁成年篇章 ★★★
