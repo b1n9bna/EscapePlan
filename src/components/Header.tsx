@@ -1,31 +1,56 @@
 import React from 'react';
-import { Gamepad2, BookOpen, Calculator, CheckSquare, ShieldCheck } from 'lucide-react';
+import { Gamepad2, BookOpen, Calculator, CheckSquare, ShieldCheck, Sun, Moon } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'sim' | 'subclasses' | 'reality' | 'diy';
   setActiveTab: (tab: 'sim' | 'subclasses' | 'reality' | 'diy') => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
+export const Header: React.FC<HeaderProps> = ({
+  activeTab,
+  setActiveTab,
+  theme = 'dark',
+  onToggleTheme
+}) => {
+  const isLight = theme === 'light';
+
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0B0F17]/85 border-b border-slate-800">
+    <header
+      className={`sticky top-0 z-50 backdrop-blur-md transition-colors duration-200 ${
+        isLight
+          ? 'bg-white/90 border-b border-stone-200 text-stone-900 shadow-xs'
+          : 'bg-[#0B0F17]/85 border-b border-slate-800 text-slate-100'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Slogan */}
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('sim')}>
-            <span className="text-2xl p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 shadow-sm">
+            <span
+              className={`text-2xl p-2 rounded-xl border shadow-sm ${
+                isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'
+              }`}
+            >
               🧭
             </span>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-amber-400 via-orange-300 to-emerald-400 bg-clip-text text-transparent">
+                <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-amber-500 via-orange-400 to-emerald-500 bg-clip-text text-transparent">
                   EscapePlan
                 </span>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                <span
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                    isLight
+                      ? 'bg-stone-100 text-stone-700 border-stone-300'
+                      : 'bg-slate-800 text-slate-300 border-slate-700'
+                  }`}
+                >
                   逃跑计划
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">
+              <p className={`text-[11px] hidden sm:block ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>
                 面向大众的全球移居双城生活手记与手搓 DIY 路线图
               </p>
             </div>
@@ -38,10 +63,12 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'sim'
                   ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
+                  : isLight
+                  ? 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <Gamepad2 className={`w-4 h-4 ${activeTab === 'sim' ? 'text-white' : 'text-amber-400'}`} />
+              <Gamepad2 className={`w-4 h-4 ${activeTab === 'sim' ? 'text-white' : 'text-amber-500'}`} />
               <span>人生模拟</span>
             </button>
 
@@ -50,10 +77,12 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'subclasses'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                  : isLight
+                  ? 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <BookOpen className={`w-4 h-4 ${activeTab === 'subclasses' ? 'text-white' : 'text-sky-400'}`} />
+              <BookOpen className={`w-4 h-4 ${activeTab === 'subclasses' ? 'text-white' : 'text-sky-500'}`} />
               <span>政策与算分</span>
             </button>
 
@@ -62,10 +91,12 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'reality'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                  : isLight
+                  ? 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <Calculator className={`w-4 h-4 ${activeTab === 'reality' ? 'text-white' : 'text-amber-400'}`} />
+              <Calculator className={`w-4 h-4 ${activeTab === 'reality' ? 'text-white' : 'text-amber-500'}`} />
               <span>税后沙盒</span>
             </button>
 
@@ -74,26 +105,63 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'diy'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                  : isLight
+                  ? 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <CheckSquare className={`w-4 h-4 ${activeTab === 'diy' ? 'text-white' : 'text-emerald-400'}`} />
+              <CheckSquare className={`w-4 h-4 ${activeTab === 'diy' ? 'text-white' : 'text-emerald-500'}`} />
               <span>手搓路线</span>
             </button>
           </nav>
 
-          {/* Right GitHub & Privacy Badge */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="hidden xl:flex items-center space-x-1 text-[11px] text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full">
+          {/* Right GitHub & Privacy Badge & Theme Toggle */}
+          <div className="flex items-center space-x-2 sm:space-x-2.5">
+            {/* Theme Toggle Button */}
+            {onToggleTheme && (
+              <button
+                onClick={onToggleTheme}
+                className={`flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                  isLight
+                    ? 'bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-300 shadow-2xs'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+                }`}
+                title={isLight ? '切换为深色古砚墨香模式' : '切换为浅色素雅宣纸模式'}
+              >
+                {isLight ? (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                    <span className="hidden sm:inline">深色</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="hidden sm:inline">浅色</span>
+                  </>
+                )}
+              </button>
+            )}
+
+            <div
+              className={`hidden xl:flex items-center space-x-1 text-[11px] px-2.5 py-1 rounded-full border ${
+                isLight
+                  ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                  : 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'
+              }`}
+            >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>纯本地运算 · 零隐私上传</span>
+              <span>本地运算 · 零上传</span>
             </div>
 
             <a
               href="https://github.com/b1n9bna/EscapePlan"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+              className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition ${
+                isLight
+                  ? 'bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-300'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+              }`}
               title="在 GitHub 上关注并给个 Star"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">

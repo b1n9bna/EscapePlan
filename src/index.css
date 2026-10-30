@@ -81,3 +81,24 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #2D3240;
 }
+
+/* Light Mode Theme Customizations */
+[data-theme="light"], .light {
+  color-scheme: light;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track,
+.light ::-webkit-scrollbar-track {
+  background: #F4F3EF;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb,
+.light ::-webkit-scrollbar-thumb {
+  background: #D6D3CD;
+  border-radius: 3px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover,
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #B8B4AA;
+}

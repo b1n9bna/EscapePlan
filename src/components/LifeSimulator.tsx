@@ -62,12 +62,16 @@ import {
   Briefcase,
   Landmark,
   HeartHandshake,
-  ShieldAlert
+  ShieldAlert,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
   onNavigateToSubclasses: (countryId?: string) => void;
   onNavigateToDIY: (countryId?: string) => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 interface ChronicleLogEntry {
@@ -379,8 +383,34 @@ const EndingCodexModal: React.FC<{
 
 export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   onNavigateToSubclasses,
-  onNavigateToDIY
+  onNavigateToDIY,
+  theme: propTheme,
+  onToggleTheme: propToggleTheme
 }) => {
+  const [localTheme, setLocalTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('escapeplan_theme');
+      if (saved === 'light' || saved === 'dark') return saved;
+    }
+    return 'dark';
+  });
+
+  const activeTheme = propTheme || localTheme;
+  const isLight = activeTheme === 'light';
+
+  const handleToggleTheme = () => {
+    if (propToggleTheme) {
+      propToggleTheme();
+    } else {
+      setLocalTheme((prev) => {
+        const next = prev === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('escapeplan_theme', next);
+        document.documentElement.setAttribute('data-theme', next);
+        document.documentElement.classList.toggle('light', next === 'light');
+        return next;
+      });
+    }
+  };
   // Gameplay View Modes:
   // 'setup' -> Birthplace Reel & Family Card
   // 'cockpit' -> Unified 3-column interactive simulation (Ages 0 to 63!)
@@ -1082,42 +1112,56 @@ ${logEntries
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12 animate-year-enter">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#13151F] border border-white/[0.08] text-stone-300 text-xs sm:text-sm mb-3 font-narrative-serif">
+          <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs sm:text-sm mb-3 font-narrative-serif ${
+            isLight ? "bg-amber-50 border-amber-200 text-amber-900" : "bg-[#13151F] border-white/[0.08] text-stone-300"
+          }`}>
             <Sparkles className="w-4 h-4 text-[#D4A359]" />
             人生模拟 · 原生家庭档案
           </div>
-          <h1 className="text-2xl sm:text-4xl font-bold text-stone-100 tracking-normal mb-2.5 font-narrative-serif">
+          <h1 className={`text-2xl sm:text-4xl font-bold tracking-normal mb-2.5 font-narrative-serif ${
+            isLight ? "text-stone-900" : "text-stone-100"
+          }`}>
             随机投胎 · 抽取人生底牌
           </h1>
-          <p className="text-sm sm:text-base text-stone-300 max-w-xl mx-auto leading-relaxed font-reading-sans">
+          <p className={`text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-reading-sans ${
+            isLight ? "text-stone-600" : "text-stone-300"
+          }`}>
             人无法自主挑选起点。每一个随机生成的家庭，都对应着一段真实的成长轨迹与社会现实。
           </p>
         </div>
 
         {/* Slot Reel */}
-        <div className="bg-[#12141C] border border-white/[0.07] rounded-2xl p-5 sm:p-7 shadow-xl mb-6">
-          <div className="flex items-center justify-between text-xs sm:text-sm text-stone-400 mb-4 border-b border-white/[0.06] pb-3 font-reading-sans">
+        <div className={`border rounded-2xl p-5 sm:p-7 shadow-xl mb-6 transition-colors ${
+          isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#12141C] border-white/[0.07] text-stone-100"
+        }`}>
+          <div className={`flex items-center justify-between text-xs sm:text-sm mb-4 border-b pb-3 font-reading-sans ${
+            isLight ? "text-stone-500 border-stone-200" : "text-stone-400 border-white/[0.06]"
+          }`}>
             <span className="flex items-center gap-2 text-[#D4A359] font-medium">
               <span
                 className={`inline-block w-2.5 h-2.5 rounded-full bg-[#D4A359] ${
-                  isSpinning ? 'animate-pulse' : ''
+                  isSpinning ? "animate-pulse" : ""
                 }`}
               />
-              {isSpinning ? '正在随机匹配出生地...' : '出生地已确定'}
+              {isSpinning ? "正在随机匹配出生地..." : "出生地已确定"}
             </span>
-            <span className="text-stone-200 font-narrative-serif font-semibold">
-              {isSpinning ? '定位中...' : charData.family.region}
+            <span className={`font-narrative-serif font-semibold ${isLight ? "text-stone-800" : "text-stone-200"}`}>
+              {isSpinning ? "定位中..." : charData.family.region}
             </span>
           </div>
 
-          <div className="relative overflow-hidden h-28 sm:h-32 rounded-xl bg-[#0A0B0E] border border-white/[0.08] flex items-center justify-center">
+          <div className={`relative overflow-hidden h-28 sm:h-32 rounded-xl border flex items-center justify-center ${
+            isLight ? "bg-stone-50 border-stone-200" : "bg-[#0A0B0E] border-white/[0.08]"
+          }`}>
             <div
               className={`text-center transition-all duration-150 ${
-                isSpinning ? 'scale-95 opacity-80' : 'scale-100 opacity-100'
+                isSpinning ? "scale-95 opacity-80" : "scale-100 opacity-100"
               }`}
             >
               <div className="text-2xl sm:text-3xl mb-1">{currentSlide.icon}</div>
-              <div className="text-lg sm:text-xl font-bold text-stone-100 tracking-wide font-narrative-serif">
+              <div className={`text-lg sm:text-xl font-bold tracking-wide font-narrative-serif ${
+                isLight ? "text-stone-900" : "text-stone-100"
+              }`}>
                 {currentSlide.region}
               </div>
               <div className="text-xs sm:text-sm text-[#D4A359]/90 mt-1 font-narrative-serif">
@@ -1126,31 +1170,68 @@ ${logEntries
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between font-reading-sans">
-            <span className="text-xs sm:text-sm text-stone-400">
-              {isSpinning ? '齿轮飞速运转中...' : '不满意当前出身，可随时重新投胎'}
+          <div className={`mt-4 pt-3 border-t flex items-center justify-between font-reading-sans ${
+            isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
+          }`}>
+            <span className="text-xs sm:text-sm">
+              {isSpinning ? "齿轮飞速运转中..." : "不满意当前出身，可随时重新投胎"}
             </span>
-            <button
-              onClick={spinReel}
-              disabled={isSpinning}
-              className="px-4 py-2 rounded-xl bg-[#181B26] hover:bg-[#1E2230] border border-white/[0.08] text-stone-200 text-xs sm:text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50 active:scale-[0.98]"
-            >
-              <RotateCcw className={`w-3.5 h-3.5 text-amber-300 ${isSpinning ? 'animate-spin' : ''}`} />
-              重新投胎
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleToggleTheme}
+                className={`px-3 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 active:scale-[0.98] ${
+                  isLight
+                    ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                    : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] text-stone-200"
+                }`}
+                title={isLight ? "切换为深色模式" : "切换为浅色护眼模式"}
+              >
+                {isLight ? (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>深色</span>
+                  </>
+                ) : (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>浅色</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={spinReel}
+                disabled={isSpinning}
+                className={`px-4 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50 active:scale-[0.98] ${
+                  isLight
+                    ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                    : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] text-stone-200"
+                }`}
+              >
+                <RotateCcw className={`w-3.5 h-3.5 text-amber-400 ${isSpinning ? "animate-spin" : ""}`} />
+                重新投胎
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Dossier Card */}
-        <div className="bg-[#12141C] border border-white/[0.07] rounded-2xl p-5 sm:p-7 shadow-xl space-y-5">
-          <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+        <div className={`border rounded-2xl p-5 sm:p-7 shadow-xl space-y-5 transition-colors ${
+          isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#12141C] border-white/[0.07] text-stone-100"
+        }`}>
+          <div className={`flex items-center justify-between border-b pb-4 ${
+            isLight ? "border-stone-200" : "border-white/[0.06]"
+          }`}>
             <div>
               <span className="text-xs font-mono-num text-[#D4A359] uppercase tracking-wider block mb-1">
                 【生平档案编号 · 0岁】
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-100 flex items-center gap-3 font-narrative-serif">
+              <h2 className={`text-xl sm:text-2xl font-bold flex items-center gap-3 font-narrative-serif ${
+                isLight ? "text-stone-900" : "text-stone-100"
+              }`}>
                 <span>{charData.name}</span>
-                <span className="text-xs px-2.5 py-1 rounded-md bg-[#181B26] border border-white/[0.08] text-stone-300 font-reading-sans font-normal">
+                <span className={`text-xs px-2.5 py-1 rounded-md border font-reading-sans font-normal ${
+                  isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-[#181B26] border-white/[0.08] text-stone-300"
+                }`}>
                   {charData.gender} · 1998年生
                 </span>
               </h2>
@@ -1167,7 +1248,9 @@ ${logEntries
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+            <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
+      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+    }`}>
               <div className="text-amber-300 font-semibold flex items-center gap-2.5 font-reading-sans">
                 <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
                   <User className="w-3.5 h-3.5 text-amber-300" />
@@ -1179,7 +1262,9 @@ ${logEntries
               </p>
             </div>
 
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+            <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
+      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+    }`}>
               <div className="text-rose-300 font-semibold flex items-center gap-2.5 font-reading-sans">
                 <div className="w-6 h-6 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center shrink-0">
                   <User className="w-3.5 h-3.5 text-rose-300" />
@@ -1191,7 +1276,9 @@ ${logEntries
               </p>
             </div>
 
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+            <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
+      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+    }`}>
               <div className="text-teal-300 font-semibold flex items-center justify-between font-reading-sans">
                 <div className="flex items-center gap-2.5">
                   <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
@@ -1209,7 +1296,9 @@ ${logEntries
               <p className="text-stone-400 text-xs mt-1 font-reading-sans pl-8">{charData.family.wealthDetail}</p>
             </div>
 
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+            <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
+      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+    }`}>
               <div className="text-sky-300 font-semibold flex items-center gap-2.5 font-reading-sans">
                 <div className="w-6 h-6 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
                   <Shield className="w-3.5 h-3.5 text-sky-300" />
@@ -1242,11 +1331,17 @@ ${logEntries
   // =========================================================================
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col bg-[#0A0B0E] text-stone-100 font-reading-sans overflow-hidden">
+    <div className={`h-[calc(100vh-64px)] flex flex-col font-reading-sans overflow-hidden transition-colors duration-200 ${
+      isLight ? "bg-[#F4F3EF] text-stone-900" : "bg-[#0A0B0E] text-stone-100"
+    }`}>
       {/* Cockpit Top Bar */}
-      <header className="h-12 border-b border-white/[0.07] bg-[#0E1017] px-4 sm:px-6 flex items-center justify-between shrink-0 text-xs text-stone-300">
+      <header className={`h-12 border-b px-4 sm:px-6 flex items-center justify-between shrink-0 text-xs transition-colors duration-200 ${
+        isLight ? "bg-white border-stone-200 text-stone-700 shadow-2xs" : "bg-[#0E1017] border-white/[0.07] text-stone-300"
+      }`}>
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-stone-100 flex items-center gap-2 font-narrative-serif text-sm">
+          <span className={`font-semibold flex items-center gap-2 font-narrative-serif text-sm ${
+            isLight ? "text-stone-900" : "text-stone-100"
+          }`}>
             <span className="w-6 h-6 rounded-lg bg-[#D4A359]/15 border border-[#D4A359]/30 flex items-center justify-center shrink-0">
               <Calendar className="w-3.5 h-3.5 text-[#E0B26A]" />
             </span>
@@ -1298,31 +1393,90 @@ ${logEntries
           </button>
         </div>
 
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
           <button
             onClick={() => setShowCodexModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#13151F] hover:bg-[#181B26] border border-white/[0.08] hover:border-[#D4A359]/50 text-[#D4A359] transition-colors text-xs font-reading-sans"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-reading-sans transition-all shadow-2xs ${
+              isLight
+                ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                : "bg-[#13151F] hover:bg-[#181B26] border-white/[0.08] hover:border-[#D4A359]/50 text-[#D4A359]"
+            }`}
             title="查看一生结局图鉴"
           >
-            <BookOpen className="w-3.5 h-3.5 text-[#D4A359]" />
+            <BookOpen className="w-3.5 h-3.5 text-[#E0B26A]" />
             <span>结局图鉴 ({unlockedEndings.length}/16)</span>
           </button>
-          <span className="text-stone-400">
-            储蓄：
-            <span
-              className={`font-mono-num font-semibold ml-1 ${
-                attrs.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'
-              }`}
-            >
-              ¥{attrs.savings.toLocaleString()}
-            </span>
-          </span>
+
+          {/* Dual Financial Badges: Personal Cash vs Family Savings */}
+          <div
+            className={`flex items-center gap-2.5 px-3 py-1 rounded-lg border text-xs ${
+              isLight ? "bg-stone-100 border-stone-300" : "bg-[#13151F] border-white/[0.08]"
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[11px] ${isLight ? "text-stone-600" : "text-stone-400"}`}>
+                {currentAge < 18 ? "个人零花" : "个人现金"}：
+              </span>
+              <span
+                className={`font-mono-num font-semibold ${
+                  attrs.savings >= 0
+                    ? isLight ? "text-amber-800" : "text-amber-300"
+                    : "text-rose-500"
+                }`}
+              >
+                ¥{attrs.savings.toLocaleString()}
+              </span>
+            </div>
+            <span className={isLight ? "text-stone-300" : "text-stone-600"}>|</span>
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[11px] ${isLight ? "text-stone-600" : "text-stone-400"}`}>
+                {currentAge < 23 ? "家庭储蓄" : "老家父母储蓄"}：
+              </span>
+              <span
+                className={`font-mono-num font-semibold ${
+                  attrs.familySavings >= 0
+                    ? isLight ? "text-teal-700" : "text-teal-300"
+                    : "text-rose-500"
+                }`}
+              >
+                ¥{attrs.familySavings.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Theme Toggle */}
+          <button
+            onClick={handleToggleTheme}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-reading-sans transition-all ${
+              isLight
+                ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                : "bg-[#13151F] hover:bg-[#181B26] border-white/[0.08] text-stone-300 hover:text-white"
+            }`}
+            title={isLight ? "切换为深色古砚墨香模式" : "切换为浅色素雅宣纸模式"}
+          >
+            {isLight ? (
+              <>
+                <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                <span>深色</span>
+              </>
+            ) : (
+              <>
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span>浅色</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={handleRestart}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#13151F] hover:bg-[#181B26] border border-white/[0.08] text-stone-300 hover:text-white transition-all text-xs font-reading-sans group"
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-reading-sans group transition-all ${
+              isLight
+                ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                : "bg-[#13151F] hover:bg-[#181B26] border-white/[0.08] text-stone-300 hover:text-white"
+            }`}
             title="重新投胎"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-stone-300 group-hover:text-amber-300 group-hover:rotate-180 transition-all duration-300" />
+            <RotateCcw className="w-3.5 h-3.5 group-hover:rotate-180 transition-all duration-300" />
             <span>重新投胎</span>
           </button>
         </div>
@@ -1336,10 +1490,14 @@ ${logEntries
         <aside
           className={`${
             mobileTab === 'profile' ? 'flex' : 'hidden'
-          } lg:flex w-full lg:w-72 shrink-0 border-r border-white/[0.07] bg-[#0D0F15] p-4 flex-col gap-4 overflow-y-auto`}
+          } lg:flex w-full lg:w-72 shrink-0 border-r p-4 flex-col gap-4 overflow-y-auto transition-colors ${
+            isLight ? "border-stone-200 bg-[#FAF9F6] text-stone-800" : "border-white/[0.07] bg-[#0D0F15] text-stone-100"
+          }`}
         >
           {/* Identity Card */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-2.5 shadow-sm">
+          <div className={`border rounded-xl p-4 space-y-2.5 shadow-sm transition-colors ${
+      isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
+    }`}>
             <div className="flex items-center justify-between">
               <span className="text-base font-bold text-stone-100 font-narrative-serif">{charData.name}</span>
               <span className="text-xs px-2.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-300 font-reading-sans">
@@ -1472,7 +1630,9 @@ ${logEntries
           </div>
 
           {/* 5 Distinct Qualitative Mental & Social States */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-2 text-xs shadow-sm">
+          <div className={`border rounded-xl p-4 space-y-2 text-xs shadow-sm transition-colors ${
+      isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
+    }`}>
             <span className="font-semibold uppercase tracking-wider text-[#D4A359] block pb-1 border-b border-white/[0.06] font-narrative-serif">
               核心心智与特质
             </span>
@@ -1858,13 +2018,21 @@ ${logEntries
                     <button
                       key={cIdx}
                       onClick={() => handleSelectChoice(choice)}
-                      className="p-3.5 sm:p-4 rounded-xl border border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/80 hover:bg-[#1E2232] hover:-translate-y-0.5 text-left transition-all duration-200 active:scale-[0.99] group flex items-center justify-between shadow-sm"
+                      className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all duration-200 active:scale-[0.99] group flex items-center justify-between shadow-2xs ${
+                        isLight
+                          ? "bg-stone-50/90 hover:bg-amber-50/70 border-stone-200 hover:border-[#D4A359] text-stone-800"
+                          : "bg-[#181B26] hover:bg-[#1E2232] border-white/[0.08] hover:border-[#D4A359]/80 text-stone-200"
+                      }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <span className="w-5 h-5 rounded-md bg-[#13151F] border border-white/[0.1] text-[#D4A359] font-mono-num text-xs font-bold flex items-center justify-center shrink-0 group-hover:border-[#D4A359]/60">
+                        <span className={`w-5 h-5 rounded-md border font-mono-num text-xs font-bold flex items-center justify-center shrink-0 ${
+                          isLight ? "bg-stone-100 border-stone-300 text-amber-800" : "bg-[#13151F] border-white/[0.1] text-[#D4A359]"
+                        }`}>
                           {cIdx + 1}
                         </span>
-                        <span className="text-xs sm:text-[13.5px] font-medium text-stone-200 group-hover:text-white leading-relaxed font-reading-sans">
+                        <span className={`text-xs sm:text-[13.5px] font-medium leading-relaxed font-reading-sans ${
+                          isLight ? "text-stone-800 group-hover:text-stone-950" : "text-stone-200 group-hover:text-white"
+                        }`}>
                           {choice.text}
                         </span>
                       </div>
@@ -1882,20 +2050,32 @@ ${logEntries
 
           {/* Action Bar at Bottom of Middle Column */}
           {!waitingForChoice && (
-            <div className="py-2.5 px-4 sm:px-6 border-t border-white/[0.07] bg-[#0E1017] flex flex-wrap items-center justify-between gap-3 shrink-0 font-reading-sans">
+            <div
+              className={`py-2.5 px-4 sm:px-6 border-t ${
+                isLight ? "bg-white border-stone-200 shadow-md" : "bg-[#0E1017] border-white/[0.07]"
+              } flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 font-reading-sans relative min-h-[58px] transition-colors`}
+            >
               {logEntries.some((e) => e.age === 63) ? (
-                <>
-                  <span className="text-xs text-[#D4A359] font-medium flex items-center gap-1.5 font-narrative-serif">
-                    <Check className="w-4 h-4 text-emerald-400" />
+                <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <span
+                    className={`text-xs font-medium flex items-center gap-1.5 font-narrative-serif ${
+                      isLight ? "text-amber-800" : "text-[#D4A359]"
+                    }`}
+                  >
+                    <Check className="w-4 h-4 text-emerald-500" />
                     一生沧桑已成卷 · 六十三岁功德圆满
                   </span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleCopyRecord}
-                      className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] bg-[#181B26] hover:bg-[#1E2230] text-stone-200 text-xs font-medium flex items-center gap-1.5 transition-all"
+                      className={`px-3.5 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-all ${
+                        isLight
+                          ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                          : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] text-stone-200"
+                      }`}
                     >
                       <Copy className="w-3.5 h-3.5" />
-                      <span>{copied ? '已复制生平' : '一键复制一生档案'}</span>
+                      <span>{copied ? "已复制生平" : "一键复制一生档案"}</span>
                     </button>
                     <button
                       onClick={handleRestart}
@@ -1905,42 +2085,50 @@ ${logEntries
                       <span>开启下一世</span>
                     </button>
                   </div>
-                </>
+                </div>
               ) : (
                 <>
                   {/* Left Controls: Auto-Play Toggle, Volume-style Speed Slider & Skip to Choice */}
-                  <div className="flex items-center gap-2 sm:gap-2.5">
+                  <div className="flex items-center gap-2 sm:gap-2.5 z-10 w-full sm:w-auto justify-between sm:justify-start">
                     {/* Auto-Play Toggle */}
                     <button
                       onClick={() => setIsAutoPlaying((prev) => !prev)}
                       className={`px-3 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98] ${
                         isAutoPlaying
-                          ? 'bg-[#D4A359]/20 border-[#D4A359] text-[#D4A359] shadow-sm shadow-amber-950/40'
-                          : 'bg-[#181B26] border-white/[0.08] hover:border-white/[0.16] text-stone-200'
+                          ? isLight
+                            ? "bg-amber-100 border-amber-500 text-amber-900 shadow-2xs"
+                            : "bg-[#D4A359]/20 border-[#D4A359] text-[#D4A359] shadow-sm shadow-amber-950/40"
+                          : isLight
+                          ? "bg-stone-100 border-stone-300 hover:bg-stone-200 text-stone-700"
+                          : "bg-[#181B26] border-white/[0.08] hover:border-white/[0.16] text-stone-200"
                       }`}
                       title="自动推进时光流转 (快捷键: A)"
                     >
                       {isAutoPlaying ? (
                         <>
-                          <Pause className="w-3.5 h-3.5 fill-[#D4A359] text-[#D4A359]" />
+                          <Pause className={`w-3.5 h-3.5 fill-current ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
                           <span>暂停</span>
                           <span className="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-ping ml-0.5" />
                         </>
                       ) : (
                         <>
-                          <Play className="w-3.5 h-3.5 text-amber-300 fill-amber-300/20" />
+                          <Play className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
                           <span>自动流转</span>
                         </>
                       )}
                     </button>
 
                     {/* Speed Slider (Volume-Slider Style) */}
-                    <div className="flex items-center gap-2 bg-[#13151F] px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/[0.08]">
+                    <div
+                      className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border ${
+                        isLight ? "bg-stone-100 border-stone-300" : "bg-[#13151F] border-white/[0.08]"
+                      }`}
+                    >
                       <div className="w-5 h-5 rounded-md bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                        <Gauge className="w-3 h-3 text-amber-300" />
+                        <Gauge className="w-3 h-3 text-amber-600 dark:text-amber-300" />
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-stone-300 whitespace-nowrap hidden sm:inline">流速</span>
+                        <span className={`text-[11px] whitespace-nowrap hidden sm:inline ${isLight ? "text-stone-600" : "text-stone-300"}`}>流速</span>
                         <input
                           type="range"
                           min="0.5"
@@ -1948,10 +2136,12 @@ ${logEntries
                           step="0.1"
                           value={autoPlaySpeed}
                           onChange={(e) => setAutoPlaySpeed(parseFloat(e.target.value))}
-                          className="w-14 sm:w-20 h-1 bg-[#1C1F2B] rounded-lg appearance-none cursor-pointer accent-[#D4A359]"
+                          className={`w-14 sm:w-20 h-1 rounded-lg appearance-none cursor-pointer accent-[#D4A359] ${
+                            isLight ? "bg-stone-300" : "bg-[#1C1F2B]"
+                          }`}
                           title={`流转间隔：${autoPlaySpeed} 秒/岁（拖动左右调节快慢）`}
                         />
-                        <span className="text-[11px] font-mono-num text-amber-300 w-8 text-right font-medium">
+                        <span className={`text-[11px] font-mono-num w-8 text-right font-medium ${isLight ? "text-amber-800" : "text-amber-300"}`}>
                           {autoPlaySpeed.toFixed(1)}s
                         </span>
                       </div>
@@ -1960,53 +2150,63 @@ ${logEntries
                     {/* Skip Directly to Next Choice */}
                     <button
                       onClick={handleSkipToNextDecision}
-                      className="px-2.5 py-1.5 rounded-xl bg-[#181B26] hover:bg-[#1E2230] border border-white/[0.08] hover:border-white/[0.16] text-stone-200 text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98]"
+                      className={`px-2.5 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98] ${
+                        isLight
+                          ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-700"
+                          : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] hover:border-white/[0.16] text-stone-200"
+                      }`}
                       title="跳过平稳过渡年，一键直达下一个人生关键抉择或高考分流"
                     >
-                      <FastForward className="w-3.5 h-3.5 text-amber-300" />
+                      <FastForward className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300" />
                       <span className="hidden sm:inline">直达抉择</span>
                     </button>
                   </div>
 
-                  {/* Middle: Minimal Keyboard Shortcut Pills */}
-                  <div className="hidden xl:flex items-center gap-2 text-[11px] text-stone-500 font-reading-sans">
-                    <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-400 font-mono-num text-[10px]">Space</kbd>
-                      推进
-                    </span>
-                    <span>·</span>
-                    <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-400 font-mono-num text-[10px]">1~4</kbd>
-                      选支
-                    </span>
-                    <span>·</span>
-                    <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-400 font-mono-num text-[10px]">A</kbd>
-                      自动
-                    </span>
-                  </div>
-
-                  {/* Right: Primary Step Button */}
-                  <div>
+                  {/* ★★★ CENTERED PRIMARY STEP BUTTON (绝对居中 / 视觉焦点) ★★★ */}
+                  <div className="sm:absolute sm:left-1/2 sm:-translate-x-1/2 flex items-center justify-center w-full sm:w-auto z-10 py-1 sm:py-0">
                     <button
                       onClick={handleNextNaturalYear}
-                      className="px-5 sm:px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-950/40 active:scale-[0.98]"
+                      className="w-full sm:w-auto px-7 sm:px-9 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30 hover:shadow-lg active:scale-[0.98] font-narrative-serif tracking-wide"
                     >
                       <span>
                         {!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)
-                          ? '十八岁 · 高考放榜与成人分流'
+                          ? "十八岁 · 高考放榜与成人分流"
                           : timeline[timelineIndex + 1]
                           ? timeline[timelineIndex + 1].age === 18
-                            ? '十八岁 · 高考放榜与成人分流'
+                            ? "十八岁 · 高考放榜与成人分流"
                             : timeline[timelineIndex + 1].age > currentAge + 1
                             ? `迈向${timeline[timelineIndex + 1].age}岁（${timeline[timelineIndex + 1].title}）`
                             : `迈入下一岁（${currentAge + 1}岁）`
                           : currentNode.age === 27 && !logEntries.some((e) => e.age === 63)
-                          ? '迈向三十岁（而立之年）'
-                          : '继续前行'}
+                          ? "迈向三十岁（而立之年）"
+                          : "继续前行"}
                       </span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
+                  </div>
+
+                  {/* Right: Keyboard Shortcut Pills */}
+                  <div className={`hidden xl:flex items-center gap-2 text-[11px] font-reading-sans z-10 ${isLight ? "text-stone-500" : "text-stone-400"}`}>
+                    <span className="flex items-center gap-1">
+                      <kbd className={`px-1.5 py-0.5 rounded border font-mono-num text-[10px] ${
+                        isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-[#181B26] border-white/[0.12] text-stone-300"
+                      }`}>Space</kbd>
+                      推进
+                    </span>
+                    <span>·</span>
+                    <span className="flex items-center gap-1">
+                      <kbd className={`px-1.5 py-0.5 rounded border font-mono-num text-[10px] ${
+                        isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-[#181B26] border-white/[0.12] text-stone-300"
+                      }`}>1~4</kbd>
+                      选支
+                    </span>
+                    <span>·</span>
+                    <span className="flex items-center gap-1">
+                      <kbd className={`px-1.5 py-0.5 rounded border font-mono-num text-[10px] ${
+                        isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-[#181B26] border-white/[0.12] text-stone-300"
+                      }`}>A</kbd>
+                      自动
+                    </span>
                   </div>
                 </>
               )}
@@ -2020,14 +2220,18 @@ ${logEntries
         <aside
           className={`${
             mobileTab === 'family' ? 'flex' : 'hidden'
-          } lg:flex w-full lg:w-72 shrink-0 border-l border-white/[0.07] bg-[#0D0F15] p-4 flex-col gap-4 overflow-y-auto`}
+          } lg:flex w-full lg:w-72 shrink-0 border-l p-4 flex-col gap-4 overflow-y-auto transition-colors ${
+            isLight ? "border-stone-200 bg-[#FAF9F6] text-stone-800" : "border-white/[0.07] bg-[#0D0F15] text-stone-100"
+          }`}
         >
           <span className="text-xs font-semibold uppercase tracking-wider text-[#D4A359] block pb-1 border-b border-white/[0.06] font-narrative-serif">
             原生家庭与血缘生态
           </span>
 
           {/* Father Dynamic Card */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+          <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
+      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+    }`}>
             <div className="flex items-center justify-between font-reading-sans">
               <span className="flex items-center gap-2 text-amber-300 font-semibold">
                 <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
@@ -2046,7 +2250,9 @@ ${logEntries
           </div>
 
           {/* Mother Dynamic Card */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+          <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
+      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+    }`}>
             <div className="flex items-center justify-between font-reading-sans">
               <span className="flex items-center gap-2 text-rose-300 font-semibold">
                 <div className="w-6 h-6 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center shrink-0">
@@ -2065,7 +2271,9 @@ ${logEntries
           </div>
 
           {/* Siblings */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+          <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
+      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+    }`}>
             <div className="text-sky-300 font-semibold flex items-center justify-between font-reading-sans">
               <span className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
@@ -2080,7 +2288,9 @@ ${logEntries
           </div>
 
           {/* Housing & Family Assets */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+          <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
+      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+    }`}>
             <div className="text-teal-300 font-semibold flex items-center justify-between font-reading-sans">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
