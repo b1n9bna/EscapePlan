@@ -16,34 +16,33 @@ export interface SimProfile {
   initialSavingsRMB: number;
   englishLevel: string;
   targetCountryId: string;
-  // 1in8b Global Demographic Stats
-  globalBirthRank: string;
-  globalWealthPercentile: number; // 超过全球百分之多少的人口
-  baseHealth: number;
-  baseHappiness: number;
-  baseLanguage: number;
-  baseBelonging: number;
+  // 乡土中国背景
+  familyRole: string; // 宗族角色：如“县城长子”、“农村小女儿”、“三代单传独生子”
+  soilTiesDesc: string; // 乡土关系网特征
 }
 
-export interface SimChoice {
+export interface DualChoice {
   text: string;
   detail: string;
-  narrative: string;
+  reaction: string; // 做出选择后的内心回响
   fundsDelta: number;
-  healthDelta?: number;
-  happinessDelta?: number;
-  languageDelta?: number;
-  belongingDelta?: number;
+  individualSovereigntyDelta: number; // 现代个体独立度 +/-
+  soilKinshipTiesDelta: number; // 故土宗族羁绊度 +/-
 }
 
-export interface SimDiaryEntry {
+export interface DualDiaryEntry {
   year: number;
   timeLabel: string;
-  sceneTitle: string;
-  sceneText: string;
-  worldFact: string; // 联合国/WHO/OECD真实统计学切片
-  parallelWorldMoment: string; // 此时此刻，地球上80亿人的另一秒
-  choices: SimChoice[];
+  phaseTitle: string;
+  // 此岸：异邦的个人生活
+  hereTitle: string;
+  hereText: string;
+  // 彼岸：老家乡土差序格局的回响
+  thereTitle: string;
+  thereText: string;
+  // 费孝通《乡土中国》社会学观察
+  sociologicalFootnote: string;
+  choices: DualChoice[];
 }
 
 export interface SimCountry {
@@ -52,11 +51,7 @@ export interface SimCountry {
   flag: string;
   city: string;
   livingCostDesc: string;
-  // 1in8b Demographic Real-World Stats
-  lifeExpectancy: number; // 预期寿命
-  annualSunshineHours: number; // 年均日照时数
-  immigrantSharePercent: string; // 移民人口占比
-  medianMonthlyWageRMB: string; // 真实全职中位数月薪
+  culturalDistance: string; // 与东亚乡土社会的文化距离描述
 }
 
 export const PROFESSIONS: Profession[] = [
@@ -111,10 +106,7 @@ export const SIM_COUNTRIES: SimCountry[] = [
     flag: "🇯🇵",
     city: "东京郊区 / 大阪",
     livingCostDesc: "生活成本适中，物价精细，满街便利店与自行车道。",
-    lifeExpectancy: 84.6,
-    annualSunshineHours: 1950,
-    immigrantSharePercent: "2.4%",
-    medianMonthlyWageRMB: "约 1.8 万 RMB"
+    culturalDistance: "近邻社会 · 汉字文化圈但人际边界极度清晰冰冷"
   },
   {
     id: "australia",
@@ -122,10 +114,7 @@ export const SIM_COUNTRIES: SimCountry[] = [
     flag: "🇦🇺",
     city: "悉尼郊区 / 维州农场小镇",
     livingCostDesc: "阳光充沛，草坪宽阔，人工极贵，靠体力劳动能自给自足。",
-    lifeExpectancy: 83.3,
-    annualSunshineHours: 2630,
-    immigrantSharePercent: "29.8%",
-    medianMonthlyWageRMB: "约 2.6 万 RMB"
+    culturalDistance: "南半球大洋洲 · 彻底告别宗族凝视的广袤移民大陆"
   },
   {
     id: "germany",
@@ -133,10 +122,7 @@ export const SIM_COUNTRIES: SimCountry[] = [
     flag: "🇩🇪",
     city: "柏林郊区 / 杜伊斯堡",
     livingCostDesc: "生活节奏严谨，严格八小时下班，周日全城闭店安宁。",
-    lifeExpectancy: 81.0,
-    annualSunshineHours: 1620,
-    immigrantSharePercent: "28.7%",
-    medianMonthlyWageRMB: "约 2.4 万 RMB"
+    culturalDistance: "中欧法理社会 · 严苛契约与绝对个人隐私保护"
   },
   {
     id: "spain",
@@ -144,10 +130,7 @@ export const SIM_COUNTRIES: SimCountry[] = [
     flag: "🇪🇸",
     city: "瓦伦西亚 / 阿利坎特",
     livingCostDesc: "气候温暖日照长，物价宜人，漫步地中海海滩与街巷。",
-    lifeExpectancy: 83.9,
-    annualSunshineHours: 2800,
-    immigrantSharePercent: "17.2%",
-    medianMonthlyWageRMB: "约 1.5 万 RMB"
+    culturalDistance: "南欧熟人天性 · 热烈松弛，家庭聚会却无东亚攀比焦虑"
   },
   {
     id: "canada",
@@ -155,10 +138,7 @@ export const SIM_COUNTRIES: SimCountry[] = [
     flag: "🇨🇦",
     city: "卡尔加里 / 温哥华郊区",
     livingCostDesc: "雪山广阔，多元包容，冬日炉火与暖咖啡的漫长岁月。",
-    lifeExpectancy: 82.8,
-    annualSunshineHours: 2050,
-    immigrantSharePercent: "23.0%",
-    medianMonthlyWageRMB: "约 2.3 万 RMB"
+    culturalDistance: "北美枫叶之国 · 多元族裔并存，漫长冬日带来深刻内省"
   },
   {
     id: "thailand",
@@ -166,21 +146,15 @@ export const SIM_COUNTRIES: SimCountry[] = [
     flag: "🇹🇭",
     city: "清迈宁曼路旁的小巷",
     livingCostDesc: "物价低廉，空气里有香茅草味道，生活节奏慢得像停滞了。",
-    lifeExpectancy: 77.2,
-    annualSunshineHours: 2650,
-    immigrantSharePercent: "5.2%",
-    medianMonthlyWageRMB: "约 4,500 RMB"
+    culturalDistance: "热带佛国 · 慢调与包容，老中胃与乡愁最温柔的海外平替"
   },
   {
     id: "china_stay",
-    name: "留在原来的城市 (平行对照)",
+    name: "留在原来的城市 (乡土对照组)",
     flag: "🇨🇳",
     city: "老家省会 / 现住地",
     livingCostDesc: "熟悉的路口，熟悉的外卖，家人在身边，平淡而琐碎的生活。",
-    lifeExpectancy: 78.6,
-    annualSunshineHours: 2000,
-    immigrantSharePercent: "0.1%",
-    medianMonthlyWageRMB: "约 6,500 RMB"
+    culturalDistance: "原生母体 · 浸泡在差序格局与人间烟火的深厚土壤中"
   }
 ];
 
@@ -195,12 +169,8 @@ export const RANDOM_PROFILES: Omit<SimProfile, 'targetCountryId'>[] = [
     hometown: "江西某县城，在杭州打工三年",
     initialSavingsRMB: 38000,
     englishLevel: "普通高中英语底子，能听懂简单单词",
-    globalBirthRank: "全球每 100 个人中，约有 17 人出生在东亚这片热土",
-    globalWealthPercentile: 51,
-    baseHealth: 82,
-    baseHappiness: 62,
-    baseLanguage: 30,
-    baseBelonging: 45
+    familyRole: "县城工薪家庭长女，下有一个读高中的弟弟",
+    soilTiesDesc: "逢年过节七大姑八大姨必查户口式催婚，父母常把‘女孩子安稳考个编制嫁人多好’挂在嘴边。"
   },
   {
     id: "p2",
@@ -212,12 +182,8 @@ export const RANDOM_PROFILES: Omit<SimProfile, 'targetCountryId'>[] = [
     hometown: "山东潍坊农村，干了七年汽修",
     initialSavingsRMB: 52000,
     englishLevel: "只会认仪表盘上的英文故障码",
-    globalBirthRank: "全球每 100 个人中，约有 28 人从事基层制造与技术维修",
-    globalWealthPercentile: 58,
-    baseHealth: 88,
-    baseHappiness: 58,
-    baseLanguage: 20,
-    baseBelonging: 40
+    familyRole: "宗族观念浓厚的农村独子，堂兄弟七八人",
+    soilTiesDesc: "村里婚丧嫁娶礼金来往极繁重，逢年过节各家攀比盖房买车，父辈极看重‘家族门面’。"
   },
   {
     id: "p3",
@@ -229,12 +195,8 @@ export const RANDOM_PROFILES: Omit<SimProfile, 'targetCountryId'>[] = [
     hometown: "湖南株洲，毕业后在成都做咖啡",
     initialSavingsRMB: 26000,
     englishLevel: "日常打招呼还行，语速一快就发懵",
-    globalBirthRank: "全球 80 亿人中，约有 4.2 亿服务业青年和你拥有相似的积蓄",
-    globalWealthPercentile: 44,
-    baseHealth: 80,
-    baseHappiness: 65,
-    baseLanguage: 35,
-    baseBelonging: 50
+    familyRole: "厂区职工家庭独女，父母已退休",
+    soilTiesDesc: "家住老机械厂生活区，邻里街坊彼此熟络透明，谁家换个工作买台电视全院皆知。"
   },
   {
     id: "p4",
@@ -246,12 +208,8 @@ export const RANDOM_PROFILES: Omit<SimProfile, 'targetCountryId'>[] = [
     hometown: "河南洛阳，在武汉外包公司工作八年",
     initialSavingsRMB: 110000,
     englishLevel: "能看懂英文技术文档，开不了口",
-    globalBirthRank: "全球受过全日制高等教育的人口比例仅为 7.2%",
-    globalWealthPercentile: 72,
-    baseHealth: 68,
-    baseHappiness: 50,
-    baseLanguage: 40,
-    baseBelonging: 35
+    familyRole: "背负全村‘名牌大学生’期待的农家子弟",
+    soilTiesDesc: "当年考上大学村头放了三千响鞭炮，如今父母年过六旬，每次视频父母总小心翼翼问‘城里买房差多少’。"
   },
   {
     id: "p5",
@@ -263,12 +221,8 @@ export const RANDOM_PROFILES: Omit<SimProfile, 'targetCountryId'>[] = [
     hometown: "江苏徐州，在公立医院做了四年合同制护士",
     initialSavingsRMB: 45000,
     englishLevel: "考过护士英语，专业词汇还算熟悉",
-    globalBirthRank: "全球医疗护理人员缺口超过 600 万人",
-    globalWealthPercentile: 55,
-    baseHealth: 76,
-    baseHappiness: 56,
-    baseLanguage: 45,
-    baseBelonging: 42
+    familyRole: "大家庭里最懂事的二姐，习惯替别人兜底",
+    soilTiesDesc: "亲戚家里谁有个头疼脑热都要找她挂号托关系，人情包袱重，但也是全家最温暖的依托。"
   }
 ];
 
@@ -282,145 +236,137 @@ export function getRandomProfile(): SimProfile {
   };
 }
 
-export const DIARY_STORIES: Record<string, SimDiaryEntry[]> = {
+export const DUAL_STORIES: Record<string, DualDiaryEntry[]> = {
   japan: [
     {
       year: 1,
       timeLabel: "初抵 · 第 1 年",
-      sceneTitle: "那间空荡荡的单身公寓，与晚上八点的超市",
-      sceneText: "第一天搬进单身公寓，房间里空得能听见回音，没有床，连天花板上的吸顶灯泡都要自己去买。窗帘太贵舍不得买，你拿带过来的两件厚羽绒服夹在窗框上挡光。晚上 7 点 50 分，你站在超市熟食区旁边假装看酸奶，眼睛一直瞟着那个穿围裙的理货员——等他掏出红色‘半额（半价）’贴纸贴在炸猪排便当上的一瞬间，你伸手拿了一盒，心算了一下：才 260 日元，合人民币 13 块钱。",
-      worldFact: "据 OECD 数据，东京单身独居率高达 50.2%，超过 45% 的年轻工薪族习惯购买晚间超市打折餐品度日。",
-      parallelWorldMoment: "此时此刻：在埃及开罗，一个年轻人正把刚出炉的皮塔饼装进纸袋；在老家县城，你妈正把吃剩的红烧肉用保鲜膜封好放进冰箱。",
+      phaseTitle: "破土与喜礼：半价便当与三十桌流水席",
+      hereTitle: "此岸 · 东京单身公寓的羽绒服窗帘",
+      hereText: "第一天搬进单身公寓，空荡荡的房间回音刺耳。没有床，窗帘太贵舍不得买，你拿带过来的两件厚羽绒服夹在窗框上挡光。晚上 7 点 50 分，你站在超市熟食区假装看酸奶，等店员掏出红色‘半额（半价）’贴纸贴在炸猪排便当上。心算了一下才 260 日元（合 13 块钱），你抓起一盒，就着百元店买的塑料箱倒扣当桌子，安安静静吃完。",
+      thereTitle: "彼岸 · 堂哥在老家镇上的大婚流水席",
+      thereText: "同在这个星期，老家堂哥在镇上礼堂办婚宴，摆了整整三十桌流水席。鞭炮震天响，大伯在敬酒时大着嗓门问你妈：“二妹，建国/若雨怎么没回来？大城市这么忙啊，亲堂哥结婚都不露面？”你妈赔着笑脸说国外请假难。家族群里发满了一桌桌大鱼大肉和敬酒视频，老人们都在问你一个月赚多少钱。",
+      sociologicalFootnote: "费孝通《乡土中国》：“在差序格局里，公私是相对的，群己界限是模糊的。婚丧嫁娶是宗族血缘网最重要的仪式。人不到场，便是一种‘断席’，再体面的借口在乡土伦理看来也是一种冷漠的脱序。”",
       choices: [
         {
-          text: "去百元店买两个塑料收纳箱倒扣着当桌子，去二手店淘了个 40 块钱掉漆的旧电饭煲。",
-          detail: "虽然简陋，但屋子里第一次飘出了热米饭的香气。",
-          narrative: "第一锅米饭煮好的时候，米香飘满了十几平米的小房间。你坐在地板上，就着一罐拌饭海苔吃了一大碗。吃完把碗洗得干干净净，忽然觉得日子好像能过下去了。",
-          fundsDelta: -1200,
-          healthDelta: 2,
-          happinessDelta: 8,
-          languageDelta: 2,
-          belongingDelta: -4
+          text: "在家族群里包了个 600 块微信红包，并附言祝百年好合；看着账户余额，决定下周少吃两顿外食。",
+          detail: "隔着大洋，用金钱赎回自己在宗族伦理里的‘在场证明’。",
+          reaction: "大伯在群里领了红包回了个大拇指，你妈私聊发来一句‘自己在那边够花不’。你关掉手机，屋子里只有冰箱压缩机的嗡嗡声。",
+          fundsDelta: -600,
+          individualSovereigntyDelta: -5,
+          soilKinshipTiesDelta: 10
         },
         {
-          text: "找同在东京的华人转租群，花更少钱搬去跟别人合租，分摊掉水电与网络费。",
-          detail: "省下了宝贵的押金，但得习惯隔壁屋半夜打电话的声音。",
-          narrative: "合租屋的厨房有点油腻，室友是个在中华料理店打工的同胞。晚上你们在狭窄的过道擦肩而过，互相客气地点头打个招呼，各自端着泡面回屋关门。",
-          fundsDelta: -600,
-          healthDelta: -2,
-          happinessDelta: 3,
-          languageDelta: 0,
-          belongingDelta: 6
+          text: "私聊堂哥发了一条真诚的长祝词，把原本准备随礼的钱留给自己添置了一台二手小电饭煲。",
+          detail: "把有限的生存资源留给异国的立足之地，接受在老家亲戚口中‘这孩子变生分了’的评价。",
+          reaction: "堂哥回了句‘谢了兄弟，注意身体’。第一锅米饭煮好的时候，米香飘满了十几平米的小房间，你觉得自己踩在了实地上。",
+          fundsDelta: -180,
+          individualSovereigntyDelta: 12,
+          soilKinshipTiesDelta: -8
         }
       ]
     },
     {
       year: 2,
       timeLabel: "立足 · 第 2 年",
-      sceneTitle: "那家 1200 日元的快剪店，与藏在枕头底下的感冒药",
-      sceneText: "头发长长了，你实在没办法，硬着头皮走进车站旁 1200 日元的快剪理发店。理发师傅问了一长串话，你一句没听懂，耳朵涨得通红，只能掏出手机翻出两年前在老家拍的照片递过去。剪完后你习惯性低头说了声‘对不起’，对方愣了一下，笑着递给你一块热毛巾。入冬的时候你发烧到了 38 度 5，不敢叫救护车怕贵，裹着被子发汗。晚上妈妈突然打微信视频过来，你慌慌张张把床头的药盒塞到枕头底下，用手抹了抹脸，笑着说‘妈，这边暖和着呢，刚喝了热汤有点出汗’。",
-      worldFact: "全球 2.8 亿跨国移民中，超过 70% 曾在前两年经历过语言隔阂导致的就医恐惧与报喜不报忧。",
-      parallelWorldMoment: "此时此刻：在墨尔本的海边，晨光刚把天际染成金黄；在老家客厅里，电视里正放着天气预报的背景音乐。",
+      phaseTitle: "裂痕与缺席：1200日元快剪与老屋拆迁",
+      hereTitle: "此岸 · 1200日元快剪店与塞在枕头下的药盒",
+      hereText: "头发长了，你硬着头皮走进车站旁 1200 日元的快剪店，听不懂日语，只能掏出两年前在老家拍的照片递给师傅。入冬的时候你发烧到 38 度 5，不敢叫救护车怕贵，裹着被子发汗。晚上妈妈突然打微信视频过来，你慌慌张张把床头的药盒塞到枕头底下，用手抹了抹脸，笑着说‘妈，这边暖和着呢，刚喝了热汤有点出汗’。",
+      thereTitle: "彼岸 · 老街拆迁，当年发小考编晒车",
+      thereText: "老家县城的那条老街拆迁了，你小时候捉迷藏的石桥被推平改建成了宽阔的景观大道。当年和你一起在网吧包夜的高中发小，在老家考上了自然资源局的事业编，朋友圈里发了提新车和订婚的喜帖，评论区全是当年老同学的一片‘苟富贵勿相忘’。那张你曾熟悉的人情大网，在没有你的情况下，按部就班地热闹繁衍着。",
+      sociologicalFootnote: "费孝通《乡土中国》：“乡土社会是一个生于斯、死于斯的熟人社会。离土之人最先感受到的，不是异国的排斥，而是故土不再等待你的失落。你的童年记忆正被水泥抹平，而你在老家的位置，正被别人填满。”",
       choices: [
         {
-          text: "买了一辆前车篮掉了一小块漆的二手自行车，下班开始自己骑车去更远的廉价蔬菜超市。",
-          detail: "不用再每次提着两袋大米走 20 分钟坡路了。",
-          narrative: "推着那辆旧车走下坡道的时候，天边有一大片粉红色的晚霞。风吹在脸上有点凉，但你第一次觉得这个城市的声音没有那么刺耳了。",
+          text: "给发小的朋友圈点了个赞，关掉手机，去二手店淘了一辆 300 块钱掉漆的旧自行车。",
+          detail: "认清自己已经是一个‘局外人’，把精力转回到眼下骑车去廉价菜场的坡道上。",
+          reaction: "推着那辆旧车走下坡道的时候，天边有一大片粉红色的晚霞。冷风吹在脸上，你第一次觉得这个城市的声音没有那么刺耳了。",
           fundsDelta: -300,
-          healthDelta: 5,
-          happinessDelta: 7,
-          languageDelta: 3,
-          belongingDelta: 2
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: -5
         },
         {
-          text: "周末去附近的便利店兼职做收银，硬着头皮每天重复几百遍‘欢迎光临’和找零用语。",
-          detail: "每天站六个小时，但日语听力和口语在实战中慢慢脱敏。",
-          narrative: "最开始老是找错硬币，急得满头大汗。三个月后，你已经能闭着眼睛辨别 100 日元和 50 日元的重量了。下班店长塞给你两个快过期的饭团，说辛苦了。",
-          fundsDelta: 3500,
-          healthDelta: -4,
-          happinessDelta: 4,
-          languageDelta: 16,
-          belongingDelta: 6
+          text: "趁着视频跟妈妈多聊了半个小时老街邻居的八卦，听着熟悉的乡音，眼眶几次泛酸。",
+          detail: "哪怕隔着时差和屏幕，依然贪恋那份来自熟人社会的温暖包容。",
+          reaction: "妈妈絮絮叨叨说着张家长李家短，挂断电话时天已经彻底黑了。你摸了摸额头，烧好像退了一点点。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: -3,
+          soilKinshipTiesDelta: 12
         }
       ]
     },
     {
       year: 3,
       timeLabel: "日常 · 第 3 年",
-      sceneTitle: "厨房水槽堵塞的下午，与那个笑出来的瞬间",
-      sceneText: "周六下午水槽突然堵了，冒出一股发酸的脏水。查了一下请疏通师傅上门要花两万多日元，你心疼得肉跳。一个人在网上搜‘下水道堵塞自己修’，去百元店买了根十块钱的简易塑料管道条，跪在厨房冰凉的瓷砖地上捅了半个小时。头发和污垢哗啦一声排走、水流打着旋漏下去的那一刻，你瘫坐在地上，两手都是黑色的油污，看着被修好的水槽，忍不住一个人在屋里苦笑了一声。",
-      worldFact: "日本蓝领熟练工上门服务人工费位列亚洲榜首，单次家庭下水管上门疏通中位数为 18,500 日元（约合 880 RMB）。",
-      parallelWorldMoment: "此时此刻：在伦敦的冬雨中，双层红色巴士缓缓驶过大桥；在你十几平米的小房间里，一碗热腾腾的牛肉饭正散发着浓郁的洋葱香气。",
+      phaseTitle: "远水与近渴：水槽里的头发与县医院的陪护床",
+      hereTitle: "此岸 · 通水槽的周六下午与吉野家温泉蛋",
+      hereText: "周六下午水槽突然堵了，冒出一股发酸的脏水。查了一下请疏通师傅上门要花两万多日元，你心疼得肉跳。一个人在网上搜‘下水道堵塞自己修’，去百元店买了根十块钱的简易塑料管道条，跪在厨房冰凉的瓷砖地上捅了半个小时。头发和污垢哗啦一声排走的那一刻，你两手黑油瘫坐在地上，苦笑出声。随后去吉野家吃了碗大份牛肉饭，多要了个温泉蛋奖励自己。",
+      thereTitle: "彼岸 · 母亲胆结石住院，走廊里的折叠床",
+      thereText: "也就是这一周，母亲胆结石急性发作在县医院动微创手术。病房紧张，大姐在走廊里租了张 20 块钱一晚的折叠陪护床，白天上班晚上在床前倒尿倒水送骨头汤。微信群里发来一张母亲打着吊瓶睡着的背影，亲戚们在群里排班送饭。大舅在语音里叹气：“家里有事，还是身边的人管用，远在天边哪怕挣美元英镑，也是远水救不了近火。”",
+      sociologicalFootnote: "费孝通《乡土中国》：“在传统家庭伦理中，‘孝’是具体的端茶倒水、是肉身的床前侍奉。跨国移居者撕裂了这种肉身侍奉的可能，转账成了唯一的代偿工具，却也同时暴露出离土者在面对亲情衰老时最深沉的无力感。”",
       choices: [
         {
-          text: "去吉野家吃了碗大份牛肉饭，多要了一份温泉蛋，奖励自己一下。",
-          detail: "生活里极微小、却真真切切属于自己的成就感。",
-          narrative: "店里静悄悄的，旁边的上班族大叔低着头大口扒饭，电视里放着无聊的综艺。你把蛋黄戳破裹着米饭吞下去，胃里暖呼呼的。",
-          fundsDelta: -45,
-          healthDelta: 3,
-          happinessDelta: 10,
-          languageDelta: 2,
-          belongingDelta: 3
+          text: "二话没说往大姐卡里转了 6000 块钱，让给母亲用最好的进口消炎药，并给大姐订了补品。",
+          detail: "用异国省吃俭用攒下的真金白银，弥补自己无法床前尽孝的内疚与亏欠。",
+          reaction: "大姐发来微信语音带着哽咽：‘老弟/妹子，钱收到了，大姐知道你在外面不容易，你放心，家里有我。’那一夜你坐在窗台前看了很久的电车灯光。",
+          fundsDelta: -6000,
+          individualSovereigntyDelta: -5,
+          soilKinshipTiesDelta: 18
         },
         {
-          text: "冲了个热水澡，把屋子彻底拖了一遍，换上晒干带阳光味的干净被套。",
-          detail: "慢慢把这个租来的小窝打理得越来越像一个家。",
-          narrative: "被子上带着淡淡的洗衣液清香。你坐在窗边看着外面的电线杆和飞过去的乌鸦，心里忽然有一块悬着的地方落了地。",
-          fundsDelta: 0,
-          healthDelta: 4,
-          happinessDelta: 9,
-          languageDelta: 1,
-          belongingDelta: 5
+          text: "每天定闹钟在早晚交接班时给母亲打视频，并帮大姐查清药品的医保报销流程，转了 2000 元分担开销。",
+          detail: "在自身微薄的经济抗风险能力与家庭责任之间寻找平衡，不过度透支异国的生存底线。",
+          reaction: "母亲在屏幕那头虚弱地笑着说‘好多了，别老花钱’。你合上笔记本，明白人生的很多遗憾，从你拖着行李箱过海关那一刻就注定了。",
+          fundsDelta: -2000,
+          individualSovereigntyDelta: 8,
+          soilKinshipTiesDelta: 6
         }
       ]
     },
     {
       year: 4,
       timeLabel: "习惯 · 第 4 年",
-      sceneTitle: "不再看导航的回家路，与隔壁老太太的打招呼",
-      sceneText: "你已经能熟练地在周二早上把可燃垃圾绑好放进收集网，再也没有被贴过黄色的警告贴纸。去区役所更新地址，工作人员说了一串专业术语，你虽然语速慢，但已经能拿出印章和在留卡一件件办妥，手心不再像以前那样冒冷汗。下楼倒垃圾碰见隔壁牵着柴犬的日本老太太，对方微笑着冲你道早安，你下意识自然地回了句‘おはようございます’，两个人微微躬身，擦肩而过。",
-      worldFact: "跨国移居者通常在第 3.5 年前后跨越本地基础行政与社区融入门槛，孤独感曲线开始显著回升。",
-      parallelWorldMoment: "此时此刻：地球上有 1.4 亿人正堵在各自城市的晚高峰车流里；而你正提着两颗卷心菜，慢悠悠踩着单车下坡。",
+      phaseTitle: "缺席与凝固：区役所印章与除夕夜的手机屏幕",
+      hereTitle: "此岸 · 不再看导航的回家路，与寄回家的洗脚盆",
+      hereText: "你已经能熟练地在周二早上把可燃垃圾绑好放进收集网，去区役所办事拿出印章和在留卡一件件办妥，手心不再冒冷汗。下楼倒垃圾碰见邻居牵柴犬的老太太，能自然躬身道早安。你用攒下的钱给老家父母在网上买了一台带加热按摩的自动洗脚盆和两件厚羽绒服，周末去河边二手书店淘了两本带插图的散文，坐在草坪上看电车驶过。",
+      thereTitle: "彼岸 · 除夕夜的大年三十，架在可乐瓶上的手机",
+      thereText: "老家除夕夜，大圆桌摆满了卤牛肉、炸丸子和红烧鱼，电视里春晚闹哄哄的。爸爸把手机架在雪碧可乐瓶上跟你视频通话，表弟喝得满面红光冲着镜头喊：“哥/姐！啥时候带个洋媳妇/洋女婿回村给我们看看啊？！”满桌亲戚都在大笑起哄。网络卡顿了一下，画面突然凝固在父母眼角深深的笑意与眼底那一抹掩饰不住的落寞里。",
+      sociologicalFootnote: "费孝通《乡土中国》：“宗族聚餐是凝固差序格局的最高潮，所有人都在寻找自己的归属席位。而那一根悬空的视频网线，把两个截然不同的文明维度强行拉在一起，又在挂断红键按下的一瞬间，将孤独放大成千倍。”",
       choices: [
         {
-          text: "给家里寄了一万块钱，给爸妈在网上买了件保暖羽绒服和一台自动洗脚盆。",
-          detail: "虽然存款没很多，但终于有能力给家里添置点东西了。",
-          narrative: "妈妈发来微信语音，声音里带着点心疼又带着点自豪：‘自己在那边多吃点好的，别老省着。’你听完按了锁屏键，把头靠在窗玻璃上。",
-          fundsDelta: -10000,
-          healthDelta: 0,
-          happinessDelta: 14,
-          languageDelta: 0,
-          belongingDelta: 12
+          text: "笑着在视频里给全桌亲戚拜年，顺从地听着他们七嘴八舌的催促与盘问，把酸楚咽在肚子里。",
+          detail: "哪怕观念早已脱钩，依然愿意配合完成这场属于老家宗族的大团圆戏码。",
+          reaction: "挂断电话，房间里死一般的寂静。窗外是东京清冷整洁的马路，远处偶有一辆救护车呼啸而过。你把洗好的衣服挂在椅背上，心里空荡荡的。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: -4,
+          soilKinshipTiesDelta: 15
         },
         {
-          text: "在河边的二手书店淘了两本带插图的生活散文，周末一个人坐在河堤草坪上看书发呆。",
-          detail: "不再焦虑每天必须学多少单词，生活节奏慢了下来。",
-          narrative: "几个日本初中生骑着自行车从河堤上呼啸而过，笑声洒了一路。河水在阳光下泛着细碎的金光，你闭上眼睛晒了半个小时太阳。",
-          fundsDelta: -50,
-          healthDelta: 6,
-          happinessDelta: 11,
-          languageDelta: 6,
-          belongingDelta: 4
+          text: "认真跟父母单独聊了十分钟日常身体状况，在亲戚们大声喧闹起哄前，礼貌借口‘这边工作要开会’提前挂断。",
+          detail: "学会为自己的精神生活设立清晰的人际边界，不再为不相干亲戚的面子表演。",
+          reaction: "屏幕黑了下来，你长舒了一口气。去厨房倒了一杯温水，坐在桌前安安静静翻开那本刚买回来的散文集，第一次享受除夕夜属于自己的绝对安宁。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: 14,
+          soilKinshipTiesDelta: -10
         }
       ]
     },
     {
       year: 5,
       timeLabel: "回望 · 第 5 年",
-      sceneTitle: "五年在留卡换下来的那一天",
-      sceneText: "窗口递出来的塑料卡片上，在留期限一栏印着‘5年’。走出入管局大楼，电车开往熟悉的品川站。你没有发财，银行卡里依然只有几万块钱；你依然习惯在晚上八点去超市看一眼打折贴纸；你依然经常想念老家那碗热腾腾的牛肉面。但你已经不用靠手机翻译过日子，你有了自己熟悉的理发师，你在这个陌生的异国角落，踏踏实实地活了下来。",
-      worldFact: "全球 80 亿人中，仅有 3.6% 的人能够合法跨越出生国国境并在异国长期定居满五年。",
-      parallelWorldMoment: "此时此刻：荒川大桥上的电车发出沉闷的铁轨摩擦声，车窗倒映着你平静的眼睛；生活没有大起大落，但你已经安顿好了自己。",
+      phaseTitle: "自洽与归处：五年在留卡与不再催促的母亲",
+      hereTitle: "此岸 · 品川入管局窗口递出的五年在留卡",
+      hereText: "塑料卡片上，在留期限一栏印着‘5年’。走出入管局大楼，电车开往熟悉的品川站。你没有发财，银行卡里依然只有几万块钱；你依然习惯在晚上八点去超市看一眼打折贴纸；你依然经常想念老家那碗热腾腾的牛肉面。但你已经不用靠翻译软件生活，你有了自己熟悉的理发师，你在这个陌生的异国角落，踏踏实实地活了下来。",
+      thereTitle: "彼岸 · 母亲寄不出的腊肠，与当年同窗的焦虑",
+      thereText: "母亲打来电话，语气变了。她不再催你考公，不再催你结婚回国，只是在电话里絮絮叨叨：“老家的腊肠快递说海关查得严寄不过去，你自己在那边多买点好肉吃。家里都挺好，不用老惦记。”当年的高中同学已经在微信朋友圈里为小升初学区房和职场降薪焦虑失眠，而你在这个安静的黄昏，坐在河堤的长椅上看着波光粼粼的河面。",
+      sociologicalFootnote: "费孝通《乡土中国》：“离土并不是对故土的背叛，而是一场漫长而痛苦的精神断奶。你终于成了一个自洽的现代个体。你摆脱了宗族邻里的指指点点与沉重人情，获得了属于自己的辽阔天地；而老家的那抹炊烟，终于退成了一枚安静守候的文化胎记。”",
       choices: [
         {
           text: "在回程的电车上发了条仅自己可见的朋友圈：‘今天第五年，下班回家。’",
-          detail: "没有任何口号，只是一张电车车窗外普通街景的照片。",
-          narrative: "列车缓缓驶过荒川大桥，夕阳把河面染得通红。你收起手机插进大衣口袋，准备下车去站前的小面包房买明天的早餐。",
+          detail: "既不宣扬，也不炫耀，只有属于自己的平静与坦然。",
+          reaction: "列车缓缓驶过荒川大桥，夕阳把河面染得金黄。你收起手机插进大衣口袋，准备下车去站前的小面包房买明天的早餐，脚步格外踏实。",
           fundsDelta: 0,
-          healthDelta: 5,
-          happinessDelta: 15,
-          languageDelta: 5,
-          belongingDelta: 10
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 5
         }
       ]
     }
@@ -428,429 +374,105 @@ export const DIARY_STORIES: Record<string, SimDiaryEntry[]> = {
   australia: [
     {
       year: 1,
-      timeLabel: "落地 · 第 1 年",
-      sceneTitle: "维州小镇的铁皮屋宿舍，与手上磨出的老茧",
-      sceneText: "下了飞机一路转火车和大巴，到了维州一个以苹果和农场出名的小镇。合租的铁皮屋里住了四个不同国家的年轻人，水龙头拧开带着一股轻微的铁锈味。第一天在包装厂打工，站了八个半小时给橘子分类装箱，腰酸得晚上翻个身都要倒吸凉气，手掌内侧磨起了两颗晶莹的水泡。晚上坐在门前台阶上，天黑得特别透彻，南半球的银河像一条银色的河横在头顶，偶尔能听到远处树林里袋鼠跳过的沙沙声。",
-      worldFact: "澳大利亚农业严重依赖季节工与打工度假者，蓝领包装工中位数时薪为 28.2 澳币（约合 135 RMB/小时）。",
-      parallelWorldMoment: "此时此刻：在孟买的清晨，成千上万的上班族正挤进没有车门的火车；而你坐在维州铁皮宿舍台阶上，头顶是南半球璀璨无垠的银河。",
+      timeLabel: "初抵 · 第 1 年",
+      phaseTitle: "破土与喜礼：铁皮屋宿舍与表妹的编制酒席",
+      hereTitle: "此岸 · 维州农场宿舍，站了八个半小时的双手水泡",
+      hereText: "下了飞机一路转火车和大巴，到了维州果园小镇。合租的铁皮屋里住了四个背包客，第一天站了八个半小时给橘子分类装箱，腰酸得晚上翻身倒吸凉气，手掌内侧磨起两颗晶莹的水泡。去 Kmart 买了 25 刀工装厚袜子。晚上坐在门前台阶上，天黑得透彻，南半球的银河像一条银色的河横在头顶，偶尔能听到袋鼠跳过的沙沙声。",
+      thereTitle: "彼岸 · 表妹考上县税务局，家族群里的亲戚私信",
+      thereText: "同在这个月，老家表妹考上了县税务局编制，大伯在老家最高档的酒楼摆了四桌宴席。家族群里都在夸表妹‘光宗耀祖、一辈子旱涝保收’。一个平日不怎么联系的堂叔突然私信你：“听说你去澳洲农村摘橘子了？好好的大专/本科文凭，跑去洋人乡下当苦力，传出去老家人听着像什么话啊？”",
+      sociologicalFootnote: "费孝通《乡土中国》：“在传统差序格局中，职业不仅是谋生手段，更是家族光耀门楣的‘社会面子’。体力劳动在士大夫传统的乡土语境中被天然视为阶层滑落，而现代个体的汗水尊严与自由，在熟人社会的尺子里往往难以折算。”",
       choices: [
         {
-          text: "去镇上的 Kmart 买了双 25 刀的工装厚袜子和两卷透气胶布，把水泡挑破缠好，第二天继续上工。",
-          detail: "普通人的韧劲全在这些咬着牙的细节里。",
-          narrative: "第二个星期，手上的水泡变成了硬硬的茧子。领到第一周 950 澳币的周薪支票时，看着银行卡里真真切切的数字，你觉得手掌没那么疼了。",
+          text: "不回复堂叔的私信，把水泡挑破缠上胶布，看着银行卡里刚收到的 950 澳币周薪支票笑了笑。",
+          detail: "用真切的劳动所得与内心的秩序，回击世俗的眼光。",
+          reaction: "第二天在流水线上，机器轰鸣，汗水滴在木箱上。领工的老外大叔冲你竖起大拇指说‘Good job mate!’，你觉得靠双手吃饭没什么丢人的。",
           fundsDelta: 4500,
-          healthDelta: -2,
-          happinessDelta: 8,
-          languageDelta: 5,
-          belongingDelta: 0
+          individualSovereigntyDelta: 15,
+          soilKinshipTiesDelta: -10
         },
         {
-          text: "跟同屋的爱尔兰背包客学着用简易咖啡壶煮黑咖啡，下班一起坐在草地上啃刚烤好的大面包。",
-          detail: "语言在磕磕绊绊的日常里飞速长进。",
-          narrative: "你学会了用浓郁的澳洲俚语说‘No worries mate’。晚上听他们讲在各地农场的见闻，你忽然觉得世界上原来有这么多人都在这么朴素地流浪。",
-          fundsDelta: 0,
-          healthDelta: 3,
-          happinessDelta: 11,
-          languageDelta: 12,
-          belongingDelta: 7
-        }
-      ]
-    },
-    {
-      year: 2,
-      timeLabel: "谋生 · 第 2 年",
-      sceneTitle: "二手面包车，与墨尔本阴天的咖啡香",
-      sceneText: "农场的工期结束，你攒了 8000 澳币，花 2200 刀买了辆开了 19 万公里的旧丰田凯美瑞。车窗升降有点卡顿，但它能带你去任何地方。你搬到了墨尔本郊区的一个小镇，在一家当地人开的街角咖啡馆找了份服务生的活。每天早上 6 点开门，满屋子都是浓郁的深烘咖啡香气。常客是个每天点一杯 Flat White 的退休老头，看你英语卡壳，会慢吞吞地跟你开玩笑，纠正你的发音。",
-      worldFact: "在澳洲，熟练护理人员与街区蓝领服务业的就业稳定性，长期显著高于普通初级文职岗位。",
-      parallelWorldMoment: "此时此刻：在老家写字楼里，前同事们正在微信群里敲着‘收到收到’；而你在咖啡机喷涌的奶泡蒸汽里，给常客递上一杯 Flat White。",
-      choices: [
-        {
-          text: "自己带饭去上班，买了一大块冷冻牛肉和打折土豆，分装成五个玻璃饭盒冻在冰箱里。",
-          detail: "外食太贵，自己做饭是省钱的不二法宝。",
-          narrative: "午休的时候在休息室热土豆炖牛肉，老板闻到香味探头说‘Smells delicious!’，顺手给你倒了一杯刚做好的拿铁。",
+          text: "礼貌回复堂叔‘出来体验生活练练英语，过两年就回’，并在家族群里给表妹发了 200 块红包道贺。",
+          detail: "咽下委屈，用乡土社会最习惯的客套话敷衍过去，维持表面的人情和平。",
+          reaction: "堂叔回了句‘早点回国考个编制才是正道’。你关掉微信，坐在门前抬头看银河，南十字星在夜空里亮得惊人。",
           fundsDelta: -200,
-          healthDelta: 4,
-          happinessDelta: 6,
-          languageDelta: 4,
-          belongingDelta: 3
-        },
-        {
-          text: "报名了周末的急救证书 (First Aid) 培训课程，想为以后转做养老护理员做准备。",
-          detail: "在澳洲，护理和蓝领是永远踏实的饭碗。",
-          narrative: "教室里坐着各个年龄段的人，你认真地在塑料假人身上按压心肺复苏。拿到证书的那天，你把它整整齐齐夹在了护照夹里。",
-          fundsDelta: -180,
-          healthDelta: 2,
-          happinessDelta: 8,
-          languageDelta: 10,
-          belongingDelta: 6
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "沉淀 · 第 3 年",
-      sceneTitle: "一个人看日落的海滩，与那通报喜不报忧的电话",
-      sceneText: "周日傍晚，你开着那辆老丰田去了海边。澳洲的海滩永远空旷干净，海浪一层层涌上来拍在沙滩上。你把折叠椅撑在沙子里，手里拿着一罐两块钱的超市气泡水。手机震动，是家里的微信视频。你整理了一下被海风吹乱的头发，接通视频。老家客厅里电视机声音很大，爸爸问你‘今天吃的啥？’你指了指前面的落日和大海：‘在海边玩呢，这边挺好的，刚吃完烤肉。’",
-      worldFact: "南半球海洋性气候使澳大利亚常年在联合国幸福指数排名中高居前十，户外活动参与率超过 82%。",
-      parallelWorldMoment: "此时此刻：在东京拥挤的地铁车厢里，无数低头族正在刷着手机；而你把折叠椅撑在空旷的白沙滩上，看着落日沉入印度洋。",
-      choices: [
-        {
-          text: "挂断电话后，一个人默默坐在椅子上看太阳落进海平线，把罐子里的最后一口水喝完。",
-          detail: "异乡人的孤独，在这一刻变得无比平静与柔和。",
-          narrative: "天色渐渐变成深蓝色，远处有小狗在海浪里奔跑。你深吸了一口带着咸味的湿润空气，心里那股长久以来的漂泊感，慢慢平复了下来。",
-          fundsDelta: 0,
-          healthDelta: 6,
-          happinessDelta: 10,
-          languageDelta: 0,
-          belongingDelta: -2
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "扎根 · 第 5 年",
-      sceneTitle: "准签信来的时候，你正跪在后院拔杂草",
-      sceneText: "手机在口袋里震了一下，是一封来自移民局的自动邮件，通知你的永居签证获批了。你戴着沾满泥土的花园手套，站在小出租屋后院的柠檬树下，把那封全英文的信从头到尾看了三遍。没有激动的大喊大叫，也没有开香槟。你只是摘下脏手套，回屋喝了一大杯自来水，然后去附近的华人超市买了一盒平时舍不得买的草莓和一袋速冻水饺，煮了一大碗。",
-      worldFact: "全球 80 亿人中，仅有不到 0.05% 的人能在 35 岁前凭借自身技能与体力劳动获得大洋洲永久居留权。",
-      parallelWorldMoment: "此时此刻：后院柠檬树下的泥土散发着温热的气息，厨房的水烧开了；你撕开一袋速冻水饺倒进锅里，水花静静翻滚。",
-      choices: [
-        {
-          text: "就着老干妈把一盘热气腾腾的水饺吃完，窗外是南半球晴朗的蓝天。",
-          detail: "普通的开局，普通的经过，普通的生活。",
-          narrative: "你坐在木椅子上，看着窗台上的阳光慢慢移动。你还是那个普通的自己，但在这个阳光广袤的大陆上，你终于不用再担心下个月该去哪里了。",
-          fundsDelta: -80,
-          healthDelta: 5,
-          happinessDelta: 16,
-          languageDelta: 4,
-          belongingDelta: 10
-        }
-      ]
-    }
-  ],
-  germany: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      sceneTitle: "那个永远刷不到预约的市政厅，与周日下午空无一人的大街",
-      sceneText: "在柏林郊区租到一个 14 平米的小单间，为了办户籍登记 (Anmeldung)，你每天早晨 6 点定闹钟刷新市政厅退号网页，刷了整整三周才抢到一个下个月的号。第一个周日你想去买洗发水，走上街才发现全城商店超市大门紧闭，街上安静得能听见自己的脚步声。你在冷风里裹紧大衣，最后在加油站小卖部花 4 欧买了块干硬的面包和一瓶水。",
-      worldFact: "德国《周日休息法》自 1919 年写入宪法，全德 95% 以上零售商店周日依法强制闭店，保障劳动者休息权。",
-      parallelWorldMoment: "此时此刻：国内三里屯和太古里正是人潮拥挤的星期天下午；而你站在柏林空无一人的冷风街角，提着加油站买的一袋面包走在石子路上。",
-      choices: [
-        {
-          text: "去 Lidl 买了两大袋 1.2 欧的便宜土豆和一袋洋葱，周末自己在厨房炖了一大锅土豆牛肉汤。",
-          detail: "虽然单调，但热腾腾的汤能抵御漫长干冷的冬天。",
-          narrative: "汤炖得软烂香浓，你盛在深碗里，就着烤得焦脆的黑面包吃完。窗外下着细雨，你看着窗玻璃上的水珠，心里慢慢安定下来。",
-          fundsDelta: -150,
-          healthDelta: 3,
-          happinessDelta: 7,
-          languageDelta: 1,
-          belongingDelta: 2
-        },
-        {
-          text: "找同楼的留学生借了辆旧自行车，顺着运河骑了十公里，两岸的落叶铺了厚厚一层。",
-          detail: "德国的大自然不需要门票，安静又开阔。",
-          narrative: "踩着吱呀作响的踏板，冷风吹得脸颊发麻。两旁的榉树叶子金黄灿烂，你停下车拍了一张照片发给爸妈，说‘这边空气特别好’。",
-          fundsDelta: 0,
-          healthDelta: 6,
-          happinessDelta: 9,
-          languageDelta: 2,
-          belongingDelta: 3
-        }
-      ]
-    },
-    {
-      year: 2,
-      timeLabel: "磨砺 · 第 2 年",
-      sceneTitle: "下午四点就全黑的天空，与那张多算了 300 欧的暖气账单",
-      sceneText: "入冬后的德国，下午四点天就彻底黑透了，阴雨连绵几个月见不到太阳，你开始每天老老实实吞一粒维生素 D。房东寄来去年的暖气物业结算单 (Nebenkosten)，要求补缴 300 欧。你硬着头皮戴着眼镜，一边用翻译软件查德语专业生词，一边列出每个月的用量明细给房东写邮件申诉，来回发了四轮，最后房东退让了 180 欧。",
-      worldFact: "据德国联邦统计局数据，中北欧冬季日照匮乏，超过 60% 的新移居者会经历季节性情绪低落 (SAD)。",
-      parallelWorldMoment: "此时此刻：在热带的新加坡，工人们正顶着 32 度的高温浇筑混凝土；而在你微暗的书桌前，宜家小台灯散发着一小圈暖黄色的光。",
-      choices: [
-        {
-          text: "去宜家花 12 欧买了个暖黄色光芒的小台灯，晚上放在床头看书，屋里一下子温暖了。",
-          detail: "学会给漫长的冬夜制造属于自己的微小光源。",
-          narrative: "暖黄色的光晕映在白墙上。你泡了一杯薄荷茶，戴上耳机听喜欢的歌，不再觉得四点天黑是一件让人恐慌的事情。",
-          fundsDelta: -90,
-          healthDelta: 2,
-          happinessDelta: 8,
-          languageDelta: 0,
-          belongingDelta: 3
-        },
-        {
-          text: "报名了每周两晚的民众夜校 (VHS) 德语 B1 班，虽然舌头经常打结，但认识了一起磕绊学德语的朋友。",
-          detail: "在笨拙的开口中，慢慢击碎异国语言的壁垒。",
-          narrative: "班上有叙利亚医生、土耳其厨师和波兰货车司机。大家德语都很破，互相用手势比划着哈哈大笑。下课一起站在校门口抽烟告别，你觉得生活有了点烟火气。",
-          fundsDelta: -1600,
-          healthDelta: 1,
-          happinessDelta: 6,
-          languageDelta: 15,
-          belongingDelta: 8
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "平静 · 第 3 年",
-      sceneTitle: "五点准时熄灯的办公室，与森林里捡到的两颗松果",
-      sceneText: "你在一家当地小物流公司找了份操作员/文员的工作。下午 4 点 55 分，同事们已经开始互相道“Schönen Feierabend”（下班愉快），5 点一到办公室灯光全熄，手机周末从没有过工作消息。周六去附近的黑森林边缘徒步，踩着松软的泥土，你弯腰捡了两颗掉在地上的小松果揣在大衣口袋里，迎面走来牵着大金毛的德国老爷爷，微笑着对你点头：“Hallo”。",
-      worldFact: "德国劳动法严格限制每日法定工时，雇员年均实际工作时间仅为 1,341 小时，位列 OECD 最低工时国家。",
-      parallelWorldMoment: "此时此刻：在国内科技园区的深夜，大楼依然灯火通明；而在黑森林边缘的泥土小径上，金毛犬摇着尾巴从你身边擦身而过。",
-      choices: [
-        {
-          text: "在林子里长长呼出一口白气，心跳放得极慢，整周的疲劳似乎都被高大的冷杉林吸收了。",
-          detail: "没有无休止的加班和群消息，生活归还给了你自己。",
-          narrative: "踩着厚厚的松针往回走，夕阳穿透树冠洒下光柱。你摸了摸口袋里圆滚滚的松果，忽然明白了为什么德国人如此热爱树林和漫步。",
-          fundsDelta: 0,
-          healthDelta: 8,
-          happinessDelta: 12,
-          languageDelta: 3,
-          belongingDelta: 5
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "扎根 · 第 5 年",
-      sceneTitle: "拿到永居卡的那天，坐在施普雷河边喝了杯淡啤酒",
-      sceneText: "外管局窗口递出来那张蓝色的居留卡。走出红砖老建筑，微风吹拂着河面。你依然常常抱怨德国火车的晚点、嫌弃周日连个买创可贴的地方都没有。但你已经习惯了这里的界限感，习惯了不被打扰的周末，习惯了把一双徒步鞋穿上好几年。",
-      worldFact: "全球 80 亿人中，欧盟蓝卡持有者满期永居批准率达到 94.2%，是全球最受法律条文刚性保护的移民路径之一。",
-      parallelWorldMoment: "此时此刻：施普雷河水在脚下静静流淌，一艘载着木材的驳船拉响了汽笛；你把黑麦面包掰成小块，不再为任何未读消息心惊肉跳。",
-      choices: [
-        {
-          text: "在河边的木长椅上坐下，看一艘货船慢悠悠划开水波。生活很平淡，但也足够安宁。",
-          detail: "告别了狂奔与焦虑，把日子过成了一汪波澜不惊的湖水。",
-          narrative: "夕阳把河面染得金黄。你从书包里拿出一块黑麦面包慢慢嚼着，不慌不忙地等半小时一班的轻轨回家。",
-          fundsDelta: -30,
-          healthDelta: 6,
-          happinessDelta: 15,
-          languageDelta: 5,
-          belongingDelta: 8
-        }
-      ]
-    }
-  ],
-  spain: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      sceneTitle: "移民局门口的那句“明天再说”，与一欧元的鲜榨橙汁",
-      sceneText: "在瓦伦西亚办居留绿卡，早上七点在移民局门口排长队，工作人员看了看材料耸耸肩说系统坏了：“Mañana, por favor（明天再来吧）”。换作以前你早就急躁上火了，但看着窗外灿烂得不讲道理的大太阳，你忽然没了脾气。走出大厅，在街角小店花 1 欧元买了一大杯鲜榨橙汁，酸甜冰凉，海风吹过来，满街都是盛开的紫薇花。",
-      worldFact: "西班牙是欧盟平均预期寿命最高国家（83.9岁），地中海饮食与充沛阳光使心脑血管发病率处于极低区间。",
-      parallelWorldMoment: "此时此刻：在国内早高峰的地铁站里，安检口排着长长的人龙；而你坐在地中海阳光下，手里端着 1 欧元的鲜榨橙汁，看鸽子在喷泉边啄食。",
-      choices: [
-        {
-          text: "在阳光下慢吞吞走回租住的老平房，顺路去烘焙房买了一根刚出炉的热法棍。",
-          detail: "生活节奏一下子被地中海的阳光拉得极慢极长。",
-          narrative: "回到家把橙汁倒进玻璃杯，就着热乎乎脆香的法棍吃饱。你坐在阳台的帆布椅上晒着太阳打盹，第一次不用惦记闹钟。",
-          fundsDelta: -25,
-          healthDelta: 6,
-          happinessDelta: 11,
-          languageDelta: 2,
-          belongingDelta: 3
-        },
-        {
-          text: "坐在街心喷泉旁边的石凳上，看着鸽子抢面包屑，给国内的朋友发了张万里无云的蓝天。",
-          detail: "没有雾霾，没有焦躁，阳光不要钱似地倾泻下来。",
-          narrative: "国内的朋友秒回：‘天好蓝啊，真羡慕’。你收起手机笑了笑，看着身边推着婴儿车散步的老夫妇，脚步自然而然慢了下来。",
-          fundsDelta: 0,
-          healthDelta: 4,
-          happinessDelta: 9,
-          languageDelta: 2,
-          belongingDelta: 4
-        }
-      ]
-    },
-    {
-      year: 2,
-      timeLabel: "慢调 · 第 2 年",
-      sceneTitle: "下午三点的闭店关门，与晚上十点才开始的露天晚餐",
-      sceneText: "你彻底适应了西班牙的“迟钝”。下午两点到五点，街上几乎所有店铺全部关门午休；晚上九点多天色才刚擦黑，广场上的露天餐馆才刚摆出桌椅。你学会了就着炸小青椒和番茄面包慢慢嚼，听着旁边一家三代人热热闹闹地大声说笑，小孩子们踩着滑板车一直疯跑到深夜十一点。",
-      worldFact: "西班牙非一线城市完整保留着两至三小时的 Siesta（午休）习惯，夜间社交多集中于 21:00 至深夜。",
-      parallelWorldMoment: "此时此刻：地球另一侧的大多数人已经进入了梦乡；而小广场的石板路上，老人们正围着小圆桌喝着咖啡，小孩在旁边踢着足球。",
-      choices: [
-        {
-          text: "学着用当地土法在小铁锅里煮了一盘海鲜饭，藏红花的香气飘满了小巷。",
-          detail: "在异国的小厨房里，找到了属于自己的灶台温度。",
-          narrative: "米饭带着微焦的锅巴，虾肉紧实甜嫩。你倒了小半杯廉价但爽口的白葡萄酒，一个人安安静静把整锅吃得干干净净。",
-          fundsDelta: -60,
-          healthDelta: 5,
-          happinessDelta: 12,
-          languageDelta: 4,
-          belongingDelta: 5
-        },
-        {
-          text: "傍晚去海边木栈道慢跑三十分钟，看着夕阳一点点把地中海染成金红色。",
-          detail: "不用花钱，就能享受整个大自然的温柔怀抱。",
-          narrative: "海浪拍打着细软的沙滩，海鸥在头顶盘旋。跑完步出了一身透汗，你坐在防波堤上甩着双腿，整个人轻快得像一片羽毛。",
-          fundsDelta: 0,
-          healthDelta: 9,
-          happinessDelta: 12,
-          languageDelta: 3,
-          belongingDelta: 4
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "自洽 · 第 5 年",
-      sceneTitle: "亲戚问你国外发财了没，你看着窗外三百天的晴天笑了笑",
-      sceneText: "第五年换到了长期居留。老家表哥发微信问你：“在那边赚大钱了吧？买大奔了吗？”你低头看了看自己穿了两年的人字拖，和刚刚在菜市场花 5 欧买的一大袋新鲜无花果，笑着回了句：“没发财，打工糊口。就是这里一年有三百天是大晴天，心情挺好。”",
-      worldFact: "全球 80 亿人中，西班牙护照免签全球 194 个国家，合法全职或非盈利定居满 5 年可申请欧盟长居。",
-      parallelWorldMoment: "此时此刻：表哥发来老家下大雪的视频；你咬了一口从菜市场买回来的无花果，海风吹动了阳台上的薄纱窗帘。",
-      choices: [
-        {
-          text: "靠在阳台铁栏杆上吃了一颗清甜的无花果，阳光晒在手臂上暖洋洋的。",
-          detail: "人生的度量衡，从来不只有存折上的数字。",
-          narrative: "微风吹起白色薄纱窗帘，巷子里传来吉他弹奏的欢快旋律。你洗了洗手，回屋准备今晚的晚餐，心里满当当的都是踏实。",
-          fundsDelta: -35,
-          healthDelta: 7,
-          happinessDelta: 16,
-          languageDelta: 5,
-          belongingDelta: 9
-        }
-      ]
-    }
-  ],
-  canada: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      sceneTitle: "大雪没过膝盖的清晨，与 Tim Hortons 的两块钱咖啡",
-      sceneText: "十一月的加拿大，推开门积雪直接淹到了小腿肚。零下十几度，你拿着一把红色的塑料大雪铲，吭哧吭哧在门前车道铲雪，睫毛上结了一层细细的白霜。手脚冻得发麻时，你走去街角的 Tim Hortons，花两块加币买了杯 Double-Double 热咖啡和一个热乎乎的蜂蜜甜甜圈，双手捧着纸杯，热气扑在脸上，感觉整个人又活过来了。",
-      worldFact: "加拿大全境年均降雪期长达 5-6 个月，全职居民家庭平均每年除雪耗时约 65 小时。",
-      parallelWorldMoment: "此时此刻：在广州的大街上，人们还穿着短袖喝着凉茶；而你在零下十五度的暴雪中捧着热咖啡，睫毛上挂着晶莹的白霜。",
-      choices: [
-        {
-          text: "去二手超市 Value Village 挑了一件厚实的二手羊毛大衣，套上后暖和极了。",
-          detail: "在异国他乡，实用与温暖比面子重要一万倍。",
-          narrative: "虽然样式朴素，但质地扎实。裹上大衣走在雪地里，脚下发出咯吱咯吱的清脆声响，你第一次觉得北国的雪景其实很美。",
-          fundsDelta: -180,
-          healthDelta: 3,
-          happinessDelta: 7,
-          languageDelta: 3,
-          belongingDelta: 3
-        },
-        {
-          text: "认识了隔壁也在铲雪的华人大叔，互相借了除雪盐，大叔教你冬天怎么给车胎防冻。",
-          detail: "海外普通华人之间最朴素的互帮互助。",
-          narrative: "大叔操着东北口音笑着说‘小伙子多穿点，刚来都这样，习惯就好了’。一把热盐撒在水泥地上，积雪慢慢融化露出灰色的地面。",
-          fundsDelta: -50,
-          healthDelta: 1,
-          happinessDelta: 8,
-          languageDelta: 1,
-          belongingDelta: 9
+          individualSovereigntyDelta: -5,
+          soilKinshipTiesDelta: 8
         }
       ]
     },
     {
       year: 2,
       timeLabel: "立足 · 第 2 年",
-      sceneTitle: "换了雪胎的旧斯巴鲁，与华人超市里的一袋老干妈",
-      sceneText: "考下了当地驾照，买了一辆十年前的二手四驱斯巴鲁，换上了抓地力强的雪胎。周末开半小时车去大统华华人超市，买了一袋挂面、一瓶老干妈和两颗大白菜，结账时收银阿姨用熟悉的乡音说了句“一共 32 块”。坐在车里听着雨刮器推开挡风玻璃上的积雪，你忽然觉得，即便在地球的另一端，日子也能过出自己的味道。",
-      worldFact: "加拿大拥有全球最多元包容的移民环境，大多伦多及大温哥华地区可见少数族裔比例超过 50%。",
-      parallelWorldMoment: "此时此刻：雨刮器推开挡风玻璃上的厚雪，车里正放着熟悉的中文民谣；后备箱里放着大统华买的大白菜和老干妈。",
+      phaseTitle: "裂痕与缺席：二手丰田与父亲被刮蹭的电动车",
+      hereTitle: "此岸 · 2200刀的旧凯美瑞与街角 Flat White",
+      hereText: "攒了 8000 澳币，花了 2200 刀买了辆开了 19 万公里的旧丰田凯美瑞。搬到墨尔本郊区，在当地咖啡馆找了份服务生。每天早上 6 点开门，满屋子都是浓郁深烘咖啡香气。常客是个点 Flat White 的退休老头，看你英语卡壳会慢吞吞开玩笑纠正你的发音。你报名了周末的 First Aid 急救证书，准备转做养老护理员。",
+      thereTitle: "彼岸 · 父亲骑车摔伤骨折，老舅找交警熟人调解",
+      thereText: "老家父亲下雨天骑电动车被一辆小轿车刮蹭摔倒，右腿小骨折。母亲在电话里哭，你在大洋彼岸急得满头大汗却连挂号软件都用不了。最后是老舅托了交警大队的一个老同学出面，查监控找到了肇事车主并调解赔了医药费。老舅在电话里语重心长叹气：“你跑那么远能顶什么事？真遇到坎坷，还不是老家这帮亲戚出面跑前跑后？”",
+      sociologicalFootnote: "费孝通《乡土中国》：“熟人社会依赖的是‘人情网’与‘关系面子’来解决纠纷与互助。离开这片土壤的人，既失去了人情网的庇护，也丧失了在关键时刻为亲人挽起袖子的力量。”",
       choices: [
         {
-          text: "回家在小电炉上热热地煮了一锅热汤面，拌上两勺辣椒酱，吃得额头冒汗。",
-          detail: "胃安顿好了，漂泊的心也就安顿了一大半。",
-          narrative: "热气腾腾的白气在窗户上结了一层水雾。你一边哧溜哧溜吃面，一边看着窗外静静飘落的雪花，屋里温暖如春。",
-          fundsDelta: -80,
-          healthDelta: 4,
-          happinessDelta: 9,
-          languageDelta: 2,
-          belongingDelta: 7
+          text: "立刻给老舅寄了澳洲的高档绵羊油和蜂胶，并给父亲转了 5000 块营养费，电话里诚恳道谢。",
+          detail: "承认宗族熟人网络的现实价值，用物质回馈亲人的托底之情。",
+          reaction: "老舅收了礼物在亲戚群里夸你懂事。你下班坐在旧车里，握着方向盘沉默了很久。你知道有些亏欠，永远填不平。",
+          fundsDelta: -5600,
+          individualSovereigntyDelta: -6,
+          soilKinshipTiesDelta: 16
         },
         {
-          text: "夏天开去落基山脚下的湖边露营，湖水蓝得像宝石一样透亮。",
-          detail: "广阔的天地，让人自然而然放下所有执念。",
-          narrative: "支起帐篷生起小营火，晚风吹过松树林带来松脂的清香。坐在折叠椅上看繁星漫天，你心想，人这辈子能这样看看世界，真好。",
-          fundsDelta: -300,
-          healthDelta: 7,
-          happinessDelta: 14,
-          languageDelta: 4,
-          belongingDelta: 4
+          text: "给家里转了 3000 元，同时坚决催促家里通过正规交警保险法务理赔，不欠不必要的人情债。",
+          detail: "试图用现代法治观念重塑老家的行事风格，虽然常常招来长辈的不解。",
+          reaction: "母亲在电话里念叨‘找熟人省事嘛’。你叹了口气，明白两代人生活在完全不同的规则宇宙里。",
+          fundsDelta: -3000,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: -2
+        }
+      ]
+    },
+    {
+      year: 3,
+      timeLabel: "沉淀 · 第 3 年",
+      phaseTitle: "远水与近渴：海滩折叠椅与弟弟买房差的八万彩礼",
+      hereTitle: "此岸 · 傍晚一个人看日落的海滩与两块钱气泡水",
+      hereText: "周日傍晚开着旧丰田去海边，澳洲的海滩永远空旷干净。把折叠椅撑在沙子里，手里拿着一罐两块钱的超市气泡水，看夕阳落进海面。空气里带着咸味与湿润，整周在护理院给老人翻身换药的疲劳，在这一刻被海浪声慢慢抚平。你深吸一口气，很久没有偏头痛了。",
+      thereTitle: "彼岸 · 亲弟弟订婚买房，母亲欲言又止的微信语音",
+      thereText: "手机震动，母亲发来几段长长的微信语音。先是问了天气，绕了半天弯子，最后吞吞吐吐地说：“……你弟弟今年订婚，女方那边非要全款买个小三居，还差八万块钱彩礼和首付。你在国外赚的是澳币，汇率高，能不能先支援家里一把？”",
+      sociologicalFootnote: "费孝通《乡土中国》：“在差序格局中，家庭财富是流动的连通器，长兄长姐天然承担着反哺幼弟幼妹的伦理绑架。跨国的高汇率更被乡土亲戚放大了‘财富神话’，忽视了你在异邦同样咬着牙的生存现实。”",
+      choices: [
+        {
+          text: "拿出自己辛苦攒下的一半积蓄（约合 4 万 RMB）汇回去，并明确表态‘这是我能支持的极限’。",
+          detail: "兼顾骨肉亲情，但设立刚性底线，保护自己在异国的生存安全垫。",
+          reaction: "母亲收了钱长舒一口气，连声夸你顾家。你看着银行卡里缩水的数字，站起身合上折叠椅，在海风里慢慢走回车里。",
+          fundsDelta: -40000,
+          individualSovereigntyDelta: 5,
+          soilKinshipTiesDelta: 14
+        },
+        {
+          text: "如实向母亲说明自己正在做护理员、存钱办永居的艰难处境，转了 1 万元作为心意，拒绝全额托底。",
+          detail: "狠下心打碎‘海外发大财’的虚幻滤镜，坚守个体独立的尊严边界。",
+          reaction: "母亲在电话那头沉默了半晌，叹息着说‘知道了，你在外面也难’。挂断电话后，你一个人在海边坐到了天黑。",
+          fundsDelta: -10000,
+          individualSovereigntyDelta: 16,
+          soilKinshipTiesDelta: -12
         }
       ]
     },
     {
       year: 5,
       timeLabel: "扎根 · 第 5 年",
-      sceneTitle: "枫叶卡寄到信箱里的那个雨天",
-      sceneText: "信箱里躺着印着枫叶的水印信封，厚厚的硬质塑料卡片。五年了，你度过了五个漫长的冬天，也见证了五个美得惊心动魄的夏天。你没有像那些社交网络上的成功人士一样住进海边豪宅，但你有一份踏实的手艺，一台能在暴风雪里平稳前行的老车，和一个属于自己的温暖壁炉。",
-      worldFact: "联合国人类发展指数常年将加拿大列入前十，移民定居五年后归属感指标平均达到 86.4%。",
-      parallelWorldMoment: "此时此刻：枫树上的红叶带着雨滴落进草坪；厨房里的牛肉汤正小火咕嘟冒泡，壁炉的火苗在玻璃后轻轻跳动。",
+      phaseTitle: "自洽与归处：后院柠檬树下的准签信与平静的炊烟",
+      hereTitle: "此岸 · 泥土手套、准签信与热腾腾的水饺",
+      hereText: "手机震动，移民局发来自动邮件，永居签证获批。你戴着沾满泥土的花园手套，站在小出租屋后院的柠檬树下，把那封信看了三遍。没有激动喊叫，也没有开香槟。摘下手套进屋喝了一大杯水，去超市买了平时舍不得买的草莓和速冻水饺，煮了一大碗就着老干妈吃完。阳光在窗台上慢慢移动，你终于不用担心下个月去哪了。",
+      thereTitle: "彼岸 · 家族重修宗族族谱，你那一栏后面的‘迁居海外’",
+      thereText: "老家村头祠堂重修族谱，老舅在微信群里发了排版照片。在密密麻麻的同辈姓名后面，你的名字旁印着一行小字：‘迁居大洋洲’。母亲发来一张老家傍晚烟囱冒青烟的照片，语音里带着平静：“老家挺好的，你自己在外面把日子过好，不用老往回跑，人平平安安就行。”",
+      sociologicalFootnote: "费孝通《乡土中国》：“离土之人最终在异邦扎下了根，而故乡最终化作了族谱上一行墨迹未干的迁居记录。你完成了从血缘宗族人到现代公民的蜕变，拥有了整片蔚蓝的天空与属于自己的院落，心安之处，即是故乡。”",
       choices: [
         {
-          text: "把信件整整齐齐收进抽屉，去厨房给小火慢炖的牛肉汤加了一小把黑胡椒。",
-          detail: "平凡生活里的最大幸运，莫过于心安即是归处。",
-          narrative: "汤在锅里咕嘟咕嘟翻滚着香气。你靠在灶台边喝了一口热茶，窗外是一排排挂着雨滴的红枫树。生活平淡而长久地向前延展。",
-          fundsDelta: 0,
-          healthDelta: 5,
-          happinessDelta: 16,
-          languageDelta: 4,
-          belongingDelta: 9
-        }
-      ]
-    }
-  ],
-  thailand: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      sceneTitle: "巷子里两千块的单身公寓，与楼下 40 泰铢的鸡肉饭",
-      sceneText: "走出清迈机场，一股热带潮湿而温暖的香茅草气息扑面而来。在宁曼路背后的小巷子里，你租下了一间带着小阳台的单身公寓，月租 9000 泰铢（不到两千人民币）。楼下就是个卖海南鸡肉饭的小摊，老奶奶总是多给你舀一勺热腾腾的冬瓜鸡汤。生活成本低得不可思议，你第一次不需要算计买一杯冰咖啡要花掉多大比例的月薪。",
-      worldFact: "清迈连续多年位居全球数字游民热门地，单人月度生活开销中位数仅为 800 至 1,200 美元（约合 5,800~8,700 RMB）。",
-      parallelWorldMoment: "此时此刻：在深圳的高新园，外卖骑手正飞速冲进写字楼电梯；而你骑着二手踏板车绕着古城护城河，风把衬衫吹得鼓了起来。",
-      choices: [
-        {
-          text: "花 300 块钱买了一辆二手机车，每天傍晚骑车绕着古城的护城河慢悠悠兜风。",
-          detail: "热带的暖风吹在身上，治愈了国内常年的偏头痛。",
-          narrative: "护城河边的鸽子扑棱棱飞起来，落日把素贴山染成了金黄色。你把车停在路边，买了袋切好的冰镇菠萝，第一次体会到什么叫‘没心没肺的松弛’。",
-          fundsDelta: -300,
-          healthDelta: 9,
-          happinessDelta: 15,
-          languageDelta: 4,
-          belongingDelta: 3
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "慢调 · 第 3 年",
-      sceneTitle: "雨季下午的咖啡馆屋檐下",
-      sceneText: "清迈的雨季，暴雨总是毫无预兆地倾盆而下。你被困在一间木头搭建的小咖啡馆屋檐下，雨水从瓦片边缘哗啦啦像瀑布一样挂下来。街上的摩托车全停在骑楼下避雨，没有人按喇叭催促，大家都在安静地看雨。你点了一杯 50 泰铢的手冲咖啡，打开手提电脑，敲完今天最后一部分给远程客户的活。",
-      worldFact: "热带季风气候午后暴雨通常在 1 小时内迅速散去，当地人视雨天为大自然赠送的自然休整时段。",
-      parallelWorldMoment: "此时此刻：老家同学群里正为了孩子的补习班焦虑争吵；而你坐在木檐下听着暴雨倾盆，手里是一杯 50 泰铢的手冲咖啡。",
-      choices: [
-        {
-          text: "合上电脑，坐在木头长凳上听了四十分钟雨声，直到天边重新透出阳光。",
-          detail: "你终于不再催促自己‘必须做点什么有用的人’。",
-          narrative: "雨停了，空气里带着泥土和青草的清新香气。你骑上车穿过湿漉漉的街道，路面积水倒映着蓝天白云，生活简单得像一汪清水。",
-          fundsDelta: -10,
-          healthDelta: 8,
-          happinessDelta: 14,
-          languageDelta: 2,
-          belongingDelta: 4
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "自在 · 第 5 年",
-      sceneTitle: "没有大富大贵，但身体和失眠彻底好了",
-      sceneText: "五年过去，你没有成为身家千万的老板，也没有买下什么豪宅。你的家当依然只有一个大行李箱和一台旧笔记本。但你学会了泰语数字和买菜砍价，你的失眠彻底不药而愈，体检指标全恢复了正常。你明白人生也许不需要那么多宏大的目标，简简单单地活在一个阳光充沛的地方，本身就是一种莫大的福气。",
-      worldFact: "全球 80 亿人中，超过 90% 的人终其一生未曾离开过出生国，也从未体验过彻底放下竞争压力的生活。",
-      parallelWorldMoment: "此时此刻：夜市看门的大爷双手合十冲你道谢；清迈的晚风穿堂而过，失眠彻底成了上辈子的遥远记忆。",
-      choices: [
-        {
-          text: "在夜市买了两盒芒果糯米饭，一盒留给自己，一盒送给楼下看门的老大爷。",
-          detail: "踏踏实实的烟火日常。",
-          narrative: "大爷双手合十冲你笑着道谢。你踩着人字拖慢吞吞地走上楼梯，清迈的晚风穿堂而过，吹得窗台上的风铃叮当作响。",
-          fundsDelta: -20,
-          healthDelta: 10,
-          happinessDelta: 16,
-          languageDelta: 6,
-          belongingDelta: 8
+          text: "把老家傍晚的照片保存下来设为手机壁纸，把准签信夹在护照里，换上鞋去附近的草坪散步。",
+          detail: "接纳自己的双重身份：既是那片厚重土地走出来的孩子，也是这片辽阔大陆上的独立旅人。",
+          reaction: "晚风吹在身上暖洋洋的，邻居家的金毛犬欢快地在草坪上追着飞盘。你踩在松软的草地上，心里满当当都是踏实。",
+          fundsDelta: -80,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 5
         }
       ]
     }
@@ -859,60 +481,380 @@ export const DIARY_STORIES: Record<string, SimDiaryEntry[]> = {
     {
       year: 1,
       timeLabel: "原地 · 第 1 年",
-      sceneTitle: "晚上下班的那碗热汤面，老板多给了一勺牛肉",
-      sceneText: "你没有走。依然住在二环边上租的小屋里，每天挤着 2 号线早高峰。周五晚上加班到快九点，浑身发沉走下天桥。路过常去的那家清真拉面馆，店里飘着浓浓的牛骨汤香气。你点了一碗细面，老板认出你是熟客，往你碗里多舀了一大勺带筋的牛肉块。热汤下肚，浑身的寒气一下子散开了。",
-      worldFact: "中国拥有全球最高密度的即时配送与平价餐饮生态，城市居民 300 米生活圈餐饮覆盖率全球第一。",
-      parallelWorldMoment: "此时此刻：在东京的某个出租屋里，一个同龄人正一个人就着凉水吃泡面；而拉面馆老板把一勺热腾腾的牛肉舀进了你的碗里。",
+      phaseTitle: "浸润与依附：加班晚上的热汤面与堂妹的喜糖",
+      hereTitle: "此岸 · 挤着二号线的打工人，与老板多给的一勺牛肉",
+      hereText: "周五晚上加班到快九点，浑身发沉走下天桥。路过常去的清真拉面馆，店里飘着浓浓牛骨汤香气。点了一碗细面，老板认出你是熟客，往你碗里多舀了一大勺带筋的牛肉块。热汤下肚，浑身的寒气一下子散开了。吃完顺路去超市买了两袋打折的大米和一卷垃圾袋，提着走回出租屋，换上舒适的棉拖鞋看地方新闻。",
+      thereTitle: "彼岸（宗族现场） · 参加堂妹婚礼，七大姑八大姨拉着你的手",
+      thereText: "周末坐两个小时高铁回老家参加堂妹的婚礼。随了 500 块礼金，大姨抓了一大把喜糖塞你口袋里，三姑拉着你的手问：“现在一个月到手多少？单位给交五险一金不？我单位有个小伙子条件不错，要不要加个微信？”虽然问得你头皮发麻，但桌上热气腾腾的大肘子和满屋子欢笑声，让你切切实实感受到了宗族的体温。",
+      sociologicalFootnote: "费孝通《乡土中国》：“在差序格局的原生土壤里，个体的隐私几乎是不存在的，但与此同时，你的脆弱也是被全盘兜底的。繁琐的催婚与盘问背后，是传统共同体对每一个成员无微不至的黏稠包裹。”",
       choices: [
         {
-          text: "吃完顺路去超市买了两袋打折的大米和一卷垃圾袋，提着走回出租屋。",
-          detail: "老家的烟火气，虽然琐碎，但也最踏实。",
-          narrative: "推开屋门，屋子里暖烘烘的。你把大米倒进米桶，换上舒适的棉拖鞋，打开电视看地方新闻。那一刻，你觉得留在熟悉的地方也没什么不好。",
-          fundsDelta: -120,
-          healthDelta: 1,
-          happinessDelta: 8,
-          languageDelta: 0,
-          belongingDelta: 12
+          text: "乖乖加上大姨推荐的相亲对象微信，中午陪大伯喝了两小杯老白干，一家人其乐融融。",
+          detail: "顺从并享受乡土人情的庇护，在这个熟人社会里当一个被妥善安顿的普通后辈。",
+          reaction: "大伯喝得满脸红光，拍着你肩膀说‘好孩子，有孝心’。晚上坐高铁回出租屋，包里塞满了妈妈硬塞的土鸡蛋和腊肉。",
+          fundsDelta: -500,
+          individualSovereigntyDelta: -8,
+          soilKinshipTiesDelta: 20
+        },
+        {
+          text: "礼貌微笑着婉拒相亲，吃完酒席下午就借口‘单位要赶方案’坐高铁回程。",
+          detail: "在体制与宗族的稠密网罗中，努力为自己保留一小块现代独立的生活飞地。",
+          reaction: "大姨在背后跟妈妈咕哝了句‘这孩子心气高’。回到出租屋拉上窗帘，虽然安静，但心里莫名多了一丝说不清的空落。",
+          fundsDelta: -500,
+          individualSovereigntyDelta: 12,
+          soilKinshipTiesDelta: 5
         }
       ]
     },
     {
       year: 3,
       timeLabel: "原地 · 第 3 年",
-      sceneTitle: "周日早晨陪父母去早市买菜",
-      sceneText: "周末睡到自然醒，坐公交车回父母家。早上陪妈妈去露天早市，摊贩们大声吆喝着刚从地里拔出来的新鲜白菜。妈妈跟卖鱼的熟人讲了半天价，省了三块钱，脸上笑开了花。回家路上你两手提着沉甸甸的菜篮子，妈妈在旁边絮絮叨叨说着亲戚邻居的闲话。",
-      worldFact: "熟人社会网络与原生家庭支持，是中国城市工薪阶层抵御生活未知风险最根本的心理缓冲垫。",
-      parallelWorldMoment: "此时此刻：海外的移居者正在对着手机屏幕报喜不报忧；而你正坐在父母家的小方桌前，蘸着老陈醋吃刚出锅的韭菜饺子。",
+      phaseTitle: "近渴与回响：母亲住院动手术与床前的端茶喂药",
+      hereTitle: "此岸 · 请了整周陪护假，在县医院走廊奔波拿化验单",
+      hereText: "母亲胆结石发作在县医院动腹腔镜手术，你向公司请了整整一周年假回老家陪护。早上 6 点去医院水房打热水，楼上楼下跑着拿抽血化验单，中午跑回老家熬了黑鱼汤用保温桶装好送来。晚上蜷缩在床边的折叠椅上，母亲翻身轻轻哼了一声，你立刻惊醒替她掖好被角。母亲拉着你的手，眼眶发红说‘还是你在身边好’。",
+      thereTitle: "彼岸（宗族呼应） · 大舅拎着老母鸡，发小帮忙联系主刀医生",
+      thereText: "住院第二天，大舅从乡下拎了两只刚宰好的老母鸡和土鸡蛋赶来；当年在县中医院当药剂师的高中发小，私下帮你跟主刀主任打了招呼，手术排在了第一台。病房里的邻床阿姨羡慕地看着母亲：“你家这孩子真懂事孝顺，天天在床前守着，比那些跑外省、跑国外的强一百倍啊！”",
+      sociologicalFootnote: "费孝通《乡土中国》：“传统孝道的本质是‘肉身的守候与陪伴’。面对生老病死的无常，身边的陪伴是任何跨国转账与体面事业都换不来的镇痛剂。留在土地上的人，用牺牲部分个人自由为代价，换取了全家最坚固的安全感。”",
       choices: [
         {
-          text: "中午帮爸爸一起在厨房包韭菜猪肉馅饺子，吃了满满两大盘。",
-          detail: "亲情在身边，是任何异国他乡都换不来的温度。",
-          narrative: "一家三口围在小方桌前蘸着醋吃饺子，电视里播着家长里短的肥皂剧。看着父母眼角越来越多的白发，你心想，至少这一刻，你随时都能陪在他们身边。",
-          fundsDelta: 0,
-          healthDelta: 4,
-          happinessDelta: 12,
-          languageDelta: 0,
-          belongingDelta: 18
+          text: "给发小发了感谢红包（发小死活退了回来，只让你下次喝酒请吃烧烤），全心全意把母亲照料到出院。",
+          detail: "深刻体会到熟人社会互相托底的温情，彻底接受生活在身边的意义。",
+          reaction: "母亲出院那天阳光很好，挽着你的胳膊慢慢走下台阶。你看着她头上日渐增多的白发，心想留在原地陪伴家人，本身就是一种极大的圆满。",
+          fundsDelta: -3000,
+          individualSovereigntyDelta: -5,
+          soilKinshipTiesDelta: 25
         }
       ]
     },
     {
       year: 5,
       timeLabel: "原地 · 第 5 年",
-      sceneTitle: "给朋友圈点了个赞，继续拖地做饭",
-      sceneText: "偶尔在朋友圈里，看到当年高中同学发在异国海滩或雪山的照片。你停下手指看了两秒，随手点了个赞，然后放下手机，转身把洗好的衣服挂在阳台晾衣绳上。水珠顺着裤脚滴在瓷砖上，楼下传来小孩子放学追逐嬉闹的声音，厨房里小火炖着的排骨汤咕嘟咕嘟冒着热气。生活像流水一样静静向前流淌，平平淡淡，也是一种真正的圆满。",
-      worldFact: "全球幸福感大规模调研显示，内心的秩序与安顿，往往取决于是否能在方寸之地找到生活的自洽。",
-      parallelWorldMoment: "此时此刻：飞机划破夜空飞往异国他乡；你给朋友圈里出国老同学的照片点了个赞，关掉手机，把炖好的排骨汤盛进了白瓷碗里。",
+      phaseTitle: "自洽与圆满：给朋友圈点了个赞，继续阳台晾衣炖汤",
+      hereTitle: "此岸 · 盛了一碗热气腾腾的排骨汤，阳台上的夕阳金边",
+      hereText: "周末睡到自然醒，坐公交车回父母家。早上陪妈妈去露天早市买白菜，帮爸爸一起包韭菜猪肉馅饺子。偶尔在朋友圈里，看到当年高中同学发在澳洲海滩冲浪或加拿大雪山滑雪的照片，你停下手指看了两秒，随手点了个赞，然后放下手机，转身把洗好的衣服挂在阳台晾衣绳上。水珠顺着裤脚滴在瓷砖上，楼下传来小孩子放学嬉闹的声音，厨房里小火炖着的排骨汤咕嘟咕嘟冒着热气。",
+      thereTitle: "彼岸（内心自洽） · 认清生活的真相后，安于脚下的方寸之地",
+      thereText: "你没有跨越大洋去追寻异国的自由，你留在熟悉的街道，熟悉每一个拐角的早点铺，熟悉父母每一个咳嗽的声调。你承受了职场的内卷和人情的繁重，但你也获得了病床前的踏实与每一个周末全家人围坐小方桌的温度。生活像流水一样静静向前流淌，平平淡淡，也是一种真正的圆满。",
+      sociologicalFootnote: "费孝通《乡土中国》：“终其一生，大部分人依然会留在这片濡湿深厚的土地上。人生的圆满从来不取决于你走得有多远，而取决于你内心的锚扎得有多深。在此地自洽，亦是非凡的胜利。”",
       choices: [
         {
-          text: "盛了一碗热气腾腾的排骨汤，坐在沙发上慢慢喝完。",
-          detail: "认清生活的真相后，依然安于自己脚下的方寸之地。",
-          narrative: "夕阳透过阳台照在地板上，把一切镀上了一层柔和的金边。不用去任何远方，你已经在自己的生活里，安顿好了整颗心。",
+          text: "盛了一碗排骨汤放在茶几上，陪爸爸坐在沙发上看地方新闻，夕阳把客厅镀上一层金色。",
+          detail: "心无波澜，安于方寸，踏踏实实安顿好了整颗心。",
+          reaction: "爸爸从碗里夹了一块肉放进你碗里：“多吃点，今天炖得烂。”窗外夜幕降临，万家灯火亮起，你知道这就是属于你的归宿。",
           fundsDelta: 0,
-          healthDelta: 3,
-          happinessDelta: 15,
-          languageDelta: 0,
-          belongingDelta: 15
+          individualSovereigntyDelta: 5,
+          soilKinshipTiesDelta: 15
+        }
+      ]
+    }
+  ],
+  germany: [
+    {
+      year: 1,
+      timeLabel: "初抵 · 第 1 年",
+      phaseTitle: "破土与喜礼：周日全城闭店与大学室友的三亚婚礼",
+      hereTitle: "此岸 · 柏林空无一人的冷风街角与加油站干面包",
+      hereText: "在柏林郊区租到一个 14 平米小单间，为了办户籍登记 (Anmeldung)，每天早上 6 点定闹钟刷新退号网页，刷了三周才抢到号。周日全城商店超市依法强制关门，街上安静得听见落叶声，你在冷风里裹紧大衣，在加油站花 4 欧买了块干硬面包。周末在厨房炖了一大锅土豆牛肉汤，窗玻璃上挂满水珠。",
+      thereTitle: "彼岸 · 大学上下铺兄弟在三亚大婚，合照里唯独缺了你",
+      thereText: "同在这个周末，大学睡在你上铺的同窗在三亚办海岛婚礼，同班同学几乎全飞过去当伴郎伴娘。班级微信群里发了上百张合照，大家穿着统一的西装礼服在沙滩上大笑。班长在群里艾特你：“@建国/若雨，就差你一个人了啊，德国那边就这么走不开？全班就你不合群啦！”",
+      sociologicalFootnote: "费孝通《乡土中国》：“同窗、战友与乡党，是差序格局向外延伸的‘拟血缘’关系网。重大人情仪式是维系这种非血缘拟宗族关系的纽带。物理距离造成的缺席，往往意味着你在这张网中的地位被悄然边缘化。”",
+      choices: [
+        {
+          text: "给室友发了 888 块的大额微信红包，并在群里发了一小段真诚自嘲的祝福视频。",
+          detail: "用自嘲和金钱化解‘不合群’的道德审判，尽量保留当年的同窗旧谊。",
+          reaction: "群里起哄发表情包，室友私聊你‘兄弟懂你，在欧洲注意身体，回国聚’。你把干面包泡进热汤里，心里微酸但释怀了。",
+          fundsDelta: -888,
+          individualSovereigntyDelta: -4,
+          soilKinshipTiesDelta: 12
+        },
+        {
+          text: "给室友私聊道喜并寄了一套德国制造的高级指甲刀套装当结婚礼物，群里保持沉默。",
+          detail: "把深厚的个人私交与吵闹的群体起哄分开，拒绝接受道德绑架。",
+          reaction: "室友收到礼物发来照片连夸精致。你关上电脑，安静喝着土豆汤，窗外是柏林安详的冬夜。",
+          fundsDelta: -350,
+          individualSovereigntyDelta: 14,
+          soilKinshipTiesDelta: 2
+        }
+      ]
+    },
+    {
+      year: 3,
+      timeLabel: "日常 · 第 3 年",
+      phaseTitle: "远水与近渴：黑森林的松果与爷爷病榻前的呢喃",
+      hereTitle: "此岸 · 五点熄灯的办公室与徒步捡到的两颗松果",
+      hereText: "在一家当地物流公司做操作文员，下午 4 点 55 分同事互相道‘Schönen Feierabend’（下班愉快），5 点一到办公室灯光全熄，周末手机从没有过工作群消息。周六去附近的黑森林徒步，松软泥土，大衣口袋里揣两颗松果，与牵金毛的德国老爷爷互道‘Hallo’，整周的疲劳被高大的冷杉林吸收殆尽。",
+      thereTitle: "彼岸 · 老家爷爷病重卧床，迷糊中念着你的小名",
+      thereText: "老家 86 岁的爷爷因肺部感染病重卧床，堂兄弟们在床前轮流伺候。大姐发来微信视频，爷爷消瘦干枯的手摸着手机屏幕，声音微弱地念叨着你的乳名，问：“二毛……怎么还不放寒假回来啊？”大伯在视频旁叹气：“老人可能撑不过这个冬天，你能请假回来看一眼不？”你查了查往返机票和外管局签证续签预约，心急如焚。",
+      sociologicalFootnote: "费孝通《乡土中国》：“‘祖荫’是乡土中国精神秩序的核心基石。隔绝万里的离土者面对祖辈生命的凋零，往往会遭遇最沉痛的伦理负罪感——在自由与尽孝之间，现代文明往往无法给出两全的答案。”",
+      choices: [
+        {
+          text: "咬咬牙花光积蓄买了三倍高价的紧急回国机票，向德企请了三周探亲假飞回爷爷床前守候。",
+          detail: "在个人前途与传统祖荫伦理的终极碰撞中，选择不给人生留下永恒的遗憾。",
+          reaction: "握住爷爷那只冰凉苍老的手时，爷爷眼角滑下了一滴泪。那一刻你明白，世上有些东西比存款和居留权更沉重。",
+          fundsDelta: -16000,
+          individualSovereigntyDelta: -8,
+          soilKinshipTiesDelta: 25
+        },
+        {
+          text: "每天定点开视频跟爷爷说话唱歌，让大姐用最好的药，给家里转了 8000 元医疗补贴。",
+          detail: "承受内心的剧痛与亲戚的侧目，理智地保住刚刚在德国立足的签证与工作根基。",
+          reaction: "爷爷在两个月后安详离世。你在黑森林里挑了一棵最高大的冷杉树，坐在树下哭了一整个下午。你长大了，但灵魂缺了一角。",
+          fundsDelta: -8000,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 5
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "回望 · 第 5 年",
+      phaseTitle: "自洽与归处：施普雷河边的啤酒与故乡渐行渐远的背影",
+      hereTitle: "此岸 · 拿到欧盟永居卡，施普雷河边喝了杯淡啤酒",
+      hereText: "外管局窗口递出来蓝色的欧盟长居卡。走出红砖老建筑，微风吹拂着河面。在河边的木长椅上坐下，看一艘货船慢悠悠划开水波。你依然常常嫌弃德铁晚点，但你已经习惯了这里的界限感，习惯了不被打扰的周末，习惯了把一双徒步鞋穿上好几年。生活很平淡，但也足够安宁。",
+      thereTitle: "彼岸 · 父母退休后的平和，以及不再有交集的同窗生活",
+      thereText: "母亲在微信上发来她和父亲在老年大学跳广场舞、打门球的照片。当年老家那些热烈盘问你的亲戚们，如今各自为儿女结婚、带孙子焦头烂额，不再有精力过问你在海外的生活。你与故土的那张大网，在五年的时空拉扯中，渐渐松弛了下来。",
+      sociologicalFootnote: "费孝通《乡土中国》：“差序格局随着距离与时间的拉长，波纹终会逐渐平复。离土之人以五年岁月换来的，不是对故乡的断绝，而是一种平静的互不相扰。你终于可以在异邦安身，在记忆中立命。”",
+      choices: [
+        {
+          text: "把河水与落日的照片发给母亲，附言‘今天拿到了长期居留，你们夏天来德国避暑吧’。",
+          detail: "以一个独立自主个体的姿态，重新与故土长辈建立平视而温柔的情感链接。",
+          reaction: "母亲回了一串笑脸：‘好啊，去看看我大儿/闺女生活的城市！’你喝完最后一口啤酒，夕阳把一切镀成了金黄。",
+          fundsDelta: -30,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 8
+        }
+      ]
+    }
+  ],
+  spain: [
+    {
+      year: 1,
+      timeLabel: "初抵 · 第 1 年",
+      phaseTitle: "破土与喜礼：一欧元的橙汁与表姐的体制内庆功酒",
+      hereTitle: "此岸 · 瓦伦西亚的“Mañana”与盛开的紫薇花",
+      hereText: "在瓦伦西亚办居留绿卡，早上七点在移民局排长队，工作人员看了看材料耸耸肩说系统坏了：“Mañana, por favor（明天再来吧）”。走出大厅，在街角小店花 1 欧元买了一大杯鲜榨橙汁，酸甜冰凉。海风吹过来，满街都是盛开的紫薇花，你坐在长凳上晒太阳打盹，第一次体会到松弛。",
+      thereTitle: "彼岸 · 表姐提拔科级干部，亲戚们在群里指点江山",
+      thereText: "同在这个星期，老家表姐在县发改局升了副科长，大姑在家族群里发满了一桌桌庆功宴的照片，亲戚们纷纷在群里献殷勤。一个远房大伯艾特你：“@小满/浩子，你看看你表姐，女孩子在体制内多体面！你跑到欧洲荒废青春，没编制以后连养老金都领不全，赶紧买机票回来考个编吧！”",
+      sociologicalFootnote: "费孝通《乡土中国》：“在皇权与乡绅治理的文化余波中，‘入仕’（考公入编）是光宗耀祖的终极路径。宗族的长辈习惯用这把唯一的尺子衡量世间所有人，无法理解世界上还有‘晒太阳喝橙汁’的松弛价值。”",
+      choices: [
+        {
+          text: "在群里发了一句‘恭喜表姐’，然后默默关闭了群消息免打扰，转头去海滩慢跑看夕阳。",
+          detail: "不再试图向乡土传统自证，学会温和地把喧嚣隔绝在视线之外。",
+          reaction: "夕阳把地中海染成金红色，海浪一层层涌上来拍打着细软的沙滩。你甩开双腿慢跑，出了一身透汗，心里轻快得像一片羽毛。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: 15,
+          soilKinshipTiesDelta: -5
+        },
+        {
+          text: "给表姐寄了一瓶西班牙特级初榨橄榄油当贺礼，客客气气维持长辈眼里的体面礼数。",
+          detail: "用不卑不亢的物质回馈，表明自己有体面的生活能力，堵住亲戚的闲话。",
+          reaction: "表姐收到油发朋友圈夸你懂生活，大姑也不再多嘴。你在阳台泡了一杯红茶，觉得多花这几十欧挺值得。",
+          fundsDelta: -300,
+          individualSovereigntyDelta: 5,
+          soilKinshipTiesDelta: 10
+        }
+      ]
+    },
+    {
+      year: 3,
+      timeLabel: "日常 · 第 3 年",
+      phaseTitle: "远水与近渴：地中海海鲜饭与老家发小的借钱语音",
+      hereTitle: "此岸 · 小铁锅慢炖海鲜饭与无花果树的清香",
+      hereText: "你彻底适应了西班牙的生活节奏。在菜市场用流利西语跟大妈砍价买海鲈鱼和番茄。学着用当地土法在小铁锅里煮了一盘海鲜饭，藏红花香气飘满小巷。阳台上的盆栽无花果结了果子，下午两点到五点全城闭店午休，阳光把你的皮肤晒成了健康的小麦色，国内长年的慢性鼻炎不药而愈。",
+      thereTitle: "彼岸 · 当年一起考研的挚友创业失败，深夜发来借钱语音",
+      thereText: "深夜两点，当年在大学和你一起通宵考研的至交挚友突然发来一段长长的语音。声音哽咽嘶哑，他在老家开教培工作室和朋友合伙被骗，欠了十几万外债，信用卡马上要逾期上征信。他吞吞吐吐地说：“兄弟……我知道你出国也不容易，但凡有别的办法我绝不开口，能不能先借我两万块钱周转一个月？”",
+      sociologicalFootnote: "费孝通《乡土中国》：“差序格局不仅是血缘，更是最亲密的义气之网。跨国的物理隔离往往会检验这种同伴关系的脆弱度：金钱借贷在现代社会是契约，而在熟人情谊中却是一面照见良心与边界的双面镜。”",
+      choices: [
+        {
+          text: "二话没说把刚刚攒下的 2 万元 RMB 转了过去，并附言‘不用急着还，先挺过这一关’。",
+          detail: "珍惜年少时纯粹的同窗义气，宁愿承担坏账风险也不愿看着故友沉沦。",
+          reaction: "朋友发来一张在马路边大哭的照片，连发了七八句‘下辈子做牛做马报答你’。你合上手机，心里沉甸甸的，但觉得问心无愧。",
+          fundsDelta: -20000,
+          individualSovereigntyDelta: 5,
+          soilKinshipTiesDelta: 18
+        },
+        {
+          text: "如实跟朋友说明自己在欧洲租房与居留的紧绷开销，转了 3000 元作为无偿赠予，温和表示借不出两万大额。",
+          detail: "严格设立个人财务安全红线，以赠代借，守护现代成年人理智的财务边界。",
+          reaction: "朋友收了钱真诚道谢。虽然关系微微多了一层客气，但你没有透支自己在异国的生存底盘。",
+          fundsDelta: -3000,
+          individualSovereigntyDelta: 12,
+          soilKinshipTiesDelta: 2
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "回望 · 第 5 年",
+      phaseTitle: "自洽与归处：三百天的晴天与父母叹息的‘乡土难移’",
+      hereTitle: "此岸 · 换到欧盟长居，表哥问发财没你笑了笑",
+      hereText: "第五年换到了长期居留。老家表哥发微信问你：“在那边赚大钱了吧？买大奔了吗？”你低头看了看自己穿了两年的人字拖，和刚刚在菜市场花 5 欧买的一大袋新鲜无花果，笑着回了句：“没发财，打工糊口。就是这里一年有三百天是大晴天，心情挺好。”",
+      thereTitle: "彼岸 · 父母来西班牙探亲一个月，最终还是想回老家打麻将",
+      thereText: "办了探亲签证，把父母接来西班牙住了一个月。爸爸每天在阳台上剥橙子，看着碧蓝的大海赞叹：“这天真蓝，空气是真好！”但住了三周后，老两口开始坐立不安。爸爸叹气：“街上一个人都不认识，连个下棋打麻将的老哥们都没有，饭馆除了面包就是火腿……还是得回老家舒坦啊。”",
+      sociologicalFootnote: "费孝通《乡土中国》：“‘安土重迁，黎民之性。’父辈的一生已经深深焊死在故土的差序网里，离开那张网，新鲜的空气也填补不了精神的失重。而你，已经成了属于这片海风与晴天的全新一代。”",
+      choices: [
+        {
+          text: "给父母买了回国的直飞头等舱票，笑着送他们进安检，约定以后每年夏天接他们来住一个月。",
+          detail: "彻底接纳两代人不同的精神归宿：尊重父母的乡土羁绊，也笃定自己的异国人生。",
+          reaction: "父母在安检口回头挥手，笑得合不拢嘴。走出机场，瓦伦西亚的微风吹拂着你的衣角，你已经安顿好了整颗心。",
+          fundsDelta: -12000,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 10
+        }
+      ]
+    }
+  ],
+  canada: [
+    {
+      year: 1,
+      timeLabel: "初抵 · 第 1 年",
+      phaseTitle: "破土与喜礼：暴雪除雪与二胎弟弟的满月酒席",
+      hereTitle: "此岸 · 零下十五度铲雪与 Tim Hortons 热咖啡",
+      hereText: "十一月的加拿大，推开门积雪没过小腿肚。零下十五度，拿着红色塑料大雪铲在门前吭哧除雪，睫毛结了一层细霜。手脚冻得发麻时去 Tim Hortons 买了两块加币的 Double-Double 热咖啡和一个热乎乎的蜂蜜甜甜圈，双手捧着纸杯，热气扑在脸上。去二手超市买了一件厚实二手羊毛大衣，脚下咯吱咯吱作响。",
+      thereTitle: "彼岸 · 哥哥在老家办二胎满月酒，催促你在老家买房",
+      thereText: "同在这个月，老家哥哥二胎办满月酒，老家亲戚二十几口人聚在包厢里大摆宴席。母亲打来电话抱怨带孙子腰酸背痛，话锋一转又开始念叨：“……你哥两个孩子房子不够住了，你在加拿大租房子住算个什么事？赶紧把钱存够回省城买套大房子，老了也有个落脚的地方。”",
+      sociologicalFootnote: "费孝通《乡土中国》：“在传统宗族眼光中，‘房产与地产’是人立足于土地最根本的具象符号。没有属于自己的水泥砖瓦，漂泊便是一种‘失根’。宗族总是试图用房产这根绳索，把远行的游子重新系回故土。”",
+      choices: [
+        {
+          text: "给侄子包了 2000 块微信满月红包，在电话里温和安抚母亲，但绝口不提买房的事。",
+          detail: "用晚辈礼金尽到姑姑/叔叔的亲情礼节，但守住自己财务不被老家房产套牢的底线。",
+          reaction: "哥哥在群里发了宝宝握着红包的小手照片。你喝了一口热咖啡，看着窗外漫天纷飞的大雪，心里非常清楚自己的未来在哪里。",
+          fundsDelta: -2000,
+          individualSovereigntyDelta: 12,
+          soilKinshipTiesDelta: 10
+        },
+        {
+          text: "跟母亲据理力争说明自己在加拿大的规划，并指出国内房产市场风险，结果电话不欢而散。",
+          detail: "试图用理性击碎传统观念，往往只会换来长辈的委屈与不解。",
+          reaction: "母亲挂断了电话，你在雪地里站了很久。大雪落在肩头很沉，你叹了一口气，继续弯腰铲雪。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: -8
+        }
+      ]
+    },
+    {
+      year: 3,
+      timeLabel: "日常 · 第 3 年",
+      phaseTitle: "远水与近渴：落基山繁星与父亲深夜急救车警笛",
+      hereTitle: "此岸 · 落基山脚下湖边露营与壁炉暖火",
+      hereText: "开着换了雪胎的旧斯巴鲁去落基山脚下的湖面露营。湖水蓝得像宝石，松脂清香弥漫。支起帐篷生起营火，躺在折叠椅上看漫天繁星，感觉整个人被大自然温柔地包裹着。在大统华买了老干妈和挂面，雪夜在小电炉上热热地煮了一锅热汤面，壁炉的火苗在玻璃后轻轻跳动。",
+      thereTitle: "彼岸 · 父亲突发轻度脑梗，深夜救护车呼啸而过",
+      thereText: "就在这个露营的周末，手机弹出老家大姐的疯狂未接来电。父亲深夜突发轻度脑梗被 120 急救车送进市医院。大姐在电话里哭得不成样子：“爸突然倒下了，嘴都歪了，医生让签病危通知书，我手都在抖啊……你能不能回来？！”你在落基山的星空下，浑身血液瞬间凝固，整夜合不上眼。",
+      sociologicalFootnote: "费孝通《乡土中国》：“生命无常是离土者头上最沉重的一柄达摩克利斯之剑。当父母的衰老与突发疾病撞上跨越太平洋的一万公里航程，所有的现代逍遥与山水风光，瞬间都会被宗族血缘最原始的痛感击穿。”",
+      choices: [
+        {
+          text: "连夜退掉营地开回温哥华，买下三天内最贵的一班直飞回国机票，飞回国内在病床前守了整整三周。",
+          detail: "放下一整年所有的假期与积蓄，遵循肉身侍奉的原生伦理，不给自己留遗憾。",
+          reaction: "守在病床前给父亲喂水擦身，父亲的病情慢慢稳定。走出医院病房看着熟悉嘈杂的街道，你累得快要虚脱，但心里的一块石头落了地。",
+          fundsDelta: -25000,
+          individualSovereigntyDelta: -5,
+          soilKinshipTiesDelta: 30
+        },
+        {
+          text: "立刻汇款两万元用于垫付抢救押金，托老家当医生的同学全程盯紧专家会诊，每天保持视频连线。",
+          detail: "由于工作处于移民审核关键期无法离境，用最高效的现代远程资源调度分担危机。",
+          reaction: "父亲手术很成功，脱离了危险期。你在加拿大的窗前看着细雨连绵，这一周你瘦了整整六斤。",
+          fundsDelta: -20000,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 8
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "回望 · 第 5 年",
+      phaseTitle: "自洽与归处：信箱里的枫叶卡与母亲电话里的‘想通了’",
+      hereTitle: "此岸 · 枫叶卡寄到信箱，给炖牛肉加了一把黑胡椒",
+      hereText: "信箱里躺着印着枫叶水印的坚硬塑料卡片。五年了，度过了五个漫长寒冷的冬天，也见证了五个惊心动魄的明艳夏天。你没有像社交网络上的网红一样住上海景豪宅，但你有一份踏实的手艺，一台能在暴风雪里平稳前行的老车，和一个属于自己的温暖壁炉。去厨房给小火慢炖的牛肉汤加了一小把黑胡椒，香气四溢。",
+      thereTitle: "彼岸 · 母亲在电话里轻声说：“你想通了，我们也想通了”",
+      thereText: "母亲打来视频，父亲恢复得很好，正在旁边乐呵呵地逗小孙子。母亲在电话里看着你红润安稳的脸色，叹了口气轻声说：“……当年老觉得你一个人跑那么远不安心。现在看你在那边过得踏实自洽，不用像国内这样天天熬夜应酬求人办事，我们也想通了。自己过得好，比啥面子都强。”",
+      sociologicalFootnote: "费孝通《乡土中国》：“这是两代人、两种文明形态历经五年摩擦后的最高和解。父母最终放下了用差序格局捆绑子女的执念，而游子也在大洋彼岸建立起了属于自己的独立尊严。故乡与异邦，终于找到了彼此最温柔的距离。”",
+      choices: [
+        {
+          text: "把炖好的热牛肉汤盛进保温盒，准备给邻居除雪的华人大叔送一碗，窗外是漫天飘落的白雪。",
+          detail: "在异国的雪地里，长出了属于自己的新根须与新温情。",
+          reaction: "大叔开门接过汤笑开了花。你走回自己的屋檐下，壁炉里柴火毕剥作响。生活平淡而长久地向前延展，你找到了属于自己的家。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 10
+        }
+      ]
+    }
+  ],
+  thailand: [
+    {
+      year: 1,
+      timeLabel: "初抵 · 第 1 年",
+      phaseTitle: "破土与喜礼：40泰铢的鸡肉饭与家族群里的‘混日子’",
+      hereTitle: "此岸 · 清迈宁曼路小巷与傍晚古城兜风的晚风",
+      hereText: "走出清迈机场，热带潮湿而温暖的香茅草气息扑面而来。在宁曼路背后的小巷租下带阳台的公寓，月租 9000 泰铢（不到两千人民币）。楼下海南鸡肉饭摊的老奶奶总是多给你舀一勺热腾腾的冬瓜鸡汤。买了一辆二手机车，傍晚慢悠悠绕着古城护城河兜风，风吹在身上，治愈了国内常年的偏头痛。",
+      thereTitle: "彼岸 · 大姑在家族群发语音：“去东南亚能混出什么名堂？”",
+      thereText: "得知你辞去国内工作去了泰国清迈，大姑在家族群里大惊小怪：“那不是去穷乡僻壤旅游的地方吗？年纪轻轻跑去东南亚混日子，既不买房也不生娃，以后老了没保障怎么办？趁早回国找个正经班上！”父母在群里沉默没有说话，发微信私下问你到底带了多少钱去。",
+      sociologicalFootnote: "费孝通《乡土中国》：“传统乡土社会的逻辑是‘积累与繁衍’，生命被严格锚定在上学、买房、结婚、生子、带孙的单向时间轴上。偏离这条时间轴的‘松弛’与‘低消费游牧’，在熟人评价体系中往往被视为不务正业的放逐。”",
+      choices: [
+        {
+          text: "在群里不辩解，私下给父母发去自己干净明亮的公寓和菜市场物价视频，转了 1000 元让他们买好吃的。",
+          detail: "用真实的生活画面安抚父母的焦虑，对远房亲戚的评价一概免打扰。",
+          reaction: "父母看完视频放心不少，说‘看着挺干净，你过得开心就行’。你骑着机车去夜市买了份芒果糯米饭，晚风吹过，无比惬意。",
+          fundsDelta: -1000,
+          individualSovereigntyDelta: 15,
+          soilKinshipTiesDelta: 5
+        },
+        {
+          text: "在群里认真发了长文解释数字游民与低成本远程生活的逻辑，试图说服亲戚。",
+          detail: "年轻一代试图在宗族微信群里启蒙长辈，往往只是徒劳耗费口舌。",
+          reaction: "大姑回了一大串大红大绿的老年养生表情包，继续说‘还是体制内好’。你合上手机苦笑，明白认知隔着一个银河系。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: 5,
+          soilKinshipTiesDelta: -5
+        }
+      ]
+    },
+    {
+      year: 3,
+      timeLabel: "日常 · 第 3 年",
+      phaseTitle: "远水与近渴：木檐下的四十分钟暴雨与外婆离世的白花",
+      hereTitle: "此岸 · 咖啡馆屋檐下听雨与徹底治好的失眠",
+      hereText: "清迈的雨季，暴雨总是毫无预兆倾盆而下。被困在一间木头搭建的小咖啡馆屋檐下，雨水从瓦片边缘像瀑布一样挂下来。街上的摩托车全停在骑楼下避雨，没有人按喇叭催促，大家都在安静看雨。你点了一杯 50 泰铢的手冲咖啡，敲完今天最后一部分给远程客户的活。你很久没有失眠过了。",
+      thereTitle: "彼岸 · 89 岁外婆离世，因为签证与机票错过出殡",
+      thereText: "也就是这个雨季，老家 89 岁的外婆在老屋平静离世。因签证更新期护照扣在移民局，加上最快航班也赶不上第二天清晨的出殡，你未能赶回老家给从小最疼你的外婆磕头送终。母亲发来灵堂的照片，黑白相框前白菊花静静绽放，表兄弟们披麻戴孝跪在灵前，而你成了远在大洋另一端的缺席者。",
+      sociologicalFootnote: "费孝通《乡土中国》：“‘丧葬之礼，慎终追远。’宗族的白事是告别也是凝聚。未能出席最疼爱自己的长辈出殡，往往会成为离土者一生无法愈合的精神伤疤，也是追求绝对自由所必须支付的最惨烈代价。”",
+      choices: [
+        {
+          text: "冒着暴雨去清迈素贴山下的寺庙，为外婆点了一盏祈福酥油灯，跪在佛前失声痛哭。",
+          detail: "在异国的佛寺里，用自己最赤诚的悲痛，完成对故土亲人最后一次灵魂告别。",
+          reaction: "香火袅袅升起，雨打芭蕉。你跪在蒲团上，想起小时候外婆塞在手心里那颗融化的白糖。你站起身，擦干眼泪，走出寺庙。",
+          fundsDelta: -200,
+          individualSovereigntyDelta: 5,
+          soilKinshipTiesDelta: 20
+        },
+        {
+          text: "给老家寄了 5000 元作为香烛帛金，并请大姐把手机放在灵前，对着视频给外婆磕了三个响头。",
+          detail: "借现代通讯媒介勉强完成跨越国界的孝道仪式，咽下无法挽回的遗憾。",
+          reaction: "大姐在电话里哭着说外婆临走前还念着你的名字。雨停了，空气里带着泥土的清香，生活依然在推着你向前走。",
+          fundsDelta: -5000,
+          individualSovereigntyDelta: -2,
+          soilKinshipTiesDelta: 15
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "回望 · 第 5 年",
+      phaseTitle: "自洽与归处：松弛的生活与当年长辈打听‘清迈养老’",
+      hereTitle: "此岸 · 家当依然只有一个行李箱，但身心彻底自洽",
+      hereText: "五年过去，没有成为身家千万的老板，也没有买下豪宅。家当依然只有一个大行李箱和一台旧笔记本。但你学会了泰语买菜砍价，你的体检指标全恢复了正常。你明白人生也许不需要那么多宏大的目标，简简单单地活在一个阳光充沛的地方，本身就是一种莫大的福气。在夜市买了两盒芒果糯米饭送给看门大爷，大爷双手合十冲你道谢。",
+      thereTitle: "彼岸 · 当年指责你的大姑，私信打听‘清迈租房一个月多少钱’",
+      thereText: "老家当年大声指责你‘胡闹混日子’的大姑，突然发来微信私聊。大姑退休了，冬天老家湿冷关节炎发作苦不堪言，她试探着问你：“浩子/小满啊……清迈那边冬天真有那么暖和吗？像大姑这种退休老人，在那边租个带电梯的小公寓一个月两千块够不够啊？”",
+      sociologicalFootnote: "费孝通《乡土中国》：“时间的齿轮转动五年，当宗族旧秩序的拥趸们自己步入老境与困局，他们终于在现实的坚硬冰冷中，回过头来重新审视那个当年叛逆离土的后辈。这一刻，你不再需要任何言语的胜利，时间已经给出了答案。”",
+      choices: [
+        {
+          text: "温和客观地给大姑列了一份清迈旅居租房的实际开销与医疗注意事项，没有一丝冷嘲热讽。",
+          detail: "历经岁月沉淀后的宽容与释怀，以平等的成年人姿态对待曾经羁绊自己的乡土亲戚。",
+          reaction: "大姑连道感谢夸你有出息。你踩着人字拖慢吞吞走上楼梯，清迈的晚风穿堂而过，吹得窗台风铃叮当作响，心里一片澄澈。",
+          fundsDelta: 0,
+          individualSovereigntyDelta: 10,
+          soilKinshipTiesDelta: 8
         }
       ]
     }
