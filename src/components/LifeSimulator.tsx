@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   generateRandomFamily,
   BIRTHPLACE_SLIDES,
+  PROVINCE_GROUPS,
   generateTimelineForCharacter,
   generateCareerTimeline,
   calculateGaokaoOutcome,
@@ -477,6 +478,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // Cinematic Birthplace Reel Animator
   const [isSpinning, setIsSpinning] = useState(false);
+  const [showProvincePicker, setShowProvincePicker] = useState(false);
+  const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>('全部');
   const [slideIndex, setSlideIndex] = useState(() => {
     const idx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === charData.family.region);
     return idx !== -1 ? idx : Math.floor(Math.random() * BIRTHPLACE_SLIDES.length);
@@ -1010,10 +1013,11 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     scrollToFeedBottom();
   };
 
-  const handleRestart = () => {
+  const handleRestart = (targetProvince?: string | unknown) => {
     confettiFiredRef.current = false;
     setIsAutoPlaying(false);
-    const fresh = generateRandomFamily();
+    const prov = typeof targetProvince === 'string' ? targetProvince : undefined;
+    const fresh = generateRandomFamily(prov);
     setCharData(fresh);
     setTimeline(generateTimelineForCharacter(fresh.family, fresh.gender));
     const matchIdx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === fresh.family.region);
@@ -1034,6 +1038,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setGamePhase('setup');
     setGaokaoCalc(null);
     setShowGaokaoModal(false);
+    setShowProvincePicker(false);
     setChosenPath('stay');
     setLogEntries([]);
     setTags([]);
@@ -1241,13 +1246,26 @@ ${logEntries
             </div>
           </div>
 
-          <div className={`mt-4 pt-3 border-t flex items-center justify-between font-reading-sans ${
+          <div className={`mt-4 pt-3 border-t flex flex-wrap items-center justify-between gap-2.5 font-reading-sans ${
             isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
           }`}>
             <span className="text-xs sm:text-sm">
-              {isSpinning ? "齿轮飞速运转中..." : "不满意当前出身，可随时重新投胎"}
+              {isSpinning ? "齿轮飞速运转中..." : "全国34省级行政区已全覆盖 · 可自主选省或随机轮盘"}
             </span>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowProvincePicker(true)}
+                disabled={isSpinning}
+                className={`px-3.5 py-2 rounded-xl border text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 active:scale-[0.98] ${
+                  isLight
+                    ? "bg-amber-100/90 hover:bg-amber-200/90 border-amber-300 text-amber-950 shadow-sm"
+                    : "bg-[#282216] hover:bg-[#342C1B] border-amber-500/40 text-amber-300 shadow-sm"
+                }`}
+                title="自主选择全国34省级行政区投胎"
+              >
+                <Compass className="w-3.5 h-3.5 text-amber-500" />
+                <span>自主选省</span>
+              </button>
               <button
                 onClick={handleToggleTheme}
                 className={`px-3 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 active:scale-[0.98] ${
@@ -1279,7 +1297,7 @@ ${logEntries
                 }`}
               >
                 <RotateCcw className={`w-3.5 h-3.5 text-amber-400 ${isSpinning ? "animate-spin" : ""}`} />
-                重新投胎
+                随机轮盘
               </button>
             </div>
           </div>
@@ -1316,6 +1334,48 @@ ${logEntries
                 家庭初始存款：¥{charData.family.initialFamilySavings.toLocaleString()}
               </span>
             </div>
+          </div>
+
+          {/* Bespoke Birth Scene Card */}
+          <div className={`p-4 sm:p-5 rounded-xl border space-y-2 transition-colors ${
+            isLight ? "bg-amber-50/70 border-amber-200/90 text-stone-800" : "bg-[#181A24] border-amber-500/25 text-stone-200"
+          }`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className={`font-semibold flex items-center gap-2 font-reading-sans ${
+                isLight ? "text-amber-900" : "text-amber-300"
+              }`}>
+                <span className="text-lg">{currentSlide.icon}</span>
+                <span className="text-sm sm:text-base font-bold font-narrative-serif">初临人间与第一声啼哭</span>
+                {charData.family.province && (
+                  <span className={`text-[11px] px-2.5 py-0.5 rounded-full border font-mono-num font-medium ${
+                    isLight ? "bg-amber-200/80 border-amber-300 text-amber-950" : "bg-amber-500/20 border-amber-500/40 text-amber-300"
+                  }`}>
+                    {charData.family.province}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs ${isLight ? "text-stone-600" : "text-stone-400"}`}>
+                  {charData.family.hospitalName} · {charData.family.cityOrCounty}
+                </span>
+                <button
+                  onClick={() => setShowProvincePicker(true)}
+                  className={`text-[11px] px-2 py-0.5 rounded border transition-all ${
+                    isLight
+                      ? "bg-white hover:bg-stone-100 border-amber-300 text-amber-900 font-medium"
+                      : "bg-white/[0.06] hover:bg-white/[0.1] border-amber-500/30 text-amber-300"
+                  }`}
+                  title="切换出生省份"
+                >
+                  换省份
+                </button>
+              </div>
+            </div>
+            <p className={`text-xs sm:text-[13.5px] leading-relaxed font-reading-sans tracking-[0.04em] ${
+              isLight ? "text-stone-800" : "text-stone-300"
+            }`}>
+              {charData.family.birthScene}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
@@ -1757,7 +1817,20 @@ ${logEntries
           </button>
 
           <button
-            onClick={handleRestart}
+            onClick={() => setShowProvincePicker(true)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-reading-sans group transition-all ${
+              isLight
+                ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
+                : "bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-300 hover:text-white"
+            }`}
+            title="自主选择全国34省级行政区重新投胎"
+          >
+            <Compass className="w-3.5 h-3.5 text-amber-500" />
+            <span>选省</span>
+          </button>
+
+          <button
+            onClick={() => handleRestart()}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-reading-sans group transition-all ${
               isLight
                 ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
@@ -2438,7 +2511,19 @@ ${logEntries
                     </button>
 
                     <button
-                      onClick={handleRestart}
+                      onClick={() => setShowProvincePicker(true)}
+                      className={`py-3 px-5 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.99] font-narrative-serif ${
+                        isLight
+                          ? "bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-950"
+                          : "bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/40 text-amber-300"
+                      }`}
+                    >
+                      <Compass className="w-4 h-4 text-amber-500" />
+                      <span>选省重开</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleRestart()}
                       className="py-3 px-6 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/40 active:scale-[0.99] font-narrative-serif"
                     >
                       <RotateCcw className="w-4 h-4" />
@@ -2970,6 +3055,161 @@ ${logEntries
                     }`} />
                   </button>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================= */}
+      {/* MODAL: 自主指定投胎省份（34省级行政区全覆盖）                      */}
+      {/* ================================================================= */}
+      {showProvincePicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-year-enter">
+          <div className={`border rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl transition-colors ${
+            isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#0E1017] border-white/[0.08] text-stone-100"
+          }`}>
+            {/* Header */}
+            <div className={`px-5 sm:px-6 py-4 border-b flex items-center justify-between shrink-0 transition-colors ${
+              isLight ? "bg-stone-50 border-stone-200" : "bg-[#13151F] border-white/[0.07]"
+            }`}>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center">
+                  <Compass className="w-4 h-4 text-[#D4A359]" />
+                </div>
+                <div>
+                  <h3 className={`text-base sm:text-lg font-bold font-narrative-serif ${
+                    isLight ? "text-stone-900" : "text-stone-100"
+                  }`}>
+                    自主指定投胎省份 · 全国34省级行政区
+                  </h3>
+                  <p className={`text-xs ${isLight ? "text-stone-500" : "text-stone-400"}`}>
+                    点击任意省份即可直接转生降临，探索各省独一无二的初临人间啼哭实景与家庭档案
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowProvincePicker(false)}
+                className={`p-2 rounded-lg transition-colors ${
+                  isLight ? "hover:bg-stone-200 text-stone-500 hover:text-stone-800" : "hover:bg-white/[0.06] text-stone-400 hover:text-white"
+                }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Region Filter Tabs */}
+            <div className={`px-5 sm:px-6 py-2.5 border-b flex items-center gap-1.5 overflow-x-auto text-xs shrink-0 no-scrollbar ${
+              isLight ? "bg-stone-100/60 border-stone-200" : "bg-[#11131B] border-white/[0.05]"
+            }`}>
+              {['全部', '华北', '东北', '华东', '华中', '华南', '西南', '西北', '港澳台'].map(grp => (
+                <button
+                  key={grp}
+                  onClick={() => setSelectedGroupFilter(grp)}
+                  className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-all ${
+                    selectedGroupFilter === grp
+                      ? isLight
+                        ? "bg-amber-600 text-white shadow-sm font-semibold"
+                        : "bg-[#D4A359] text-stone-950 font-bold shadow-sm"
+                      : isLight
+                        ? "bg-white text-stone-600 hover:bg-stone-200/80 border border-stone-200"
+                        : "bg-white/[0.04] text-stone-400 hover:text-stone-200 hover:bg-white/[0.08] border border-white/[0.04]"
+                  }`}
+                >
+                  {grp}
+                </button>
+              ))}
+            </div>
+
+            {/* Province Grid Body */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+              {PROVINCE_GROUPS
+                .filter(g => selectedGroupFilter === '全部' || g.group === selectedGroupFilter)
+                .map(groupItem => (
+                  <div key={groupItem.group} className="space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#D4A359]">
+                        【{groupItem.group}地区 · {groupItem.provinces.length}个省级行政区】
+                      </span>
+                      <div className={`flex-1 h-[1px] ${isLight ? "bg-stone-200" : "bg-white/[0.06]"}`} />
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
+                      {groupItem.provinces.map(prov => {
+                        const isCurrent = charData.family.province === prov.province ||
+                          charData.family.region.startsWith(prov.province);
+
+                        return (
+                          <button
+                            key={prov.id}
+                            onClick={() => {
+                              handleRestart(prov.province);
+                            }}
+                            className={`p-3 rounded-xl border text-left transition-all relative group active:scale-[0.98] ${
+                              isCurrent
+                                ? isLight
+                                  ? "bg-amber-100/90 border-amber-500 shadow-md ring-1 ring-amber-500"
+                                  : "bg-amber-500/20 border-amber-500/80 shadow-md ring-1 ring-amber-500/50"
+                                : isLight
+                                  ? "bg-stone-50 hover:bg-amber-50 hover:border-amber-400 border-stone-200 text-stone-800"
+                                  : "bg-[#151722] hover:bg-[#1C1F2D] hover:border-amber-500/40 border-white/[0.06] text-stone-200"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-xl group-hover:scale-110 transition-transform">{prov.icon}</span>
+                              {isCurrent && (
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                  isLight ? "bg-amber-600 text-white" : "bg-amber-500 text-stone-950"
+                                }`}>
+                                  当前
+                                </span>
+                              )}
+                            </div>
+                            <div className={`font-bold text-sm sm:text-base font-narrative-serif leading-tight ${
+                              isLight ? "text-stone-900" : "text-stone-100"
+                            }`}>
+                              {prov.province}
+                            </div>
+                            <div className={`text-[11px] mt-1 truncate ${
+                              isLight ? "text-stone-500 group-hover:text-amber-800" : "text-stone-400 group-hover:text-amber-300"
+                            }`}>
+                              {prov.shortLabel}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {/* Footer */}
+            <div className={`px-5 py-3 border-t flex items-center justify-between shrink-0 ${
+              isLight ? "bg-stone-50 border-stone-200" : "bg-[#13151F] border-white/[0.07]"
+            }`}>
+              <span className={`text-xs ${isLight ? "text-stone-500" : "text-stone-400"}`}>
+                34省级行政区全收录 · 随选随生
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setShowProvincePicker(false);
+                    spinReel();
+                  }}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    isLight
+                      ? "bg-white hover:bg-stone-100 border-stone-300 text-stone-700"
+                      : "bg-white/[0.05] hover:bg-white/[0.08] border-white/[0.08] text-stone-300"
+                  }`}
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
+                  <span>听天由命 随机轮盘</span>
+                </button>
+                <button
+                  onClick={() => setShowProvincePicker(false)}
+                  className="px-4 py-1.5 rounded-lg bg-stone-700 hover:bg-stone-600 text-white text-xs font-medium transition-all"
+                >
+                  关闭
+                </button>
               </div>
             </div>
           </div>
