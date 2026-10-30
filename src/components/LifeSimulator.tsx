@@ -687,15 +687,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       return updated;
     });
 
-    // Check if next year is 18 (Gaokao trigger)
-    const nextIdx = timelineIndex + 1;
-    if (currentNode.age === 17) {
-      const calc = calculateGaokaoOutcome(attrs, tags);
-      setGaokaoCalc(calc);
-      setShowGaokaoModal(true);
-      return;
-    }
-
     // ★★★ 二十一岁大四毕业抉择：精准定制后续 22~27 岁专属职场/学术轨迹 ★★★
     // 彻底杜绝“本科工作两年又突然硕士毕业签约”的严重逻辑矛盾！
     if (currentNode.age === 21) {
@@ -731,44 +722,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       // 将后续30, 35, 42, 52, 63岁里程碑直接串接进时间线，三栏交互彻底统一！
       const currentNodes = timeline.slice(0, timelineIndex + 1);
       setTimeline([...currentNodes, ...adultMilestones]);
-      scrollToFeedBottom();
-      return;
     }
 
-    // ★★★ 中年关键抉择 (30, 35, 42岁)：选完后停留在当前年龄看反馈，通过底部按钮跨入下一岁阶段 ★★★
-    if (currentNode.age >= 30) {
-      scrollToFeedBottom();
-      return;
-    }
-
-    if (nextIdx >= timeline.length) {
-      return;
-    }
-
-    // Automatically load next natural event or choice
-    const nextNode = timeline[nextIdx];
-    if (nextNode.naturalDelta) {
-      applyDelta(nextNode.naturalDelta);
-    }
-    if (nextNode.naturalTags) {
-      setTags((prev) => Array.from(new Set([...prev, ...(nextNode.naturalTags || [])])));
-    }
-
-    const nextLog: ChronicleLogEntry = {
-      id: nextNode.id,
-      age: nextNode.age,
-      year: birthYear + nextNode.age,
-      stageName: nextNode.stageName,
-      title: nextNode.title,
-      scene: nextNode.scene,
-      type: nextNode.type || 'natural',
-      statDelta: nextNode.naturalDelta,
-      tagsAdded: nextNode.naturalTags,
-      reflection: nextNode.reflection
-    };
-
-    setLogEntries((prev) => [...prev, nextLog]);
-    setTimelineIndex(nextIdx);
+    // 无论哪个年龄段抉择，都让玩家看清抉择反馈与属性变化，统一通过底部操作栏“迈入下一岁”从容前行
     scrollToFeedBottom();
   };
 
@@ -1678,7 +1634,9 @@ ${logEntries
                   >
                     <span>
                       {timeline[timelineIndex + 1]
-                        ? timeline[timelineIndex + 1].age > currentAge + 1
+                        ? timeline[timelineIndex + 1].age === 18 || currentNode.age === 17
+                          ? '十八岁 · 高考放榜与成人分流'
+                          : timeline[timelineIndex + 1].age > currentAge + 1
                           ? `迈向${timeline[timelineIndex + 1].age}岁（${timeline[timelineIndex + 1].title}）`
                           : `迈入下一岁（${currentAge + 1}岁）`
                         : '继续前行'}

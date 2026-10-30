@@ -1018,9 +1018,9 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       id: "age_4_fever",
       age: 4,
       stageName: "疾苦期 · 4岁",
-      title: "深夜暴雨与镇卫生院的吊水",
+      title: "深夜暴雨与医院急诊的吊水",
       scene:
-        "一场突如其来的急性肺炎让你高烧到近四十度。深夜暴雨如注，父亲披着破塑料布骑车推着你，母亲坐在后座死死护住你的前额，连夜赶往镇卫生院。冰凉的药水在玻璃瓶里一滴滴落入血管，你第一次对病痛与家庭的无助有了朦胧的感知。",
+        "一场突如其来的急性肺炎让你高烧到近四十度。深夜暴雨如注，父亲披着破塑料布骑车推着你，母亲坐在后座死死护住你的前额，连夜赶往{hospital}急诊。冰凉的药水在玻璃瓶里一滴滴落入血管，你第一次对病痛与家庭的无助有了朦胧的感知。",
       type: "natural",
       naturalDelta: { health: -5, kinshipGuilt: 10, resilience: 5 }
     },
@@ -1699,7 +1699,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       stageName: "初中一年级 · 12岁",
       title: "重点火箭班与普通班的分流博弈",
       scene:
-        "小升初摸底考成绩出炉。县城中学按成绩将学生分入快慢班。快班是冲刺重点高中的摇篮，但周末需加课补习且收费不菲；普通班管理松散，放学早。全家人围在饭桌旁等你的决断。",
+        "小升初摸底考成绩出炉。中学按成绩将学生分入快慢班。快班是冲刺重点高中的摇篮，但周末需加课补习且收费不菲；普通班管理松散，放学早。全家人围在饭桌旁等你的决断。",
       type: "choice",
       choices: [
         {
@@ -1799,9 +1799,9 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       id: "age_13_voice",
       age: 13,
       stageName: "初中二年级 · 13岁",
-      title: "变声期的敏感与磨损的旧球鞋",
+      title: "发育抽条期的敏感与磨损的旧球鞋",
       scene:
-        "喉结开始突出，声音变得沙哑粗糙。你开始格外在意异性同学的目光和自己有些发旧的球鞋。班上有家境优渥的同学穿上了名牌运动鞋，你悄悄把双脚往课桌底下缩了缩。青春期的自尊与敏感在悄然生长。",
+        "身体悄然拔高抽条，声音与身形都有了微妙变化。你开始格外在意周围同学的目光和自己有些发旧的球鞋。班上有家境优渥的同学穿上了新潮名牌运动鞋，你悄悄把双脚往课桌底下缩了缩。青春期的自尊与敏感在悄然生长。",
       type: "natural",
       naturalDelta: { inferiority: 10, social: 5 }
     },
@@ -1879,7 +1879,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
         {
           text: "咬紧牙关备战中考，无论如何要冲进普高",
           detail: "哪怕全家节衣缩食，你也坚信唯有传统高考文凭才能改变命运。",
-          reaction: "你每天刷完三套模拟卷，顺利拿到县重点高中的录取通知书，但家里的存折已见底。",
+          reaction: "你每天刷完三套模拟卷，顺利拿到{highSchool}的录取通知书，但家里的存折已见底。",
           delta: { academicCapital: 25, cognition: 20, health: -10, kinshipGuilt: 15 },
           trackTrigger: "academic",
           addTags: ["普高冲刺", "学术路径"]
@@ -1913,7 +1913,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
         {
           text: "求家里支持走美术艺考，发誓考不上全额退学退还学费",
           detail: "父母拿出压箱底的养老积蓄为你报名。你每天在画室画石膏像到手指抽筋。",
-          reaction: "你以全县专业第一的成绩拿到降分指标考入重点普高艺术班。",
+          reaction: "你以名列前茅的专业成绩拿到降分指标考入{highSchool}艺术班。",
           delta: { academicCapital: 15, kinshipGuilt: 25, savings: -12000, resilience: 15 },
           trackTrigger: "academic",
           addTags: ["艺术曲折", "举家豪赌"]
@@ -1980,31 +1980,31 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       id: "age_16_rankings_cut",
       age: 16,
       stageName: "高中/职校阶段 · 16岁",
-      title: "普高月考大榜排名如刀割",
+      title: "高中月考大榜排名如刀割",
       scene:
-        "普高教室走廊上挂满了大红排位榜，每次月考名次上下浮动几名都牵动着全家人的神经。同桌在晚自习因为做不出最后一道导数大题号啕大哭被家长接回家。你看着漆黑的窗外，体会到了独木桥的冷酷。",
+        "教室走廊上挂满了大红排位榜，每次月考名次上下浮动几名都牵动着全家人的神经。同桌在晚自习因为做不出最后一道导数大题号啕大哭被家长接回家。你看着漆黑的窗外，体会到了独木桥的冷酷。",
       type: "natural",
       naturalDelta: { cognition: 10, academicCapital: 10, health: -5 }
     },
     {
-      id: "age_16_lathe_work",
+      id: "age_16_dormitory_study",
       age: 16,
       stageName: "高中/职校阶段 · 16岁",
-      title: "实训车间机床车出的第一枚螺母",
+      title: "寄宿高中大通铺与熄灯后手电背单词",
       scene:
-        "在职业中专的金属切削实训车间，你戴着护目镜在车床前站了整整一个下午。当千分尺卡准尺寸的那一刻，一根光洁标准的金属螺栓在机油中成型。实训师傅点头夸你有悟性，你体会到了把控具体物质的踏实感。",
+        "寄宿高中的多生宿舍，熄灯铃声一响，整个楼道陷入黑暗。为了跟上重点班的快节奏，你缩在被窝里用手电筒照着厚厚的英语词汇手册，默背完最后一页才沉沉睡去。在逼仄的床板上，你暗自下定决心要凭分数改变命运。",
       type: "natural",
-      naturalDelta: { resilience: 15, cognition: 5, savings: 200 }
+      naturalDelta: { academicCapital: 15, resilience: 15, health: -5 }
     },
     {
-      id: "age_16_assembly_line",
+      id: "age_16_evening_study",
       age: 16,
       stageName: "高中/职校阶段 · 16岁",
-      title: "两班倒流水线上的第一份整千工资",
+      title: "高一晚自习自行车破风与校门口热包子",
       scene:
-        "沿海电子厂流水线上，八小时两班倒，手指机械地贴着手机盖板防尘膜。月底银行卡上到账了第一笔两千四百块工资。你第一次在ATM机前看着吐出的钞票，给家里汇了一半，另一半紧紧贴在内衣口袋。",
+        "冬夜十点，晚自习下课铃打响。你裹紧有些单薄的校服棉袄，推着破旧自行车迎着刀子般的夜风骑行回家。校门口推车蒸笼热汽腾腾，两块钱买两个大肉包子吞下肚，浑身才有了暖意。书包沉甸甸压着后座，青春在题海与寒风中拔节生长。",
       type: "natural",
-      naturalDelta: { resilience: 15, savings: 1200, kinshipGuilt: 10 }
+      naturalDelta: { resilience: 15, academicCapital: 10, health: -5 }
     }
   ],
 
@@ -2050,7 +2050,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       stageName: "冲刺阶段 · 17岁",
       title: "自主招生与保送加分资格的风波",
       scene:
-        "高考前夕，省重点高校在县中投放了三个自招降分名额。原本按照摸底排名稳稳有你一个，但红榜公布时你的名字被县领导亲属顶替了。全班死一般沉寂。",
+        "高考前夕，省重点高校在{highSchool}投放了三个自招降分名额。原本按照摸底排名稳稳有你一个，但红榜公布时你的名字被有背景的关系户顶替了。全班死一般沉寂。",
       type: "choice",
       choices: [
         {
@@ -2118,9 +2118,39 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
 
 export function generateTimelineForCharacter(
   family: FamilyOrigin,
-  _gender: "男" | "女"
+  gender: "男" | "女"
 ): LifeEventNode[] {
   const result: LifeEventNode[] = [];
+
+  const resolveText = (str: string) => {
+    let s = str
+      .replace(/\{hospital\}/g, family.hospitalName)
+      .replace(/\{cityOrCounty\}/g, family.cityOrCounty)
+      .replace(/\{primarySchool\}/g, family.primarySchoolName)
+      .replace(/\{highSchool\}/g, family.highSchoolName);
+
+    if (family.region.includes("市") || family.region.includes("矿") || family.region.includes("区")) {
+      s = s
+        .replace(/县医院/g, family.hospitalName)
+        .replace(/县重点高中/g, family.highSchoolName)
+        .replace(/县一中/g, family.highSchoolName)
+        .replace(/县中/g, family.highSchoolName)
+        .replace(/县城中学/g, "市重点中学")
+        .replace(/县实验小学/g, family.primarySchoolName)
+        .replace(/镇卫生院/g, `${family.hospitalName}急诊`);
+    } else {
+      s = s
+        .replace(/镇卫生院/g, family.hospitalName);
+    }
+
+    const resolvedSiblingName = family.siblingType.includes("brother")
+      ? "弟弟"
+      : family.siblingType.includes("sister")
+      ? "妹妹"
+      : "同胞";
+    s = s.replace(/\{sibling\}/g, resolvedSiblingName);
+    return s;
+  };
 
   // 仅生成 0 ~ 18 岁（童年到高考）：19~27岁成人职场由高考分流引擎精准赋予，彻底杜绝混入错误分轨剧本！
   for (let age = 0; age <= 18; age++) {
@@ -2182,78 +2212,184 @@ export function generateTimelineForCharacter(
       continue;
     }
 
-    // 3岁：手足降生或邻里社交抉择（因果闭环且充满人性博弈）
-    if (age === 3 && family.siblingType === "younger_brother") {
-      result.push({
-        id: "age_3_younger_brother",
-        age: 3,
-        stageName: "幼儿期 · 3岁",
-        title: "添弟之喜与悄然倾斜的天平",
-        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个弟弟。家里围满了道喜的亲友，父亲在走廊分发红鸡蛋。母亲将你揽在床边轻声叮嘱：“你做姐姐了，以后要多懂事，好吃的先紧着弟弟。”你看着襁褓里那个通红的小婴儿，第一次隐约体会到了重心的转移。`,
-        type: "choice",
-        choices: [
-          {
-            text: "乖乖点头，把自己兜里舍不得吃的半块饼干轻轻放到摇篮边",
-            detail: "过早学会了迎合大人的懂事期待，把委屈与隐忍藏在心底深处。",
-            reaction: "长辈们纷纷夸你‘长姐有担当’，但你的内心悄悄多了一层懂事的拘谨。",
-            delta: { kinshipGuilt: 20, inferiority: 10, resilience: 15 },
-            addTags: ["早熟懂事", "长姐担当"]
-          },
-          {
-            text: "抱紧父母的大腿哭闹委屈，不许他们抱别的孩子",
-            detail: "勇敢表达自己的不安与失落，绝不委屈自己的天然情感。",
-            reaction: "虽然被父亲轻轻训斥了几句，但母亲心疼地把你抱在怀里温声安慰，护住了你的自尊。",
-            delta: { rebellion: 20, inferiority: -10, happiness: 10 },
-            addTags: ["捍卫关爱", "天性自我"]
-          },
-          {
-            text: "好奇地伸手戳戳弟弟粉嫩的小脸，自己搬小板凳去门口搭积木",
-            detail: "自得其乐，不依赖大人的时刻关注，展现出强大的自洽能力。",
-            reaction: "你沉浸在自己的小世界里，从小就习惯了独立自足的生活节奏。",
-            delta: { cognition: 15, happiness: 15, resilience: 10 },
-            addTags: ["自得其乐", "独立自洽"]
-          }
-        ]
-      });
-      continue;
-    }
+    // 3岁：手足降生或手足互动抉择（彻底吻合家庭同胞设置与角色性别）
+    if (age === 3) {
+      if (family.siblingType === "younger_brother") {
+        result.push({
+          id: "age_3_younger_brother",
+          age: 3,
+          stageName: "幼儿期 · 3岁",
+          title: "添弟之喜与悄然倾斜的天平",
+          scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个弟弟。家里围满了道喜的亲友，父亲在走廊分发红鸡蛋。母亲将你揽在床边轻声叮嘱：“你做${gender === "男" ? "哥哥" : "姐姐"}了，以后要多懂事，好吃的先紧着弟弟。”你看着襁褓里那个通红的小婴儿，第一次隐约体会到了重心的转移。`,
+          type: "choice",
+          choices: [
+            {
+              text: "乖乖点头，把自己兜里舍不得吃的半块饼干轻轻放到摇篮边",
+              detail: "过早学会了迎合大人的懂事期待，把委屈与隐忍藏在心底深处。",
+              reaction: `长辈们纷纷夸你‘${gender === "男" ? "长兄有担当" : "长姐有担当"}’，但你的内心悄悄多了一层懂事的拘谨。`,
+              delta: { kinshipGuilt: 20, inferiority: 10, resilience: 15 },
+              addTags: ["早熟懂事", gender === "男" ? "兄长担当" : "长姐担当"]
+            },
+            {
+              text: "抱紧父母的大腿哭闹委屈，不许他们抱别的孩子",
+              detail: "勇敢表达自己的不安与失落，绝不委屈自己的天然情感。",
+              reaction: "虽然被父亲轻轻训斥了几句，但母亲心疼地把你抱在怀里温声安慰，护住了你的自尊。",
+              delta: { rebellion: 20, inferiority: -10, happiness: 10 },
+              addTags: ["捍卫关爱", "天性自我"]
+            },
+            {
+              text: "好奇地伸手戳戳弟弟粉嫩的小脸，自己搬小板凳去门口搭积木",
+              detail: "自得其乐，不依赖大人的时刻关注，展现出强大的自洽能力。",
+              reaction: "你沉浸在自己的小世界里，从小就习惯了独立自足的生活节奏。",
+              delta: { cognition: 15, happiness: 15, resilience: 10 },
+              addTags: ["自得其乐", "独立自洽"]
+            }
+          ]
+        });
+        continue;
+      }
 
-    if (age === 3 && family.siblingType === "younger_sister") {
-      result.push({
-        id: "age_3_younger_sister",
-        age: 3,
-        stageName: "幼儿期 · 3岁",
-        title: "添妹之喜与手足初啼",
-        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个妹妹。小小的病房里摆满了婴儿衣物，母亲虚弱地将妹妹抱给你看：“看，这是你的小妹妹，以后你们手足要互相照应。”`,
-        type: "choice",
-        choices: [
-          {
-            text: "主动伸出小手牵着妹妹软绵绵的小拇指，咯咯笑起来",
-            detail: "天性温厚，发自内心地接纳新生命的到来，手足情深初萌芽。",
-            reaction: "妹妹也停止了啼哭，小小的手抓着你的手指，病房里满是温情暖意。",
-            delta: { happiness: 20, social: 15, kinshipGuilt: 10 },
-            addTags: ["手足情深", "温厚纯良"]
-          },
-          {
-            text: "把家里分给自己的水果糖偷偷藏在小抽屉里，警惕看着新成员",
-            detail: "对家庭资源的变化有着超乎年龄的警觉，自我防御意识极强。",
-            reaction: "你默默守护自己的小天地，更早地体会到了人间的竞争与生存本能。",
-            delta: { resilience: 15, inferiority: 5, savings: 50 },
-            addTags: ["早熟警觉", "自我防御"]
-          },
-          {
-            text: "开心地拿出自己最喜欢的布娃娃塞进摇篮跟她分享",
-            detail: "乐于分享与付出，天生具备温暖周围人的感染力与亲和力。",
-            reaction: "全家人看着你们两姐妹相视而笑，家庭氛围变得格外温馨舒缓。",
-            delta: { happiness: 25, social: 20 },
-            addTags: ["慷慨分享", "乐天温情"]
-          }
-        ]
-      });
-      continue;
-    }
+      if (family.siblingType === "younger_sister") {
+        result.push({
+          id: "age_3_younger_sister",
+          age: 3,
+          stageName: "幼儿期 · 3岁",
+          title: "添妹之喜与手足初啼",
+          scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个妹妹。小小的病房里摆满了婴儿衣物，母亲虚弱地将妹妹抱给你看：“看，这是你的小妹妹，以后你们手足要互相照应。”`,
+          type: "choice",
+          choices: [
+            {
+              text: "主动伸出小手牵着妹妹软绵绵的小拇指，咯咯笑起来",
+              detail: "天性温厚，发自内心地接纳新生命的到来，手足情深初萌芽。",
+              reaction: "妹妹也停止了啼哭，小小的手抓着你的手指，病房里满是温情暖意。",
+              delta: { happiness: 20, social: 15, kinshipGuilt: 10 },
+              addTags: ["手足情深", "温厚纯良"]
+            },
+            {
+              text: "把家里分给自己的水果糖偷偷藏在小抽屉里，警惕看着新成员",
+              detail: "对家庭资源的变化有着超乎年龄的警觉，自我防御意识极强。",
+              reaction: "你默默守护自己的小天地，更早地体会到了人间的竞争与生存本能。",
+              delta: { resilience: 15, inferiority: 5, savings: 50 },
+              addTags: ["早熟警觉", "自我防御"]
+            },
+            {
+              text: "开心地拿出自己最喜欢的玩具塞进摇篮跟她分享",
+              detail: "乐于分享与付出，天生具备温暖周围人的感染力与亲和力。",
+              reaction: `全家人看着你们${gender === "女" ? "两姐妹" : "兄妹俩"}相视而笑，家庭氛围变得格外温馨舒缓。`,
+              delta: { happiness: 25, social: 20 },
+              addTags: ["慷慨分享", "乐天温情"]
+            }
+          ]
+        });
+        continue;
+      }
 
-    if (age === 3 && family.siblingType === "only_child") {
+      if (family.siblingType === "elder_sister") {
+        result.push({
+          id: "age_3_elder_sister",
+          age: 3,
+          stageName: "幼儿期 · 3岁",
+          title: "姐姐牵着的小手与大院里的庇护",
+          scene: `三岁这年，七岁的姐姐每天放学牵着你的手在${family.cityOrCounty}家属区的大院里玩。有跑得飞快的大孩子想抢你的小饼干，姐姐立刻张开胳膊把你护在身后。长辈们路过都夸姐姐懂事会疼${gender === "女" ? "妹妹" : "弟弟"}。`,
+          type: "choice",
+          choices: [
+            {
+              text: "紧紧拉着姐姐的衣角，把手里的饼干掰了一大半塞进姐姐嘴里",
+              detail: "懂得感恩与回报，自小与姐姐建立了深厚的手足信赖。",
+              reaction: "姐姐嚼着饼干冲你笑得眉眼弯弯，手足情深成为童年最温暖的底色。",
+              delta: { happiness: 20, kinshipGuilt: 10, social: 15 },
+              addTags: ["手足情深", "知恩懂报"]
+            },
+            {
+              text: "从姐姐身后探出头，捡起地上的小树枝壮着胆子挥舞",
+              detail: "天生硬气，在家庭庇护下更添一份敢于反抗的勇气。",
+              reaction: "对方被你们俩的气势震住走开，大院里的大人纷纷夸这小家伙‘人小骨气硬’。",
+              delta: { resilience: 20, rebellion: 15, inferiority: -10 },
+              addTags: ["骨气刚烈", "敢爱敢恨"]
+            },
+            {
+              text: "蹲在姐姐脚边专心看砖缝里的一串红蚂蚁搬家",
+              detail: "不为外界纷扰所动，沉浸在自我的宁静世界中。",
+              reaction: "你的淡定自若引得周围人发笑，从小展现出强大的专注力与定力。",
+              delta: { cognition: 15, happiness: 15, inferiority: -5 },
+              addTags: ["专注沉静", "波澜不惊"]
+            }
+          ]
+        });
+        continue;
+      }
+
+      if (family.siblingType === "elder_brother") {
+        result.push({
+          id: "age_3_elder_brother",
+          age: 3,
+          stageName: "幼儿期 · 3岁",
+          title: "哥哥的二八斜梁与大院里的小跟班",
+          scene: `三岁这年，六岁的哥哥在大院里玩泥巴跑得飞起，你成了哥哥最忠实的小跟班。哥哥从兜里摸出一颗皱巴巴的水果糖塞进你嘴里：“嘘，别让妈知道，快吃！”`,
+          type: "choice",
+          choices: [
+            {
+              text: "把糖含在嘴里甜得眯起眼睛，寸步不离跟在哥哥屁股后面当小帮手",
+              detail: "信赖哥哥的庇护，甘心当个快乐的小尾巴，家庭氛围融洽温馨。",
+              reaction: "哥哥得意地拍拍胸脯说以后罩着你，你体会到了有兄长庇佑的踏实安全感。",
+              delta: { happiness: 25, social: 15, kinshipGuilt: 5 },
+              addTags: ["兄友弟恭", "天伦暖意"]
+            },
+            {
+              text: "偏不听哥哥的指挥，自己迈着小短腿去追大院花坛边的小花猫",
+              detail: "不愿屈从于任何人的意志，展现出强烈的独立自主天性。",
+              reaction: "哥哥吓得一路小跑跟在后面护着你，长辈们都笑你‘主意真大’。",
+              delta: { rebellion: 20, resilience: 15, happiness: 10 },
+              addTags: ["自主意识", "胆大心细"]
+            },
+            {
+              text: "跑去厨房悄悄告诉母亲：“哥哥给我吃糖啦！”",
+              detail: "心思单纯诚实，恪守家庭规矩，天然依恋父母权威。",
+              reaction: "母亲笑着摸摸你的头，又奖了你一小把炒南瓜子，哥哥无奈地冲你做鬼脸。",
+              delta: { kinshipGuilt: 15, social: 10, inferiority: -5 },
+              addTags: ["天真诚恳", "依恋父母"]
+            }
+          ]
+        });
+        continue;
+      }
+
+      if (family.siblingType === "middle_child") {
+        result.push({
+          id: "age_3_middle_child",
+          age: 3,
+          stageName: "幼儿期 · 3岁",
+          title: "夹心层的饭桌与悄然学会的察言观色",
+          scene: `三岁这年，饭桌上的好菜长辈习惯先紧着刚出生的小弟，新衣服是长姐穿小了改下来的旧布衣。夹在中间的你，坐在小马扎上默默喝着碗里的米汤，比同龄孩子更早学会了看大人的脸色。`,
+          type: "choice",
+          choices: [
+            {
+              text: "主动帮母亲把空碗收进水槽，安安静静不哭不闹",
+              detail: "过早学会了用懂事与顺用来换取大人的注意与夸奖。",
+              reaction: "母亲疲惫的脸上露出一丝欣慰：“就数这娃最省心。”但你的眼底多了一丝讨好的拘谨。",
+              delta: { kinshipGuilt: 20, inferiority: 10, resilience: 15 },
+              addTags: ["察言观色", "夹心懂事"]
+            },
+            {
+              text: "趁大人不注意，伸出小勺舀了一大勺肉汤浇在自己碗里大口扒饭",
+              detail: "深知凡事不靠恩赐靠自取，骨子里有着极强的生存争夺本能。",
+              reaction: "长辈们愣了一下哈哈大笑：“这娃机灵，饿不着！”你凭本能填饱了肚子。",
+              delta: { resilience: 20, rebellion: 15, cognition: 10 },
+              addTags: ["机变争先", "不甘居后"]
+            },
+            {
+              text: "吃完饭自己搬小马扎去院门口看连环画，沉浸在自己的小世界里",
+              detail: "不争不抢，向内寻找精神的自足与丰盈，天生具备强大的精神自洽力。",
+              reaction: "外界的偏心与冷落丝毫伤害不到你，你从小就构建了坚固的精神避难所。",
+              delta: { cognition: 20, happiness: 15, inferiority: -10 },
+              addTags: ["精神自洽", "淡泊超然"]
+            }
+          ]
+        });
+        continue;
+      }
+
+      // only_child 独生子女
       result.push({
         id: "age_3_only_child",
         age: 3,
@@ -2291,40 +2427,28 @@ export function generateTimelineForCharacter(
     const pool = AGE_EVENT_POOLS[age];
     if (!pool || pool.length === 0) continue;
 
-    // 彻底告别单调剧本！每次投胎全年龄段真随机抽取，保证剧情极其丰富丰富丰富！
+    // 每次投胎全年龄段真随机抽取
     const randomIndex = Math.floor(Math.random() * pool.length);
     const selected = pool[randomIndex] || pool[0];
 
-    // 动态置换场景中的医院、学校与具体称谓，保持极致沉浸
-    let resolvedScene = selected.scene
-      .replace(/\{hospital\}/g, family.hospitalName)
-      .replace(/\{cityOrCounty\}/g, family.cityOrCounty)
-      .replace(/\{primarySchool\}/g, family.primarySchoolName)
-      .replace(/\{highSchool\}/g, family.highSchoolName);
-
-    if (family.region.includes("市") || family.region.includes("矿") || family.region.includes("区")) {
-      resolvedScene = resolvedScene
-        .replace(/县医院/g, family.hospitalName)
-        .replace(/县一中/g, family.highSchoolName)
-        .replace(/县实验小学/g, family.primarySchoolName);
-    }
-
-    const resolvedSiblingName = family.siblingType.includes("brother")
-      ? "弟弟"
-      : family.siblingType.includes("sister")
-      ? "妹妹"
-      : "同胞";
-    resolvedScene = resolvedScene.replace(/\{sibling\}/g, resolvedSiblingName);
+    // 全文动态置换（标题、场景、选项及反馈全面适配）
+    const resolvedChoices = selected.choices?.map((c) => ({
+      ...c,
+      text: resolveText(c.text),
+      detail: resolveText(c.detail),
+      reaction: resolveText(c.reaction)
+    }));
 
     result.push({
       ...selected,
-      scene: resolvedScene
+      title: resolveText(selected.title),
+      scene: resolveText(selected.scene),
+      choices: resolvedChoices
     });
   }
 
   return result;
 }
-
 
 // ============================================================================
 // 19 ~ 27 岁：基于高考与教育阶层的专属人生分轨事件库（彻底告别985去进外包/卖菜的荒谬）
