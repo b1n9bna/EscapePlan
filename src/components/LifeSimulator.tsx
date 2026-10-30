@@ -621,8 +621,24 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // ADVANCE NATURAL TIMELINE STEP
   // =========================================================================
   const handleNextNaturalYear = () => {
+    // 1. 如果即将迈向或已处于17/18岁且尚未进行高考分流，优先触发高考结算
+    if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17 || (!timeline[timelineIndex + 1] && currentAge <= 18))) {
+      const calc = calculateGaokaoOutcome(attrs, tags);
+      setGaokaoCalc(calc);
+      setShowGaokaoModal(true);
+      return;
+    }
+
     const nextIdx = timelineIndex + 1;
     if (nextIdx >= timeline.length) {
+      // 检查27岁是否需要挂载成年里程碑（兜底容错）
+      if (currentNode.age === 27 && !logEntries.some((e) => e.age === 63)) {
+        const track = gaokaoCalc?.degreeTrack || 'double_non';
+        const adultMilestones = generateAdultMilestones(track, chosenPath, charData.family);
+        const currentNodes = timeline.slice(0, timelineIndex + 1);
+        setTimeline([...currentNodes, ...adultMilestones]);
+        return;
+      }
       // Reached end of simulation (Age 63)
       return;
     }
@@ -1637,12 +1653,16 @@ ${logEntries
                     className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-950/40 active:scale-[0.98]"
                   >
                     <span>
-                      {timeline[timelineIndex + 1]
-                        ? timeline[timelineIndex + 1].age === 18 || currentNode.age === 17
+                      {!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)
+                        ? '十八岁 · 高考放榜与成人分流'
+                        : timeline[timelineIndex + 1]
+                        ? timeline[timelineIndex + 1].age === 18
                           ? '十八岁 · 高考放榜与成人分流'
                           : timeline[timelineIndex + 1].age > currentAge + 1
                           ? `迈向${timeline[timelineIndex + 1].age}岁（${timeline[timelineIndex + 1].title}）`
                           : `迈入下一岁（${currentAge + 1}岁）`
+                        : currentNode.age === 27 && !logEntries.some((e) => e.age === 63)
+                        ? '迈向三十岁（而立之年）'
                         : '继续前行'}
                     </span>
                     <ArrowRight className="w-4 h-4" />

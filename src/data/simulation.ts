@@ -2424,6 +2424,19 @@ export function generateTimelineForCharacter(
       continue;
     }
 
+    // 18岁：高考与成人分流门槛节点
+    if (age === 18) {
+      result.push({
+        id: "age_18_gaokao_prep",
+        age: 18,
+        stageName: "十八岁 · 少年与成人的分水岭",
+        title: "十八岁 · 高考放榜与成人分流",
+        scene: `这一年盛夏，你在${family.highSchoolName}考点走出最后一门考场。教室黑板上的倒计时终于归零，桌椅被搬空，漫天碎纸在窗外飞舞。几周后，邮递员顶着烈日按响车铃，将那封决定你未来几年乃至半生命运的信封送到了手中。`,
+        type: "natural"
+      });
+      continue;
+    }
+
     const pool = AGE_EVENT_POOLS[age];
     if (!pool || pool.length === 0) continue;
 
