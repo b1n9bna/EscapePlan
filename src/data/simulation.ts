@@ -2603,6 +2603,63 @@ export const CAREER_EVENTS_BY_TRACK: Record<
             addTags: ["短期交流", "开阔视野"]
           }
         ]
+      },
+      {
+        id: "age_19_985_civil",
+        age: 19,
+        stageName: "名校大一/大二 · 19岁",
+        title: "模拟政协社团、基层民生调研与政务视野",
+        scene:
+          "名校大一期间，凭借沉稳作风与过硬的公文笔头，你担任了学院学生法学社团骨干，并带队赴省内县区开展‘城乡公共服务与基层治理’田野调研。看着老百姓真实的诉求与期盼，你的公共服务抱负不再是空泛口号。",
+        type: "choice",
+        choices: [
+          {
+            text: "扎实撰写基层民生调研报告并获省直机关优秀调研立项，公文逻辑愈发老练",
+            detail: "白天深入村居走访座谈，夜晚整理台账数据，写出三万字政策建言报告受到专家高度评价。",
+            reaction: "调研报告被省直智库刊发内参，学院党委特批专项科研奖学金，政务笔杆声名鹊起。",
+            delta: { social: 25, cognition: 20, savings: 5000 },
+            addTags: ["调研骨干", "笔头扎实"]
+          },
+          {
+            text: "竞选担任学院分团委与学生会骨干，统筹大型青年志愿服务，磨炼协调手腕",
+            detail: "周全处理校院两级日常事务，学会了在组织纪律与多元诉求之间寻找平衡最大公约数。",
+            reaction: "辅导员与分管书记对你交口称赞，你展现出超越同龄人的政治站位与协调定力。",
+            delta: { social: 30, resilience: 15, rebellion: -10 },
+            addTags: ["学生骨干", "组织统筹"]
+          },
+          {
+            text: "辅修法学与涉外政策第二学位，考取普通话一级与法律职业资格前置基础",
+            detail: "苦读行政法与公共政策经典，打牢法治思维与综合政策分析的底层框架。",
+            reaction: "专业绩点名列前茅，你在理论素养与综合素质上建立了牢固的竞争壁垒。",
+            delta: { academicCapital: 25, cognition: 20, savings: 2000 },
+            addTags: ["法学素养", "综合拔尖"]
+          }
+        ]
+      },
+      {
+        id: "age_19_985_acad",
+        age: 19,
+        stageName: "名校大一/大二 · 19岁",
+        title: "基础学科拔尖计划与前沿学术精读",
+        scene:
+          "入选名校基础理科拔尖人才培养梯队，由长江学者一对一担任学业导师。面对浩繁的英文原版专著与前沿科学猜想，你耐得住板凳十年冷，在图书馆与研讨室沉潜求索。",
+        type: "choice",
+        choices: [
+          {
+            text: "沉浸于基础理论文献精读与数学物理推导，在讨论班上作精彩前沿主旨报告",
+            detail: "一遍遍验证理论定理，展现出纯粹的科学求知欲与扎实的学术基本功。",
+            reaction: "导师赞叹你的理论悟性，直接将你纳为国家重点基础课题的核心助理。",
+            delta: { academicCapital: 25, cognition: 25, inferiority: -10 },
+            addTags: ["潜心求索", "学术骨干"]
+          },
+          {
+            text: "申请高校公派海外知名学府短期研修，与国际顶尖学者面对面研讨学术课题",
+            detail: "走出本土单一语境，去看看国际一流学术机构的科研氛围与生活节奏。",
+            reaction: "学术视野大开，打破了狭隘的做题思维，立志攀登人类科学的高峰。",
+            delta: { cognition: 25, rebellion: 20, social: 15 },
+            addTags: ["国际视野", "前沿触觉"]
+          }
+        ]
       }
     ],
     20: [
@@ -2635,6 +2692,63 @@ export const CAREER_EVENTS_BY_TRACK: Record<
             reaction: "博客访问量破万，GitHub收到了来自同行的赞赏与关注，技术视野大开。",
             delta: { rebellion: 20, cognition: 20, savings: 3000 },
             addTags: ["开源探索", "极客精神"]
+          }
+        ]
+      },
+      {
+        id: "age_20_985_civil",
+        age: 20,
+        stageName: "名校大二/大三 · 20岁",
+        title: "省直/市直机关政务暑期实习与选调生前置培养",
+        scene:
+          "大三暑期，凭借名校推荐与过硬综合素质，你进入省直部门或市直行政审批服务中心开展为期两个月的政务暑期实习。每天协助处室整理案卷台账、草拟会议纪要与调研专报，第一次近距离触摸公共权力运行的脉搏与体制规矩。",
+        type: "choice",
+        choices: [
+          {
+            text: "协助处室起草全省民生实事重点督办简报，格式严谨条理清晰，受处长重点嘉奖",
+            detail: "细致严谨，不厌其烦校对公文每一处数据与措辞，展现出极为扎实的政务综合素质。",
+            reaction: "分管厅领导在简报上圈阅批示，处室领导主动为你向省委组织部推荐选调重点考察培养。",
+            delta: { social: 25, cognition: 20, savings: 6000 },
+            addTags: ["政务骨干", "选调青睐"]
+          },
+          {
+            text: "主动轮岗到政务服务便民一线窗口，帮办事群众解决审批堵点，收到多封群众表扬信",
+            detail: "扑下身子为老百姓办实事，设身处地化解企业与群众办事痛点，作风朴实真诚。",
+            reaction: "大厅领导通报表扬你的务实为民作风，你深切体会到全心全意为人民服务的真正尊严。",
+            delta: { social: 30, resilience: 20, happiness: 15 },
+            addTags: ["扎根一线", "群众口碑"]
+          },
+          {
+            text: "系统研读历年省委定向选调生招录策论，每晚在自习室刷真题磨砺申论与行政素养",
+            detail: "把握政策导向，将专业知识与国家宏观治理大政方针融会贯通，申论功底如火纯青。",
+            reaction: "模拟测试成绩稳居全校前三，你对大四选调生选拔考试胜券在握。",
+            delta: { academicCapital: 25, cognition: 20, savings: 2000 },
+            addTags: ["申论拔尖", "选调储备"]
+          }
+        ]
+      },
+      {
+        id: "age_20_985_acad",
+        age: 20,
+        stageName: "名校大二/大三 · 20岁",
+        title: "国家级大创重点攻关与保研学术论文",
+        scene:
+          "大三学年，你作为项目负责人主持的国家级大学生创新科研课题进入攻坚期。在国家重点实验室经过数百次仿真计算与理论修正，成功取得突破性成果，准备在学术年会上作英文分论坛口头报告。",
+        type: "choice",
+        choices: [
+          {
+            text: "全力以赴冲刺国际权威SCI/SSCI一区论文收录，提前锁定名校保研直博资格",
+            detail: "耐得住枯燥寂寞，反复打磨论文逻辑与实验图表，审稿专家给出高度正面评价。",
+            reaction: "论文被权威期刊正式录用，导师提前为你保留了国家重点实验室免试直博名额。",
+            delta: { academicCapital: 30, cognition: 25, savings: 8000 },
+            addTags: ["顶刊一作", "保研直博"]
+          },
+          {
+            text: "参与重大产学研协同攻关项目，打通学术算法在现代化高端产业中的工程落地",
+            detail: "既追求理论高度，又关注现实应用，带领团队成功将算法落地在产业装备中。",
+            reaction: "合作企业开出高额课题奖金，你的学术实践能力在全校研究生院提前传为佳话。",
+            delta: { cognition: 25, savings: 18000, social: 20 },
+            addTags: ["产学融合", "复合英才"]
           }
         ]
       }
@@ -2901,6 +3015,63 @@ export const CAREER_EVENTS_BY_TRACK: Record<
             addTags: ["勤工俭学", "早早自立"]
           }
         ]
+      },
+      {
+        id: "age_19_dn_civil",
+        age: 19,
+        stageName: "双非大一/大二 · 19岁",
+        title: "图书馆抢座备战教资与团总支骨干磨砺",
+        scene:
+          "双非综合高校里，你早早明确了求稳的追求。每天清晨在图书馆占座，背诵普通话与教育学法学规范，同时担任班级与团总支骨干，锻炼公文写作与沟通能力。",
+        type: "choice",
+        choices: [
+          {
+            text: "踏实考取高级教师资格证与普通话一级，公文与综合成绩名列全系前茅",
+            detail: "不混日子，大学期间早早拿下求职硬通票，为未来体制内招聘打下坚固基础。",
+            reaction: "教资考试一次性高分通过，心里有了第一块踏实的就业压舱石。",
+            delta: { cognition: 15, academicCapital: 20, savings: 2000 },
+            addTags: ["教资在手", "踏实底牌"]
+          },
+          {
+            text: "担任学院团总支主要学生骨干，协助辅导员处理各类行政杂务，锻炼周全处事手腕",
+            detail: "认真梳理各类通知台账，磨炼公文撰写和待人接物的细致度，深受老师赞许。",
+            reaction: "被学院评为优秀共青团干部，提前适应了体制行政的规矩与节奏。",
+            delta: { social: 25, cognition: 10, rebellion: -10 },
+            addTags: ["学生骨干", "处事周全"]
+          },
+          {
+            text: "兼职辅导中小学生功课，生活费自给自足，体会到靠知识自立的踏实",
+            detail: "体谅父母挣钱不易，用自己的双手早早实现经济独立，踏实能吃苦。",
+            reaction: "不仅没向家里伸手，卡里还攒下了小额应急资金，做人体面硬气。",
+            delta: { savings: 6000, resilience: 15, inferiority: -10 },
+            addTags: ["勤工俭学", "早熟自立"]
+          }
+        ]
+      },
+      {
+        id: "age_19_dn_biz",
+        age: 19,
+        stageName: "双非大一/大二 · 19岁",
+        title: "校园商贸试水与沿海市场初探",
+        scene:
+          "你天生对商业流转有着敏锐嗅觉。在校期间敏锐捕捉到学生换季与二手交易需求，合伙搭建起校园物流与转转社群，利用课余时间跑批发市场与物流点。",
+        type: "choice",
+        choices: [
+          {
+            text: "靠诚信与薄利多销将校园物流代理做大，大学第一年便赚取了人生第一笔两万元净利润",
+            detail: "不怕脏不怕累，起早贪黑搬运收发，靠口碑和信誉成为整栋宿舍楼的掌柜。",
+            reaction: "年底存折上有了两万多元结余，你彻底告别了对家庭的生活费依赖。",
+            delta: { savings: 20000, social: 20, resilience: 15 },
+            addTags: ["小有斩获", "商业起步"]
+          },
+          {
+            text: "苦练商务英语与数字营销运营，在跨境电商独立站中成功试单",
+            detail: "把外语和市场知识转化为实际订单，早早融入市场真实商业运作。",
+            reaction: "收到来自海外客户的第一笔外币汇款，你的商业视野大为开阔。",
+            delta: { cognition: 20, resilience: 15, savings: 8000 },
+            addTags: ["跨境试水", "数字商务"]
+          }
+        ]
       }
     ],
     20: [
@@ -2933,6 +3104,63 @@ export const CAREER_EVENTS_BY_TRACK: Record<
             reaction: "顺利一次性拿下高级中学教师资格证，心里多了一块结实的求稳压舱石。",
             delta: { cognition: 15, kinshipGuilt: 15, social: 10 },
             addTags: ["教职压舱", "稳健规划"]
+          }
+        ]
+      },
+      {
+        id: "age_20_dn_civil",
+        age: 20,
+        stageName: "双非大二/大三 · 20岁",
+        title: "基层街道/政务大厅便民实习与省考行测备战",
+        scene:
+          "大三暑期，你申请到老家地级市政务服务中心或街道办事处开展为期两个月的实习。白天耐心接待办事群众、整理档案台账，晚上在自习室刷申论真题，早早为公务员省考与事业编制铺路。",
+        type: "choice",
+        choices: [
+          {
+            text: "踏踏实实刷完近十年省考国考行测与申论真题，模考成绩稳步突破135分",
+            detail: "归纳总结题型规律，把申论大作文练到行文工整、立意深刻，应试功底深厚。",
+            reaction: "辅导机构名师批改模考卷赞不绝口，你对毕业考编上岸底气十足。",
+            delta: { academicCapital: 25, cognition: 15, resilience: 10 },
+            addTags: ["考公冲刺", "刷题有成"]
+          },
+          {
+            text: "在政务大厅窗口耐心接待群众、整理档案案卷，受到街道领导赞扬表彰",
+            detail: "热心细致，不厌其烦解答老年人与企业办证难题，展现出务实本色。",
+            reaction: "街道领导在总结会上点名肯定，你深切体会到为民解忧的踏实成就感。",
+            delta: { social: 25, resilience: 15, savings: 5000 },
+            addTags: ["基层口碑", "务实能干"]
+          },
+          {
+            text: "参与基层社区矛盾纠纷排查志愿服务，深入掌握熟人社会人情世故与群众工作方法",
+            detail: "学会了如何跟社区老百姓交心交底，说话通俗亲切，人情练达。",
+            reaction: "居委会老书记夸你‘有灵性、能扛事’，你在本地社会积累了深厚群众基础。",
+            delta: { social: 25, cognition: 15, kinshipGuilt: 10 },
+            addTags: ["人情练达", "群众基础"]
+          }
+        ]
+      },
+      {
+        id: "age_20_dn_biz",
+        age: 20,
+        stageName: "双非大二/大三 · 20岁",
+        title: "进出口商贸公司业务跟单实习与供应链摸爬",
+        scene:
+          "大三阶段，你进入沿海一家进出口外贸公司担任业务跟单实习生。从核对发票、跟进海关报关到与海外客户邮件沟通，早早摸清了真实商业流转的底层密码。",
+        type: "choice",
+        choices: [
+          {
+            text: "凭借细致负责独立跟进三笔海外客商订单，拿到转正底薪与丰厚提成",
+            detail: "不畏琐碎，认真把控出货质检与物流节点，为公司挽回数万元延误损失。",
+            reaction: "外贸主管直接为你开出了大四提前留用转正的合同，月薪可观。",
+            delta: { savings: 18000, social: 20, resilience: 15 },
+            addTags: ["外贸熟手", "业务破局"]
+          },
+          {
+            text: "掌握国内优质货源直供渠道，利用信息差试水自营小额分销",
+            detail: "敏锐发现产业带工厂与终端市场的利润差，自己搭建独立供销渠道。",
+            reaction: "流水滚滚而来，存折资金突破五万元，提前拥有了自立门户的商业底气。",
+            delta: { savings: 25000, cognition: 20, rebellion: 15 },
+            addTags: ["自立渠道", "商海初啼"]
           }
         ]
       }
@@ -4776,20 +5004,120 @@ export function getTailoredCareerSubtrackNodes(
   ];
 }
 
+export function getCareerSubtrack(
+  tags: string[] = []
+): "civil" | "tech" | "academic" | "commercial" | "artisan" {
+  if (
+    tags.some((t) =>
+      [
+        "选调",
+        "体制",
+        "机关",
+        "事业编",
+        "公职",
+        "公共治理",
+        "基层政法",
+        "省直机关",
+        "单位中坚",
+        "作风扎实",
+        "群众口碑",
+        "接地气",
+        "政治学",
+        "公服栋梁",
+        "政务骨干",
+        "选调生苗子"
+      ].some((k) => t.includes(k))
+    )
+  ) {
+    return "civil";
+  }
+
+  if (
+    tags.some((t) =>
+      [
+        "学术",
+        "科研",
+        "读研",
+        "保研",
+        "考研",
+        "顶刊",
+        "硕博",
+        "课题",
+        "高校教职",
+        "学术苗子",
+        "纯粹求索",
+        "保研直博"
+      ].some((k) => t.includes(k))
+    )
+  ) {
+    return "academic";
+  }
+
+  if (
+    tags.some((t) =>
+      ["工匠", "手艺", "技工", "机修", "数控", "大工匠", "高级工", "大专实用", "特级大工"].some((k) =>
+        t.includes(k)
+      )
+    )
+  ) {
+    return "artisan";
+  }
+
+  if (
+    tags.some((t) =>
+      ["实体", "商贸", "掌柜", "生意", "商业", "店铺", "经管商贸", "商业敏锐", "外贸熟手"].some((k) =>
+        t.includes(k)
+      )
+    )
+  ) {
+    return "commercial";
+  }
+
+  return "tech";
+}
+
 export function generateCareerTimeline(
   family: FamilyOrigin,
   degreeTrack: "985_211" | "double_non" | "junior_college",
-  _extraTags: string[] = []
+  extraTags: string[] = []
 ): LifeEventNode[] {
   const trackPool = CAREER_EVENTS_BY_TRACK[degreeTrack] || CAREER_EVENTS_BY_TRACK["double_non"];
   const result: LifeEventNode[] = [];
+
+  const isCivil = extraTags.some((t) =>
+    ["选调", "体制", "公职", "公共治理", "基层政法", "省直机关", "公服", "政务"].some((k) =>
+      t.includes(k)
+    )
+  );
+  const isAcad = extraTags.some((t) =>
+    ["学术", "科研", "求索", "基科", "学者"].some((k) => t.includes(k))
+  );
+  const isBiz = extraTags.some((t) =>
+    ["商贸", "商业", "经管"].some((k) => t.includes(k))
+  );
 
   for (let age = 19; age <= 27; age++) {
     const ageEvents = trackPool[age];
     if (!ageEvents || ageEvents.length === 0) continue;
 
-    const randomIndex = Math.floor(Math.random() * ageEvents.length);
-    const selected = ageEvents[randomIndex] || ageEvents[0];
+    let selected = ageEvents[0];
+    if (age === 19 || age === 20) {
+      if (isCivil) {
+        const found = ageEvents.find((e) => e.id.includes("civil"));
+        if (found) selected = found;
+      } else if (isAcad) {
+        const found = ageEvents.find((e) => e.id.includes("acad"));
+        if (found) selected = found;
+      } else if (isBiz) {
+        const found = ageEvents.find((e) => e.id.includes("biz"));
+        if (found) selected = found;
+      } else {
+        selected = ageEvents[0];
+      }
+    } else {
+      const randomIndex = Math.floor(Math.random() * ageEvents.length);
+      selected = ageEvents[randomIndex] || ageEvents[0];
+    }
 
     // 动态置换场景变量
     let resolvedScene = selected.scene
@@ -4864,7 +5192,7 @@ export function calculateGaokaoOutcome(
   attrs: CharacterAttributes,
   tags: string[] = []
 ): GaokaoCalculation {
-  // If Vocational Track
+  // If Vocational / Artisan Track from 0~17
   if (tags.includes("职教蓝领") || tags.includes("手艺人底色") || tags.includes("早期打工")) {
     return {
       degreeTrack: "junior_college",
@@ -4878,15 +5206,15 @@ export function calculateGaokaoOutcome(
         prompt: "面对大专三年的时光，你的核心规划是：",
         options: [
           {
-            text: "周末去校外兼职打工、自考职业技能高级证书，尽可能积攒启动资金",
-            detail: "不再向家里伸手要生活费，利用一切假期在维修厂或门店积累实操经验。",
-            delta: { resilience: 20, savings: 5000, cognition: 10 },
-            addTags: ["大专实用", "早熟自立"]
+            text: "扎根实训基地苦练数控机床与精密维保绝活，考取高级工职业资格，靠手艺硬核立足",
+            detail: "不再向家里伸手要生活费，利用一切实训与假期在工厂一线打磨不可替代的实操硬功夫。",
+            delta: { resilience: 25, savings: 6000, cognition: 15 },
+            addTags: ["大专实用", "手艺人底色", "早熟自立"]
           },
           {
-            text: "报名‘专升本’培训班，咬紧牙关再战两年，誓要拿到全日制本科学位",
-            detail: "你依然无法放下被社会学历筛选歧视的屈辱，试图通过专升本洗刷起点劣势。",
-            delta: { academicCapital: 20, kinshipGuilt: 15, savings: -4000 },
+            text: "报名‘专升本’培训班，咬紧牙关再战两年，誓要在二十岁拿到全日制本科学位",
+            detail: "你依然无法放下被社会学历筛选歧视的屈辱，试图通过专升本长跑洗刷起点劣势。",
+            delta: { academicCapital: 25, kinshipGuilt: 15, savings: -4000 },
             addTags: ["专升本执念", "逆袭渴望"]
           }
         ]
@@ -4894,89 +5222,133 @@ export function calculateGaokaoOutcome(
     };
   }
 
-  // Academic Track: Top universities (985/211)
-  if (attrs.cognition >= 65 || attrs.academicCapital >= 60) {
+  // Standard Gaokao Weighted Scoring (750 Points Standard)
+  let rawScore = 330;
+  // 应试做题本钱是主力（满权重约 250 分）
+  rawScore += (attrs.academicCapital || 0) * 2.5;
+  // 综合认知与理解力（满权重约 100 分）
+  rawScore += (attrs.cognition || 0) * 1.0;
+  // 心理素质与抗压抗挫韧劲（满权重约 45 分）
+  rawScore += (attrs.resilience || 0) * 0.45;
+  // 自卑/紧张扣分（最多扣 35 分）
+  rawScore -= (attrs.inferiority || 0) * 0.35;
+
+  // 关键特质与高中抉择标签修正
+  const scoreBonuses: Record<string, number> = {
+    "全省模考拔尖": 25,
+    "刷题狠劲": 20,
+    "做题拔尖": 20,
+    "自主招生破局": 15,
+    "自律自强": 15,
+    "题海苦读": 12,
+    "稳扎稳打": 10,
+    "考前焦虑": -18,
+    "精神内耗": -22,
+    "厌学逃避": -35
+  };
+  tags.forEach((t) => {
+    for (const [k, bonus] of Object.entries(scoreBonuses)) {
+      if (t.includes(k)) rawScore += bonus;
+    }
+  });
+
+  const finalScore = Math.round(Math.min(698, Math.max(310, rawScore)));
+
+  // Tier 1: 985/211 重点大学 (全省前1.5%~2.0%，必须同时满足做题资本>=70与见识认知>=65)
+  if (finalScore >= 628 && (attrs.academicCapital || 0) >= 70 && (attrs.cognition || 0) >= 65) {
     return {
       degreeTrack: "985_211",
       title: "【985/211重点大学 · 顶尖高校录取】",
-      scoreText: "高考总分 642 分（全省排位前 1.2%），稳稳斩获重点大学王牌硬核理工/经管专业！",
+      scoreText: `高考总分 ${finalScore} 分（全省排位前 1.2%），稳稳斩获顶尖重点大学录取通知书！`,
       verdict:
-        "你在长达十二年的应试长跑中脱颖而出！红榜挂在校门前，校长和老师亲自送来喜报与奖学金，亲友们把你看作改写门楣的榜样。你用十二年的自律苦读换来了这张录取通知书，但未来更大的考验才刚刚开始。",
-      academicCapitalDesc: "重点大学文凭到手，拥有优质校友网络与校招核心入场券，同时也承载着整个家庭更沉重的期许。",
-      psychologicalDossier: `家庭牵绊：${attrs.kinshipGuilt}%，心理压力：${attrs.inferiority}%。你虽然赢得了考试，但深知未来依然不能松懈。`,
+        "你在长达十二年的应试长跑中脱颖而出！红榜挂在校门前，校长和老师亲自送来喜报与奖学金，亲友们把你看作改写门楣的骄傲。你用十二年的极致自律与做题硬功夫换来了这张稀缺门票，未来不同赛道的宏大版图正向你展开。",
+      academicCapitalDesc: "重点大学文凭到手，拥有顶尖校友网络与各行业核心选拔入场券，同时也承载着整个家庭更沉重的期许。",
+      psychologicalDossier: `家庭牵绊：${attrs.kinshipGuilt}%，应试底盘：${attrs.academicCapital}%。你赢下了最艰难的第一道独木桥，骨子里充满底气。`,
       firstStepChoice: {
-        prompt: "面对名校志愿与专业，你的最后决断：",
+        prompt: "面对名校王牌志愿与未来赛道，你的根本立志是：",
         options: [
           {
-            text: "选最热门的计算机/电子信息/金融专业，一心只想通过技术改变家庭阶层",
-            detail: "你深知家里毫无背景，唯有最热门的专业能让你在毕业五年内换回真金白银。",
-            delta: { resilience: 20, academicCapital: 20, savings: 10000 },
-            addTags: ["重点大学光环", "大厂做题家"]
+            text: "攻读重点大学王牌计算机/电子信息工程专业，立志用技术硬实力在市场立足",
+            detail: "名校理工硬核底蕴，面向前沿科技与高端研发，毕业后立志用代码与工程能力改变家庭阶层。",
+            delta: { resilience: 20, academicCapital: 25, savings: 10000 },
+            addTags: ["重点大学光环", "大厂做题家", "重点工科"]
           },
           {
-            text: "选省内公费师范/定向选调专业，服从分配，为全家换取铁饭碗安全感",
-            detail: "听从父母的劝说，用名校文凭换取县城或地级市最高的体制内稳定地位。",
-            delta: { kinshipGuilt: 25, rebellion: -20, savings: 8000 },
-            addTags: ["重点大学光环", "体制预备役"]
+            text: "报考重点大学法学/公共管理专业，锁定省委定向选调与体制内公共服务直通车",
+            detail: "听从父母与内心对稳定秩序的向往，志在公共治理与民生建设，为全家换取铁饭碗安全感。",
+            delta: { kinshipGuilt: 25, rebellion: -20, social: 20, savings: 8000 },
+            addTags: ["重点大学光环", "体制预备役", "公共治理"]
+          },
+          {
+            text: "选择基础数学/理论物理/人文社科专业，耐得住十年冷板凳，立志投身纯粹学术研究",
+            detail: "不被短期世俗功利捆绑，追求真理与深层认知，立志本硕博连读攀登科学与学术殿堂。",
+            delta: { cognition: 30, academicCapital: 25, rebellion: 15, savings: 5000 },
+            addTags: ["重点大学光环", "学术苗子", "纯粹求索"]
           }
         ]
       }
     };
   }
 
-  // Ordinary double-non university
-  if (attrs.cognition >= 45 || attrs.academicCapital >= 35) {
+  // Tier 2: 普通公办本科（双非本一/二本，490~627分，绝大多数本科生的真实天地）
+  if (finalScore >= 490) {
     return {
       degreeTrack: "double_non",
-      title: "【沿海普通公办本科（双非） · 夹缝里的大多数】",
-      scoreText: "高考总分 518 分（超一本线12分），录取至沿海二线城市普通公办综合大学",
+      title: "【沿海普通公办本科（双非一本/二本） · 真实而厚重的大多数】",
+      scoreText: `高考总分 ${finalScore} 分（超省控公办本科线），被二线省会公办综合性大学录取`,
       verdict:
-        "不高不低的分数，折射出你十二年来既不甘摆烂又未曾彻底发疯的真实写照。你跨入了本科的门槛，但没有名校光环加持，你必须在接下来的四年里独自面对更加现实的市场竞争。",
-      academicCapitalDesc: "普通本科文凭，够得着大多数企业的投简历门槛，但无法在简历初筛中脱颖而出。",
-      psychologicalDossier: `独立倾向：${attrs.rebellion}%，心理压力：${attrs.inferiority}%。你渴望大城市的广阔空间，但现实资本尚显不足。`,
+        "不高不低的分数，折射出你十二年来既不甘摆烂又未曾彻底疯狂的真实写照。你跨过了全日制本科的门槛，没有名校天生光环加持，但也免去了高处不胜寒的重压。未来的路，全看你在大学四年的主动突围。",
+      academicCapitalDesc: "正规公办本科文凭，够得着绝大多数企业与体制内考编的基本门槛，关键在于个人专业与实操积累。",
+      psychologicalDossier: `独立倾向：${attrs.rebellion}%，抗压韧劲：${attrs.resilience}%。你深知自己是一介凡人，必须更早找准立足社会的生态位。`,
       firstStepChoice: {
-        prompt: "进入大学校园，你的生存重心定为：",
+        prompt: "迈入大学校园，你为自己确立的突围支点是：",
         options: [
           {
-            text: "瞒着家里在沿海城市疯狂兼职实习、自学敲代码和外语，早早融入市场求生",
-            detail: "不靠死板的书本，在大学四年就通过社会真实需求锤炼自己的专业与实践技能。",
-            delta: { resilience: 30, rebellion: 20, savings: 5000 },
-            addTags: ["双非文理", "主动破局"]
+            text: "选择实用型软件工程与智能物联专业，大学四年疯狂自学做项目，靠硬实战经验突围",
+            detail: "深知学历并非王牌，早早泡在机房与开源社区，通过真实企业项目锤炼专业实操技能。",
+            delta: { resilience: 25, cognition: 20, rebellion: 15, savings: 6000 },
+            addTags: ["双非应用工科", "主动破局", "实战技术"]
           },
           {
-            text: "踏实考教资、考普通话、备战考研二战三战，试图通过二次升学翻盘",
-            detail: "你不敢轻易涉足社会风浪，把所有精力投在象牙塔考研自习室的厚厚书本里。",
-            delta: { academicCapital: 25, kinshipGuilt: 15 },
-            addTags: ["双非文理", "考研执念"]
+            text: "选择公共管理与法学教育，主攻普通话、法考与省考事业编，早早规划编制保障",
+            detail: "顺应家庭求稳期待，大学四年系统研习行测申论与法律知识，瞄准体制内的稳定与安详。",
+            delta: { kinshipGuilt: 25, social: 20, rebellion: -15, savings: 5000 },
+            addTags: ["双非基层政法", "体制预备役", "公职考编"]
+          },
+          {
+            text: "选择国际贸易与数字商务，在沿海二线城市兼职跑业务，早早融入市场流转与商业实操",
+            detail: "发挥商业嗅觉与人情练达，不被死板书本局限，通过具体的商贸流转与供应链摸爬滚打。",
+            delta: { social: 25, resilience: 20, savings: 8000 },
+            addTags: ["双非经管商贸", "商业敏锐", "早早自立"]
           }
         ]
       }
     };
   }
 
-  // Junior college
+  // Tier 3: 公办高等职业技术学院 / 专科定向 (< 490 分)
   return {
     degreeTrack: "junior_college",
-    title: "【省会普通公办大专 · 现实的冷水】",
-    scoreText: "高考总分 412 分，未达本科线，被省城一所老牌专科院校录取",
+    title: "【省会普通公办大专 · 现实的冷水与重新出发】",
+    scoreText: `高考总分 ${finalScore} 分（未达本科省控线），录取至省属公办职业技术学院`,
     verdict:
-      "出分那一晚，客厅里一片沉寂。父母在阳台上长吁短叹，十二年的应试长跑在这一刻画上了句号。你意识到自己在做题应试上并不占优，但也终于放下了执念，开始思考更务实的出路。",
-    academicCapitalDesc: "大专文凭，在遍地本科生的时代显得有些单薄，唯有硬核技能能防身。",
-    psychologicalDossier: `心理压力：${attrs.inferiority + 20}%。家人的叹息如针扎，但你也彻底放下了应试的包袱。`,
+      "出分那一晚，客厅里一片沉寂。父母在阳台上长吁短叹，十二年的应试长跑在这一刻画上了句号。你意识到自己在死板做题应试上并不占优，但也终于放下了虚浮的执念，开始思考最务实的谋生出路。",
+    academicCapitalDesc: "大专文凭，在遍地本科生的时代稍显单薄，但只要练就一身过硬的独门手艺，照样能在社会稳稳立足。",
+    psychologicalDossier: `生存韧性：${attrs.resilience}%，心理压力：${attrs.inferiority + 15}%。家人的叹息如针扎，但你也彻底放下了应试的沉重包袱。`,
     firstStepChoice: {
       prompt: "拿着大专通知书，你的第一步打算：",
       options: [
         {
-          text: "坦然接纳现实：大专学一门实用护理/软件开发手艺，周末打三份兼职不再向家里要钱",
-          detail: "贫穷和挫败不再能轻易击垮你，你把身段放到最低，在社会泥土里摸爬滚打。",
-          delta: { resilience: 35, inferiority: -10, savings: 3000 },
-          addTags: ["大专实用", "早熟自立"]
+          text: "坦然接纳现实：大专学一门实用精密数控或维保手艺，周末打工自给自足不再要钱",
+          detail: "贫穷和挫败不再能轻易击垮你，你把身段放到最低，在具体的工业与社会泥土里摸爬滚打。",
+          delta: { resilience: 35, inferiority: -10, savings: 5000 },
+          addTags: ["大专实用", "手艺人底色", "早熟自立"]
         },
         {
-          text: "全家凑出三万块复读费，去隔壁市高考补习学校复读一年，背水一战",
-          detail: "你承受不起同辈和亲友异样的眼光，你决定再拿一年的青春在题海里拼一把。",
-          delta: { academicCapital: 25, kinshipGuilt: 30, familySavings: -30000 },
-          addTags: ["复读背水", "巨额学债"]
+          text: "报名专升本重点培训班，在自习室咬牙再战两年，誓要在二十岁拿到全日制本科学历",
+          detail: "你承受不起同辈和亲友异样的眼光，决定拿出全部毅力在图书馆里再拼一次学历突围。",
+          delta: { academicCapital: 25, kinshipGuilt: 20, savings: -4000 },
+          addTags: ["专升本执念", "逆袭渴望"]
         }
       ]
     }
@@ -5097,10 +5469,418 @@ export function evaluate27YearOldLife(
 export function generateAdultMilestones(
   track: "985_211" | "double_non" | "junior_college",
   chosenPath: "emigrate" | "stay",
-  family: FamilyOrigin
+  family: FamilyOrigin,
+  careerSubtrack: "civil" | "tech" | "academic" | "commercial" | "artisan" = "tech"
 ): LifeEventNode[] {
   const city = family.cityOrCounty || "省城";
 
+  // =========================================================================
+  // 1. 公职 / 选调 / 机关 / 事业单位赛道 (Civil Subtrack) - 彻底告别大厂IT叙事！
+  // =========================================================================
+  if (careerSubtrack === "civil") {
+    if (chosenPath === "stay") {
+      return [
+        {
+          id: "adult_civil_stay_30",
+          age: 30,
+          stageName: "三十而立 · 30岁",
+          title: "提任正科级业务科长与主政一方业务",
+          scene: `凭借选调与机关工作中扎实的公文笔杆、群众作风与过硬政绩，三十岁的你顺利提任为单位最年轻的核心业务科长（或下派挂职副区长/副县长），统筹全区民生保障与重点产业专班。老家父母逢人便骄傲地挺直腰杆，但你深知手中的权责重千钧。面对纷繁复杂的现实诉求：`,
+          type: "choice",
+          choices: [
+            {
+              text: "【扑下身子主导民生攻坚专班】带头深入一线化解拆迁难题，推动新城优质公办学校与医院配套落地",
+              detail: "不搞形式主义，夜以继日协调十几个部门，把老百姓最关心的实事办到心坎上，打造群众拍手称赞的‘民心工程’。",
+              reaction: "工程受到省委主要领导专题批示肯定，你成为市直机关公认‘既懂大局又能啃硬骨头’的年轻顶梁柱。",
+              delta: { social: 30, resilience: 20, savings: 25000 },
+              addTags: ["民心所向", "政绩硬核"]
+            },
+            {
+              text: "【严守廉洁纪律底线稳扎稳打】公道处事，坚决拒收一切不合规礼金与亲友关系户请托，立身端正",
+              detail: "行事稳健端方，滴水不漏，在错综复杂的人际关系网中守住原则，建立起坚如磐石的清廉口碑。",
+              reaction: "纪检部门和组织部门对你高度认可，父母虽然帮亲戚碰了壁，但对你风清气正的威信由衷自豪。",
+              delta: { resilience: 25, cognition: 20, kinshipGuilt: -20, savings: 20000 },
+              addTags: ["清廉自持", "行稳致远"]
+            }
+          ]
+        },
+        {
+          id: "adult_civil_stay_35",
+          age: 35,
+          stageName: "三十五岁关隘 · 35岁",
+          title: "晋升副处级领导与全省重点改革攻坚",
+          scene: `三十五岁生日这周，你通过全省综合考察与组织遴选，正式晋升为副处级领导干部（或重要业务处室处长）。同龄人在私企正面临35岁优化下岗的阵痛，而你正坐在全省重点民生改革协调调度会的中心席位，统筹各部门协同推进重点攻坚。面对盘根错节的利益博弈：`,
+          type: "choice",
+          choices: [
+            {
+              text: "【迎难而上啃下最硬的体制改革骨头】牵头推进政务审批全流程阳光化，打破部门利益壁垒",
+              detail: "顶住阻力推动政务数字一网通办，把原本需要跑两个月的审批压缩到三天，受到群众与企业极高好评。",
+              reaction: "全省改革现场会在你主政区域召开，被省委组织部树为‘担当作为优秀好干部’标杆。",
+              delta: { social: 35, resilience: 25, savings: 35000 },
+              addTags: ["改革先锋", "担当有为"]
+            },
+            {
+              text: "【协调各方利益护航现世平稳发展】善于把矛盾化解在萌芽状态，统筹兼顾各方诉求，确保大局和谐",
+              detail: "为人谦逊沉稳，注重政策平稳过渡，不急功近利，被上下公认为最值得信赖的‘定海神针’。",
+              reaction: "班子成员对你心悦诚服，你在单位与地方建立了极高的人望，处事从容自如。",
+              delta: { social: 30, cognition: 25, savings: 30000 },
+              addTags: ["中流砥柱", "人望所归"]
+            }
+          ]
+        },
+        {
+          id: "adult_civil_stay_42",
+          age: 42,
+          stageName: "四十二岁岁月 · 42岁",
+          title: "正处长/二级巡视员与家族中流砥柱",
+          scene: `四十二岁这年，你已晋升为正处级主要领导（或二级巡视员）。老家父亲年逾古稀突发重疾，你不仅下班后守在病榻前端汤喂药，更凭借多年清廉奉公经营的广泛信誉，协调省城三甲医院专家全力救治，为整个家族撑起了最坚固的依靠。面对病榻前的家庭责任：`,
+          type: "choice",
+          choices: [
+            {
+              text: "【孝行感动病榻与树立严正家风】亲自侍奉双亲直至康复，在家族中以身作则树立尊老爱幼、诚实守法的规矩",
+              detail: "亲力亲为侍奉床前，公私分明，用至孝真情让年迈双亲感受到最踏实的安全感。",
+              reaction: "父亲康复出院时老泪纵横：“你在前头走得正，全家在后头腰杆硬！”家族内外人人赞叹。",
+              delta: { kinshipGuilt: -40, happiness: 25, savings: -30000 },
+              addTags: ["纯孝传家", "家风严正"]
+            },
+            {
+              text: "【牵头设立宗族教育与扶困帮扶】以身作则资助贫困堂表弟妹考学读书，成为家族人人敬仰的定盘星",
+              detail: "不拿公帑谋私，拿自己的工资结余帮扶宗族后辈，成为大家庭中受尽敬重的威望核心。",
+              reaction: "宗族子弟纷纷以你为楷模，逢年过节门庭若市，你在故土赢得了崇高的社会声望。",
+              delta: { social: 35, savings: -50000, resilience: 20 },
+              addTags: ["宗族栋梁", "望族声誉"]
+            }
+          ]
+        },
+        {
+          id: "adult_civil_stay_52",
+          age: 52,
+          stageName: "五十二岁荣枯 · 52岁",
+          title: "两袖清风与下一代优良家传",
+          scene: `五十二岁，你在重要领导岗位上威信隆重，两袖清风，口碑载道。你的孩子在良好家风与你开阔视野的熏陶下，顺利考入一流重点大学，为人谦和正直。两代人的清白立身与家国情怀，在这一刻形成了最坚实的传承。`,
+          type: "milestone",
+          naturalDelta: { savings: 100000, social: 30, happiness: 30 },
+          naturalTags: ["清白传家", "门楣生辉"],
+          reflection: "一代人的清廉奉公，两代人的正道传承。你兑现了体制基石的崇高使命。"
+        },
+        {
+          id: "adult_civil_stay_63",
+          age: 63,
+          stageName: "六十三岁退休 · 63岁",
+          title: "干部隆重荣休与无愧苍生",
+          scene: `六十三岁这年，组织上为你举行了庄重隆重的退休仪式。老领导、老部下与群众代表依依不舍，送来题有‘清风明月、利国利民’的锦旗。拿着全额保障的离退休待遇与高品质医疗，回望从当年农家/工人子弟一步步走到今日，你一生问心无愧，善始善终。`,
+          type: "milestone",
+          naturalDelta: { happiness: 35, resilience: 30 },
+          naturalTags: ["功成荣休", "无愧苍生"],
+          reflection: "在生你养你的土地上奉献一生，清风两袖，泽被乡民，安详圆满。"
+        }
+      ];
+    }
+
+    // civil + emigrate (公共治理/智库出海)
+    return [
+      {
+        id: "adult_civil_emigrate_30",
+        age: 30,
+        stageName: "三十而立 · 30岁",
+        title: "国际公共政策智库与跨国交流使者",
+        scene: `凭借深厚的公共管理底蕴与过硬的外语综合能力，三十岁的你在日内瓦/新加坡国际公共政策智库或涉外机构担任高级项目专员，独立主导跨国公共治理与发展合作。站在三十岁的人生节点：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【深耕跨国公共治理】主笔撰写亚太区域民生与减贫合作政策蓝皮书，成为智库骨干",
+            detail: "将中国治理实践与国际规则深度结合，为发展中国家提供实战决策参考，享有崇高专业声誉。",
+            reaction: "多国代表高度评价你的战略眼光，受邀在联合国教科文分论坛发表主旨演讲。",
+            delta: { social: 30, cognition: 25, savings: 150000 },
+            addTags: ["智库骨干", "国际声誉"]
+          },
+          {
+            text: "【享受简单规律生活】严格遵循国际组织人性化工时，下午五点关电脑去湖畔散步享受宁静",
+            detail: "告别过度的人情羁绊，在清爽透明的国际环境中找回身心的纯粹健康与平衡。",
+            reaction: "身心舒展通透，身体指标全面恢复最佳状态，活出了令人向往的松弛与尊严。",
+            delta: { happiness: 30, health: 25, inferiority: -20 },
+            addTags: ["身心通透", "国际松弛"]
+          }
+        ]
+      },
+      {
+        id: "adult_civil_emigrate_35",
+        age: 35,
+        stageName: "三十五岁关隘 · 35岁",
+        title: "国际组织资深主管与全球援助统筹",
+        scene: `三十五岁生日，你升任国际非政府组织驻外资深代表兼项目主管，统筹数千万美元的跨境民生援助项目。国际组织提供免税优厚薪资与全额全球医保，生活安详从容：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【统筹大型跨国援助】协调多国政府与基层社区，成功推动跨国乡村清洁饮水与基础医疗援助落地",
+            detail: "展现出过硬的跨文化领导力与大局观，援助惠及十万基层群众，获颁国际人道合作勋章。",
+            reaction: "联合国驻地协调员高度赞扬你的卓越贡献，你的名字被载入该组织杰出贡献名录。",
+            delta: { social: 35, savings: 200000, resilience: 20 },
+            addTags: ["跨文化领袖", "大局担当"]
+          },
+          {
+            text: "【兼任国际大学客座专家】在海外名校开设公共治理研讨班，潜心著述与传道授业",
+            detail: "将半生治理智慧转化为学术教材，享受知识分子的从容体面与学术尊严。",
+            reaction: "来自数十个国家的学生对你敬重有加，你的著作被多所国际知名智库指定为必读参考。",
+            delta: { cognition: 30, happiness: 25, social: 20 },
+            addTags: ["客座专家", "桃李天下"]
+          }
+        ]
+      },
+      {
+        id: "adult_civil_emigrate_42",
+        age: 42,
+        stageName: "四十二岁岁月 · 42岁",
+        title: "跨洋反哺与双亲至孝托底",
+        scene: `老家父亲突发急症住院，你连夜搭乘跨国航班飞回${city}。面对病榻前年迈的双亲：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【动用外币储蓄托底】请国内顶尖专家会诊并聘请专业护工，亲自在床前侍奉半月",
+            detail: "用雄厚的外币资金与成熟的现代照护为双亲撑起最可靠的屏障，尽到为人儿女的最大孝道。",
+            reaction: "父亲度过危险期，拉着你的手老泪纵横：“你在大洋彼岸有大出息，爹这辈子踏实了！”",
+            delta: { savings: -60000, kinshipGuilt: -35, happiness: 25 },
+            addTags: ["至孝托底", "血脉相守"]
+          },
+          {
+            text: "【接父母海外旅居康养】为父母办理长期探亲签证，接双亲至海外宜居小镇体验田园静养",
+            detail: "让辛苦了一辈子的普通工人/农民父母亲眼看看世界的辽阔与你奋斗出的清爽天地。",
+            reaction: "父母在异国阳光与微风中舒展欢笑，两代人的代际心结在这一刻彻底冰释。",
+            delta: { savings: -40000, kinshipGuilt: -30, happiness: 30 },
+            addTags: ["天伦安享", "两地安心"]
+          }
+        ]
+      },
+      {
+        id: "adult_civil_emigrate_52",
+        age: 52,
+        stageName: "五十二岁荣枯 · 52岁",
+        title: "全球治理专家与下一代多元格局",
+        scene: `你的孩子在多元国际文化中茁壮成长，精通多国语言，思维敏捷，自信坦荡，以平等包容的视野审视世界。看着眼前这个免受单一内卷摧残的下一代，你深知当年勇敢走向世界的决定，彻底改写了家族的生命维度。`,
+        type: "milestone",
+        naturalDelta: { savings: 250000, happiness: 30, cognition: 25 },
+        naturalTags: ["全球视野", "多元格局"],
+        reflection: "以才智服务全球，给下一代换来了不被狭窄评价体系捆绑的辽阔天空。"
+      },
+      {
+        id: "adult_civil_emigrate_63",
+        age: 63,
+        stageName: "六十三岁退休 · 63岁",
+        title: "国际双重年金荣休与云卷云舒",
+        scene: `六十三岁这年，你按期办理了国际组织全额退休，享有终身全球顶级医保与双重年金。湖畔微风吹过向阳露台，你偶尔受邀受聘为母校与国际高校的公共治理终身荣誉顾问，游历列国，笑看云卷云舒，一生波澜壮阔，无怨无悔。`,
+        type: "milestone",
+        naturalDelta: { happiness: 35, resilience: 30 },
+        naturalTags: ["国际荣休", "一生无悔"],
+        reflection: "走出方寸天地，以天下为己任。风清气朗，一生无憾。"
+      }
+    ];
+  }
+
+  // =========================================================================
+  // 2. 学术研究 / 硕博科研 / 高校教职赛道 (Academic Subtrack)
+  // =========================================================================
+  if (careerSubtrack === "academic") {
+    if (chosenPath === "stay") {
+      return [
+        {
+          id: "adult_acad_stay_30",
+          age: 30,
+          stageName: "三十而立 · 30岁",
+          title: "青年学者破格副教授与国家基金攻坚",
+          scene: `博士后出站后，凭借多篇高水平学术成果，三十岁的你被省内顶尖高校破格引进为副教授、硕士生导师。独立挂牌青年课题组，手握国家自然科学/国家社科重点青年基金项目：`,
+          type: "choice",
+          choices: [
+            {
+              text: "【潜心攻克核心前沿重大课题】带领研究生团队夜以继日跑实验仿真，冲刺国际顶尖期刊主刊封面",
+              detail: "耐得住板凳十年冷，不盲目追求横向项目赚快钱，誓在基础科学前沿树立国内学术话语权。",
+              reaction: "团队突破性研究成果被国际顶级权威期刊正式录用，你在全国青年学者学术年会上作特邀主旨报告。",
+              delta: { academicCapital: 35, cognition: 30, savings: 80000 },
+              addTags: ["学术新星", "顶刊突破"]
+            },
+            {
+              text: "【推动产业关键卡脖子技术落地】与国家骨干龙头企业共建产学研联合工程中心，攻坚产业急需",
+              detail: "将象牙塔里的理论成果转化为支撑实体工业的硬核算法与工艺，让科研切实造福产业。",
+              reaction: "工程技术成果成功通过专家组严苛验收并实现产业化，课题组获得千万元级研发经费支持。",
+              delta: { cognition: 25, savings: 150000, social: 25 },
+              addTags: ["产学先锋", "卡脖子攻坚"]
+            }
+          ]
+        },
+        {
+          id: "adult_acad_stay_35",
+          age: 35,
+          stageName: "三十五岁关隘 · 35岁",
+          title: "破格晋升正教授博导与重点实验室挂牌",
+          scene: `三十五岁生日这年，你凭借过硬学术贡献破格晋升为学校最年轻的正高级教授与博士生导师，领衔省部级重点实验室建设。面对海内外多所名校的高薪挖角：`,
+          type: "choice",
+          choices: [
+            {
+              text: "【扎根母校领衔建设国家级创新团队】拒绝外部挖角，深耕本校学科平台，申报国家级重点创新引智基地",
+              detail: "甘为人梯，带领一批年轻博士生成长为骨干，把本学科在全国学科评估中拉升至顶尖A+档位。",
+              reaction: "学校特批建立以你名字命名的科学家工作室，你成为学界公认的中生代领军旗帜。",
+              delta: { academicCapital: 35, social: 30, savings: 120000 },
+              addTags: ["学科旗帜", "国家团队"]
+            },
+            {
+              text: "【担任国家科技重大专项核心专家】入选国家部委战略科学家咨询委员会，参与国家中长期科技规划",
+              detail: "站在国家战略高度布局科学技术未来走向，将学术追求深度融入国家复兴的历史进程。",
+              reaction: "国家领导人亲切接见重大专项专家组成员，你的建言被写入国家科技战略报告。",
+              delta: { cognition: 35, social: 35, savings: 100000 },
+              addTags: ["战略科学家", "国家智囊"]
+            }
+          ]
+        },
+        {
+          id: "adult_acad_stay_42",
+          age: 42,
+          stageName: "四十二岁岁月 · 42岁",
+          title: "国家杰青/长江学者与病榻至孝守望",
+          scene: `四十二岁，你顺利当选国家杰出青年科学基金获得者与长江学者特聘教授。老家父亲突发急症住院，你不仅床前侍奉，更凭借广泛的学者声望与积蓄协调顶级医疗资源，尽显至孝。面对家庭与学术的平衡：`,
+          type: "choice",
+          choices: [
+            {
+              text: "【亲自床前侍奉尽孝与优良家传】白天处理实验室关键方向，夜晚亲自守候病榻端药喂汤",
+              detail: "学者亦是为人儿女，你用温厚纯良的孝行给病榻上的双亲最踏实的宽慰，给子女树立品德榜样。",
+              reaction: "老人康复出院时满脸自豪，门生故旧交口称赞‘大先生有真性情、大仁大孝’。",
+              delta: { kinshipGuilt: -40, happiness: 30, savings: -40000 },
+              addTags: ["仁孝大家", "德艺双馨"]
+            },
+            {
+              text: "【出资设立宗族教育与扶困助学基金】以学者稿酬与奖金设立家族助学奖，激励宗族后辈用知识立身",
+              detail: "不忘农家/平民本色，用知识的火种照亮宗族年轻一代的前路，被老家乡亲奉为当代文曲星。",
+              reaction: "数名后辈在你的资助鼓励下考入重点高校，宗族门风焕然一新，德泽绵长。",
+              delta: { social: 35, savings: -60000, resilience: 20 },
+              addTags: ["文曲重光", "耕读传家"]
+            }
+          ]
+        },
+        {
+          id: "adult_acad_stay_52",
+          age: 52,
+          stageName: "五十二岁荣枯 · 52岁",
+          title: "两院院士评选梯队与桃李满天下",
+          scene: `五十二岁，你作为学科元老进入两院院士正式有效候选人名单。三十年学术长跑结出硕果累累，门下走出了数十名活跃在全国高校与国家重点科研院所的教授与青年学者。你的孩子在学术氛围熏陶下品学兼优，两代学者风骨峥嵘。`,
+          type: "milestone",
+          naturalDelta: { savings: 200000, social: 35, happiness: 30 },
+          naturalTags: ["学界泰斗", "桃李满园"],
+          reflection: "板凳坐得十年冷，文章不写一句空。你用纯粹的才智铸就了不朽的学问基业。"
+        },
+        {
+          id: "adult_acad_stay_63",
+          age: 63,
+          stageName: "六十三岁退休 · 63岁",
+          title: "资深荣誉教授荣休与学术终身成就",
+          scene: `六十三岁这年，高校为你举行隆重的学术终身成就表彰大会。各界门生学者齐聚一堂向你深深致敬。学校授予你终身荣誉资深特聘教授与独立研讨室，享有最高国家专家津贴与医疗待遇。在绿树成荫的校园里著书立说，启迪后学，一生圆满崇高。`,
+          type: "milestone",
+          naturalDelta: { happiness: 35, resilience: 30 },
+          naturalTags: ["先生之风", "山高水长"],
+          reflection: "立德立言立功，先生之风，山高水长。"
+        }
+      ];
+    }
+
+    // academic + emigrate (海外教职/学术终身轨)
+    return [
+      {
+        id: "adult_acad_emigrate_30",
+        age: 30,
+        stageName: "三十而立 · 30岁",
+        title: "海外名校终身教职轨(Tenure-Track)助理教授",
+        scene: `凭借名校博士与高水平学术发表，三十岁的你在北美/欧洲顶尖综合性大学拿下终身教职轨道(Tenure-Track)助理教授职位，拥有独立实验室与充足的国际启动科研经费。站在三十岁的人生节点：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【潜心学术冲刺重大科学发现】夜以继日带领国际博士生攻克前沿理论，冲击Nature/Science正刊",
+            detail: "享受海外纯粹宽松的学术自由探索氛围，在世界科学的最前沿留下中国学者的名字。",
+            reaction: "论文被顶级期刊以封面文章发表，全球主流科技媒体争相报道你的突破成果。",
+            delta: { academicCapital: 35, cognition: 30, savings: 160000 },
+            addTags: ["前沿突破", "国际学者"]
+          },
+          {
+            text: "【追求生活平衡与学者尊严】每年休满三个月学术长假，在山海湖泊之间徒步写作，享受学术从容",
+            detail: "告别焦虑与浮躁，把时间还给深思、家庭与纯粹的探索乐趣，活出学者最本真的体面。",
+            reaction: "身心清澈通透，后院花草繁盛，你在从容自由中找到了学术与生命的和谐共振。",
+            delta: { happiness: 30, health: 25, inferiority: -20 },
+            addTags: ["学者从容", "天地自在"]
+          }
+        ]
+      },
+      {
+        id: "adult_acad_emigrate_35",
+        age: 35,
+        stageName: "三十五岁关隘 · 35岁",
+        title: "提前斩获终身教职(Tenure)与讲席教授",
+        scene: `三十五岁生日这周，大学校董会全票通过你的终身教职评审，提前锁定终身副教授(Tenured Associate Professor)。彻底摆脱了任何年龄与下岗危机，享有终身科研保障：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【领衔组建国际跨学科科学中心】联合欧美多国顶级学者发起国际大科学计划，引领学科潮流",
+            detail: "凭借学术威望与全球号召力，成为国际前沿学派的公认旗手，享有崇高国际声誉。",
+            reaction: "国际科学理事会授予你青年领军科学家大奖，你的学说被写入国际通行教科书。",
+            delta: { social: 35, savings: 220000, cognition: 30 },
+            addTags: ["学派宗师", "全球声誉"]
+          },
+          {
+            text: "【专心撰写学术传世经典巨著】推辞多余行政应酬，沉下心来撰写耗时多年的权威理论专著",
+            detail: "不为眼前名利所动，追求能经受住时光淘洗的永恒知识，将名字刻在人类思想史上。",
+            reaction: "专著由剑桥/哈佛大学出版社全球出版，成为该领域的开山经典之作。",
+            delta: { cognition: 35, happiness: 30, resilience: 20 },
+            addTags: ["传世经典", "大作问世"]
+          }
+        ]
+      },
+      {
+        id: "adult_acad_emigrate_42",
+        age: 42,
+        stageName: "四十二岁岁月 · 42岁",
+        title: "讲席讲座教授与跨洋孝道托底",
+        scene: `四十二岁，你已晋升为冠名讲席讲座教授。老家国内父亲突发重疾，你立即动用国际优质医疗协作与外币积蓄，安排国内最好的专家诊疗手术，并亲自回国陪护：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【雄厚外币储蓄医疗托底】支付最好的三甲特需医疗费用与康复护工，床前寸步不离侍奉",
+            detail: "用实打实的跨国财力与孝心为父母筑起最坚固的防线，让老家双亲安享无忧晚年。",
+            reaction: "父亲度过危险期出院，逢人便夸你‘书读得大，心更孝顺’，全家倍感踏实自豪。",
+            delta: { savings: -60000, kinshipGuilt: -35, happiness: 25 },
+            addTags: ["至孝托底", "书香传家"]
+          },
+          {
+            text: "【接双亲海外大学城安居小住】为父母办理探亲长住，在宁静绿树成荫的大学城小筑安顿双亲",
+            detail: "让辛苦一辈子的普通父母亲身漫步在世界一流学府的大草坪上，享受清澈阳光与安宁天伦。",
+            reaction: "双亲身体指标显著好转，看着你受全校师生敬重的模样，脸上洋溢着欣慰笑意。",
+            delta: { savings: -40000, kinshipGuilt: -30, happiness: 30 },
+            addTags: ["天伦安享", "两地安心"]
+          }
+        ]
+      },
+      {
+        id: "adult_acad_emigrate_52",
+        age: 52,
+        stageName: "五十二岁荣枯 · 52岁",
+        title: "国际权威院士荣誉与下一代从容成长",
+        scene: `五十二岁，你当选为国际知名科学院外籍院士。你的孩子在大学城多元浓郁的学术土壤中自由成长，独立自信，勇于探索未知的科学与艺术世界，完全免受同辈压力与畸形内卷的困扰。两代人在知识的天空下各得其乐，生命舒展坦荡。`,
+        type: "milestone",
+        naturalDelta: { savings: 250000, happiness: 30, cognition: 30 },
+        naturalTags: ["国际院士", "书香长流"],
+        reflection: "以才智立身全球，以德行启迪后人。人类知识的长河中，有你闪耀的一朵浪花。"
+      },
+      {
+        id: "adult_acad_emigrate_63",
+        age: 63,
+        stageName: "六十三岁退休 · 63岁",
+        title: "荣誉终身教授荣休与著述立说",
+        scene: `六十三岁这年，大学授予你荣誉终身教授称号，保留专用工作室与全额终身年金。后院阳光洒在书桌的泛黄原稿上，偶尔受邀在全球顶级学术殿堂讲学交流，一生求索真理，心无旁骛，境界高远，浩然长存。`,
+        type: "milestone",
+        naturalDelta: { happiness: 35, resilience: 30 },
+        naturalTags: ["学问长青", "不朽人生"],
+        reflection: "探求真理，启迪蒙昧。一生纯粹，高山仰止。"
+      }
+    ];
+  }
+
+  // =========================================================================
+  // 3. 默认轨道（科技研发 / 实业商贸 / 工匠大专）
+  // =========================================================================
   if (track === "985_211" && chosenPath === "emigrate") {
     return [
       {

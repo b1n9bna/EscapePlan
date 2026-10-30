@@ -7,6 +7,7 @@ import {
   calculateGaokaoOutcome,
   generateAdultMilestones,
   getTailoredCareerSubtrackNodes,
+  getCareerSubtrack,
   generateFinalLifetimeVerdict,
   detectCrisisWarning,
   ENDING_CODEX_DEFS,
@@ -731,7 +732,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       // 检查27岁是否需要挂载成年里程碑（兜底容错）
       if (currentNode.age === 27 && !logEntries.some((e) => e.age === 63)) {
         const track = gaokaoCalc?.degreeTrack || 'double_non';
-        const adultMilestones = generateAdultMilestones(track, chosenPath, charData.family);
+        const careerSub = getCareerSubtrack(tags);
+        const adultMilestones = generateAdultMilestones(track, chosenPath, charData.family, careerSub);
         const currentNodes = timeline.slice(0, timelineIndex + 1);
         setTimeline([...currentNodes, ...adultMilestones]);
         return;
@@ -912,7 +914,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setChosenPath(path);
 
       const track = gaokaoCalc?.degreeTrack || 'double_non';
-      const adultMilestones = generateAdultMilestones(track, path, charData.family);
+      const allCurrentTags = Array.from(new Set([...tags, ...(choice.addTags || [])]));
+      const careerSub = getCareerSubtrack(allCurrentTags);
+      const adultMilestones = generateAdultMilestones(track, path, charData.family, careerSub);
 
       // 将后续30, 35, 42, 52, 63岁里程碑直接串接进时间线，三栏交互彻底统一！
       const currentNodes = timeline.slice(0, timelineIndex + 1);
