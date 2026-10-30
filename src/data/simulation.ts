@@ -54,6 +54,8 @@ export interface LifeChoice {
   delta: Partial<CharacterAttributes>;
   addTags?: string[];
   trackTrigger?: "vocational" | "academic";
+  stanceBadge?: string;
+  tradeOffHint?: string;
 }
 
 export interface LifeEventNode {
@@ -1108,24 +1110,27 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "挺起胸膛目不斜视，大声跟读少先队宣誓词",
-          detail: "你把宣誓词背得滚瓜烂熟，如愿第一批戴上大红领巾，全班掌声雷动。",
-          reaction: "你小心翼翼把红领巾叠得整整齐齐放进书包，暗自立下了当好学生的志向。",
-          delta: { cognition: 15, academicCapital: 15, happiness: 10 },
+          stanceBadge: "苦修争优",
+          text: "挺起胸膛目不斜视大声宣誓，如愿第一批戴上大红领巾立志拔尖！",
+          detail: "把宣誓词背得滚瓜烂熟，在掌声中戴上荣誉，暗自立下要做体制内第一标兵的雄心。",
+          reaction: "你把红领巾叠得整整齐齐，但为了保持这种拔尖的姿态，你过早告别了无忧无虑的玩耍。",
+          delta: { academicCapital: 20, cognition: 15, health: -5, happiness: -5 },
           addTags: ["少年志气", "争先争优"]
         },
         {
-          text: "将多带的一支铅笔借给旁边急哭了的同学",
-          detail: "比起台上的荣誉，你更看重身边同伴的难处。",
-          reaction: "同学破涕为笑，老师在台下投来赞许的目光，你们成了形影不离的好友。",
-          delta: { social: 20, happiness: 15, inferiority: -10 },
+          stanceBadge: "草莽仗义",
+          text: "将多带的一支铅笔借给旁边急哭的同学，并悄悄教他系红领巾！",
+          detail: "比起台上的虚名荣誉，你更看重身边同伴的难处，用朴素的善良赢得最铁的挚友。",
+          reaction: "同学破涕为笑，老师投来赞许的目光，你们成了形影不离的一生莫逆之交。",
+          delta: { social: 30, happiness: 25, inferiority: -10 },
           addTags: ["善良同理", "童年挚友"]
         },
         {
-          text: "站在队伍最后排安静看着，内心平静波澜不惊",
-          detail: "过早拥有了一份超越同龄人的淡然，不热衷于仪式化的追捧。",
-          reaction: "你在属于自己的角落里默默观察着集体规则，保全了一份清醒与松弛。",
-          delta: { resilience: 10, rebellion: 10, inferiority: -5 },
+          stanceBadge: "旷野哲思",
+          text: "站在后排微风中，专心看操场老白杨树上的花喜鹊筑巢，波澜不惊！",
+          detail: "过早拥有一份超越同龄人的超脱与淡然，不热衷于仪式化的追捧，在天地微风中自得其乐。",
+          reaction: "你在属于自己的角落里默默观察集体规则，保全了一份难能可贵的通透与松弛神性。",
+          delta: { resilience: 20, rebellion: 20, happiness: 25, cognition: 15 },
           addTags: ["从容内省", "清醒独处"]
         }
       ]
@@ -1140,25 +1145,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "高高举手快步走上讲台，工整写出答案并算对了附加题",
-          detail: "你在全班惊叹的目光中展露出惊人的数字敏感与做题天赋。",
-          reaction: "数学老师在你的作业本上画了一朵大红花，当场任命你为数学课代表。",
-          delta: { cognition: 20, academicCapital: 20, happiness: 10 },
+          stanceBadge: "考场锋芒",
+          text: "高高举手快步上台，不仅算对更推导出双重乘除简便解法！",
+          detail: "在全班惊叹的目光中展露出惊人的数字敏感与做题天赋，当场拿下免修特权。",
+          reaction: "数学老师在作业本上画了大红花，任命你为课代表，你稳稳跨出了应试做题第一步。",
+          delta: { academicCapital: 25, cognition: 20, happiness: 10, health: -5 },
           addTags: ["算术天才", "展露头角"]
         },
         {
-          text: "低头屏住呼吸数手指，暗暗在草稿纸上反复验算",
-          detail: "谨慎克制，不愿在成人面前冒任何出错丢脸的风险。",
-          reaction: "虽然没有举手，但你在本子上算得全对，内心多了一份笃定的底气。",
-          delta: { cognition: 10, resilience: 10, inferiority: 5 },
-          addTags: ["沉稳谨慎", "暗中发力"]
+          stanceBadge: "商感萌芽",
+          text: "在课桌下自编算盘口诀，教前后桌快速心算并换取麦芽糖与弹珠！",
+          detail: "极早发现知识交换的商业价值，建立起自己在小团体里的技术壁垒与人望。",
+          reaction: "前后桌同学心算飞速进步，你每天课桌抽屉里都堆满了小伙伴孝敬的零食与小玩意。",
+          delta: { savings: 20, social: 25, cognition: 20, happiness: 20 },
+          addTags: ["商业启蒙", "孩子王"]
         },
         {
-          text: "在台下小声把答案告诉了卡壳涨红了脸的同桌",
-          detail: "讲义气，懂得在同伴陷入窘境时伸出援手。",
-          reaction: "同桌顺利过关，下课后悄悄塞给你一块大白兔奶糖表示感谢。",
-          delta: { social: 15, happiness: 10, inferiority: -5 },
-          addTags: ["仗义机敏", "结伴同行"]
+          stanceBadge: "旷野创想",
+          text: "在课本空白处画出精彩幽默的连环四格漫画，逗得全班憋笑！",
+          detail: "天马行空的艺术想象力与松弛天性，自小构筑了丰饶独特的精神乐园。",
+          reaction: "连数学老师课后看了你的画本也忍不住笑出声，夸你‘思维极其活跃，必有大创造力’。",
+          delta: { happiness: 30, social: 20, rebellion: 15, cognition: 15 },
+          addTags: ["艺术灵动", "松弛乐天"]
         }
       ]
     },
@@ -1172,25 +1180,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "咽下口水快步走开，去文具摊买下一块带香味的橡皮擦",
-          detail: "你用小小的自制力抵御了诱惑，牢牢守住了母亲叮嘱的原则。",
-          reaction: "握着干净的新橡皮，你第一次体会到自我克制带来的踏实感。",
-          delta: { resilience: 15, cognition: 10, inferiority: -5 },
+          stanceBadge: "自律积蓄",
+          text: "咽下口水快步走开，去文具摊买下实用橡皮擦，余钱小心存入铁罐！",
+          detail: "用稚嫩的自制力抵御即时享乐，早早树立起克制自律与长期积蓄的习惯。",
+          reaction: "看着铁罐里叮当响的硬币，你体会到掌控自己欲望的踏实感，心性坚定。",
+          delta: { resilience: 20, cognition: 15, savings: 5 },
           addTags: ["克制自律", "早熟自持"]
         },
         {
-          text: "买下两张最酷的西游记闪光贴纸贴在课本封面",
-          detail: "‘童年就这一次，我也想拥有一张属于自己的漂亮贴纸。’",
-          reaction: "课间许多同学凑过来看你的新贴纸，你心里充满小小的雀跃与自豪。",
-          delta: { happiness: 15, social: 10, savings: -1 },
-          addTags: ["率真童趣", "纯真快乐"]
+          stanceBadge: "市井博弈",
+          text: "和同伴在泥地跳格子打赌，凭高超手艺不花一分钱赢回一大把稀有贴纸！",
+          detail: "凭身手和聪明敏捷在街坊孩童中站稳脚跟，成为校门口公认的游戏霸主。",
+          reaction: "全班同学纷纷拜你为师学技巧，你甚至开始用贴纸换取铅笔，商道大开！",
+          delta: { social: 30, resilience: 20, savings: 15, happiness: 20 },
+          addTags: ["身手敏捷", "街头霸主"]
         },
         {
-          text: "和同伴在泥地跳格子打赌，凭高超手艺赢回一大把贴纸",
-          detail: "凭身手和聪明劲在街坊孩童中站稳脚跟，不花一分钱。",
-          reaction: "你成了校门口的小赢家，同学们纷纷拜你为师学技巧。",
-          delta: { social: 20, resilience: 10, happiness: 10 },
-          addTags: ["身手敏捷", "街头智慧"]
+          stanceBadge: "率真童趣",
+          text: "买下最霸气的西游记大圣闪光贴纸贴在胸口，尽情享受纯粹的童年欢愉！",
+          detail: "‘童年就这一次，我也想拥有一张属于自己的漂亮贴纸！’率性豁达不内耗。",
+          reaction: "小伙伴们围着你羡慕不已，你昂首挺胸扮演齐天大圣，收获了一整天的阳光！",
+          delta: { happiness: 35, social: 20, health: 10 },
+          addTags: ["纯真童乐", "阳光天性"]
         }
       ]
     },
@@ -1204,24 +1215,27 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "把书包紧紧护在胸前，冒着暴雨在积水路上一路狂奔回家",
-          detail: "像一棵任凭风吹雨打的野草，不怨天尤人，靠双脚冲破风雨。",
-          reaction: "虽然浑身湿透，但书包里的课本完好无损。母亲赶紧熬了姜汤把你裹进干棉被里。",
-          delta: { resilience: 20, health: -5, happiness: 10 },
+          stanceBadge: "野草骨气",
+          text: "把书包紧紧护在胸前，冒着暴雨在积水路上一路狂奔，书本滴水未湿！",
+          detail: "像一棵任凭风吹雨打的野草，不怨天尤人，靠双脚冲破风雨，守护求学的课本。",
+          reaction: "虽然浑身湿透，但课本一尘不染，母亲心疼地熬姜汤为你裹进棉被，你眼神无比坚毅。",
+          delta: { resilience: 25, academicCapital: 15, health: -5, happiness: 10 },
           addTags: ["风雨兼程", "野草骨气"]
         },
         {
-          text: "邀请同样没伞的同学一起在门卫传达室避雨讲连环画故事",
-          detail: "天性豁达开朗，无论身处何种窘境都能找到生活的乐趣。",
-          reaction: "看门大爷听得入迷，还给你们倒了两杯热开水，风雨变成了温暖的回忆。",
-          delta: { social: 20, happiness: 15, cognition: 10 },
-          addTags: ["乐观通达", "逆境生花"]
+          stanceBadge: "豁达乐观",
+          text: "邀请同样没伞的同学一起在门卫传达室避雨，开讲三国连环画故事！",
+          detail: "天性豁达开朗，无论身处何种窘境都能找到生活的乐趣，聚集起满满的温情。",
+          reaction: "看门大爷听得入迷还给你们泡了热麦乳精，凄风苦雨变成了温暖一生的避风港记忆。",
+          delta: { social: 30, happiness: 30, cognition: 20 },
+          addTags: ["逆境生花", "豁达融洽"]
         },
         {
-          text: "父亲顶着暴雨骑着二八大杠赶来，将你塞进雨衣怀里",
-          detail: "看着父亲湿透的双肩和雨水混合的汗水，心里充满深深的依恋。",
-          reaction: "坐在自行车横梁上贴着父亲温热的胸膛，你感到了无与伦比的安全感。",
-          delta: { kinshipGuilt: 15, happiness: 15, health: 5 },
+          stanceBadge: "深情依恋",
+          text: "坐在父亲顶雨赶来的二八大杠雨衣怀里，贴着温热胸膛听雨声！",
+          detail: "看着父亲湿透的双肩与混合汗水的雨水，体会到父爱如山沉甸甸的安全感。",
+          reaction: "你紧紧抱住父亲粗壮的腰，贫瘠的家庭因为至真至浓的亲情而坚不可摧。",
+          delta: { kinshipGuilt: 25, happiness: 25, health: 10 },
           addTags: ["父爱如山", "家庭温情"]
         }
       ]
@@ -1236,25 +1250,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "绘声绘色给围拢过来的同学们讲长坂坡单骑救主",
-          detail: "表达欲与口才展露无遗，迅速成为全班公认的‘故事大王’。",
-          reaction: "同学们听得如痴如醉，连班主任路过也停下脚步笑着听你讲完。",
-          delta: { social: 20, cognition: 15, happiness: 15 },
-          addTags: ["口才出众", "故事大王"]
+          stanceBadge: "走廊评书",
+          text: "在课桌上摆水杯开讲长坂坡赵子龙单骑救主，口若悬河聚拢全班！",
+          detail: "极强的表达欲与公众演说口才展露无遗，迅速成为全班公认的‘故事大王’。",
+          reaction: "全班同学听得如痴如醉，连班主任也驻足带头鼓掌，你的人气如日中天！",
+          delta: { social: 35, cognition: 20, happiness: 25 },
+          addTags: ["演说领袖", "故事大王"]
         },
         {
-          text: "把书收好放回书包，认真把当天的生字笔顺工整抄完",
-          detail: "专注克制，把当务之急的学业放在第一位。",
-          reaction: "老师将你的字帖贴在教室后黑板展示，夸你‘少年心性定，必成大器’。",
-          delta: { academicCapital: 15, cognition: 15, resilience: 10 },
-          addTags: ["自律笃定", "严谨求学"]
+          stanceBadge: "图书出租",
+          text: "每次外借收取一分钱或一颗水果糖，三天回本并扩充成班级图书角！",
+          detail: "敏锐发现精神消费的商业逻辑，以微薄资本撬动图书流转，建立起校园小图书馆。",
+          reaction: "你成了班里最有书读且零钱不断的小能手，连高年级同学都慕名前来借书！",
+          delta: { savings: 50, cognition: 25, social: 25 },
+          addTags: ["商业启蒙", "图书管家"]
         },
         {
-          text: "大方把连环画借给平日常受冷落孤立的后座同学看",
-          detail: "心思细腻，关注着角落里那些沉默的孩子。",
-          reaction: "后座同学眼里闪烁着感激的光，默默帮你把弄脏的桌角擦得干干净净。",
-          delta: { social: 15, inferiority: -10, happiness: 15 },
-          addTags: ["温暖包容", "共情关照"]
+          stanceBadge: "闭门临摹",
+          text: "躲在窗边拿薄纸细致临摹关公绣像与刀法，自学工笔白描透视！",
+          detail: "耐得住寂寞，把喧嚣关在门外，在黑白线条与传统画法中沉潜钻研，领悟美学。",
+          reaction: "老师将你的白描画作贴在教室后黑板展示，夸你‘少年心性定，必有大造诣’。",
+          delta: { academicCapital: 20, cognition: 25, resilience: 20, happiness: 15 },
+          addTags: ["书画入微", "沉潜钻研"]
         }
       ]
     },
@@ -1268,25 +1285,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "低头不语，午饭时悄悄躲到操场乒乓球台底下吃完",
-          detail: "你早早学会了用自尊裹紧自己的贫瘠，把敏感磨成了内敛的硬壳。",
-          reaction: "你开始学着城里同学的语调一字一句纠正发音，夜里在被窝里练普通话咬字。",
-          delta: { inferiority: 15, cognition: 10, social: -10 },
-          addTags: ["自尊敏感", "早熟好强"]
+          stanceBadge: "傲骨发愤",
+          text: "嚼粗粮不慕虚华，抓紧午休时间把当天的生字帖工整练完！",
+          detail: "把匮乏化作磨砺自尊的磨刀石，坚信唯有满分卷面才能赢得真正的体面与敬重。",
+          reaction: "期末你的字帖贴在年级大黑板展出，老师夸你‘心性坚韧，定成大器’，自尊傲立。",
+          delta: { academicCapital: 20, cognition: 15, resilience: 20, happiness: -5 },
+          addTags: ["自尊傲骨", "发奋图强"]
         },
         {
-          text: "大方把咸菜分给同桌：‘我家自己腌的，尝尝很香’",
-          detail: "你身上带着野草般的坦荡，贫穷没有第一时间压弯你的腰。",
-          reaction: "同桌吃了一口被辣得直吸气，反倒和你成了下课一起拍卡片的朋友。",
-          delta: { social: 15, happiness: 10, inferiority: -10, resilience: 10 },
-          addTags: ["坦荡大方", "草莽韧劲"]
+          stanceBadge: "市井豪迈",
+          text: "筷子一插大方把秘制咸菜分给全班：“我家自腌的，比肉还香！”",
+          detail: "坦荡无畏，用纯正的人格魅力与豪爽击碎冷嘲热讽，在欢笑声中结交一群死党。",
+          reaction: "城里同桌吃得满嘴流油直呼过瘾，第二天纷纷带自家好菜与你互换，融成一片！",
+          delta: { social: 30, happiness: 25, resilience: 20, inferiority: -20 },
+          addTags: ["坦荡大方", "草莽豪情"]
         },
         {
-          text: "吵着要买商场45元保温盒，母亲叹气数零钱",
-          detail: "母亲叹着气数出抽屉里带折痕的零钱，父亲在院子里重重抽了一口旱烟。",
-          reaction: "第二天你如愿拿到了新饭盒，但母亲接下来整整两周每顿饭只就着白菜汤咽冷馍。",
-          delta: { kinshipGuilt: 20, happiness: -10, familySavings: -45 },
-          addTags: ["内疚阴影", "好面子"]
+          stanceBadge: "商业调配",
+          text: "用自家爽脆酱瓜跟同桌换来稀罕的进口威化饼与画本，资源互通！",
+          detail: "敏锐察觉各自所需，用信息差和资源调配化解尴尬，初尝以物易物的商业甜头。",
+          reaction: "你成了班级物资调配小能手，不仅天天吃上新鲜零食，还攒下了一笔铅笔文具储备。",
+          delta: { savings: 30, cognition: 25, social: 20, happiness: 20 },
+          addTags: ["资源调配", "商业嗅觉"]
         }
       ]
     },
@@ -1300,25 +1320,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "鼓起勇气高高举手，大声背诵唐诗自荐当学习委员",
-          detail: "你渴望通过优秀表现赢取老师的关注，用成绩打破家庭出身的界限。",
-          reaction: "老师有些意外，赞赏了你的胆量，让你当上了小组长，你第一次感到被认可。",
-          delta: { cognition: 15, social: 10, academicCapital: 10 },
-          addTags: ["积极争先", "做题苗子"]
+          stanceBadge: "主动争先",
+          text: "鼓起勇气高高举手，大声背诵唐诗自荐当学习委员！",
+          detail: "渴望通过过硬的才学表现赢取老师关注，用成绩打破出身的局限与偏见。",
+          reaction: "老师非常惊喜，当场任命你为常任学习委员，你第一次体会到凭实力赢得尊重的喜悦。",
+          delta: { academicCapital: 25, cognition: 20, resilience: 15, inferiority: -10 },
+          addTags: ["领头拔尖", "做题苗子"]
         },
         {
-          text: "默默低头把手缩进袖子里，甘愿留在角落安静翻书",
-          detail: "你习惯了不起眼的安全感，不想成为目光焦点的众矢之的。",
-          reaction: "你被分到了靠窗倒数第二排，虽然被忽略，但你拥有了自由发呆和看杂书的天地。",
-          delta: { happiness: 10, inferiority: 5, rebellion: 5 },
-          addTags: ["内敛隐形", "安静独处"]
+          stanceBadge: "操场霸主",
+          text: "拿出从家里带来的五彩弹珠，课间迅速聚拢全班呼朋引伴称兄道弟！",
+          detail: "比起规规矩矩的体制班干部，你更喜欢在操场旷野上当指挥若定的孩子王。",
+          reaction: "下课铃一响全班男生都围着你转，你成了校园里声望最高的领袖，老师对你又爱又敬！",
+          delta: { social: 35, happiness: 25, resilience: 20 },
+          addTags: ["操场霸主", "豪气天成"]
         },
         {
-          text: "拿出从家里带来的五彩弹珠，课间迅速聚拢了一大帮同桌玩伴",
-          detail: "比起规规矩矩的班干部，你更喜欢在操场上呼朋引伴称兄道弟。",
-          reaction: "你很快成了班里的孩子王，大家下课都围着你转，老师拿你哭笑不得。",
-          delta: { social: 20, happiness: 15, academicCapital: -5 },
-          addTags: ["孩子王", "外向好客"]
+          stanceBadge: "窗边沉思",
+          text: "选靠窗倒数第二排安坐，享受自由看杂书、看天边飞鸟的独立精神领地！",
+          detail: "不热衷于世俗权力的争夺，在角落里自得其乐，构筑起独立而丰饶的精神世界。",
+          reaction: "你拥有了别人羡慕不来的从容闲暇，课外杂书读了一本又一本，眼界远超同龄孩童。",
+          delta: { happiness: 30, cognition: 25, rebellion: 20 },
+          addTags: ["窗边沉思", "精神自足"]
         }
       ]
     },
@@ -1332,25 +1355,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "笔直站在母亲身旁，拿出新发下的语文书大声朗读课文",
-          detail: "你用专注的读书声为尴尬的母亲筑起尊严的防线。",
-          reaction: "年级主任路过夸你‘这娃心性好，是个念书的料’，特批缓交一个月入学。",
-          delta: { cognition: 15, resilience: 15, inferiority: 5 },
-          addTags: ["要强争气", "以读卫尊"]
+          stanceBadge: "书生骨气",
+          text: "站在母亲身旁朗声背诵课文，以出类拔萃的才学打动主任特批缓缴！",
+          detail: "用清脆响亮的读书声为窘迫的母亲筑起尊严的防线，展现出无可挑剔的求学天资。",
+          reaction: "教导主任路过赞叹‘这娃是个读书的料’，大笔一挥特批免除借读滞纳金缓交入学！",
+          delta: { academicCapital: 25, cognition: 20, resilience: 20, inferiority: -10 },
+          addTags: ["以读卫尊", "神童资质"]
         },
         {
-          text: "懂事地拉了拉母亲衣角：‘妈，咱不念了，回家放羊吧’",
-          detail: "过早察觉到了贫困的刺痛，不忍心看着母亲在陌生人面前低三下四。",
-          reaction: "母亲眼圈一红，狠狠搂住你说‘砸锅卖铁也得让你把书念完！’",
-          delta: { kinshipGuilt: 25, happiness: -10, resilience: 10 },
-          addTags: ["心疼双亲", "懂事沉重"]
+          stanceBadge: "手艺抵资",
+          text: "掏出自己雕刻的精美木刻生肖和帮门卫修好的手电筒折抵勤工！",
+          detail: "“老师，我能帮学校修课桌修理水龙头！”超常的动手天赋让校领导赞叹不已破格录用。",
+          reaction: "校长当场宣布让你担任红领巾劳动标兵，免除了全部借读费，母亲含泪欣慰不已！",
+          delta: { savings: 50, social: 25, resilience: 25, cognition: 20 },
+          addTags: ["动手立身", "巧手破局"]
         },
         {
-          text: "默默去走廊洗手池打水，帮老师把办公室外的花坛擦得干干净净",
-          detail: "早熟敏锐，懂得用具体的眼力见与勤快博取成人世界的好感。",
-          reaction: "班主任有些动容，叹了口气领着你进了教室安排在中间好座位。",
-          delta: { social: 15, resilience: 10, inferiority: 5 },
-          addTags: ["察言观色", "勤勉早熟"]
+          stanceBadge: "旷野温情",
+          text: "紧紧牵着母亲的手在夕阳台阶温声安慰，成为母亲最坚实的依靠！",
+          detail: "“妈，咱不丢人，我往后一定出息让你过上好日子！”用稚嫩却坚定的怀抱温暖母亲。",
+          reaction: "母亲抹去眼泪紧紧搂住你，家庭的凝聚力与深情在患难中被淬炼得无坚不摧！",
+          delta: { happiness: 35, familySavings: 1000, resilience: 25, health: 10 },
+          addTags: ["孝道暖炉", "深情淬炼"]
         }
       ]
     }
@@ -1407,25 +1433,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "咬紧牙关拼命摆臂冲刺，拿下全校第一名为班级争光",
-          detail: "心无旁骛，用顽强的爆发力战胜了全校所有的竞争对手。",
-          reaction: "班主任和全班同学把你高高抛起，大红奖状印着你的名字贴在黑板正中。",
-          delta: { resilience: 20, happiness: 20, health: 10, inferiority: -15 },
-          addTags: ["短跑冠军", "扬眉吐气"]
+          stanceBadge: "搏命夺冠",
+          text: "咬紧牙关拼命摆臂冲刺，双膝擦破依然打破校纪录拿下全校第一！",
+          detail: "心无旁骛，用顽强的爆发力战胜了所有对手，登上最高领奖台，但大腿韧带严重拉伤。",
+          reaction: "班主任和全班同学把你高高抛起，大红奖状印着你的名字贴在黑板正中，但你瘸着腿走了一整周。",
+          delta: { academicCapital: 15, resilience: 25, happiness: 15, health: -15 },
+          addTags: ["短跑冠军", "拼命三郎"]
         },
         {
-          text: "终点前不慎跌倒擦破手掌，忍痛爬起来坚持跑完全程",
-          detail: "就算落后甚至负伤，也绝不在众人注视下放弃退缩。",
-          reaction: "全场观众为你响起雷鸣般的掌声，体育老师赞叹‘这孩子有骨气！’",
-          delta: { resilience: 25, inferiority: -10, health: -5 },
-          addTags: ["坚韧硬骨", "虽败犹荣"]
+          stanceBadge: "偏锋统筹",
+          text: "组织场外后勤与拉赞助，摆冰镇白糖水摊为运动员服务大赚零花！",
+          detail: "洞悉大型赛事的物资流动，拉拢好友在终点分发糖水与看管衣物，净赚人生第一笔小金库。",
+          reaction: "不仅班级后勤井井有条，兜里还塞满了皱巴巴的零钞，老师夸你‘天生有统帅商业大局观’。",
+          delta: { social: 30, savings: 150, cognition: 20, happiness: 20 },
+          addTags: ["赛事总管", "商业头脑"]
         },
         {
-          text: "赛后把赢来的铅笔奖品分给陪你练全程的同桌好友",
-          detail: "把同甘共苦的情谊看得比单打独斗的荣誉更重要。",
-          reaction: "好友感动不已，从家里带来珍藏的铁皮青蛙玩具与你分享。",
-          delta: { social: 20, happiness: 15 },
-          addTags: ["重情重义", "真挚伙伴"]
+          stanceBadge: "文创采写",
+          text: "背着借来的傻瓜相机与速写本记录每个热血瞬间，广播稿催泪全校！",
+          detail: "用极其细腻的文字与镜头定格落后同学爬起的感人画面，文采飞扬轰动全校广播站。",
+          reaction: "全校师生在广播喇叭下热泪盈眶，校长特批你为学校首席红领巾通讯员！",
+          delta: { cognition: 25, happiness: 30, social: 25, academicCapital: 15 },
+          addTags: ["金牌采写", "灵魂观察"]
         }
       ]
     },
@@ -1439,25 +1468,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "找了一处向阳的树荫，津津有味吃完并把草地杂物收拾干净",
-          detail: "内心坦然，不卑不亢，享受大自然与属于自己的朴素滋味。",
-          reaction: "带队老师夸你‘不仅懂事而且爱护环境’，在春游总结班会上特别表扬了你。",
-          delta: { happiness: 15, resilience: 15, inferiority: -10 },
-          addTags: ["坦然自洽", "文明懂事"]
+          stanceBadge: "坦然自洽",
+          text: "向阳树荫下津津有味品尝自家土鸡蛋，顺手清理全场垃圾获全校通报！",
+          detail: "内心坦荡，不卑不亢，享受大自然与朴素的美味，用文明与自律赢得全场尊崇。",
+          reaction: "带队老师夸你‘心性通透懂事且爱护自然’，在春游总结班会上特别向全校表扬了你。",
+          delta: { happiness: 30, health: 15, resilience: 20, inferiority: -15 },
+          addTags: ["坦然自洽", "文明风骨"]
         },
         {
-          text: "大方拿自家土鸡蛋跟同桌交换了一口健力宝尝鲜",
-          detail: "善于沟通交流，用大方的性格打破家庭物质的隔阂。",
-          reaction: "同桌赞叹你家的土鸡蛋比超市买的香得多，两人开怀大笑。",
-          delta: { social: 20, happiness: 15 },
-          addTags: ["爽朗大度", "人际融洽"]
+          stanceBadge: "爽朗社交",
+          text: "大方拿自家土鸡蛋跟同桌交换健力宝与火腿肠，打破物质隔阂结交挚友！",
+          detail: "善于人际融通，用真诚大方的性格消弭阶层差异，让城里同学争相品尝农家风味。",
+          reaction: "同桌赞叹你家的土鸡蛋比超市买的香得多，两人开怀大笑，成了形影不离的好伙伴。",
+          delta: { social: 30, happiness: 25, inferiority: -10 },
+          addTags: ["人际大度", "打破壁垒"]
         },
         {
-          text: "主动帮老师搬运急救医药箱和大水壶，走在队伍最前面领路",
-          detail: "眼里有活，用踏实勤快赢取大人们的一致赞赏。",
-          reaction: "老师奖励了你一枚小红花胸章，夸你‘是个能担当的大孩子’。",
-          delta: { social: 15, resilience: 10, academicCapital: 5 },
-          addTags: ["勤快担当", "师长喜爱"]
+          stanceBadge: "领队担当",
+          text: "主动帮老师背负急救医药箱与大水壶，走在队伍最前面当开路领队！",
+          detail: "眼里有活，用踏实勤快与大哥哥般的担当赢取大人们的一致赞赏与信赖。",
+          reaction: "老师奖励了你一枚小红花特权胸章，任命你为班级常任安全委员。",
+          delta: { social: 20, resilience: 20, academicCapital: 15, health: 10 },
+          addTags: ["骨干担当", "师长喜爱"]
         }
       ]
     },
@@ -1471,25 +1503,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "仅用一支铅笔精细素描出家乡的麦浪与高耸的大烟囱",
-          detail: "不受器材限制，凭借极其敏锐的观察力与笔触构图打动评委。",
-          reaction: "你的画作斩获市级二等奖并刊登在当地晚报上，全校师生刮目相看。",
-          delta: { cognition: 25, academicCapital: 15, inferiority: -15 },
-          addTags: ["天生画匠", "以素胜彩"]
+          stanceBadge: "铅笔惊艳",
+          text: "仅用一支残铅笔精细素描家乡麦浪大透视，力压豪华彩笔斩获特等奖！",
+          detail: "不受器材限制，凭借极其敏锐的结构观察力与光影笔触打动全省评委，轰动展馆。",
+          reaction: "评委专家对你的素描功力赞不绝口，美术馆出资为你买下一整套专业进口画具并挂出巨幅画作！",
+          delta: { academicCapital: 25, cognition: 30, resilience: 25, happiness: 20 },
+          addTags: ["素描神童", "凭实力通关"]
         },
         {
-          text: "礼貌向同桌借用红黄两色，认真给画里的太阳与小红花着色",
-          detail: "进退有度，懂得合理借助外部资源完成目标。",
-          reaction: "同桌大方把整盒笔推给你共用，你们共同完成了迎春画卷。",
-          delta: { social: 15, happiness: 15, inferiority: -5 },
-          addTags: ["进退有度", "协作共赢"]
+          stanceBadge: "商业手绘",
+          text: "课间帮同学在书皮上精绘齐天大圣与变形金刚，每张两毛自筹全套彩笔！",
+          detail: "把画画天赋迅速转化为商业变现，短短三天桌前排起长队，不仅买回彩笔还结交全班朋友。",
+          reaction: "不仅如愿用上了属于自己的高级彩笔，兜里还剩下大笔零花，成了校园公认的‘神笔画师’。",
+          delta: { savings: 60, social: 25, cognition: 20, happiness: 20 },
+          addTags: ["手艺创富", "校园画师"]
         },
         {
-          text: "利用午休时间主动承担了班级后黑板报的全部插画设计",
-          detail: "把画画的才能奉献给集体，把黑板装点得赏心悦目。",
-          reaction: "班级在全校黑板报评比中斩获总冠军，你的名字被写在板报落款处。",
-          delta: { social: 20, resilience: 15, happiness: 10 },
-          addTags: ["班级骨干", "集体荣誉"]
+          stanceBadge: "旷野拾萃",
+          text: "收集校园金黄落叶与各色花瓣拼贴出微观大地艺术，灵气逼人独树一帜！",
+          detail: "跳出千篇一律的填色框框，在大自然中汲取灵感，创造出震撼人心的原生态植物拼贴画。",
+          reaction: "你的作品被省少儿美育刊物选作封面，专家赞叹‘这孩子保留了未经规训的纯粹艺术灵魂’。",
+          delta: { happiness: 35, cognition: 25, rebellion: 20, social: 20 },
+          addTags: ["大地艺术", "灵性自留"]
         }
       ]
     },
@@ -1503,25 +1538,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "在走廊笔直站着，拿出课本默默把课文全篇背了下来",
-          detail: "你没有哭，但那些路过同学投来的探寻目光，让你深切体会到了自尊被刺痛的滋味。",
-          reaction: "从那天起，你暗暗发誓要用成绩证明自己。期末考试你考了年级第一名。",
-          delta: { academicCapital: 15, cognition: 15, inferiority: 10 },
+          stanceBadge: "苦修傲骨",
+          text: "在走廊笔直迎风站立背诵完全本课文，下周期末考夺年级第一令全校刮目！",
+          detail: "你没有哭，把自尊受挫的剧痛炼成了钢铁般的意志，用绝对分数迫使班主任公开道歉。",
+          reaction: "期末颁奖台上，你一人包揽全部三好学生与满分奖状，但自尊心从此多了一层坚硬冰冷的甲胄。",
+          delta: { academicCapital: 25, cognition: 20, health: -10, happiness: -10, resilience: 30 },
           addTags: ["要强自尊", "发奋苦读"]
         },
         {
-          text: "中午趁老师不注意，跑去学校后山水沟里抓小龙虾和小泥鳅卖给菜市场小贩凑钱",
-          detail: "满身泥浆，指甲缝里全是黑泥，但你真的用塑料袋换回了皱巴巴的八张十元纸币。",
-          reaction: "当你把钱交到讲台上时，班主任有些诧异。你第一次体会到靠自己的双手换来尊严的底气。",
-          delta: { social: 10, resilience: 15, savings: 50, cognition: -5 },
-          addTags: ["早早谋生", "市井生存"]
+          stanceBadge: "野性创富",
+          text: "午休去后山水渠摸两桶小龙虾卖给菜市小贩，堂堂正正凭双手交齐费用！",
+          detail: "不怨天尤人，满身泥浆却眼神如狼，靠自己的野性体力和市场交易堂堂正正换回尊严。",
+          reaction: "当你把一把带泥腥味的真钞排在讲台上时，全班肃然起敬，你第一次体会到金钱与独立的份量！",
+          delta: { savings: 120, social: 20, resilience: 30, health: 15, cognition: 15 },
+          addTags: ["野性自立", "草莽生存"]
         },
         {
-          text: "默默哭着跑回家，让母亲去邻居家借钱凑齐",
-          detail: "母亲在抽屉翻找无果，叹着气去隔壁借了钱，领着你回学校交齐。",
-          reaction: "你回到了座位，但母亲低头给老师赔笑脸的模样，成了你心中沉重的一道烙印。",
-          delta: { kinshipGuilt: 15, happiness: -15, familySavings: -80 },
-          addTags: ["愧疚沉重"]
+          stanceBadge: "风骨坦荡",
+          text: "旧布衣洗得雪白领口熨平，在阳光下昂首朗诵《少年中国说》全无卑色！",
+          detail: "根本不将世俗标签与校服攀比放在眼里，内在的自信与风骨反倒成了校园一道靓丽风景。",
+          reaction: "校长路过被你铿锵有力的读书声吸引驻足，当场特批校服款免除，全校掌声雷动！",
+          delta: { happiness: 35, resilience: 25, cognition: 25, health: 15 },
+          addTags: ["风骨坦荡", "傲然自尊"]
         }
       ]
     },
@@ -1535,25 +1573,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "一把抓起书包当众倒扣在桌上，连铅笔盒都摔开证明清白",
-          detail: "你眼含热泪浑身发抖，哪怕鱼死网破也绝不受平白诬陷。",
-          reaction: "书包里除了发旧的课本别无他物。不久后班长在自己大衣兜里找到了笔，全班向你道歉。",
-          delta: { rebellion: 15, resilience: 15, inferiority: 5 },
-          addTags: ["刚烈自证", "硬骨头"]
+          stanceBadge: "逻辑自证",
+          text: "调阅早自习值日排班与笔迹勘验，条理分明当场揪出真凶洗刷冤屈！",
+          detail: "条理清晰逻辑严密，不仅有理有据证明自身清白，更迫使真正偷藏笔的同学当众认错。",
+          reaction: "班主任和全班同学对你的冷静睿智刮目相看，班长满脸通红诚恳向你鞠躬赔罪。",
+          delta: { cognition: 25, academicCapital: 20, resilience: 20, happiness: 15 },
+          addTags: ["神探逻辑", "沉着自护"]
         },
         {
-          text: "咬紧牙关低下头，默默任由班主任搜查书包抽屉",
-          detail: "你过早地学会了吞下委屈，明白底层在权威面前辩解的苍白。",
-          reaction: "搜查一无所获，老师尴尬地拍拍你肩膀让你坐下，但那种屈辱感久久挥之不去。",
-          delta: { inferiority: 20, kinshipGuilt: 5, resilience: 10 },
-          addTags: ["隐忍屈辱", "自尊内敛"]
+          stanceBadge: "江湖格局",
+          text: "淡定掏出帮街坊修钟表攒下的两张纸币：“若找不到这支我赔！”格局震慑全场！",
+          detail: "气吞山河的格局与豪迈气魄瞬间震慑全班，窃贼羞愧自首，你收获了全班无可撼动的尊崇。",
+          reaction: "全班为你的胸襟叹服，班长私下买来最好的钢笔送给你当谢礼，你成了班级真正的无冕之王。",
+          delta: { social: 35, resilience: 25, cognition: 20, savings: -20 },
+          addTags: ["江湖格局", "领袖风范"]
         },
         {
-          text: "冷静指出漏洞：‘我今天早上和劳动委员一起进门的，他能作证’",
-          detail: "不卑不亢，用逻辑和目击证人化解风波。",
-          reaction: "劳动委员站出来证实了你的说法，班主任赞赏了你的条理清晰，风波平息。",
-          delta: { cognition: 15, social: 10, resilience: 10 },
-          addTags: ["沉着冷静", "机敏自护"]
+          stanceBadge: "冷眼洞察",
+          text: "神色泰然自若，在草稿本写下讽刺群氓偏见的寓言小品，展现过人早熟洞察！",
+          detail: "穿透人性中‘有罪推定’与贫富偏见的虚妄，在年幼的心灵里生发出极其深刻的社会观察力。",
+          reaction: "你的文章在语文周记课上被老师当范文深读，全班陷入沉思，你完成了思想上的高维蜕变。",
+          delta: { cognition: 30, happiness: 25, rebellion: 25, resilience: 20 },
+          addTags: ["哲思蜕变", "冷眼观世"]
         }
       ]
     },
@@ -1567,25 +1608,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "咬牙死磕，把错题本抄写三遍，直到全部滚瓜烂熟",
-          detail: "顺从父母的高压管束，用完美的卷面换取家庭里少得可怜的温和。",
-          reaction: "你次次考第一，但你开始有了梦中被抽打惊醒的心慌毛病。",
-          delta: { academicCapital: 20, cognition: 15, happiness: -15, health: -5 },
-          addTags: ["高压顺从", "完美做题"]
+          stanceBadge: "顺从苦修",
+          text: "咬牙把错题本抄写五遍做到滚瓜烂熟，换取家庭温和但常有心悸梦惊",
+          detail: "顺从父母的高压管束，用近乎完美的卷面换取家庭少得可怜的温和，考了全县第一。",
+          reaction: "你次次考第一，但你开始有了梦中被抽打惊醒的心慌毛病，精神始终处于紧绷应激状态。",
+          delta: { academicCapital: 25, cognition: 20, health: -15, happiness: -20, resilience: 15 },
+          addTags: ["高压做题", "完美主义"]
         },
         {
-          text: "把武侠小说和故事书藏在课本底下，偷偷在被窝里看",
-          detail: "‘既然现实这么窒息，那我就在想象的世界里翱翔。’",
-          reaction: "虽然常被抓包挨训，但你保全了自己的灵气与想象力，作文常常拿满分。",
-          delta: { rebellion: 20, cognition: 10, happiness: 10 },
-          addTags: ["暗中叛逆", "精神逃逸"]
+          stanceBadge: "暗中滋养",
+          text: "把武侠小说与科幻故事藏在课本下偷读，保全超凡灵气与文学想象力！",
+          detail: "‘既然现实这么窒息，那就在想象的世界里翱翔。’虽然常被抓包挨训，但灵气丝毫未受磨灭。",
+          reaction: "你的作文屡屡被推荐到省市报刊发表，独特的文风与想象力成了你一生最宝贵的精神财富。",
+          delta: { happiness: 30, cognition: 25, rebellion: 25, social: 15 },
+          addTags: ["文学灵气", "精神逃逸"]
         },
         {
-          text: "放下笔跟父亲认真谈：‘爸，你越打我越记不住’",
-          detail: "鼓起勇气打破家庭暴力的沉闷闭环，试图建立平等对话。",
-          reaction: "父亲愣了半天，手里的掸子慢慢放下了，那晚他叹着气默默去阳台抽了一根烟。",
-          delta: { rebellion: 15, kinshipGuilt: -10, resilience: 15 },
-          addTags: ["勇敢直言", "破冰代沟"]
+          stanceBadge: "破冰沟通",
+          text: "平静放下笔与父亲认真对视：“爸，越打我越紧张，教我方法好吗？”",
+          detail: "鼓起勇气打破家庭暴力的沉闷闭环，用超越年龄的理性引导父母建立平等的代际对话。",
+          reaction: "父亲愣了半天，手里的掸子慢慢放下了，那晚他在阳台抽完烟后，第一次坐下来温和为你讲题。",
+          delta: { happiness: 30, kinshipGuilt: -15, resilience: 25, health: 15 },
+          addTags: ["破冰代沟", "家庭和解"]
         }
       ]
     }
@@ -1715,25 +1759,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "咬牙进入火箭班，挑灯夜读跟上高压节奏",
-          detail: "你每天只睡5个半小时，床头贴满错题卡，在严酷的分数排位中艰难前行。",
-          reaction: "你的期末排位稳固在年级前列，但深度近视和偏头痛也悄然找上了你。",
-          delta: { cognition: 20, academicCapital: 20, health: -10, happiness: -10 },
+          stanceBadge: "苦修登顶",
+          text: "咬牙进入火箭班，挑灯夜读跟上高压节奏，稳居年级前三！",
+          detail: "每天只睡5个半小时，床头贴满错题卡，在严酷的分数排位中与尖子生近身肉搏。",
+          reaction: "你的期末排位稳固在年级前列，但深度近视和偏头痛也悄然找上了你，少年的笑容渐渐变少。",
+          delta: { cognition: 25, academicCapital: 30, health: -20, happiness: -20, resilience: 20 },
           addTags: ["快班高压", "做题机器"]
         },
         {
-          text: "进普通平行班，保全作息，自学课外知识",
-          detail: "你拒绝无休止的机械刷题，下课后在旧书摊和图书馆看杂书，保持身心健康。",
-          reaction: "虽然成绩处于中游，但你保留了独立的思考能力与健全的体魄。",
-          delta: { cognition: 10, happiness: 15, rebellion: 10 },
-          addTags: ["心态平稳", "自由探索"]
+          stanceBadge: "偏锋商海",
+          text: "进普通班保全精力，课余倒腾当红文具与网吧充值卡摸清现金流！",
+          detail: "敏锐抓住县城学生消费潮流，帮小卖部代销零食与漫画，手里积攒下可观的私房钱。",
+          reaction: "虽然成绩处于中游，但你在同龄人中人缘极佳，早早摸透了市井交易与人情往来的底层逻辑。",
+          delta: { social: 30, savings: 800, cognition: 20, academicCapital: -5 },
+          addTags: ["市井财商", "人脉亨通"]
         },
         {
-          text: "结识镇上做买卖和外向的同学，课余学做小生意",
-          detail: "你帮小卖部倒卖文具和二手漫画，第一次体会到现金流转带来的现实快乐。",
-          reaction: "成绩退到中后段，但你在同龄人中人缘极佳，早早摸清了街头生存规则。",
-          delta: { social: 20, savings: 200, academicCapital: -10 },
-          addTags: ["商业嗅觉", "市井朋友"]
+          stanceBadge: "旷野自洽",
+          text: "留在普通班享受大把闲暇，读遍名著科幻杂书，强健身心与体魄！",
+          detail: "拒绝无休止的机械刷题，每天打篮球、游泳、在旧书摊看杂书，保持身心的健全与旺盛生命力。",
+          reaction: "你拥有全校最健壮的体魄与通透独立的精神世界，终生免疫应试焦虑与精神内耗！",
+          delta: { health: 25, happiness: 35, cognition: 25, resilience: 15 },
+          addTags: ["从容通达", "精神旷野"]
         }
       ]
     },
@@ -1747,25 +1794,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "帮成绩差的舍友辅导作业打扫宿舍，换取零食与饭票",
-          detail: "放下身段用脑力与勤快解决温饱，不向家里诉苦。",
-          reaction: "你赢得了舍友们的尊重与照顾，甚至成了寝室的主心骨。",
-          delta: { social: 15, resilience: 15, savings: 50 },
-          addTags: ["自立自强", "宿舍领袖"]
+          stanceBadge: "偏锋领袖",
+          text: "帮成绩差的舍友辅导作业答疑，成了全宿舍说一不二的主心骨！",
+          detail: "用脑力与人格魅力化解温饱窘境，不仅饭票零食吃不完，更赢得全寝室最深的敬重。",
+          reaction: "全寝室的舍友都视你为大哥，多年后各奔前程依然对你随叫随到，积累了一辈子的铁杆人脉。",
+          delta: { social: 30, resilience: 20, savings: 150, happiness: 15 },
+          addTags: ["宿舍领袖", "江湖声望"]
         },
         {
-          text: "就着白开水咽完干馒头，泡在自习室看书忘记饥饿",
-          detail: "把一切生理匮乏压制在精神深处，靠自尊心苦撑。",
-          reaction: "你熬过了艰难的四天，但落下了偶尔胃痉挛的病根。",
-          delta: { resilience: 20, health: -10, inferiority: 10 },
-          addTags: ["苦行忍耐", "坚硬内敛"]
+          stanceBadge: "苦修苦行",
+          text: "就着白开水咽完干馒头，泡在自习室把整本英语词典背完忘记饥饿！",
+          detail: "把一切生理匮乏压制在精神深处，靠钢铁般的自尊心苦撑，发誓终有一天要靠读书翻盘。",
+          reaction: "你熬过了艰难的四天，英语月考斩获全校第一，但胃部偶尔落下了阵痛的病根。",
+          delta: { academicCapital: 25, cognition: 20, resilience: 25, health: -15 },
+          addTags: ["苦行傲骨", "钢铁意志"]
         },
         {
-          text: "去公用电话亭给老家打电话，听到母亲声音那一刻哭了出来",
-          detail: "依然是那个依恋家庭的孩子，无法完全独自消化贫困。",
-          reaction: "母亲连夜向邻居借了钱汇给你，电话里满是自责与叹息。",
-          delta: { kinshipGuilt: 20, happiness: -10, familySavings: -100, savings: 100 },
-          addTags: ["家庭牵挂"]
+          stanceBadge: "旷野乐天",
+          text: "借来一把旧吉他在走廊带领全楼合唱《童年》，用纯粹的浪漫驱散寒冷！",
+          detail: "在最窘迫的寒夜用音乐和欢笑温暖所有人，整栋宿舍楼的窗户都探出脑袋跟着大合唱。",
+          reaction: "连查寝的宿管大叔都笑着端来了一大碗热腾腾的面条，清贫的青春变成了永生难忘的浪漫诗篇！",
+          delta: { happiness: 40, social: 30, health: 15 },
+          addTags: ["浪漫天性", "逆境狂歌"]
         }
       ]
     },
@@ -1779,25 +1829,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "坚决转身离开：‘我还要去自习室复习英语’",
-          detail: "抵御诱惑，死守应试底线，不碰任何脱轨的事物。",
-          reaction: "同桌嘲笑你是个‘胆小鬼书呆子’，但你的英语成绩稳居第一。",
-          delta: { academicCapital: 15, cognition: 10, social: -10 },
-          addTags: ["自律如铁", "避开诱惑"]
-        },
-        {
-          text: "省下一顿饭钱打满两个小时，在联机对战中找到极致快乐",
-          detail: "尝到了叛逆与虚拟世界带来的巨大宣泄快感。",
-          reaction: "虽然通关了反恐精英，但第二天上课打瞌睡被班主任罚站一整节课。",
-          delta: { happiness: 15, rebellion: 15, academicCapital: -10, savings: -10 },
-          addTags: ["网吧浪游", "初试叛逆"]
-        },
-        {
-          text: "向网管请教电脑系统原理，帮网管修键盘换取免费上网时间",
-          detail: "对计算机背后的技术机制产生了强烈好奇与自学冲动。",
-          reaction: "你早早掌握了装系统、局域网调试和基本的代码操作，成了同龄人眼里的电脑高手。",
-          delta: { cognition: 20, resilience: 15, savings: 0 },
+          stanceBadge: "极客破局",
+          text: "向网管死磕Linux系统安装与代码原理，自学软硬件技术与局域网调试！",
+          detail: "对计算机背后的技术机制产生了狂热好奇，帮网管修键盘装系统换取免费上网与技术指导。",
+          reaction: "你早早掌握了系统装机、网络嗅探和基础代码，成了同龄人仰望的计算机天才，技术启蒙极早！",
+          delta: { cognition: 35, rebellion: 25, savings: 300, resilience: 20 },
           addTags: ["极客启蒙", "动手能手"]
+        },
+        {
+          stanceBadge: "电竞领袖",
+          text: "在局域网CS对战中战术指挥若定，带领小镇战队拿下全省联赛冠军！",
+          detail: "展现出过人的战场洞察力与临场心理博弈，不仅赢得大笔赛事奖金，更在江湖上名声大噪。",
+          reaction: "你分到了丰厚的比赛奖金，网吧老板奉你为座上宾，收获了一群生死与共的铁哥们。",
+          delta: { social: 35, savings: 1500, happiness: 25, rebellion: 20 },
+          addTags: ["战队统帅", "豪爽义气"]
+        },
+        {
+          stanceBadge: "外语探窗",
+          text: "戴上耳机借网吧网络收听BBC英语原声广播，在外语世界里寻找远方！",
+          detail: "在市井烟雾中守住内心的航标，借互联网之桥聆听大洋彼岸的真实声音，自练地道口音。",
+          reaction: "在同龄人还在死记中式英语时，你已经能流利听懂原声电台，为未来的全球化生存埋下神级底牌！",
+          delta: { academicCapital: 25, cognition: 30, resilience: 20, happiness: 15 },
+          addTags: ["国际视野", "破壁自学"]
         }
       ]
     }
@@ -1889,27 +1942,30 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "咬紧牙关备战中考，无论如何要冲进普高",
-          detail: "哪怕全家节衣缩食，你也坚信唯有传统高考文凭才能改变命运。",
-          reaction: "你每天刷完三套模拟卷，顺利拿到{highSchool}的录取通知书，但家里的存折已见底。",
-          delta: { academicCapital: 25, cognition: 20, health: -10, kinshipGuilt: 15 },
+          stanceBadge: "苦修登顶",
+          text: "咬紧牙关拼死冲刺普高，坚信做题是寒门唯一的窄门！",
+          detail: "哪怕全家节衣缩食，每天只睡5小时刷烂三套题，也决不向分流低头。",
+          reaction: "你顺利拿到{highSchool}录取通知书，但长期熬夜让你的视力跌入高度近视，身心疲惫不堪。",
+          delta: { academicCapital: 30, cognition: 20, health: -20, happiness: -15, resilience: 20 },
           trackTrigger: "academic",
           addTags: ["普高冲刺", "学术路径"]
         },
         {
-          text: "选择公办中专/高职学机电/护理实用技术",
-          detail: "务实早熟，深知家里无力支撑漫长的大学教育，选择能早日自食其力的道路。",
-          reaction: "班主任有些惋惜，但你在实训车间掌握了扎实的操作技能，早早独立生活。",
-          delta: { resilience: 25, savings: 500, academicCapital: -10, cognition: -5 },
+          stanceBadge: "偏锋破局",
+          text: "报考公立高级技师数控/自动化实操班，掌握不可替代的硬核手艺！",
+          detail: "‘靠一身过硬真本事吃饭，比虚浮的名头结实得多！’免学费并快速进入校企高薪实训。",
+          reaction: "你在实训车间掌握了精密机床操作，16岁便能独立带薪实习，极早实现经济自给自足！",
+          delta: { resilience: 30, savings: 4000, cognition: 15, health: 15 },
           trackTrigger: "vocational",
-          addTags: ["职教蓝领", "手艺人底色"]
+          addTags: ["实干底色", "硬核技能"]
         },
         {
-          text: "辍学跟随同乡前往沿海服装厂当学徒",
-          detail: "不愿再向父母伸手要钱，提着编织袋踏上南下的绿皮火车。",
-          reaction: "十六岁你在轰鸣的缝纫车间熬夜赶工，虽然早早有了收入，但未来的路变窄了。",
-          delta: { savings: 2500, health: -15, social: 15, cognition: -20 },
-          addTags: ["早期打工", "过早谋生"]
+          stanceBadge: "偏锋闯荡",
+          text: "提早奔赴沿海供应链大厂与特区，从外贸采购与电商打单闯起！",
+          detail: "跳出书本的象牙塔，提着行囊踏上南下列车，在最前沿的商业洪流中摸爬滚打。",
+          reaction: "你在深圳和东莞的电商与外贸圈迅速摸透市场规则，结交了一帮同甘共苦的生意伙伴，积攒了第一桶金！",
+          delta: { savings: 8000, social: 30, resilience: 30, cognition: 20, rebellion: 25 },
+          addTags: ["沿海淘金", "商贸嗅觉"]
         }
       ]
     },
@@ -1923,28 +1979,31 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "求家里支持走美术艺考，发誓考不上全额退学退还学费",
-          detail: "父母拿出压箱底的养老积蓄为你报名。你每天在画室画石膏像到手指抽筋。",
-          reaction: "你以名列前茅的专业成绩拿到降分指标考入{highSchool}艺术班。",
-          delta: { academicCapital: 15, kinshipGuilt: 25, familySavings: -12000, resilience: 15 },
+          stanceBadge: "苦修登顶",
+          text: "求家里拿出压箱钱全力支持走美术艺考，每天在画室画到手指抽筋！",
+          detail: "父母拿出多年攒下的养老积蓄为你报名。你每天在画室临摹石膏像与色彩静物到凌晨。",
+          reaction: "你以名列前茅的专业成绩拿到降分指标考入{highSchool}艺术班，背负着全家的期待负重前行。",
+          delta: { academicCapital: 20, familySavings: -12000, resilience: 20, health: -10 },
           trackTrigger: "academic",
           addTags: ["艺术曲折", "举家豪赌"]
         },
         {
-          text: "坚决放弃艺考念头，在普通文化课上玩命死磕到底",
-          detail: "‘家里经不起这样的折腾，我只能靠纯文化课考出来。’",
-          reaction: "你把作息压缩到极限，最终以超普高线3分的惊险成绩压线入读普通高中。",
-          delta: { academicCapital: 20, resilience: 20, health: -10 },
+          stanceBadge: "做题硬骨",
+          text: "坚决放弃高昂集训，纯靠普通文化课死磕到底压线逆袭！",
+          detail: "‘家里经不起这样的折腾，我只能靠自己一笔一划考出来！’作息压到极致，专攻数学错题。",
+          reaction: "你以超普高线5分的惊险战绩压线入读普通高中，省下了上万元救命钱，昂首挺胸！",
+          delta: { academicCapital: 25, resilience: 25, health: -15, happiness: 10 },
           trackTrigger: "academic",
           addTags: ["压线逆袭", "硬骨头"]
         },
         {
-          text: "报考三年制公费五年一贯制大专（师范定向/幼师）",
-          detail: "免学费包住宿，毕业后直接回乡任教或就业，为家里减负。",
-          reaction: "你在安稳的师范校园里安顿下来，提前锁定了体制内定向生态位。",
-          delta: { kinshipGuilt: 10, rebellion: -20, savings: 2000 },
+          stanceBadge: "偏锋破局",
+          text: "利用二手板卡自学CG插画与网络商业约稿，靠接单为家里自筹学费！",
+          detail: "在网上向职业画师请教，把天赋投入到当红游戏角色插画与同人设计中，赚取真金白银。",
+          reaction: "你的画作在插画社区大受欢迎，不仅自筹了全部学杂费，还提前建立了商业插画人脉！",
+          delta: { savings: 6000, cognition: 25, rebellion: 25, happiness: 25 },
           trackTrigger: "vocational",
-          addTags: ["公费师范", "安稳求生"]
+          addTags: ["商业画师", "自力更生"]
         }
       ]
     },
@@ -1958,27 +2017,31 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "坚决不从，拿着自己挣的奖学金和零花钱搬进学校自习室",
-          detail: "‘哪怕要饭我也要把书念完，你们拦不住我！’",
-          reaction: "班主任和校长亲自上门做你父母的思想工作，学校为你免除了学杂费。",
-          delta: { rebellion: 35, academicCapital: 20, kinshipGuilt: -15, resilience: 20 },
+          stanceBadge: "苦修求索",
+          text: "坚决不从，拿着自己挣的奖学金和零花钱搬进学校自习室死磕到底！",
+          detail: "‘哪怕喝白开水啃冷馒头我也要把书念完，你们拦不住我！’用绝对成绩赢得全免学费特批。",
+          reaction: "班主任和校长亲自上门做你父母的思想工作，学校为你免除学杂费，你成了校园逆流传奇。",
+          delta: { rebellion: 35, academicCapital: 25, resilience: 25, health: -10 },
           trackTrigger: "academic",
           addTags: ["破门求学", "逆流而上"]
         },
         {
-          text: "接管家里摊位，白天出摊卖货，夜里自考中专/大专学历",
-          detail: "体恤父母的难处，把家庭责任扛在肩上，但并未彻底放弃读书。",
-          reaction: "你成了集贸市场里最年轻有文化的摊主，账目理得清清楚楚。",
-          delta: { resilience: 25, kinshipGuilt: 20, savings: 3000, academicCapital: -5 },
+          stanceBadge: "偏锋商海",
+          text: "接管家里摊位，引入批发账目与早市外卖配送，改造成盈利大档口！",
+          detail: "体恤父母的难处，但绝不因循守旧。用年轻人的敏锐商业眼光整合进货渠道，拓展周边客源。",
+          reaction: "摊位流水翻了整整三倍，不仅帮家里还清了债务，卡里还积攒下了数万元启动资金！",
+          delta: { savings: 16000, resilience: 25, social: 25, cognition: 20 },
           trackTrigger: "vocational",
-          addTags: ["负重孝子", "半工半读"]
+          addTags: ["商业奇才", "挽狂澜者"]
         },
         {
-          text: "收拾包裹连夜坐大巴投奔在沿海打工的表哥",
-          detail: "彻底与原生家庭决裂，奔赴南方大都市寻找自己的命运。",
-          reaction: "在深圳工业区的轰鸣声中，你开启了早熟的打工漂流记。",
-          delta: { rebellion: 40, kinshipGuilt: -30, savings: 1500, resilience: 25 },
-          addTags: ["少年离家", "异乡漂流"]
+          stanceBadge: "降维出海",
+          text: "收拾包裹连夜坐大巴奔赴沿海经济特区，投身外贸供应链浪潮！",
+          detail: "‘世界那么大，老家的小池塘容不下我的野心！’奔赴深圳与义乌，在蓬勃的外贸窗口闯荡。",
+          reaction: "你在轰鸣的外贸物流港与跨国展会中眼界大开，迅速掌握了涉外沟通与供应链操盘技巧！",
+          delta: { savings: 9000, cognition: 35, rebellion: 40, resilience: 25 },
+          trackTrigger: "vocational",
+          addTags: ["外贸弄潮", "跳出故土"]
         }
       ]
     }
@@ -2034,25 +2097,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "全力自律刷题，把作息压榨到生理极限",
-          detail: "你用极度的自律封锁了所有脆弱，大冬天洗冷水脸，风油精擦在眼皮底下。",
-          reaction: "你的模拟考成绩锁死在第一梯队，但慢性浅表性胃炎和偏头痛成了甩不掉的毛病。",
-          delta: { cognition: 25, academicCapital: 25, health: -15, resilience: 15 },
-          addTags: ["冷血做题机", "自律苦修"]
+          stanceBadge: "苦修登顶",
+          text: "每天只睡4小时狂饮浓茶红牛，将题海战术推到肉身生理极限",
+          detail: "‘既然没有退路，那就把每一秒都压榨在试卷上！’大冬天洗冷水脸，风油精擦在眼皮底下。",
+          reaction: "你的模拟考分数一路飙升逼近全省前1%，但早起常常心悸胸闷，神经紧绷到了极点。",
+          delta: { academicCapital: 30, cognition: 20, health: -25, happiness: -20, resilience: 20 },
+          addTags: ["透支冲顶", "绝境狂奔"]
         },
         {
-          text: "保持平和心态，每天散步排解焦虑保全心智",
-          detail: "‘如果通关的前提是彻底崩溃，那我宁可做一个身心健全的普通人。’",
-          reaction: "虽然没有拔尖，但你保全了内心的完整与松弛，成绩处于中常水平。",
-          delta: { happiness: 20, health: 10, cognition: 5 },
-          addTags: ["精神完整", "松弛防线"]
+          stanceBadge: "旷野自洽",
+          text: "保持每天8小时充足睡眠与下午三公里慢跑，以顶级竞技体魄应考",
+          detail: "‘如果通关的前提是彻底崩溃，那我宁可做一个身心健全的自洽者。’用充沛的精力和清晰的脑力迎考。",
+          reaction: "考场上其他考生哈欠连天焦躁不安，你思路如泉涌落笔如飞，发挥出惊人的抗压定力！",
+          delta: { health: 25, happiness: 30, academicCapital: 20, cognition: 15 },
+          addTags: ["身心巅峰", "松弛应战"]
         },
         {
-          text: "职高深钻实操技能，拿下职业资格证",
-          detail: "把所有课余时间投在车床机修和电气布线上，手上的机油成了你的底气。",
-          reaction: "校企实习面试你拔得头筹，工厂师傅对你的实操规范赞不绝口。",
-          delta: { resilience: 30, savings: 1000, cognition: 10 },
-          addTags: ["技能立身", "实干底色"]
+          stanceBadge: "偏锋破局",
+          text: "系统复盘历年命题规律与赋分模型，组织班级学习共同体互助押题",
+          detail: "用研究性视角破解高考游戏规则，搭建高效答题框架，并为周围好友讲解核心模型。",
+          reaction: "不仅自己做题如探囊取物，还带动了整个小群体的分数飞跃，赢得了一批患难知交。",
+          delta: { cognition: 25, academicCapital: 20, social: 30, resilience: 20 },
+          addTags: ["方法论大师", "众望所归"]
         }
       ]
     },
@@ -2066,25 +2132,36 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "咽下所有委屈，把愤怒化为刷题狠劲，誓要裸分赢回尊严",
-          detail: "‘既然潜规则不让我走近道，我就用硬实力把他们碾碎！’",
-          reaction: "高考最后冲刺你每天只睡四个小时，模拟考分数一路暴涨突破640分。",
-          delta: { academicCapital: 30, resilience: 25, inferiority: -10 },
-          addTags: ["裸分硬核", "发愤图强"]
+          stanceBadge: "苦修登顶",
+          text: "咽下委屈化作彻夜刷题的凶狠，誓要在裸分考场上用实力碾碎特权！",
+          detail: "‘既然潜规则剥夺了近道，那就在纯粹的考场上把他们碾得粉碎！’每天只睡4小时，刷穿真题。",
+          reaction: "你在狂热的解题冲刺中攻克了所有压轴题，但偏头痛和严重颈椎病也落下了病根。",
+          delta: { academicCapital: 35, cognition: 20, health: -20, happiness: -15, resilience: 25 },
+          addTags: ["裸分狂徒", "硬核应试"]
         },
         {
-          text: "向省教育考试院实名写信并提交复核申诉材料",
-          detail: "骨子里拥有坚不可摧的原则感，绝不容许潜规则践踏自己的青春。",
-          reaction: "调查组入驻核查，顶替者被取消资格，名额公正归还，你成了全校传奇。",
-          delta: { rebellion: 35, resilience: 20, social: 15 },
-          addTags: ["硬骨正气", "维权斗士"]
+          stanceBadge: "法理铁拳",
+          text: "搜集完整的学籍与考勤档案，向省教育纪检实名申诉掀翻暗箱交易！",
+          detail: "骨子里拥有坚不可摧的正气与抗争胆魄，绝不容许暗箱潜规则践踏寒门青春。",
+          reaction: "调查组火速入驻核查，顶替者被当场除名，指标公正归还，你成了全校青年维权传奇！",
+          delta: { social: 30, cognition: 25, rebellion: 35, resilience: 25, happiness: 20 },
+          addTags: ["铁骨正气", "维权斗士"]
         },
         {
-          text: "心态大崩，借酒浇愁破罐破摔放弃最后复习",
-          detail: "第一次深刻体会到现实的不公，对所谓应试公平产生了幻灭感。",
-          reaction: "成绩出现断崖式滑坡，跌入普通本科或大专批次。",
-          delta: { academicCapital: -20, happiness: -20, rebellion: 25 },
-          addTags: ["幻灭受挫", "青春阵痛"]
+          stanceBadge: "偏锋破局",
+          text: "看穿单一应试的虚妄，转战跨境电商、海外独立站与外文编程接单！",
+          detail: "老子不在你们封闭的负和游戏里陪跑！利用晚自习自学外语与编程，提前开辟全球市场。",
+          reaction: "高考前夕你的独立站迎来了第一个海外爆单，赚取了人生第一笔两万多元外汇，降维打击！",
+          delta: { savings: 24000, cognition: 30, rebellion: 35, happiness: 25 },
+          addTags: ["商业降维", "极客破局"]
+        },
+        {
+          stanceBadge: "旷野浪游",
+          text: "撕掉模考成绩单，背上吉他与速写本奔赴大山深处寻找生命的本真！",
+          detail: "拒绝将青春异化为流水线耗材，在雪山与广袤原野中采风创作，灵魂彻底觉醒脱胎换骨。",
+          reaction: "你在大山村民的热情与纯净自然中找回了滚烫的生命力，创作出全网疯传的民谣与原生态长文！",
+          delta: { happiness: 45, health: 30, social: 25, rebellion: 30 },
+          addTags: ["旷野觉醒", "精神丰盈"]
         }
       ]
     },
@@ -2098,25 +2175,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          text: "推翻班主任的保守方案，坚信真实水准，依然主报985/211硬核工科",
-          detail: "经得起大风大浪，拥有顶尖高手的定力与自信。",
-          reaction: "高考正试你发挥神勇，彻底洗刷三模耻辱，斩获重点大学录取通知书。",
-          delta: { resilience: 30, academicCapital: 20, rebellion: 20 },
+          stanceBadge: "苦修登顶",
+          text: "推翻保守求稳方案，坚信真实实力，第一志愿依然锁死985硬核理工！",
+          detail: "经得起大风大浪，拥有顶尖高手的定力与自信，绝不在黎明前向胆怯投降。",
+          reaction: "高考正试你发挥神勇彻底洗刷失常耻辱，斩获重点大学录取通知书！",
+          delta: { academicCapital: 30, resilience: 25, rebellion: 20, happiness: 20 },
           addTags: ["大心脏", "逆风翻盘"]
         },
         {
-          text: "顺从接受现实，修改志愿为包分配的省内定向师范/公费警校",
-          detail: "深知家里经不起复读和大城市的失业风险，将稳妥安全感置于一切之上。",
-          reaction: "稳稳拿到了体制包分配的敲门砖，全家人松了一大口气。",
-          delta: { kinshipGuilt: 20, rebellion: -25, savings: 5000 },
-          addTags: ["求稳扎根", "体制预备"]
+          stanceBadge: "偏锋出海",
+          text: "务实报考沿海开放城市公办院校涉外商贸/软件专业，奔赴广阔大市场！",
+          detail: "不留恋封闭的熟人老家，一心借着大学跳板拥抱沿海广阔的商业机会与国际流动性。",
+          reaction: "文凭虽非顶尖，但沿海蓬勃的民企实习、外资港口与跨境出海为你推开了全新的大门！",
+          delta: { rebellion: 25, resilience: 20, social: 25, savings: 3000 },
+          addTags: ["奔赴沿海", "跳出故土"]
         },
         {
-          text: "坦然接纳分数，主报沿海普通公办大学软件/外贸专业，准备去海边闯荡",
-          detail: "不留恋老家，一心只想借着大学的跳板远离内陆熟人池塘。",
-          reaction: "虽然文凭不算顶尖，但沿海广阔的市场和实习机会为你打开了全新天地。",
-          delta: { rebellion: 25, resilience: 20, social: 15 },
-          addTags: ["奔赴沿海", "跳出故土"]
+          stanceBadge: "旷野自洽",
+          text: "坦然接受保底方案，报考包分配的省内定向师范/公费警校，稳稳扎根",
+          detail: "体恤父母的焦虑与家庭经受力，将安稳底线与生活节奏置于虚名之上，求得现世安好。",
+          reaction: "毕业包分配、带编制且无后顾之忧，全家人在老家摆酒庆祝，你拥有了从容的生活。",
+          delta: { familySavings: 15000, happiness: 25, resilience: 20, health: 15 },
+          addTags: ["求稳扎根", "体制预备"]
         }
       ]
     }
@@ -2192,31 +2272,35 @@ export function generateTimelineForCharacter(
         type: "choice",
         choices: [
           {
-            text: "一把抓过旧算盘与账本，小手拨弄算珠噼啪响",
-            detail: "对数字和交易天然敏感，引得周围亲友夸赞这娃天生有财商会持家。",
-            reaction: "长辈们笑得合不拢嘴，父亲把一块银圆塞进了你的贴身荷包。",
-            delta: { cognition: 15, savings: 200, happiness: 10 },
+            stanceBadge: "偏锋商感",
+            text: "一把抓过旧算盘与账本，小手拨弄算珠噼啪作响！",
+            detail: "对数字、流水与利益交易天然敏感，引得周围亲友夸赞这娃天生有财商会做买卖。",
+            reaction: "长辈们笑得合不拢嘴，父亲把一块珍藏的老银圆塞进了你的贴身荷包当作启动资金。",
+            delta: { cognition: 20, savings: 300, happiness: 15 },
             addTags: ["早慧商感", "精打细算"]
           },
           {
-            text: "伸手抱住发黄的新华字典与毛笔，安静翻看纸页",
-            detail: "不哭不闹喜静爱书，眉宇间流露出对文字与做题知识的本能好奇。",
-            reaction: "外公推了推老花镜欣慰点头：“是个读书的苗子，往后准有出息。”",
-            delta: { cognition: 15, academicCapital: 20, inferiority: -5 },
+            stanceBadge: "苦修书香",
+            text: "伸手抱住发黄的新华字典与毛笔，安静翻看纸页！",
+            detail: "不哭不闹喜静爱书，眉宇间流露出对文字符号与应试求知的本能好奇与沉稳专注。",
+            reaction: "外公推了推老花镜欣慰点头：“是个读书的硬苗子，往后准有大出息！”",
+            delta: { academicCapital: 25, cognition: 20, inferiority: -10 },
             addTags: ["书香初萌", "好学幼苗"]
           },
           {
-            text: "攥住沉甸甸的小扳手与螺丝刀，在木桌缝里捣鼓",
-            detail: "专注摆弄机械与实物构件，自小展现出过硬的动手实操天性。",
-            reaction: "开修理铺的二叔拍腿大笑：“好手艺人！凭真力气吃饭走遍天下不慌！”",
-            delta: { resilience: 20, social: 10, health: 10 },
+            stanceBadge: "硬核工匠",
+            text: "攥住沉甸甸的小扳手与螺丝刀，在木桌缝里专注捣鼓！",
+            detail: "专注摆弄机械构件与实体工具，自小展现出过硬的动手实操天性与工匠底色。",
+            reaction: "开修理铺的二叔拍腿大笑：“好手艺人！凭真力气吃饭走遍天下都不慌！”",
+            delta: { resilience: 25, social: 15, health: 15 },
             addTags: ["工匠天分", "动手实操"]
           },
           {
-            text: "抓起那张花花绿绿的纸币，眼睛直勾勾望着门外飞鸟",
-            detail: "自小对辽阔未知的远方充满渴望，天性不受规训与拘束。",
-            reaction: "母亲轻轻把你抱在怀里擦汗：“这孩子心大，往后怕是留不住在家门口哟。”",
-            delta: { rebellion: 25, happiness: 20, kinshipGuilt: -5 },
+            stanceBadge: "旷野出海",
+            text: "抓起那张花花绿绿的纸币，眼睛直勾勾望着门外飞鸟！",
+            detail: "自小对辽阔未知的远方充满向往，天性不受故土温室的规训与拘束，神往世界。",
+            reaction: "母亲轻轻把你抱在怀里擦汗：“这孩子心大得很，往后怕是留不住在家门口哟。”",
+            delta: { rebellion: 30, happiness: 25, kinshipGuilt: -5 },
             addTags: ["向往辽阔", "天性不羁"]
           }
         ]

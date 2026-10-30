@@ -64,7 +64,11 @@ import {
   HeartHandshake,
   ShieldAlert,
   Sun,
-  Moon
+  Moon,
+  Crown,
+  Zap,
+  Globe,
+  Feather
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -1330,6 +1334,127 @@ ${logEntries
   // VIEW 2: 3-COLUMN COCKPIT INTERACTIVE SIMULATION
   // =========================================================================
 
+  const getChoicePresentation = (choice: LifeChoice, cIdx: number) => {
+    let stance = choice.stanceBadge || '';
+    let cleanText = choice.text;
+
+    const bracketMatch = choice.text.match(/^【(.*?)】\s*(.*)$/);
+    if (bracketMatch) {
+      if (!stance) stance = bracketMatch[1];
+      cleanText = bracketMatch[2];
+    }
+
+    let archetype: 'merit' | 'hustle' | 'zen' | 'global' = 'merit';
+    if (stance) {
+      if (
+        stance.includes('苦修') ||
+        stance.includes('登顶') ||
+        stance.includes('做题') ||
+        stance.includes('考场') ||
+        stance.includes('狂徒') ||
+        stance.includes('书香') ||
+        stance.includes('争优') ||
+        stance.includes('硬拼') ||
+        stance.includes('透支') ||
+        stance.includes('硬骨') ||
+        stance.includes('顺从') ||
+        stance.includes('夺冠')
+      ) {
+        archetype = 'merit';
+      } else if (
+        stance.includes('偏锋') ||
+        stance.includes('商') ||
+        stance.includes('极客') ||
+        stance.includes('法理') ||
+        stance.includes('手艺') ||
+        stance.includes('野性') ||
+        stance.includes('创富') ||
+        stance.includes('工匠') ||
+        stance.includes('机变') ||
+        stance.includes('领袖') ||
+        stance.includes('电竞') ||
+        stance.includes('统筹')
+      ) {
+        archetype = 'hustle';
+      } else if (
+        stance.includes('旷野') ||
+        stance.includes('自洽') ||
+        stance.includes('浪游') ||
+        stance.includes('逍遥') ||
+        stance.includes('生活') ||
+        stance.includes('哲思') ||
+        stance.includes('坦然') ||
+        stance.includes('松弛') ||
+        stance.includes('科学') ||
+        stance.includes('乐天') ||
+        stance.includes('温情') ||
+        stance.includes('风骨') ||
+        stance.includes('草莽')
+      ) {
+        archetype = 'zen';
+      } else if (
+        stance.includes('出海') ||
+        stance.includes('降维') ||
+        stance.includes('世界') ||
+        stance.includes('海外') ||
+        stance.includes('破局') ||
+        stance.includes('外语')
+      ) {
+        archetype = 'global';
+      } else {
+        archetype = cIdx === 0 ? 'merit' : cIdx === 1 ? 'hustle' : 'zen';
+      }
+    } else {
+      const d = choice.delta || {};
+      const tags = choice.addTags || [];
+      if (
+        (d.rebellion ?? 0) >= 20 ||
+        cleanText.includes('出海') ||
+        cleanText.includes('海外') ||
+        cleanText.includes('外语')
+      ) {
+        archetype = 'global';
+        stance = '降维出海';
+      } else if (
+        (d.savings ?? 0) > 80 ||
+        tags.some((t) => t.includes('商') || t.includes('市井') || t.includes('手艺') || t.includes('实操'))
+      ) {
+        archetype = 'hustle';
+        stance = '偏锋破局';
+      } else if ((d.happiness ?? 0) >= 15 || (d.health ?? 0) >= 10) {
+        archetype = 'zen';
+        stance = '旷野自洽';
+      } else {
+        archetype = 'merit';
+        stance = '苦修登顶';
+      }
+    }
+
+    const tradeOffs: { label: string; tone: 'danger' | 'cash' | 'academic' | 'zen' | 'social' | 'global' }[] = [];
+    const d = choice.delta || {};
+
+    if ((d.health ?? 0) <= -10 || (d.happiness ?? 0) <= -10) {
+      tradeOffs.push({ label: '⚠️ 身心透支', tone: 'danger' });
+    }
+    if ((d.savings ?? 0) >= 80) {
+      tradeOffs.push({ label: `💰 现金 +¥${d.savings}`, tone: 'cash' });
+    }
+    if ((d.academicCapital ?? 0) >= 15 || (d.cognition ?? 0) >= 20) {
+      tradeOffs.push({ label: '📚 学术/应试跃升', tone: 'academic' });
+    }
+    if ((d.happiness ?? 0) >= 15 || (d.health ?? 0) >= 10) {
+      tradeOffs.push({ label: '🌿 充盈自洽', tone: 'zen' });
+    }
+    if ((d.social ?? 0) >= 15) {
+      tradeOffs.push({ label: '🤝 四海人脉', tone: 'social' });
+    }
+    if ((d.rebellion ?? 0) >= 20 || cleanText.includes('出海') || cleanText.includes('海外')) {
+      tradeOffs.push({ label: '🌐 出海潜能', tone: 'global' });
+    }
+
+    return { stance, cleanText, detail: choice.detail, archetype, tradeOffs };
+  };
+
   return (
     <div className={`h-[calc(100vh-64px)] flex flex-col font-reading-sans overflow-hidden transition-colors duration-200 ${
       isLight ? "bg-[#F4F3EF] text-stone-900" : "bg-[#0A0B0E] text-stone-100"
@@ -2000,45 +2125,163 @@ ${logEntries
 
             {/* Active Choice Card (if waiting for choice) */}
             {waitingForChoice && currentNode.choices && (
-              <div className="bg-[#13151E] border-2 border-[#D4A359]/60 rounded-2xl p-5 sm:p-6 shadow-xl space-y-3.5 animate-year-enter">
-                <div className="flex items-center justify-between text-xs sm:text-sm font-semibold text-[#D4A359] font-narrative-serif">
-                  <div className="flex items-center gap-2">
-                    <Compass className="w-4 h-4 text-[#D4A359]" />
-                    请做出你的抉择
+              <div className={`border-2 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 animate-year-enter transition-colors ${
+                isLight
+                  ? "bg-white border-amber-600/35 shadow-amber-900/5"
+                  : "bg-[#13151E] border-[#D4A359]/60 shadow-2xl"
+              }`}>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-semibold font-narrative-serif">
+                  <div className={`flex items-center gap-2 ${isLight ? "text-amber-900" : "text-[#D4A359]"}`}>
+                    <Compass className={`w-4 h-4 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
+                    <span>宿命抉择时刻 · 请选定你的人生航道</span>
                   </div>
                   {isAutoPlaying && (
-                    <span className="text-[11px] font-normal text-[#D4A359] font-reading-sans flex items-center gap-1.5 bg-[#D4A359]/15 px-2.5 py-0.5 rounded-full border border-[#D4A359]/30">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-pulse" />
+                    <span className={`text-[11px] font-normal font-reading-sans flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
+                      isLight
+                        ? "bg-amber-50 text-amber-800 border-amber-200"
+                        : "bg-[#D4A359]/15 text-[#D4A359] border-[#D4A359]/30"
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isLight ? "bg-amber-600" : "bg-[#D4A359]"}`} />
                       自动流转挂起中 · 选定后自动继续
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-1 gap-2.5 pt-1">
-                  {currentNode.choices.map((choice, cIdx) => (
-                    <button
-                      key={cIdx}
-                      onClick={() => handleSelectChoice(choice)}
-                      className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all duration-200 active:scale-[0.99] group flex items-center justify-between shadow-2xs ${
-                        isLight
-                          ? "bg-stone-50/90 hover:bg-amber-50/70 border-stone-200 hover:border-[#D4A359] text-stone-800"
-                          : "bg-[#181B26] hover:bg-[#1E2232] border-white/[0.08] hover:border-[#D4A359]/80 text-stone-200"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className={`w-5 h-5 rounded-md border font-mono-num text-xs font-bold flex items-center justify-center shrink-0 ${
-                          isLight ? "bg-stone-100 border-stone-300 text-amber-800" : "bg-[#13151F] border-white/[0.1] text-[#D4A359]"
+
+                <div className="grid grid-cols-1 gap-3 pt-1">
+                  {currentNode.choices.map((choice, cIdx) => {
+                    const p = getChoicePresentation(choice, cIdx);
+
+                    let badgeIcon = <Crown className="w-3.5 h-3.5 shrink-0" />;
+                    let cardBg = isLight
+                      ? "bg-amber-50/50 hover:bg-amber-100/70 border-amber-300/60 hover:border-amber-600"
+                      : "bg-[#181512] hover:bg-[#221c17] border-amber-500/25 hover:border-amber-400";
+                    let badgeStyle = isLight
+                      ? "bg-amber-100 text-amber-900 border-amber-300"
+                      : "bg-amber-500/15 text-amber-300 border-amber-500/30";
+                    let numBadgeStyle = isLight
+                      ? "bg-amber-200/80 text-amber-950 border-amber-400"
+                      : "bg-amber-500/20 text-amber-300 border-amber-500/40";
+
+                    if (p.archetype === 'hustle') {
+                      badgeIcon = <Zap className="w-3.5 h-3.5 shrink-0" />;
+                      cardBg = isLight
+                        ? "bg-emerald-50/50 hover:bg-emerald-100/70 border-emerald-300/60 hover:border-emerald-600"
+                        : "bg-[#111915] hover:bg-[#16221c] border-emerald-500/25 hover:border-emerald-400";
+                      badgeStyle = isLight
+                        ? "bg-emerald-100 text-emerald-900 border-emerald-300"
+                        : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
+                      numBadgeStyle = isLight
+                        ? "bg-emerald-200/80 text-emerald-950 border-emerald-400"
+                        : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+                    } else if (p.archetype === 'zen') {
+                      badgeIcon = <Feather className="w-3.5 h-3.5 shrink-0" />;
+                      cardBg = isLight
+                        ? "bg-sky-50/50 hover:bg-sky-100/70 border-sky-300/60 hover:border-sky-600"
+                        : "bg-[#111822] hover:bg-[#15202c] border-sky-500/25 hover:border-sky-400";
+                      badgeStyle = isLight
+                        ? "bg-sky-100 text-sky-900 border-sky-300"
+                        : "bg-sky-500/15 text-sky-300 border-sky-500/30";
+                      numBadgeStyle = isLight
+                        ? "bg-sky-200/80 text-sky-950 border-sky-400"
+                        : "bg-sky-500/20 text-sky-300 border-sky-500/40";
+                    } else if (p.archetype === 'global') {
+                      badgeIcon = <Globe className="w-3.5 h-3.5 shrink-0" />;
+                      cardBg = isLight
+                        ? "bg-purple-50/50 hover:bg-purple-100/70 border-purple-300/60 hover:border-purple-600"
+                        : "bg-[#181320] hover:bg-[#22172d] border-purple-500/25 hover:border-purple-400";
+                      badgeStyle = isLight
+                        ? "bg-purple-100 text-purple-900 border-purple-300"
+                        : "bg-purple-500/15 text-purple-300 border-purple-500/30";
+                      numBadgeStyle = isLight
+                        ? "bg-purple-200/80 text-purple-950 border-purple-400"
+                        : "bg-purple-500/20 text-purple-300 border-purple-500/40";
+                    }
+
+                    return (
+                      <button
+                        key={cIdx}
+                        onClick={() => handleSelectChoice(choice)}
+                        className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all duration-200 active:scale-[0.99] group shadow-sm flex flex-col gap-2 relative ${cardBg}`}
+                      >
+                        {/* Top row: Key + Stance Badge + TradeOff Pills */}
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-5 h-5 rounded-md border font-mono-num text-xs font-bold flex items-center justify-center shrink-0 ${numBadgeStyle}`}>
+                              {cIdx + 1}
+                            </span>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11.5px] font-semibold border ${badgeStyle}`}>
+                              {badgeIcon}
+                              <span>【{p.stance}】</span>
+                            </span>
+                          </div>
+
+                          {/* Trade-off Lens Pills */}
+                          <div className="flex flex-wrap items-center gap-1.5 ml-auto">
+                            {p.tradeOffs.map((to, toIdx) => {
+                              let pillColor = isLight
+                                ? "bg-stone-100 text-stone-700 border-stone-200"
+                                : "bg-stone-800 text-stone-300 border-stone-700";
+                              if (to.tone === 'danger') {
+                                pillColor = isLight
+                                  ? "bg-rose-50 text-rose-700 border-rose-200"
+                                  : "bg-rose-950/50 text-rose-300 border-rose-800/40";
+                              } else if (to.tone === 'cash') {
+                                pillColor = isLight
+                                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                  : "bg-emerald-950/50 text-emerald-300 border-emerald-800/40";
+                              } else if (to.tone === 'zen') {
+                                pillColor = isLight
+                                  ? "bg-sky-50 text-sky-800 border-sky-200"
+                                  : "bg-sky-950/50 text-sky-300 border-sky-800/40";
+                              } else if (to.tone === 'academic') {
+                                pillColor = isLight
+                                  ? "bg-amber-50 text-amber-900 border-amber-200"
+                                  : "bg-amber-950/50 text-amber-300 border-amber-800/40";
+                              } else if (to.tone === 'social') {
+                                pillColor = isLight
+                                  ? "bg-blue-50 text-blue-800 border-blue-200"
+                                  : "bg-blue-950/50 text-blue-300 border-blue-800/40";
+                              } else if (to.tone === 'global') {
+                                pillColor = isLight
+                                  ? "bg-purple-50 text-purple-800 border-purple-200"
+                                  : "bg-purple-950/50 text-purple-300 border-purple-800/40";
+                              }
+                              return (
+                                <span
+                                  key={toIdx}
+                                  className={`text-[10.5px] font-medium px-2 py-0.5 rounded-full border ${pillColor}`}
+                                >
+                                  {to.label}
+                                </span>
+                              );
+                            })}
+                            <span className={`hidden sm:inline-block text-[11px] font-mono ml-1 opacity-60 ${
+                              isLight ? "text-stone-500" : "text-stone-400"
+                            }`}>
+                              [按键 {cIdx + 1}]
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-500 transition-transform group-hover:translate-x-1 shrink-0 ml-1" />
+                          </div>
+                        </div>
+
+                        {/* Main Action Text */}
+                        <div className={`text-xs sm:text-[14px] font-semibold leading-snug font-reading-sans ${
+                          isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
                         }`}>
-                          {cIdx + 1}
-                        </span>
-                        <span className={`text-xs sm:text-[13.5px] font-medium leading-relaxed font-reading-sans ${
-                          isLight ? "text-stone-800 group-hover:text-stone-950" : "text-stone-200 group-hover:text-white"
-                        }`}>
-                          {choice.text}
-                        </span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-300 transition-transform group-hover:translate-x-1 shrink-0 ml-3" />
-                    </button>
-                  ))}
+                          {p.cleanText}
+                        </div>
+
+                        {/* Detail / Philosophical Teaser */}
+                        {p.detail && (
+                          <div className={`text-[11.5px] sm:text-[12.5px] italic font-narrative-serif leading-relaxed line-clamp-2 pt-0.5 ${
+                            isLight ? "text-stone-600" : "text-stone-400"
+                          }`}>
+                            “{p.detail}”
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
