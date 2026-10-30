@@ -915,7 +915,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   };
 
   // =========================================================================
-  // AUTO-PLAY ENGINE (WITH SMART AUTO-PAUSE ON DECISION / CRISIS / RETIREMENT)
+  // AUTO-PLAY ENGINE (PERSISTENT INTENT: SUSPEND ON CHOICE, AUTO-RESUME ON SELECTION)
   // =========================================================================
   useEffect(() => {
     if (!isAutoPlaying) return;
@@ -923,9 +923,13 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setIsAutoPlaying(false);
       return;
     }
-    // Smart auto-pause guards
-    if (waitingForChoice || showGaokaoModal || logEntries.some((e) => e.age === 63)) {
+    // Fully completed at 63 years old
+    if (logEntries.some((e) => e.age === 63)) {
       setIsAutoPlaying(false);
+      return;
+    }
+    // Suspend timer while waiting for user choice or Gaokao decision, WITHOUT turning off auto-play!
+    if (waitingForChoice || showGaokaoModal) {
       return;
     }
 
@@ -1760,9 +1764,17 @@ ${logEntries
             {/* Active Choice Card (if waiting for choice) */}
             {waitingForChoice && currentNode.choices && (
               <div className="bg-[#13151E] border-2 border-[#D4A359]/60 rounded-2xl p-5 sm:p-6 shadow-xl space-y-3.5 animate-year-enter">
-                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#D4A359] font-narrative-serif">
-                  <Compass className="w-4 h-4 text-[#D4A359]" />
-                  请做出你的抉择
+                <div className="flex items-center justify-between text-xs sm:text-sm font-semibold text-[#D4A359] font-narrative-serif">
+                  <div className="flex items-center gap-2">
+                    <Compass className="w-4 h-4 text-[#D4A359]" />
+                    请做出你的抉择
+                  </div>
+                  {isAutoPlaying && (
+                    <span className="text-[11px] font-normal text-[#D4A359] font-reading-sans flex items-center gap-1.5 bg-[#D4A359]/15 px-2.5 py-0.5 rounded-full border border-[#D4A359]/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-pulse" />
+                      自动流转挂起中 · 选定后自动继续
+                    </span>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 gap-2.5 pt-1">
                   {currentNode.choices.map((choice, cIdx) => (
@@ -2018,6 +2030,12 @@ ${logEntries
                 <GraduationCap className="w-3.5 h-3.5" />
                 十八岁 · 高考放榜与学业结算
               </div>
+              {isAutoPlaying && (
+                <div className="text-[11px] text-[#D4A359] font-reading-sans flex items-center justify-center gap-1.5 mb-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-pulse" />
+                  自动流转挂起中 · 选定去向后自动继续
+                </div>
+              )}
               <h2 className="text-xl sm:text-2xl font-bold text-[#D4A359] mb-2 font-narrative-serif">
                 {gaokaoCalc.title}
               </h2>
