@@ -65,11 +65,7 @@ import {
   HeartHandshake,
   ShieldAlert,
   Sun,
-  Moon,
-  Crown,
-  Zap,
-  Globe,
-  Feather
+  Moon
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -2108,7 +2104,7 @@ ${logEntries
                       <span>{entry.chosenOptionText}</span>
                     </div>
                     {entry.chosenReaction && (
-                      <div className={`text-xs sm:text-[13px] leading-relaxed pl-3 border-l-2 italic font-reading-sans ${
+                      <div className={`text-xs sm:text-[13px] leading-relaxed pl-3 border-l-2 font-reading-sans ${
                         isLight ? "text-stone-700 border-amber-500/60 font-normal" : "text-stone-300 border-[#D4A359]/40"
                       }`}>
                         {entry.chosenReaction}
@@ -2119,7 +2115,7 @@ ${logEntries
 
                 {/* If milestone reflection present */}
                 {entry.reflection && (
-                  <div className={`mt-2 text-xs sm:text-[13px] italic pt-2 border-t flex items-start gap-1.5 p-3 rounded-xl font-reading-sans ${
+                  <div className={`mt-2 text-xs sm:text-[13px] pt-2 border-t flex items-start gap-1.5 p-3 rounded-xl font-reading-sans ${
                     isLight
                       ? "bg-amber-100/70 text-amber-950 border border-amber-300 font-medium"
                       : "text-[#D4A359]/90 border-white/[0.06] bg-[#D4A359]/10"
@@ -2377,92 +2373,57 @@ ${logEntries
 
             {/* Active Choice Card (if waiting for choice) */}
             {waitingForChoice && currentNode.choices && (
-              <div className={`border-2 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 animate-year-enter transition-colors ${
+              <div className={`rounded-2xl p-4 sm:p-5 shadow-lg space-y-3.5 animate-year-enter transition-colors border ${
                 isLight
-                  ? "bg-white border-amber-600/35 shadow-amber-900/5"
-                  : "bg-[#13151E] border-[#D4A359]/60 shadow-2xl"
+                  ? "bg-stone-50/95 border-stone-300 text-stone-900 shadow-stone-200/50"
+                  : "bg-[#11131B] border-stone-700/80 text-stone-100 shadow-stone-950/60"
               }`}>
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-semibold font-narrative-serif">
-                  <div className={`flex items-center gap-2 ${isLight ? "text-amber-900" : "text-[#D4A359]"}`}>
-                    <Compass className={`w-4 h-4 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
-                    <span>宿命抉择时刻 · 请选定你的人生航道</span>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-semibold">
+                  <div className={`flex items-center gap-2 ${isLight ? "text-amber-900" : "text-amber-400"}`}>
+                    <Compass className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span className="tracking-wide">宿命抉择时刻 · 请斟酌你的人生航道</span>
                   </div>
                   {isAutoPlaying && (
-                    <span className={`text-[11px] font-normal font-reading-sans flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
+                    <span className={`text-[11px] font-normal flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
                       isLight
-                        ? "bg-amber-50 text-amber-800 border-amber-200"
-                        : "bg-[#D4A359]/15 text-[#D4A359] border-[#D4A359]/30"
+                        ? "bg-amber-100/70 text-amber-900 border-amber-300"
+                        : "bg-amber-500/15 text-amber-300 border-amber-500/30"
                     }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isLight ? "bg-amber-600" : "bg-[#D4A359]"}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isLight ? "bg-amber-600" : "bg-amber-400"}`} />
                       自动流转挂起中 · 选定后自动继续
                     </span>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 pt-1">
+                <div className="grid grid-cols-1 gap-2.5 pt-0.5">
                   {currentNode.choices.map((choice, cIdx) => {
                     const p = getChoicePresentation(choice, cIdx);
-
-                    let badgeIcon = <Crown className="w-3.5 h-3.5 shrink-0" />;
-                    let cardBg = isLight
-                      ? "bg-amber-50/50 hover:bg-amber-100/70 border-amber-300/60 hover:border-amber-600"
-                      : "bg-[#181512] hover:bg-[#221c17] border-amber-500/25 hover:border-amber-400";
-                    let badgeStyle = isLight
-                      ? "bg-amber-100 text-amber-900 border-amber-300"
-                      : "bg-amber-500/15 text-amber-300 border-amber-500/30";
-                    let numBadgeStyle = isLight
-                      ? "bg-amber-200/80 text-amber-950 border-amber-400"
-                      : "bg-amber-500/20 text-amber-300 border-amber-500/40";
-
-                    if (p.archetype === 'hustle') {
-                      badgeIcon = <Zap className="w-3.5 h-3.5 shrink-0" />;
-                      cardBg = isLight
-                        ? "bg-emerald-50/50 hover:bg-emerald-100/70 border-emerald-300/60 hover:border-emerald-600"
-                        : "bg-[#111915] hover:bg-[#16221c] border-emerald-500/25 hover:border-emerald-400";
-                      badgeStyle = isLight
-                        ? "bg-emerald-100 text-emerald-900 border-emerald-300"
-                        : "bg-emerald-500/15 text-emerald-300 border-emerald-500/30";
-                      numBadgeStyle = isLight
-                        ? "bg-emerald-200/80 text-emerald-950 border-emerald-400"
-                        : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
-                    } else if (p.archetype === 'zen') {
-                      badgeIcon = <Feather className="w-3.5 h-3.5 shrink-0" />;
-                      cardBg = isLight
-                        ? "bg-sky-50/50 hover:bg-sky-100/70 border-sky-300/60 hover:border-sky-600"
-                        : "bg-[#111822] hover:bg-[#15202c] border-sky-500/25 hover:border-sky-400";
-                      badgeStyle = isLight
-                        ? "bg-sky-100 text-sky-900 border-sky-300"
-                        : "bg-sky-500/15 text-sky-300 border-sky-500/30";
-                      numBadgeStyle = isLight
-                        ? "bg-sky-200/80 text-sky-950 border-sky-400"
-                        : "bg-sky-500/20 text-sky-300 border-sky-500/40";
-                    } else if (p.archetype === 'global') {
-                      badgeIcon = <Globe className="w-3.5 h-3.5 shrink-0" />;
-                      cardBg = isLight
-                        ? "bg-purple-50/50 hover:bg-purple-100/70 border-purple-300/60 hover:border-purple-600"
-                        : "bg-[#181320] hover:bg-[#22172d] border-purple-500/25 hover:border-purple-400";
-                      badgeStyle = isLight
-                        ? "bg-purple-100 text-purple-900 border-purple-300"
-                        : "bg-purple-500/15 text-purple-300 border-purple-500/30";
-                      numBadgeStyle = isLight
-                        ? "bg-purple-200/80 text-purple-950 border-purple-400"
-                        : "bg-purple-500/20 text-purple-300 border-purple-500/40";
-                    }
 
                     return (
                       <button
                         key={cIdx}
                         onClick={() => handleSelectChoice(choice)}
-                        className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all duration-200 active:scale-[0.99] group shadow-sm flex flex-col gap-2 relative ${cardBg}`}
+                        className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all duration-150 active:scale-[0.99] group shadow-sm flex flex-col gap-2 relative ${
+                          isLight
+                            ? "bg-white hover:bg-amber-50/40 border-stone-200 hover:border-amber-400 text-stone-900"
+                            : "bg-[#161824] hover:bg-[#1D2030] border-stone-800 hover:border-amber-500/50 text-stone-100"
+                        }`}
                       >
-                        {/* Top row: Key + Stance Badge + TradeOff Pills */}
+                        {/* Top row: Number + Stance Badge + TradeOff Pills */}
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span className={`w-5 h-5 rounded-md border font-mono-num text-xs font-bold flex items-center justify-center shrink-0 ${numBadgeStyle}`}>
+                            <span className={`w-5 h-5 rounded-md border font-mono text-xs font-bold flex items-center justify-center shrink-0 ${
+                              isLight
+                                ? "bg-stone-100 text-stone-800 border-stone-300"
+                                : "bg-stone-800 text-stone-200 border-stone-700"
+                            }`}>
                               {cIdx + 1}
                             </span>
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11.5px] font-semibold border ${badgeStyle}`}>
-                              {badgeIcon}
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11.5px] font-semibold border ${
+                              isLight
+                                ? "bg-amber-50 text-amber-900 border-amber-200"
+                                : "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                            }`}>
                               <span>【{p.stance}】</span>
                             </span>
                           </div>
@@ -2472,31 +2433,15 @@ ${logEntries
                             {p.tradeOffs.map((to, toIdx) => {
                               let pillColor = isLight
                                 ? "bg-stone-100 text-stone-700 border-stone-200"
-                                : "bg-stone-800 text-stone-300 border-stone-700";
+                                : "bg-stone-800/80 text-stone-300 border-stone-700/60";
                               if (to.tone === 'danger') {
                                 pillColor = isLight
-                                  ? "bg-rose-50 text-rose-700 border-rose-200"
-                                  : "bg-rose-950/50 text-rose-300 border-rose-800/40";
+                                  ? "bg-rose-50 text-rose-800 border-rose-200"
+                                  : "bg-rose-950/40 text-rose-300 border-rose-800/40";
                               } else if (to.tone === 'cash') {
                                 pillColor = isLight
                                   ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                                  : "bg-emerald-950/50 text-emerald-300 border-emerald-800/40";
-                              } else if (to.tone === 'zen') {
-                                pillColor = isLight
-                                  ? "bg-sky-50 text-sky-800 border-sky-200"
-                                  : "bg-sky-950/50 text-sky-300 border-sky-800/40";
-                              } else if (to.tone === 'academic') {
-                                pillColor = isLight
-                                  ? "bg-amber-50 text-amber-900 border-amber-200"
-                                  : "bg-amber-950/50 text-amber-300 border-amber-800/40";
-                              } else if (to.tone === 'social') {
-                                pillColor = isLight
-                                  ? "bg-blue-50 text-blue-800 border-blue-200"
-                                  : "bg-blue-950/50 text-blue-300 border-blue-800/40";
-                              } else if (to.tone === 'global') {
-                                pillColor = isLight
-                                  ? "bg-purple-50 text-purple-800 border-purple-200"
-                                  : "bg-purple-950/50 text-purple-300 border-purple-800/40";
+                                  : "bg-emerald-950/40 text-emerald-300 border-emerald-800/40";
                               }
                               return (
                                 <span
@@ -2510,22 +2455,22 @@ ${logEntries
                             <span className={`hidden sm:inline-block text-[11px] font-mono ml-1 opacity-60 ${
                               isLight ? "text-stone-500" : "text-stone-400"
                             }`}>
-                              [按键 {cIdx + 1}]
+                              [{cIdx + 1}]
                             </span>
                             <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-500 transition-transform group-hover:translate-x-1 shrink-0 ml-1" />
                           </div>
                         </div>
 
-                        {/* Main Action Text */}
-                        <div className={`text-xs sm:text-[14px] font-semibold leading-snug font-reading-sans ${
+                        {/* Main Action Text - clear, upright, no jitter */}
+                        <div className={`text-[13.5px] sm:text-[14.5px] font-semibold leading-relaxed tracking-normal ${
                           isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
                         }`}>
                           {p.cleanText}
                         </div>
 
-                        {/* Detail / Philosophical Teaser */}
+                        {/* Detail text - clean, upright, NO italic! */}
                         {p.detail && (
-                          <div className={`text-[11.5px] sm:text-[12.5px] italic font-narrative-serif leading-relaxed line-clamp-2 pt-0.5 ${
+                          <div className={`text-[12px] sm:text-[13px] leading-relaxed line-clamp-2 pt-0.5 ${
                             isLight ? "text-stone-600" : "text-stone-400"
                           }`}>
                             “{p.detail}”

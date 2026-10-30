@@ -4,23 +4,25 @@
 
 :root {
   color-scheme: dark;
-  --font-serif: "Noto Serif SC", "Songti SC", "STSong", "Source Han Serif SC", SimSun, serif;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  /* 现代高清晰度抗疲劳无衬线字体栈：彻底消除宋体毛刺、散光重影与视疲劳 */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 }
 
 body {
   margin: 0;
   background-color: #0A0B0E;
-  color: #E8EAF0;
+  color: #E2E6F0;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 典雅人文宋体 */
+/* 人文阅读统一采用清晰无衬线字体 */
 .font-narrative-serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
+  letter-spacing: 0.01em;
 }
 
 /* 舒适阅读正文 */
@@ -34,36 +36,35 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* 中文长文本小说级行距与微字距 */
+/* 中文长文本护眼阅读行距与适度字距 */
 .prose-reading {
   font-family: var(--font-sans);
   font-size: 15px;
-  line-height: 1.82;
-  letter-spacing: 0.015em;
-  color: #D3D7E3;
+  line-height: 1.86;
+  letter-spacing: 0.02em;
+  color: #DDE2EE;
+  font-weight: 400;
 }
 
 @media (min-width: 640px) {
   .prose-reading {
     font-size: 15.5px;
-    line-height: 1.86;
+    line-height: 1.92;
   }
 }
 
-/* 新生岁月淡入轻推过渡 */
+/* 新生岁月静雅淡入过渡（取消纵向位移突变，避免震颤与视觉眩晕） */
 @keyframes yearCardEnter {
   0% {
     opacity: 0;
-    transform: translateY(12px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .animate-year-enter {
-  animation: yearCardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: yearCardEnter 0.22s ease-out forwards;
 }
 
 /* Custom scrollbar */
