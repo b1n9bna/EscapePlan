@@ -10,6 +10,7 @@ import {
   calculateGaokaoOutcome,
   generateAdultMilestones,
   getTailoredCareerSubtrackNodes,
+  getTailoredAdultChoiceBranch,
   getCareerSubtrack,
   generateFinalLifetimeVerdict,
   detectCrisisWarning,
@@ -518,11 +519,22 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Auto-scroll anchor for middle column
   const feedContainerRef = useRef<HTMLDivElement>(null);
   const feedBottomRef = useRef<HTMLDivElement>(null);
+  const choiceCardRef = useRef<HTMLDivElement>(null);
 
   const scrollToFeedBottom = () => {
     setTimeout(() => {
       feedBottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 60);
+  };
+
+  const scrollToChoiceCard = () => {
+    setTimeout(() => {
+      if (choiceCardRef.current) {
+        choiceCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        feedBottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 80);
   };
 
   // Age 18 Gaokao Calculated Outcome state
@@ -684,7 +696,11 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Smoothly anchor scroll inside middle feed container on entry or choice update
   useEffect(() => {
     if (gamePhase === 'cockpit') {
-      scrollToFeedBottom();
+      if (waitingForChoice) {
+        scrollToChoiceCard();
+      } else {
+        scrollToFeedBottom();
+      }
     }
   }, [logEntries.length, waitingForChoice, gamePhase]);
 
@@ -955,6 +971,19 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       // 将后续30, 35, 42, 52, 63岁里程碑直接串接进时间线，三栏交互彻底统一！
       const currentNodes = timeline.slice(0, timelineIndex + 1);
       setTimeline([...currentNodes, ...adultMilestones]);
+    }
+
+    // ★★★ 成年篇章（28~63岁）因果分支拦截：彻底消除“选了大集团维保督导，下一步却变成工坊被查封”等严重逻辑矛盾！★★★
+    const allCurrentTags = Array.from(new Set([...tags, ...(choice.addTags || [])]));
+    const tailoredAdultNodes = getTailoredAdultChoiceBranch(
+      currentNode.id,
+      choice.text,
+      allCurrentTags,
+      charData.family
+    );
+    if (tailoredAdultNodes && tailoredAdultNodes.length > 0) {
+      const currentNodes = timeline.slice(0, timelineIndex + 1);
+      setTimeline([...currentNodes, ...tailoredAdultNodes]);
     }
 
     // 无论哪个年龄段抉择，都让玩家看清抉择反馈与属性变化，统一通过底部操作栏“迈入下一岁”从容前行
@@ -2259,11 +2288,18 @@ ${logEntries
                 </div>
               </div>
             )}
-            {logEntries.map((entry, idx) => (
+            {logEntries.map((entry, idx) => {
+              const isWaitingCurrentChoice = idx === logEntries.length - 1 && waitingForChoice;
+
+              return (
               <div
                 key={entry.id + idx}
                 className={`border rounded-2xl p-5 sm:p-6 shadow-sm space-y-3.5 transition-all animate-year-enter ${
-                  isLight
+                  isWaitingCurrentChoice
+                    ? isLight
+                      ? "bg-white border-amber-400 ring-2 ring-amber-400/50 text-stone-900 shadow-amber-900/10"
+                      : "bg-[#141622] border-amber-500/60 ring-2 ring-amber-500/30 text-stone-100 shadow-stone-950/80"
+                    : isLight
                     ? "bg-white border-stone-200/90 hover:border-stone-300 text-stone-900 shadow-stone-200/50"
                     : "bg-[#12141C] border-white/[0.07] hover:border-white/[0.12] text-stone-100"
                 }`}
@@ -2291,6 +2327,27 @@ ${logEntries
                 <p className={`prose-reading whitespace-pre-line ${isLight ? "text-stone-800 font-normal" : "text-stone-200"}`}>
                   {entry.scene}
                 </p>
+
+                {/* If actively waiting for choice on this current card */}
+                {isWaitingCurrentChoice && (
+                  <button
+                    type="button"
+                    onClick={() => choiceCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                    className={`w-full mt-2 py-2 px-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-between transition-all active:scale-[0.99] ${
+                      isLight
+                        ? "bg-amber-100 hover:bg-amber-200/80 text-amber-950 border-amber-300 shadow-sm"
+                        : "bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-sm"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Compass className="w-4 h-4 text-amber-500 animate-spin-slow shrink-0" />
+                      <span>正在等候你在此关隘做出人生抉择...</span>
+                    </span>
+                    <span className="text-xs font-mono underline flex items-center gap-1 font-bold">
+                      前往下方选项 ↓
+                    </span>
+                  </button>
+                )}
 
                 {/* If Stat Delta present */}
                 {entry.statDelta && Object.keys(entry.statDelta).length > 0 && (
@@ -2408,7 +2465,8 @@ ${logEntries
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
 
             {/* ★★★ 六十三岁法定退休：重磅终局卡片（五维雷达图 + 16终局图鉴 + 成就徽章） ★★★ */}
             {logEntries.some((e) => e.age === 63) && (() => {
@@ -2703,14 +2761,18 @@ ${logEntries
 
             {/* Active Choice Card (if waiting for choice) */}
             {waitingForChoice && currentNode.choices && (
-              <div className={`rounded-2xl p-4 sm:p-6 shadow-lg space-y-4 animate-year-enter transition-colors border ${
-                isLight
-                  ? "bg-stone-50/95 border-stone-300 text-stone-900 shadow-stone-200/50"
-                  : "bg-[#11131B] border-stone-700/80 text-stone-100 shadow-stone-950/60"
-              }`}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className={`flex items-center gap-2 text-sm sm:text-base font-bold ${isLight ? "text-amber-900" : "text-amber-400"}`}>
-                    <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
+              <div
+                ref={choiceCardRef}
+                className={`rounded-2xl p-4 sm:p-6 shadow-xl space-y-4 animate-year-enter transition-all border ${
+                  isLight
+                    ? "bg-white border-amber-300 text-stone-900 shadow-amber-900/10 ring-2 ring-amber-300/60"
+                    : "bg-[#11131B] border-amber-500/50 text-stone-100 shadow-stone-950/80 ring-2 ring-amber-500/30"
+                }`}
+              >
+                {/* 1. Header Bar with Destiny Marker */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200 dark:border-white/[0.08]">
+                  <div className={`flex items-center gap-2 text-sm sm:text-base font-bold ${isLight ? "text-amber-950" : "text-amber-400"}`}>
+                    <Compass className="w-5 h-5 text-amber-500 shrink-0 animate-spin-slow" />
                     <span className="tracking-[0.06em]">宿命抉择时刻 · 请斟酌你的人生航道</span>
                   </div>
                   {isAutoPlaying && (
@@ -2723,6 +2785,62 @@ ${logEntries
                       自动流转挂起中 · 选定后自动继续
                     </span>
                   )}
+                </div>
+
+                {/* 🌟 2. 核心剧情与当前抉择境遇：直观呈现这一岁发生的故事，彻底解决“不知道这一岁描述在哪”的问题！ 🌟 */}
+                <div className={`p-4 sm:p-5 rounded-xl border relative overflow-hidden transition-all shadow-sm ${
+                  isLight
+                    ? "bg-gradient-to-br from-amber-50/90 via-stone-50 to-amber-50/40 border-amber-200/90 text-stone-900"
+                    : "bg-gradient-to-br from-[#171924] via-[#13151F] to-[#10121A] border-amber-500/30 text-stone-100"
+                }`}>
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2 font-mono-num">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-bold border tracking-wider ${
+                        isLight
+                          ? "bg-amber-100 text-amber-950 border-amber-300"
+                          : "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                      }`}>
+                        【{currentNode.age}岁 · {birthYear + currentNode.age}年】
+                      </span>
+                      <span className={`text-xs sm:text-[13px] font-medium tracking-wide ${
+                        isLight ? "text-stone-700 font-semibold" : "text-stone-300"
+                      }`}>
+                        {currentNode.stageName}
+                      </span>
+                    </div>
+                    <span className={`text-xs font-semibold flex items-center gap-1.5 ${
+                      isLight ? "text-amber-800" : "text-amber-400"
+                    }`}>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>重大关隘情境</span>
+                    </span>
+                  </div>
+
+                  <h3 className={`text-base sm:text-[19px] font-bold font-narrative-serif tracking-[0.03em] leading-snug mb-2.5 ${
+                    isLight ? "text-stone-900" : "text-amber-200"
+                  }`}>
+                    {currentNode.title}
+                  </h3>
+
+                  <p className={`text-sm sm:text-[15px] font-reading-sans leading-relaxed whitespace-pre-line pl-3.5 border-l-2 ${
+                    isLight
+                      ? "text-stone-800 border-amber-500/70 font-normal"
+                      : "text-stone-200 border-amber-500/50"
+                  }`}>
+                    {currentNode.scene}
+                  </p>
+                </div>
+
+                {/* 3. Choice Guidance Divider */}
+                <div className="flex items-center gap-3 pt-1">
+                  <div className={`h-px flex-1 ${isLight ? "bg-amber-200" : "bg-amber-500/20"}`} />
+                  <span className={`text-xs sm:text-[13px] font-semibold tracking-wider flex items-center gap-1.5 ${
+                    isLight ? "text-amber-900 font-bold" : "text-amber-400"
+                  }`}>
+                    <Compass className="w-4 h-4 text-amber-500" />
+                    <span>命运之秤已在你手中 · 请做出决断：</span>
+                  </span>
+                  <div className={`h-px flex-1 ${isLight ? "bg-amber-200" : "bg-amber-500/20"}`} />
                 </div>
 
                 <div className="grid grid-cols-1 gap-3.5 sm:gap-4 pt-1">

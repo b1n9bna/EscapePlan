@@ -8,6 +8,7 @@ import { REGION_ECOSYSTEMS } from './provincial_ecosystems';
 export * from './soul_imprints';
 export * from './provincial_routes';
 export * from './provincial_ecosystems';
+export * from './adult_branches';
 
 export interface FamilyOrigin {
   region: string;
