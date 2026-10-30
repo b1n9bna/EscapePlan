@@ -1026,6 +1026,166 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
   // --------------------------------------------------------------------------
   6: [
     {
+      id: "age_6_pioneers",
+      age: 6,
+      stageName: "小学一年级 · 6岁",
+      title: "第一批少先队入队仪式与大红领巾",
+      scene:
+        "新学期少先队入队仪式在全校操场隆重举行。高年级的大队长手捧鲜红的红领巾走到第一排，全班只有五个表现最优异的名额能第一批戴上红领巾，所有人的目光都聚焦在主席台前。",
+      type: "choice",
+      choices: [
+        {
+          text: "挺起胸膛目不斜视，大声跟读少先队宣誓词",
+          detail: "你把宣誓词背得滚瓜烂熟，如愿第一批戴上大红领巾，全班掌声雷动。",
+          reaction: "你小心翼翼把红领巾叠得整整齐齐放进书包，暗自立下了当好学生的志向。",
+          delta: { cognition: 15, academicCapital: 15, happiness: 10 },
+          addTags: ["少年志气", "争先争优"]
+        },
+        {
+          text: "将多带的一支铅笔借给旁边急哭了的同学",
+          detail: "比起台上的荣誉，你更看重身边同伴的难处。",
+          reaction: "同学破涕为笑，老师在台下投来赞许的目光，你们成了形影不离的好友。",
+          delta: { social: 20, happiness: 15, inferiority: -10 },
+          addTags: ["善良同理", "童年挚友"]
+        },
+        {
+          text: "站在队伍最后排安静看着，内心平静波澜不惊",
+          detail: "过早拥有了一份超越同龄人的淡然，不热衷于仪式化的追捧。",
+          reaction: "你在属于自己的角落里默默观察着集体规则，保全了一份清醒与松弛。",
+          delta: { resilience: 10, rebellion: 10, inferiority: -5 },
+          addTags: ["从容内省", "清醒独处"]
+        }
+      ]
+    },
+    {
+      id: "age_6_chalkboard",
+      age: 6,
+      stageName: "小学一年级 · 6岁",
+      title: "黑板粉笔字与被叫上讲台做算术题",
+      scene:
+        "数学课上，老师在黑板上用红色粉笔写下一道带进位的十以内加减法，目光扫过全班每个缩着脑袋的新生：‘谁敢上来写？’全班鸦雀无声，同桌紧张得连呼吸都放慢了。",
+      type: "choice",
+      choices: [
+        {
+          text: "高高举手快步走上讲台，工整写出答案并算对了附加题",
+          detail: "你在全班惊叹的目光中展露出惊人的数字敏感与做题天赋。",
+          reaction: "数学老师在你的作业本上画了一朵大红花，当场任命你为数学课代表。",
+          delta: { cognition: 20, academicCapital: 20, happiness: 10 },
+          addTags: ["算术天才", "展露头角"]
+        },
+        {
+          text: "低头屏住呼吸数手指，暗暗在草稿纸上反复验算",
+          detail: "谨慎克制，不愿在成人面前冒任何出错丢脸的风险。",
+          reaction: "虽然没有举手，但你在本子上算得全对，内心多了一份笃定的底气。",
+          delta: { cognition: 10, resilience: 10, inferiority: 5 },
+          addTags: ["沉稳谨慎", "暗中发力"]
+        },
+        {
+          text: "在台下小声把答案告诉了卡壳涨红了脸的同桌",
+          detail: "讲义气，懂得在同伴陷入窘境时伸出援手。",
+          reaction: "同桌顺利过关，下课后悄悄塞给你一块大白兔奶糖表示感谢。",
+          delta: { social: 15, happiness: 10, inferiority: -5 },
+          addTags: ["仗义机敏", "结伴同行"]
+        }
+      ]
+    },
+    {
+      id: "age_6_snack_shop",
+      age: 6,
+      stageName: "小学一年级 · 6岁",
+      title: "校门口小卖部贴纸与五毛零花钱诱惑",
+      scene:
+        "校门口小卖部门前挤满了小学生，彩色玻璃罐里的酸梅粉、大白兔奶糖和闪光孙悟空贴纸让人挪不开眼。同桌掏出两张纸币买了一大堆零食，你在旁边捏着母亲给买橡皮的五毛硬币。",
+      type: "choice",
+      choices: [
+        {
+          text: "咽下口水快步走开，去文具摊买下一块带香味的橡皮擦",
+          detail: "你用小小的自制力抵御了诱惑，牢牢守住了母亲叮嘱的原则。",
+          reaction: "握着干净的新橡皮，你第一次体会到自我克制带来的踏实感。",
+          delta: { resilience: 15, cognition: 10, inferiority: -5 },
+          addTags: ["克制自律", "早熟自持"]
+        },
+        {
+          text: "买下两张最酷的西游记闪光贴纸贴在课本封面",
+          detail: "‘童年就这一次，我也想拥有一张属于自己的漂亮贴纸。’",
+          reaction: "课间许多同学凑过来看你的新贴纸，你心里充满小小的雀跃与自豪。",
+          delta: { happiness: 15, social: 10, savings: -1 },
+          addTags: ["率真童趣", "纯真快乐"]
+        },
+        {
+          text: "和同伴在泥地跳格子打赌，凭高超手艺赢回一大把贴纸",
+          detail: "凭身手和聪明劲在街坊孩童中站稳脚跟，不花一分钱。",
+          reaction: "你成了校门口的小赢家，同学们纷纷拜你为师学技巧。",
+          delta: { social: 20, resilience: 10, happiness: 10 },
+          addTags: ["身手敏捷", "街头智慧"]
+        }
+      ]
+    },
+    {
+      id: "age_6_rain",
+      age: 6,
+      stageName: "小学一年级 · 6岁",
+      title: "暴雨天校门外水洼飞溅与破油纸伞",
+      scene:
+        "放学时天空骤变，倾盆大雨倾泻而下。校门口站满了打着漂亮大黑伞接孩子的家长，城里同学一个个被牵着手接走。你没有雨伞，裤脚被泥水溅得湿透，站在屋檐下看着天色渐晚。",
+      type: "choice",
+      choices: [
+        {
+          text: "把书包紧紧护在胸前，冒着暴雨在积水路上一路狂奔回家",
+          detail: "像一棵任凭风吹雨打的野草，不怨天尤人，靠双脚冲破风雨。",
+          reaction: "虽然浑身湿透，但书包里的课本完好无损。母亲赶紧熬了姜汤把你裹进干棉被里。",
+          delta: { resilience: 20, health: -5, happiness: 10 },
+          addTags: ["风雨兼程", "野草骨气"]
+        },
+        {
+          text: "邀请同样没伞的同学一起在门卫传达室避雨讲连环画故事",
+          detail: "天性豁达开朗，无论身处何种窘境都能找到生活的乐趣。",
+          reaction: "看门大爷听得入迷，还给你们倒了两杯热开水，风雨变成了温暖的回忆。",
+          delta: { social: 20, happiness: 15, cognition: 10 },
+          addTags: ["乐观通达", "逆境生花"]
+        },
+        {
+          text: "父亲顶着暴雨骑着二八大杠赶来，将你塞进雨衣怀里",
+          detail: "看着父亲湿透的双肩和雨水混合的汗水，心里充满深深的依恋。",
+          reaction: "坐在自行车横梁上贴着父亲温热的胸膛，你感到了无与伦比的安全感。",
+          delta: { kinshipGuilt: 15, happiness: 15, health: 5 },
+          addTags: ["父爱如山", "家庭温情"]
+        }
+      ]
+    },
+    {
+      id: "age_6_comics",
+      age: 6,
+      stageName: "小学一年级 · 6岁",
+      title: "课桌抽屉里的三国连环画与故事大王",
+      scene:
+        "你在废品收购站淘到一本残破但画风精美的《三国演义》连环画，用旧挂历纸细心包好了书皮。课间休息时，你的课桌周围挤满了探头探脑想要借看的同学。",
+      type: "choice",
+      choices: [
+        {
+          text: "绘声绘色给围拢过来的同学们讲长坂坡单骑救主",
+          detail: "表达欲与口才展露无遗，迅速成为全班公认的‘故事大王’。",
+          reaction: "同学们听得如痴如醉，连班主任路过也停下脚步笑着听你讲完。",
+          delta: { social: 20, cognition: 15, happiness: 15 },
+          addTags: ["口才出众", "故事大王"]
+        },
+        {
+          text: "把书收好放回书包，认真把当天的生字笔顺工整抄完",
+          detail: "专注克制，把当务之急的学业放在第一位。",
+          reaction: "老师将你的字帖贴在教室后黑板展示，夸你‘少年心性定，必成大器’。",
+          delta: { academicCapital: 15, cognition: 15, resilience: 10 },
+          addTags: ["自律笃定", "严谨求学"]
+        },
+        {
+          text: "大方把连环画借给平日常受冷落孤立的后座同学看",
+          detail: "心思细腻，关注着角落里那些沉默的孩子。",
+          reaction: "后座同学眼里闪烁着感激的光，默默帮你把弄脏的桌角擦得干干净净。",
+          delta: { social: 15, inferiority: -10, happiness: 15 },
+          addTags: ["温暖包容", "共情关照"]
+        }
+      ]
+    },
+    {
       id: "age_6_lunchbox",
       age: 6,
       stageName: "小学一年级 · 6岁",
@@ -1164,6 +1324,102 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
   // 8岁 · 小学三年级 (Choice)
   // --------------------------------------------------------------------------
   8: [
+    {
+      id: "age_8_sports",
+      age: 8,
+      stageName: "小学三年级 · 8岁",
+      title: "校运会六十米短跑与全场加油呐喊",
+      scene:
+        "春季校运会，没有专业跑鞋的你穿着洗得发白的回力球鞋站在跑道起点。发令枪响那一刻，班级看台上敲着搪瓷盆为你声嘶力竭地喊加油。",
+      type: "choice",
+      choices: [
+        {
+          text: "咬紧牙关拼命摆臂冲刺，拿下全校第一名为班级争光",
+          detail: "心无旁骛，用顽强的爆发力战胜了全校所有的竞争对手。",
+          reaction: "班主任和全班同学把你高高抛起，大红奖状印着你的名字贴在黑板正中。",
+          delta: { resilience: 20, happiness: 20, health: 10, inferiority: -15 },
+          addTags: ["短跑冠军", "扬眉吐气"]
+        },
+        {
+          text: "终点前不慎跌倒擦破手掌，忍痛爬起来坚持跑完全程",
+          detail: "就算落后甚至负伤，也绝不在众人注视下放弃退缩。",
+          reaction: "全场观众为你响起雷鸣般的掌声，体育老师赞叹‘这孩子有骨气！’",
+          delta: { resilience: 25, inferiority: -10, health: -5 },
+          addTags: ["坚韧硬骨", "虽败犹荣"]
+        },
+        {
+          text: "赛后把赢来的铅笔奖品分给陪你练全程的同桌好友",
+          detail: "把同甘共苦的情谊看得比单打独斗的荣誉更重要。",
+          reaction: "好友感动不已，从家里带来珍藏的铁皮青蛙玩具与你分享。",
+          delta: { social: 20, happiness: 15 },
+          addTags: ["重情重义", "真挚伙伴"]
+        }
+      ]
+    },
+    {
+      id: "age_8_picnic",
+      age: 8,
+      stageName: "小学三年级 · 8岁",
+      title: "学校春游与塑料袋里装的土鸡蛋",
+      scene:
+        "学校组织春游，城里同学带了面包、火腿肠和易拉罐健力宝；你书包里装着母亲清晨早起煮好的两个土鸡蛋和几片抹酱馒头。大家在绿油油的草坡上铺开桌布。",
+      type: "choice",
+      choices: [
+        {
+          text: "找了一处向阳的树荫，津津有味吃完并把草地杂物收拾干净",
+          detail: "内心坦然，不卑不亢，享受大自然与属于自己的朴素滋味。",
+          reaction: "带队老师夸你‘不仅懂事而且爱护环境’，在春游总结班会上特别表扬了你。",
+          delta: { happiness: 15, resilience: 15, inferiority: -10 },
+          addTags: ["坦然自洽", "文明懂事"]
+        },
+        {
+          text: "大方拿自家土鸡蛋跟同桌交换了一口健力宝尝鲜",
+          detail: "善于沟通交流，用大方的性格打破家庭物质的隔阂。",
+          reaction: "同桌赞叹你家的土鸡蛋比超市买的香得多，两人开怀大笑。",
+          delta: { social: 20, happiness: 15 },
+          addTags: ["爽朗大度", "人际融洽"]
+        },
+        {
+          text: "主动帮老师搬运急救医药箱和大水壶，走在队伍最前面领路",
+          detail: "眼里有活，用踏实勤快赢取大人们的一致赞赏。",
+          reaction: "老师奖励了你一枚小红花胸章，夸你‘是个能担当的大孩子’。",
+          delta: { social: 15, resilience: 10, academicCapital: 5 },
+          addTags: ["勤快担当", "师长喜爱"]
+        }
+      ]
+    },
+    {
+      id: "age_8_crayons",
+      age: 8,
+      stageName: "小学三年级 · 8岁",
+      title: "少儿书画比赛与二十四色水彩笔",
+      scene:
+        "市里举办少儿书画展，美术老师挑选画得好的同学参赛。你平时只能用铅笔在废纸背面练习，看着同桌桌上展开一整盒耀眼的二十四色双头水彩笔。",
+      type: "choice",
+      choices: [
+        {
+          text: "仅用一支铅笔精细素描出家乡的麦浪与高耸的大烟囱",
+          detail: "不受器材限制，凭借极其敏锐的观察力与笔触构图打动评委。",
+          reaction: "你的画作斩获市级二等奖并刊登在当地晚报上，全校师生刮目相看。",
+          delta: { cognition: 25, academicCapital: 15, inferiority: -15 },
+          addTags: ["天生画匠", "以素胜彩"]
+        },
+        {
+          text: "礼貌向同桌借用红黄两色，认真给画里的太阳与小红花着色",
+          detail: "进退有度，懂得合理借助外部资源完成目标。",
+          reaction: "同桌大方把整盒笔推给你共用，你们共同完成了迎春画卷。",
+          delta: { social: 15, happiness: 15, inferiority: -5 },
+          addTags: ["进退有度", "协作共赢"]
+        },
+        {
+          text: "利用午休时间主动承担了班级后黑板报的全部插画设计",
+          detail: "把画画的才能奉献给集体，把黑板装点得赏心悦目。",
+          reaction: "班级在全校黑板报评比中斩获总冠军，你的名字被写在板报落款处。",
+          delta: { social: 20, resilience: 15, happiness: 10 },
+          addTags: ["班级骨干", "集体荣誉"]
+        }
+      ]
+    },
     {
       id: "age_8_uniform",
       age: 8,
@@ -2543,11 +2799,9 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
 
 export function generateTimelineForCharacter(
   family: FamilyOrigin,
-  gender: "男" | "女"
+  _gender: "男" | "女"
 ): LifeEventNode[] {
   const result: LifeEventNode[] = [];
-
-  const seed = (family.region.length * 7 + family.fatherAge * 3 + (gender === "男" ? 1 : 2)) % 3;
 
   for (let age = 0; age <= 27; age++) {
     // 0岁：严格契合出生地医院与生活区，绝不出现“地级市生活区却在县医院出生”的矛盾
@@ -2597,35 +2851,9 @@ export function generateTimelineForCharacter(
     const pool = AGE_EVENT_POOLS[age];
     if (!pool || pool.length === 0) continue;
 
-    let selected = pool[0];
-
-    if (age === 6) {
-      if (family.wealthTier.includes("入不敷出") || family.wealthTier.includes("留守")) {
-        selected = pool[2] || pool[0];
-      } else if (family.region.includes("百强") || family.region.includes("地级市")) {
-        selected = pool[1] || pool[0];
-      } else {
-        selected = pool[0];
-      }
-    } else if (age === 15) {
-      if (family.wealthTier.includes("小康") || family.fatherJob.includes("科员") || family.fatherJob.includes("大夫")) {
-        selected = pool[1] || pool[0];
-      } else if (family.wealthTier.includes("入不敷出")) {
-        selected = pool[2] || pool[0];
-      } else {
-        selected = pool[0];
-      }
-    } else if (age === 18) {
-      selected = pool[seed % pool.length] || pool[0];
-    } else if (age === 20) {
-      selected = pool[seed % pool.length] || pool[0];
-    } else if (age === 24) {
-      selected = pool[seed % pool.length] || pool[0];
-    } else if (age === 27) {
-      selected = pool[seed % pool.length] || pool[0];
-    } else {
-      selected = pool[(seed + age) % pool.length] || pool[0];
-    }
+    // 彻底告别单调剧本！每次投胎全年龄段真随机抽取，保证剧情极其丰富丰富丰富！
+    const randomIndex = Math.floor(Math.random() * pool.length);
+    const selected = pool[randomIndex] || pool[0];
 
     // 动态置换场景中的医院、学校与具体称谓，保持极致沉浸
     let resolvedScene = selected.scene
@@ -2641,7 +2869,11 @@ export function generateTimelineForCharacter(
         .replace(/县实验小学/g, family.primarySchoolName);
     }
 
-    const resolvedSiblingName = family.siblingType.includes("brother") ? "弟弟" : family.siblingType.includes("sister") ? "妹妹" : "同胞";
+    const resolvedSiblingName = family.siblingType.includes("brother")
+      ? "弟弟"
+      : family.siblingType.includes("sister")
+      ? "妹妹"
+      : "同胞";
     resolvedScene = resolvedScene.replace(/\{sibling\}/g, resolvedSiblingName);
 
     result.push({
