@@ -39,8 +39,8 @@ body {
 /* 中文长文本护眼阅读行距与适度字距 */
 .prose-reading {
   font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.86;
+  font-size: var(--prose-size, 17px);
+  line-height: var(--prose-line-height, 1.88);
   letter-spacing: 0.02em;
   color: #DDE2EE;
   font-weight: 400;
@@ -48,9 +48,43 @@ body {
 
 @media (min-width: 640px) {
   .prose-reading {
-    font-size: 15.5px;
-    line-height: 1.92;
+    font-size: var(--prose-size-sm, 18.5px);
+    line-height: var(--prose-line-height-sm, 1.95);
   }
+}
+
+/* 阅读器字号档位微调 (默认采用大号护眼字号) */
+.font-scale-normal {
+  --prose-size: 15.5px;
+  --prose-size-sm: 16.5px;
+  --prose-line-height: 1.84;
+  --prose-line-height-sm: 1.88;
+  --choice-title-size: 15px;
+  --choice-title-size-sm: 16px;
+  --choice-desc-size: 13px;
+  --choice-desc-size-sm: 13.5px;
+}
+
+.font-scale-large {
+  --prose-size: 17px;
+  --prose-size-sm: 18.5px;
+  --prose-line-height: 1.88;
+  --prose-line-height-sm: 1.95;
+  --choice-title-size: 16.5px;
+  --choice-title-size-sm: 18px;
+  --choice-desc-size: 14px;
+  --choice-desc-size-sm: 15px;
+}
+
+.font-scale-huge {
+  --prose-size: 19px;
+  --prose-size-sm: 21px;
+  --prose-line-height: 1.95;
+  --prose-line-height-sm: 2.02;
+  --choice-title-size: 18.5px;
+  --choice-title-size-sm: 20.5px;
+  --choice-desc-size: 15.5px;
+  --choice-desc-size-sm: 17px;
 }
 
 /* 新生岁月静雅淡入过渡（取消纵向位移突变，避免震颤与视觉眩晕） */

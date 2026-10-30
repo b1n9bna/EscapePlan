@@ -65,7 +65,8 @@ import {
   HeartHandshake,
   ShieldAlert,
   Sun,
-  Moon
+  Moon,
+  Type
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -542,6 +543,22 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Auto-play state & Speed control (in seconds per year, volume-slider style)
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const [autoPlaySpeed, setAutoPlaySpeed] = useState(1.2);
+
+  // Reader Font Size state ('normal' | 'large' | 'huge'), default to 'large' (comfort eye-care size)
+  const [readerFontSize, setReaderFontSize] = useState<'normal' | 'large' | 'huge'>(() => {
+    try {
+      return (localStorage.getItem('escape_plan_reader_font_size') as 'normal' | 'large' | 'huge') || 'large';
+    } catch {
+      return 'large';
+    }
+  });
+
+  const handleSetFontSize = (size: 'normal' | 'large' | 'huge') => {
+    setReaderFontSize(size);
+    try {
+      localStorage.setItem('escape_plan_reader_font_size', size);
+    } catch {}
+  };
 
   // Confetti trigger once at Age 63
   const confettiFiredRef = useRef(false);
@@ -1602,6 +1619,18 @@ ${logEntries
             <BookOpen className="w-3.5 h-3.5" />
             <span>{unlockedEndings.length}/16</span>
           </button>
+          <button
+            onClick={() => handleSetFontSize(readerFontSize === 'normal' ? 'large' : readerFontSize === 'large' ? 'huge' : 'normal')}
+            className={`px-2 py-1 rounded-md flex items-center gap-1 border-l ml-0.5 text-xs font-semibold transition-colors ${
+              isLight
+                ? "text-stone-800 border-stone-300"
+                : "text-amber-400 border-white/[0.08]"
+            }`}
+            title="点击切换字号（标准 / 大 / 特大）"
+          >
+            <Type className="w-3.5 h-3.5" />
+            <span>{readerFontSize === 'normal' ? '标准' : readerFontSize === 'large' ? '大字' : '特大'}</span>
+          </button>
         </div>
 
         <div className="hidden lg:flex items-center gap-2.5 sm:gap-3">
@@ -1617,6 +1646,55 @@ ${logEntries
             <BookOpen className="w-3.5 h-3.5 text-[#E0B26A]" />
             <span>结局图鉴 ({unlockedEndings.length}/16)</span>
           </button>
+
+          {/* Reader Font Size Selector */}
+          <div
+            className={`flex items-center rounded-lg border text-xs font-reading-sans overflow-hidden ${
+              isLight ? "bg-stone-100 border-stone-300" : "bg-[#13151F] border-white/[0.08]"
+            }`}
+            title="调节推演正文与选项字号大小"
+          >
+            <div className={`px-2 py-1 text-[11px] flex items-center gap-1 border-r font-medium ${
+              isLight ? "border-stone-300 text-stone-600" : "border-white/[0.08] text-stone-400"
+            }`}>
+              <Type className="w-3 h-3 text-amber-500" />
+              <span>字号</span>
+            </div>
+            <button
+              onClick={() => handleSetFontSize('normal')}
+              className={`px-2.5 py-1 text-xs transition-colors ${
+                readerFontSize === 'normal'
+                  ? isLight ? "bg-amber-200 text-amber-950 font-bold" : "bg-[#D4A359]/25 text-[#D4A359] font-bold"
+                  : isLight ? "text-stone-600 hover:text-stone-900" : "text-stone-400 hover:text-stone-200"
+              }`}
+            >
+              标准
+            </button>
+            <button
+              onClick={() => handleSetFontSize('large')}
+              className={`px-2.5 py-1 text-xs border-l transition-colors ${
+                isLight ? "border-stone-300" : "border-white/[0.08]"
+              } ${
+                readerFontSize === 'large'
+                  ? isLight ? "bg-amber-200 text-amber-950 font-bold" : "bg-[#D4A359]/25 text-[#D4A359] font-bold"
+                  : isLight ? "text-stone-600 hover:text-stone-900" : "text-stone-400 hover:text-stone-200"
+              }`}
+            >
+              大字
+            </button>
+            <button
+              onClick={() => handleSetFontSize('huge')}
+              className={`px-2.5 py-1 text-xs border-l transition-colors ${
+                isLight ? "border-stone-300" : "border-white/[0.08]"
+              } ${
+                readerFontSize === 'huge'
+                  ? isLight ? "bg-amber-200 text-amber-950 font-bold" : "bg-[#D4A359]/25 text-[#D4A359] font-bold"
+                  : isLight ? "text-stone-600 hover:text-stone-900" : "text-stone-400 hover:text-stone-200"
+              }`}
+            >
+              特大
+            </button>
+          </div>
 
           {/* Dual Financial Badges: Personal Cash vs Family Savings */}
           <div
@@ -1949,15 +2027,15 @@ ${logEntries
             mobileTab === 'log' ? 'flex' : 'hidden'
           } lg:flex flex-1 ${
             isLight ? "bg-[#F8F7F4] text-stone-900" : "bg-[#0A0B0E] text-stone-100"
-          } flex-col h-full min-w-0 relative transition-colors`}
+          } font-scale-${readerFontSize} flex-col h-full min-w-0 relative transition-colors`}
         >
           {/* Chronicle Feed Container */}
           <div
             ref={feedContainerRef}
             className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 scroll-smooth"
           >
-            {/* Centered reading column wrapper */}
-            <div className="max-w-2xl mx-auto w-full space-y-4">
+            {/* Centered reading column wrapper - optimized comfortable reading width */}
+            <div className="max-w-[720px] mx-auto w-full space-y-4 sm:space-y-5">
             {/* Crisis Toast Alert inside Chronicle Feed */}
             {crisisWarning && !logEntries.some((e) => e.age === 63) && (
               <div className={`rounded-2xl p-4 sm:p-5 flex items-start gap-3 shadow-lg animate-pulse border-2 ${
@@ -1967,10 +2045,10 @@ ${logEntries
               }`}>
                 <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${isLight ? "text-rose-600" : "text-rose-400"}`} />
                 <div className="space-y-1">
-                  <h4 className={`text-sm font-bold font-narrative-serif ${isLight ? "text-rose-900" : "text-rose-300"}`}>
+                  <h4 className={`text-base font-bold font-narrative-serif ${isLight ? "text-rose-900" : "text-rose-300"}`}>
                     {crisisWarning.title}
                   </h4>
-                  <p className={`text-xs leading-relaxed font-reading-sans ${isLight ? "text-rose-800" : "text-rose-200/90"}`}>
+                  <p className={`text-xs sm:text-sm leading-relaxed font-reading-sans ${isLight ? "text-rose-800" : "text-rose-200/90"}`}>
                     {crisisWarning.desc}
                   </p>
                 </div>
@@ -1979,17 +2057,17 @@ ${logEntries
             {logEntries.map((entry, idx) => (
               <div
                 key={entry.id + idx}
-                className={`border rounded-2xl p-5 sm:p-6 shadow-sm space-y-3 transition-all animate-year-enter ${
+                className={`border rounded-2xl p-5 sm:p-6 shadow-sm space-y-3.5 transition-all animate-year-enter ${
                   isLight
                     ? "bg-white border-stone-200/90 hover:border-stone-300 text-stone-900 shadow-stone-200/50"
                     : "bg-[#12141C] border-white/[0.07] hover:border-white/[0.12] text-stone-100"
                 }`}
               >
                 {/* Entry Header */}
-                <div className={`flex items-center justify-between text-xs border-b pb-2 font-mono-num ${
+                <div className={`flex items-center justify-between text-xs sm:text-[14px] border-b pb-2.5 font-mono-num ${
                   isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
                 }`}>
-                  <span className={`font-semibold ${isLight ? "text-amber-800 font-bold" : "text-[#D4A359]"}`}>
+                  <span className={`font-semibold tracking-wide ${isLight ? "text-amber-800 font-bold" : "text-[#D4A359]"}`}>
                     [{entry.age}岁 · {entry.year}年]
                   </span>
                   <span className={`font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
@@ -1998,7 +2076,7 @@ ${logEntries
                 </div>
 
                 {/* Entry Title */}
-                <h3 className={`text-base sm:text-lg font-bold font-narrative-serif tracking-normal ${
+                <h3 className={`text-lg sm:text-[21px] font-bold font-narrative-serif tracking-normal leading-snug ${
                   isLight ? "text-stone-900" : "text-stone-100"
                 }`}>
                   {entry.title}
@@ -2011,7 +2089,7 @@ ${logEntries
 
                 {/* If Stat Delta present */}
                 {entry.statDelta && Object.keys(entry.statDelta).length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-1 text-xs">
+                  <div className="flex flex-wrap gap-2 pt-1 text-xs sm:text-[13px]">
                     {entry.statDelta.health !== undefined && entry.statDelta.health !== 0 && (
                       <span
                         className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
@@ -2092,19 +2170,19 @@ ${logEntries
 
                 {/* If a choice was made */}
                 {entry.chosenOptionText && (
-                  <div className={`mt-3 pt-3 border-t p-3.5 rounded-xl space-y-1.5 ${
+                  <div className={`mt-3 pt-3 border-t p-3.5 sm:p-4 rounded-xl space-y-2 ${
                     isLight
                       ? "bg-amber-50/70 border border-amber-200/80 text-stone-800"
                       : "border-white/[0.06] bg-[#161822] text-stone-100"
                   }`}>
-                    <div className={`text-xs sm:text-[13px] font-semibold flex items-center gap-1.5 font-reading-sans ${
+                    <div className={`text-sm sm:text-[15px] font-semibold flex items-center gap-1.5 font-reading-sans ${
                       isLight ? "text-amber-900 font-bold" : "text-[#D4A359]"
                     }`}>
                       <span>抉择印记：</span>
                       <span>{entry.chosenOptionText}</span>
                     </div>
                     {entry.chosenReaction && (
-                      <div className={`text-xs sm:text-[13px] leading-relaxed pl-3 border-l-2 font-reading-sans ${
+                      <div className={`text-[13.5px] sm:text-[14.5px] leading-relaxed pl-3.5 border-l-2 font-reading-sans ${
                         isLight ? "text-stone-700 border-amber-500/60 font-normal" : "text-stone-300 border-[#D4A359]/40"
                       }`}>
                         {entry.chosenReaction}
@@ -2115,12 +2193,12 @@ ${logEntries
 
                 {/* If milestone reflection present */}
                 {entry.reflection && (
-                  <div className={`mt-2 text-xs sm:text-[13px] pt-2 border-t flex items-start gap-1.5 p-3 rounded-xl font-reading-sans ${
+                  <div className={`mt-2.5 text-[13.5px] sm:text-[14.5px] pt-2.5 border-t flex items-start gap-2 p-3.5 rounded-xl font-reading-sans leading-relaxed ${
                     isLight
                       ? "bg-amber-100/70 text-amber-950 border border-amber-300 font-medium"
                       : "text-[#D4A359]/90 border-white/[0.06] bg-[#D4A359]/10"
                   }`}>
-                    <Sparkles className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
+                    <Sparkles className={`w-4 h-4 shrink-0 mt-0.5 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
                     <span>体悟：{entry.reflection}</span>
                   </div>
                 )}
@@ -2373,18 +2451,18 @@ ${logEntries
 
             {/* Active Choice Card (if waiting for choice) */}
             {waitingForChoice && currentNode.choices && (
-              <div className={`rounded-2xl p-4 sm:p-5 shadow-lg space-y-3.5 animate-year-enter transition-colors border ${
+              <div className={`rounded-2xl p-4 sm:p-6 shadow-lg space-y-4 animate-year-enter transition-colors border ${
                 isLight
                   ? "bg-stone-50/95 border-stone-300 text-stone-900 shadow-stone-200/50"
                   : "bg-[#11131B] border-stone-700/80 text-stone-100 shadow-stone-950/60"
               }`}>
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-semibold">
-                  <div className={`flex items-center gap-2 ${isLight ? "text-amber-900" : "text-amber-400"}`}>
-                    <Compass className="w-4 h-4 text-amber-500 shrink-0" />
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className={`flex items-center gap-2 text-sm sm:text-base font-bold ${isLight ? "text-amber-900" : "text-amber-400"}`}>
+                    <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
                     <span className="tracking-wide">宿命抉择时刻 · 请斟酌你的人生航道</span>
                   </div>
                   {isAutoPlaying && (
-                    <span className={`text-[11px] font-normal flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
+                    <span className={`text-xs font-normal flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
                       isLight
                         ? "bg-amber-100/70 text-amber-900 border-amber-300"
                         : "bg-amber-500/15 text-amber-300 border-amber-500/30"
@@ -2395,7 +2473,7 @@ ${logEntries
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-2.5 pt-0.5">
+                <div className="grid grid-cols-1 gap-3 pt-0.5">
                   {currentNode.choices.map((choice, cIdx) => {
                     const p = getChoicePresentation(choice, cIdx);
 
@@ -2403,7 +2481,7 @@ ${logEntries
                       <button
                         key={cIdx}
                         onClick={() => handleSelectChoice(choice)}
-                        className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all duration-150 active:scale-[0.99] group shadow-sm flex flex-col gap-2 relative ${
+                        className={`p-4 sm:p-5 rounded-xl border text-left transition-all duration-150 active:scale-[0.99] group shadow-sm flex flex-col gap-2 relative ${
                           isLight
                             ? "bg-white hover:bg-amber-50/40 border-stone-200 hover:border-amber-400 text-stone-900"
                             : "bg-[#161824] hover:bg-[#1D2030] border-stone-800 hover:border-amber-500/50 text-stone-100"
@@ -2412,14 +2490,14 @@ ${logEntries
                         {/* Top row: Number + Stance Badge + TradeOff Pills */}
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span className={`w-5 h-5 rounded-md border font-mono text-xs font-bold flex items-center justify-center shrink-0 ${
+                            <span className={`w-6 h-6 rounded-md border font-mono text-xs sm:text-sm font-bold flex items-center justify-center shrink-0 ${
                               isLight
                                 ? "bg-stone-100 text-stone-800 border-stone-300"
                                 : "bg-stone-800 text-stone-200 border-stone-700"
                             }`}>
                               {cIdx + 1}
                             </span>
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11.5px] font-semibold border ${
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-semibold border ${
                               isLight
                                 ? "bg-amber-50 text-amber-900 border-amber-200"
                                 : "bg-amber-500/15 text-amber-300 border-amber-500/30"
@@ -2446,13 +2524,13 @@ ${logEntries
                               return (
                                 <span
                                   key={toIdx}
-                                  className={`text-[10.5px] font-medium px-2 py-0.5 rounded-full border ${pillColor}`}
+                                  className={`text-[11.5px] sm:text-xs font-medium px-2.5 py-0.5 rounded-full border ${pillColor}`}
                                 >
                                   {to.label}
                                 </span>
                               );
                             })}
-                            <span className={`hidden sm:inline-block text-[11px] font-mono ml-1 opacity-60 ${
+                            <span className={`hidden sm:inline-block text-xs font-mono ml-1 opacity-60 ${
                               isLight ? "text-stone-500" : "text-stone-400"
                             }`}>
                               [{cIdx + 1}]
@@ -2461,18 +2539,24 @@ ${logEntries
                           </div>
                         </div>
 
-                        {/* Main Action Text - clear, upright, no jitter */}
-                        <div className={`text-[13.5px] sm:text-[14.5px] font-semibold leading-relaxed tracking-normal ${
-                          isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
-                        }`}>
+                        {/* Main Action Text - clear, upright, prominent font size */}
+                        <div
+                          style={{ fontSize: 'var(--choice-title-size, 17px)' }}
+                          className={`font-semibold leading-relaxed tracking-normal ${
+                            isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
+                          }`}
+                        >
                           {p.cleanText}
                         </div>
 
-                        {/* Detail text - clean, upright, NO italic! */}
+                        {/* Detail text - clean, upright, legible font size */}
                         {p.detail && (
-                          <div className={`text-[12px] sm:text-[13px] leading-relaxed line-clamp-2 pt-0.5 ${
-                            isLight ? "text-stone-600" : "text-stone-400"
-                          }`}>
+                          <div
+                            style={{ fontSize: 'var(--choice-desc-size, 14px)' }}
+                            className={`leading-relaxed line-clamp-3 pt-0.5 ${
+                              isLight ? "text-stone-600" : "text-stone-400"
+                            }`}
+                          >
                             “{p.detail}”
                           </div>
                         )}
@@ -2606,7 +2690,7 @@ ${logEntries
                   <div className="sm:absolute sm:left-1/2 sm:-translate-x-1/2 flex items-center justify-center w-full sm:w-auto z-10 py-1 sm:py-0">
                     <button
                       onClick={handleNextNaturalYear}
-                      className="w-full sm:w-auto px-7 sm:px-9 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30 hover:shadow-lg active:scale-[0.98] font-narrative-serif tracking-wide"
+                      className="w-full sm:w-auto px-8 sm:px-10 py-3 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30 hover:shadow-lg active:scale-[0.98] font-narrative-serif tracking-wide"
                     >
                       <span>
                         {!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)
