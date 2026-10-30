@@ -79,7 +79,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     inferiority: 35, // 自卑创伤
     academicCapital: 30, // 做题应试资本
     kinshipGuilt: 40, // 宗族愧疚与重负
-    rebellion: 30, // 反叛逆鳞
+    rebellion: 30, // 独立叛逆度
     resilience: 30, // 生存韧劲
     savings: charData.family.initialSavings // 储蓄
   }));
@@ -311,35 +311,35 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Helpers for text descriptions of core attributes (all upright, readable, no brackets clutter)
+  // Helpers for text descriptions of core attributes (grounded, mature, realistic)
   const getInferiorityDesc = (val: number) => {
-    if (val >= 60) return "深刻自卑敏感 · 深恐受人轻视";
+    if (val >= 60) return "自卑敏感 · 害怕被人看轻";
     if (val >= 35) return "自尊内敛 · 习惯独自消化";
-    return "坦荡野性 · 野草不轻易弯腰";
+    return "坦荡从容 · 不在意外界眼光";
   };
 
   const getAcademicDesc = (val: number) => {
-    if (val >= 60) return "顶尖做题机器 · 试卷杀出金身";
-    if (val >= 35) return "中规中矩 · 普高夹缝求生";
-    return "转战具体手艺 · 避开虚浮内卷";
+    if (val >= 60) return "应试做题拔尖 · 掌握做题方法";
+    if (val >= 35) return "中规中矩 · 普高普通水平";
+    return "侧重实用技能 · 避开应试内卷";
   };
 
   const getGuiltDesc = (val: number) => {
-    if (val >= 60) return "宗族重负 · 父母期待是无形锁链";
-    if (val >= 35) return "隐性牵绊 · 始终挂念父母老去";
-    return "精神断脐 · 纯粹为自己负责";
+    if (val >= 60) return "家庭包袱重 · 背负全家期待";
+    if (val >= 35) return "隐性牵挂 · 顾念家庭父母";
+    return "自我独立 · 只为自己负责";
   };
 
   const getRebellionDesc = (val: number) => {
-    if (val >= 60) return "逆鳞初成 · 随时准备掀桌";
-    if (val >= 35) return "清醒游离 · 身体在场灵魂在逃";
-    return "顺从规则 · 信奉集体与秩序";
+    if (val >= 60) return "高度叛逆独立 · 拒绝按部就班";
+    if (val >= 35) return "清醒游离 · 身体顺从精神独立";
+    return "规矩顺从 · 信奉秩序与安稳";
   };
 
   const getResilienceDesc = (val: number) => {
-    if (val >= 60) return "百炼成钢 · 四海皆可摸爬滚打";
-    if (val >= 35) return "粗糙经磨 · 能吃常人苦";
-    return "温室幼苗 · 尚未经历风浪";
+    if (val >= 60) return "生存能力极强 · 适应各种逆境";
+    if (val >= 35) return "踏实耐磨 · 能吃普通人的苦";
+    return "抗压偏弱 · 缺乏挫折历练";
   };
 
   // =========================================================================
@@ -354,13 +354,13 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-stone-900 border border-stone-800 text-stone-300 text-sm mb-3">
             <Sparkles className="w-4 h-4 text-amber-400" />
-            人生底牌 · 天命降生投影
+            人生模拟 · 原生家庭档案
           </div>
           <h1 className="text-3xl sm:text-5xl font-bold text-stone-100 tracking-tight mb-3">
             抽一张人生底牌
           </h1>
           <p className="text-base sm:text-lg text-stone-300 max-w-xl mx-auto leading-relaxed">
-            没有人能自主选择降生的家庭。按下命运齿轮，看你这一世落入哪片泥土与屋檐。
+            人生无法自选起点。每一个随机生成的家庭，都对应着一段真实的成长轨迹与阶层现实。
           </p>
         </div>
 
@@ -369,7 +369,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
           <div className="flex items-center justify-between text-sm text-stone-400 mb-4 border-b border-stone-800/80 pb-3">
             <span className="flex items-center gap-2 text-amber-400 font-medium">
               <span className={`inline-block w-2.5 h-2.5 rounded-full bg-amber-400 ${isSpinning ? 'animate-pulse' : ''}`} />
-              {isSpinning ? "正在全中国疆域随机寻址中..." : "出生地已锁定落籍"}
+              {isSpinning ? "正在随机匹配出生地..." : "出生地已确定"}
             </span>
             <span className="text-stone-300">
               {isSpinning ? "定位中..." : charData.family.region}
@@ -399,7 +399,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
           {/* Reel Control */}
           <div className="mt-5 pt-4 border-t border-stone-800/80 flex items-center justify-between">
             <span className="text-sm text-stone-400">
-              {isSpinning ? "命运正在飞速翻转..." : "对出生地不满意？可重新抽取"}
+              {isSpinning ? "正在生成中..." : "对家庭背景不满意？可重新抽取"}
             </span>
             <button
               onClick={triggerBirthReel}
@@ -407,7 +407,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-stone-950 border border-stone-700 text-stone-200 text-sm sm:text-base transition-colors"
             >
               <RotateCcw className={`w-4 h-4 ${isSpinning ? 'animate-spin text-amber-400' : ''}`} />
-              重新摇号投胎
+              重新抽取家庭
             </button>
           </div>
         </div>
@@ -436,7 +436,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
 
               {/* Upright, dignified seal */}
               <div className="border border-rose-700/80 bg-rose-950/30 text-rose-300 px-3.5 py-1.5 rounded-xl text-sm font-bold tracking-wider">
-                已落籍 · 六岁
+                生平档案 · 6岁
               </div>
             </div>
 
@@ -455,7 +455,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
             <div className="space-y-3 pt-4 border-t border-stone-800/80">
               <div className="flex items-center gap-2 text-stone-200 text-base font-bold">
                 <Users className="w-5 h-5 text-sky-400 shrink-0" />
-                <span>父母生计与性情档案：</span>
+                <span>父母生计与性格档案：</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-7">
                 <div className="bg-[#101116] p-4 rounded-2xl border border-stone-800">
@@ -515,11 +515,11 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
                 onClick={handleStartLife}
                 className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-bold text-lg sm:text-xl shadow-xl shadow-amber-950/20 transition-all flex items-center justify-center gap-2.5"
               >
-                接受这张底牌，以六岁之躯启程
+                接受这个出身，从小学一年级（6岁）开始
                 <ArrowRight className="w-5 h-5" />
               </button>
               <p className="text-center text-sm text-stone-400 mt-3">
-                从小学一年级开始，你的每一个选择都将与这份家庭底色发生剧烈化学反应
+                从小学一年级开始，你往后的每一个抉择都将决定你的大学与职业走向
               </p>
             </div>
           </div>
@@ -537,7 +537,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-950/50 text-amber-300 border border-amber-800/50 text-sm mb-3">
             <GraduationCap className="w-4 h-4" />
-            十八岁 · 高考放榜与成人命运审判
+            十八岁 · 高考放榜与学业结算
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-stone-100 tracking-tight mb-2.5">
             十二载因果终局出炉
@@ -593,7 +593,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
               <span className="text-stone-100 font-medium">{getGuiltDesc(attrs.kinshipGuilt)}</span>
             </div>
             <div className="flex justify-between items-center py-1 border-b border-stone-800/60">
-              <span className="text-stone-400">【反叛与逆鳞】</span>
+              <span className="text-stone-400">【反叛与独立】</span>
               <span className="text-rose-400 font-medium">{getRebellionDesc(attrs.rebellion)}</span>
             </div>
             <div className="flex justify-between items-center py-1">
@@ -830,21 +830,21 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
           <div className="space-y-4 text-base sm:text-lg text-stone-200 leading-relaxed">
             <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
               <span className="text-amber-400 font-bold block mb-1.5">
-                故土与血缘审判：
+                家庭顾念与情感牵绊：
               </span>
               {diagnosis.kinshipEvaluation}
             </div>
 
             <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
               <span className="text-sky-400 font-bold block mb-1.5">
-                秩序与体制审查：
+                体制依附与现实权衡：
               </span>
               {diagnosis.systemEvaluation}
             </div>
 
             <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
               <span className="text-stone-300 font-bold block mb-1.5">
-                宿命判词：
+                人生研判与核心结论：
               </span>
               「{diagnosis.fateVerdict}」
             </div>
@@ -1078,7 +1078,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
               </span>
             </div>
             <div>
-              <span className="text-stone-400 block text-xs sm:text-sm mb-1">反叛逆鳞</span>
+              <span className="text-stone-400 block text-xs sm:text-sm mb-1">独立叛逆度</span>
               <span className="text-rose-400 font-sans font-bold">{attrs.rebellion}%</span>
             </div>
             <div>
