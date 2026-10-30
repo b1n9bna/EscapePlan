@@ -2,9 +2,7 @@ export interface Profession {
   id: string;
   name: string;
   icon: string;
-  category: "tech" | "creative" | "service" | "blue_collar" | "education" | "general";
-  initialSalaryLevel: "low" | "medium" | "high";
-  description: string;
+  backgroundDesc: string;
 }
 
 export interface SimProfile {
@@ -12,346 +10,281 @@ export interface SimProfile {
   age: number;
   gender: "男" | "女";
   profession: Profession;
-  education: "高中 / 中专 / 技校" | "普通全日制大专" | "普通统招本科" | "重点大学本硕";
-  hometown: "一线大都市打工人" | "二三线省会城市" | "县城小镇青年";
-  trait: string; // 性格特质
-  initialFundsRMB: number; // 启动资金
-  englishLevel: "零基础纯靠比划" | "四六级哑巴英语" | "日常无障碍/雅思6分" | "精通/雅思7.5+";
+  education: string;
+  hometown: string;
+  initialSavingsRMB: number;
+  englishLevel: string;
   targetCountryId: string;
 }
 
-export interface SimEventChoice {
+export interface SimChoice {
   text: string;
-  subtext?: string;
-  effects: {
-    healthDelta?: number;        // 心理与生理健康 (-50 ~ +50)
-    fundsDeltaRMB?: number;      // 资金变化
-    languageDelta?: number;      // 语言熟练度 (+0 ~ +30)
-    prProgressDelta?: number;    // 身份/永居进度 (+0% ~ +30%)
-    laozhongDelta?: number;      // 老中依赖度
-  };
-  outcomeNarrative: string;      // 抉择后的真实故事反馈
+  detail: string;
+  narrative: string;
+  fundsDelta: number; // 简单记账
 }
 
-export interface SimYearEvent {
-  year: number; // 1 ~ 5
-  title: string;
-  scenario: string;
-  tags?: string[];
-  choices: SimEventChoice[];
-}
-
-export interface SimEnding {
-  id: string;
-  title: string;
-  subtitle: string;
-  badge: string;
-  badgeColor: string;
-  summary: string;
-  keyStatsSummary: string;
-  quote: string;
+export interface SimDiaryEntry {
+  year: number;
+  timeLabel: string;
+  sceneTitle: string;
+  sceneText: string;
+  choices: SimChoice[];
 }
 
 export const PROFESSIONS: Profession[] = [
   {
-    id: "software_dev",
-    name: "程序员 / IT开发者",
-    icon: "💻",
-    category: "tech",
-    initialSalaryLevel: "high",
-    description: "具备代码能力，海外IT缺口大但面试卷算法与语言。"
+    id: "clerk",
+    name: "二线城市普通文员 / 客服",
+    icon: "📄",
+    backgroundDesc: "日常处理表格与客户琐事，月薪四五千，存不下什么钱但也相对稳定。"
   },
   {
-    id: "designer",
-    name: "视觉设计师 / 自由插画师",
-    icon: "🎨",
-    category: "creative",
-    initialSalaryLevel: "medium",
-    description: "靠作品集说话，审美无国界，适合远程或文化创意岗位。"
-  },
-  {
-    id: "barista_baker",
-    name: "咖啡师 / 烘焙甜品师",
+    id: "barista",
+    name: "连锁店咖啡师 / 烘焙学徒",
     icon: "☕",
-    category: "service",
-    initialSalaryLevel: "medium",
-    description: "生活技能点满，澳新日加咖啡馆刚需，社交圈子极易打开。"
+    backgroundDesc: "站一整天拉花打奶泡，手上常有被蒸汽烫到的小伤口，熟悉服务业日常。"
   },
   {
-    id: "nurse_caregiver",
-    name: "护士 / 康复养老护理员",
+    id: "nurse",
+    name: "普通医院护士 / 养老院护理",
     icon: "🏥",
-    category: "service",
-    initialSalaryLevel: "medium",
-    description: "全球老龄化严重，欧美澳新紧缺绿色通道，身份通过率最高。"
+    backgroundDesc: "倒班三班倒，看惯了生老病死与家长里短，耐心好、不怕脏和累。"
   },
   {
     id: "technician",
-    name: "电工 / 水管工 / 汽修技师",
+    name: "汽修工 / 家电维修小哥",
     icon: "🔧",
-    category: "blue_collar",
-    initialSalaryLevel: "high",
-    description: "西方蓝领时薪天花板，靠过硬手艺打天下，不用熬夜画PPT。"
+    backgroundDesc: "懂一点电路和机械，指甲缝里总有点洗不净的机油，擅长动手解决问题。"
   },
   {
-    id: "educator",
-    name: "幼教老师 / 国际中文教师",
+    id: "teacher",
+    name: "幼儿园老师 / 辅导班老师",
     icon: "📚",
-    category: "education",
-    initialSalaryLevel: "medium",
-    description: "澳洲加拿大紧缺优先，耐心有爱心，适合有教育背景的人群。"
+    backgroundDesc: "带小朋友有耐心，嗓子常年有点哑，性格温和内向。"
   },
   {
-    id: "marketing_ops",
-    name: "市场运营 / 跨境电商运营",
-    icon: "📦",
-    category: "general",
-    initialSalaryLevel: "medium",
-    description: "熟悉国际供应链与海外社交媒体，适合出海或跨国商贸。"
+    id: "dev",
+    name: "普通外包程序员 / 运维",
+    icon: "💻",
+    backgroundDesc: "写普通的业务代码，常年久坐腰不太好，不擅长人际应酬。"
   },
   {
-    id: "fresh_grad",
-    name: "应届毕业生 / 迷茫青年",
-    icon: "🎓",
-    category: "general",
-    initialSalaryLevel: "low",
-    description: "年轻就是最大资本！适合打工度假 (WHV) 或语言学校探索世界。"
-  },
-  {
-    id: "digital_nomad",
-    name: "自由职业 / 数字游民",
-    icon: "🧘",
-    category: "creative",
-    initialSalaryLevel: "medium",
-    description: "赚远程美金或被动收入，一台电脑即工位，海滩咖啡馆常驻。"
+    id: "freelancer",
+    name: "刚毕业两年的迷茫年轻人",
+    icon: "🎒",
+    backgroundDesc: "换过两三份工作，不知道未来要做什么，想换个环境看看世界。"
   }
-];
-
-export const FUND_OPTIONS = [
-  { label: "破釜沉舟穷游 (5万 RMB)", value: 50000, desc: "精打细算，下飞机第一天就得找打工生计" },
-  { label: "工薪稳健启动金 (20万 RMB)", value: 200000, desc: "能够应付第一年学费/押金与基础开销" },
-  { label: "中产从容准备 (60万 RMB)", value: 600000, desc: "有较强抗风险缓冲期，可支持过渡期租房与培训" },
-  { label: "富足底气基金 (150万 RMB+)", value: 1500000, desc: "适合直接非盈利居留、投资或买房定居" }
 ];
 
 export const SIM_COUNTRIES = [
   {
     id: "japan",
-    name: "日本 (Tokyo/Osaka)",
+    name: "日本",
     flag: "🇯🇵",
-    desc: "治安无敌、24小时便利店、语言学校或特定技能低门槛快速启航",
-    difficulty: "中等",
-    costLevel: "¥¥"
+    city: "东京郊区 / 大阪",
+    livingCostDesc: "生活成本适中，物价精细，满街便利店与自行车道。"
   },
   {
     id: "australia",
-    name: "澳大利亚 (Sydney/Melbourne)",
+    name: "澳大利亚",
     flag: "🇦🇺",
-    desc: "阳光大草坪、蓝领时薪天花板、打工度假(WHV)与护理技工移民圣地",
-    difficulty: "中等",
-    costLevel: "¥¥¥"
-  },
-  {
-    id: "thailand",
-    name: "泰国 (Chiang Mai/Bangkok)",
-    flag: "🇹🇭",
-    desc: "物价极低、美食丰富、DTV 5年多次游民签、老中生活降维神仙天堂",
-    difficulty: "极低",
-    costLevel: "¥"
+    city: "悉尼郊区 / 维州农场小镇",
+    livingCostDesc: "阳光充沛，草坪宽阔，人工极贵，靠体力劳动能自给自足。"
   },
   {
     id: "germany",
-    name: "德国 (Berlin/Munich)",
+    name: "德国",
     flag: "🇩🇪",
-    desc: "工会强大绝无加班、机会卡6分制赴德、公立大学免学费、欧洲中心",
-    difficulty: "困难",
-    costLevel: "¥¥"
+    city: "柏林郊区 / 杜伊斯堡",
+    livingCostDesc: "生活节奏严谨，严格八小时下班，周日全城闭店安宁。"
   },
   {
     id: "spain",
-    name: "西班牙 (Valencia/Barcelona)",
+    name: "西班牙",
     flag: "🇪🇸",
-    desc: "气候最好、非盈利居留有存款即可住、海鲜饭与地中海松弛人生",
-    difficulty: "低",
-    costLevel: "¥¥"
+    city: "瓦伦西亚 / 阿利坎特",
+    livingCostDesc: "气候温暖日照长，物价宜人，漫步地中海海滩与街巷。"
+  },
+  {
+    id: "canada",
+    name: "加拿大",
+    flag: "🇨🇦",
+    city: "卡尔加里 / 温哥华郊区",
+    livingCostDesc: "雪山广阔，多元包容，冬日炉火与暖咖啡的漫长岁月。"
+  },
+  {
+    id: "thailand",
+    name: "泰国",
+    flag: "🇹🇭",
+    city: "清迈宁曼路旁的小巷",
+    livingCostDesc: "物价低廉，空气里有香茅草味道，生活节奏慢得像停滞了。"
   },
   {
     id: "china_stay",
-    name: "中国 · 现住地 (平行时空对照组)",
+    name: "留在原来的城市 (平行对照)",
     flag: "🇨🇳",
-    desc: "如果留下来继续当打工人会发生什么？最真实的平行宇宙对照！",
-    difficulty: "熟悉",
-    costLevel: "¥¥"
+    city: "老家省会 / 现住地",
+    livingCostDesc: "熟悉的路口，熟悉的外卖，家人在身边，平淡而琐碎的生活。"
   }
 ];
 
-export const RANDOM_NAMES = [
-  "李想", "陈晓梅", "林深", "周若雨", "王大明", 
-  "张宁", "沈越", "赵雅婷", "刘晨", "姜来", 
-  "徐小伟", "高杨", "郭静", "孙一诺", "宋飞"
+export const RANDOM_PROFILES: Omit<SimProfile, 'targetCountryId'>[] = [
+  {
+    name: "周若雨",
+    age: 26,
+    gender: "女",
+    profession: PROFESSIONS[0], // 文员
+    education: "普通全日制大专",
+    hometown: "江西某县城，在杭州打工三年",
+    initialSavingsRMB: 38000,
+    englishLevel: "普通高中英语底子，能听懂简单单词"
+  },
+  {
+    name: "陈浩",
+    age: 29,
+    gender: "男",
+    profession: PROFESSIONS[3], // 汽修
+    education: "职业中专汽修专业",
+    hometown: "山东潍坊农村，干了七年汽修",
+    initialSavingsRMB: 52000,
+    englishLevel: "只会认仪表盘上的英文故障码"
+  },
+  {
+    name: "林小满",
+    age: 24,
+    gender: "女",
+    profession: PROFESSIONS[1], // 咖啡师
+    education: "民办三本新闻系",
+    hometown: "湖南株洲，毕业后在成都做咖啡",
+    initialSavingsRMB: 26000,
+    englishLevel: "日常打招呼还行，语速一快就发懵"
+  },
+  {
+    name: "张建国",
+    age: 34,
+    gender: "男",
+    profession: PROFESSIONS[5], // 程序员
+    education: "普通省属大学计算机本科",
+    hometown: "河南洛阳，在武汉外包公司工作八年",
+    initialSavingsRMB: 110000,
+    englishLevel: "能看懂英文技术文档，开不了口"
+  },
+  {
+    name: "王婷",
+    age: 27,
+    gender: "女",
+    profession: PROFESSIONS[2], // 护士
+    education: "医学院护理专科",
+    hometown: "江苏徐州，在公立医院做了四年合同制护士",
+    initialSavingsRMB: 45000,
+    englishLevel: "考过护士英语，专业词汇还算熟悉"
+  }
 ];
 
-export const RANDOM_TRAITS = [
-  "老中胃重度依恋 · 离不开深夜外卖与人间烟火",
-  "天生孤癖社恐 · 讨厌聚会社交，自愈能力极强",
-  "乐天派大条 · 随遇而安，走到哪里都能活",
-  "做题家灵魂 · 信奉努力打卡，极度擅长应试考证",
-  "动手能力MAX · 蓝领糙汉体质，擅长修修补补",
-  "佛系生活家 · 物质欲望低，追求阳光与大自然"
-];
-
-export const RANDOM_EDUCATIONS: SimProfile['education'][] = [
-  "高中 / 中专 / 技校",
-  "普通全日制大专",
-  "普通统招本科",
-  "重点大学本硕"
-];
-
-export const RANDOM_HOMETOWNS: SimProfile['hometown'][] = [
-  "一线大都市打工人",
-  "二三线省会城市",
-  "县城小镇青年"
-];
-
-export const RANDOM_FUNDS = [
-  30000,   // 3万 (破釜沉舟)
-  50000,   // 5万
-  120000,  // 12万 (省吃俭用工薪)
-  250000,  // 25万
-  450000,  // 45万 (稳健中产)
-  850000   // 85万 (小富底气)
-];
-
-export function generateRandomLife(): SimProfile {
-  const name = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
-  const age = Math.floor(Math.random() * 18) + 22; // 22 ~ 39
-  const gender: "男" | "女" = Math.random() > 0.5 ? "男" : "女";
-  const profession = PROFESSIONS[Math.floor(Math.random() * PROFESSIONS.length)];
-  const education = RANDOM_EDUCATIONS[Math.floor(Math.random() * RANDOM_EDUCATIONS.length)];
-  const hometown = RANDOM_HOMETOWNS[Math.floor(Math.random() * RANDOM_HOMETOWNS.length)];
-  const trait = RANDOM_TRAITS[Math.floor(Math.random() * RANDOM_TRAITS.length)];
-  const initialFundsRMB = RANDOM_FUNDS[Math.floor(Math.random() * RANDOM_FUNDS.length)];
-  
-  const engLevels: SimProfile['englishLevel'][] = [
-    "零基础纯靠比划",
-    "四六级哑巴英语",
-    "日常无障碍/雅思6分",
-    "精通/雅思7.5+"
-  ];
-  const englishLevel = engLevels[Math.floor(Math.random() * engLevels.length)];
-
-  // Default target countries (excluding China stay for default roll, but user can pick it)
-  const availableCountries = SIM_COUNTRIES.filter(c => c.id !== "china_stay");
-  const targetCountryId = availableCountries[Math.floor(Math.random() * availableCountries.length)].id;
-
+export function getRandomProfile(): SimProfile {
+  const base = RANDOM_PROFILES[Math.floor(Math.random() * RANDOM_PROFILES.length)];
+  const countries = SIM_COUNTRIES.filter(c => c.id !== "china_stay");
+  const randomCountry = countries[Math.floor(Math.random() * countries.length)].id;
   return {
-    name,
-    age,
-    gender,
-    profession,
-    education,
-    hometown,
-    trait,
-    initialFundsRMB,
-    englishLevel,
-    targetCountryId
+    ...base,
+    targetCountryId: randomCountry
   };
 }
 
-export const SIM_YEAR_EVENTS: Record<string, SimYearEvent[]> = {
+export const DIARY_STORIES: Record<string, SimDiaryEntry[]> = {
   japan: [
     {
       year: 1,
-      title: "初来乍到：租房审查与第一笔生计",
-      scenario: "你拉着两个大行李箱走出成田机场。虽然满街便利店让你备感亲切，但中介带你看房时，房东一听是初次赴日外国人连连摆手；同时你的启动资金正以每天几百人民币的速度缩水。",
+      timeLabel: "初抵 · 第 1 年",
+      sceneTitle: "那间空荡荡的单身公寓，与晚上八点的超市",
+      sceneText: "第一天搬进单身公寓，房间里空得能听见回音，没有床，连天花板上的吸顶灯泡都要自己去买。窗帘太贵舍不得买，你拿带过来的两件厚羽绒服夹在窗框上挡光。晚上 7 点 50 分，你站在超市熟食区旁边假装看酸奶，眼睛一直瞟着那个穿围裙的理货员——等他掏出红色‘半额（半价）’贴纸贴在炸猪排便当上的一瞬间，你伸手拿了一盒，心算了一下：才 260 日元，合人民币 13 块钱。",
       choices: [
         {
-          text: "咬牙付 2 个月礼金+押金+担保公司费，租下山手线沿线独立小公寓，省下通勤时间全力学语言找工。",
-          subtext: "前期烧钱，但生活品质与效率有保证",
-          effects: { fundsDeltaRMB: -35000, healthDelta: 10, languageDelta: 15, prProgressDelta: 20, laozhongDelta: -10 },
-          outcomeNarrative: "你搬进了虽然只有 18 平米但麻雀虽小五脏俱全的单身公寓。每天下班去全家买便当，日语听力在便利店店员的礼貌客套话中飞速长进。"
+          text: "去百元店买两个塑料收纳箱倒扣着当桌子，去二手店淘了个 40 块钱掉漆的旧电饭煲。",
+          detail: "虽然简陋，但屋子里第一次飘出了热米饭的香气。",
+          narrative: "第一锅米饭煮好的时候，米香飘满了十几平米的小房间。你坐在地板上，就着一罐拌饭海苔吃了一大碗。吃完把碗洗得干干净净，忽然觉得日子好像能过下去了。",
+          fundsDelta: -1200
         },
         {
-          text: "选择华人合租房 (Share House)，先去中华料理店或便利店夜班打工糊口，把生活成本压到最低。",
-          subtext: "极致省钱，但室友矛盾多且老中圈子扎堆",
-          effects: { fundsDeltaRMB: -12000, healthDelta: -10, languageDelta: 5, prProgressDelta: 10, laozhongDelta: 20 },
-          outcomeNarrative: "房租省下了一大半，但每天在合租屋厨房听室友痛骂日本西瓜太贵。你在便利店扫码熟练得让人心疼，存款没怎么掉，但有点怀疑出国的意义。"
+          text: "找同在东京的华人转租群，花更少钱搬去跟别人合租，分摊掉水电与网络费。",
+          detail: "省下了宝贵的押金，但得习惯隔壁屋半夜打电话的声音。",
+          narrative: "合租屋的厨房有点油腻，室友是个在中华料理店打工的同胞。晚上你们在狭窄的过道擦肩而过，互相客气地点头打个招呼，各自端着泡面回屋关门。",
+          fundsDelta: -600
         }
       ]
     },
     {
       year: 2,
-      title: "除夕之夜：老中胃大爆发与会社文化洗礼",
-      scenario: "转眼到了第二年春节，国内群里全在晒热腾腾的年夜饭与除夕晚会。而东京大雪纷飞，你下班走在静悄悄的新宿街头，会社领导下班硬拉着你去居酒屋开‘忘年会’喝酒敬酒，你已经连续三个月没吃到地道羊肉串了。",
+      timeLabel: "立足 · 第 2 年",
+      sceneTitle: "那家 1200 日元的快剪店，与藏在枕头底下的感冒药",
+      sceneText: "头发长长了，你实在没办法，硬着头皮走进车站旁 1200 日元的快剪理发店。理发师傅问了一长串话，你一句没听懂，耳朵涨得通红，只能掏出手机翻出两年前在老家拍的照片递过去。剪完后你习惯性低头说了声‘对不起’，对方愣了一下，笑着递给你一块热毛巾。入冬的时候你发烧到了 38 度 5，不敢叫救护车怕贵，裹着被子发汗。晚上妈妈突然打微信视频过来，你慌慌张张把床头的药盒塞到枕头底下，用手抹了抹脸，笑着说‘妈，这边暖和着呢，刚喝了热汤有点出汗’。",
       choices: [
         {
-          text: "推掉应酬！直奔池袋或者高田马场，找家东北铁锅炖，豪掷一万日元狂炫，回屋跟家里视频。",
-          subtext: "老中胃大满足，狠狠治愈精神内耗",
-          effects: { fundsDeltaRMB: -8000, healthDelta: 25, languageDelta: 0, prProgressDelta: 10, laozhongDelta: 25 },
-          outcomeNarrative: "热气腾腾的铁锅炖酸菜粉条下肚那一刻，你的眼泪差点掉下来。你明白自己无论跑多远，骨子里那颗中国胃永远在叫嚣。"
+          text: "买了一辆前车篮掉了一小块漆的二手自行车，下班开始自己骑车去更远的廉价蔬菜超市。",
+          detail: "不用再每次提着两袋大米走 20 分钟坡路了。",
+          narrative: "推着那辆旧车走下坡道的时候，天边有一大片粉红色的晚霞。风吹在脸上有点凉，但你第一次觉得这个城市的声音没有那么刺耳了。",
+          fundsDelta: -300
         },
         {
-          text: "跟着日本同事去居酒屋‘二次会’喝清酒，硬着头皮练习敬语，借机向课长争取转正与涨薪机会。",
-          subtext: "融入当地社会，忍受社畜客套",
-          effects: { fundsDeltaRMB: 15000, healthDelta: -15, languageDelta: 25, prProgressDelta: 25, laozhongDelta: -20 },
-          outcomeNarrative: "喝到半夜两点吐在车站卫生间，但课长拍着你肩膀说‘君は本当に頑張っている’。下个月你的工资单涨了 4 万日元，签证续签了 3 年！"
+          text: "周末去附近的便利店兼职做收银，硬着头皮每天重复几百遍‘欢迎光临’和找零用语。",
+          detail: "每天站六个小时，但日语听力和口语在实战中慢慢脱敏。",
+          narrative: "最开始老是找错硬币，急得满头大汗。三个月后，你已经能闭着眼睛辨别 100 日元和 50 日元的重量了。下班店长塞给你两个快过期的饭团，说辛苦了。",
+          fundsDelta: 3500
         }
       ]
     },
     {
       year: 3,
-      title: "立足与蜕变：考级加分还是跳槽外资？",
-      scenario: "在日第三年，你已经对垃圾分类熟记于心，看病报销70%的健保卡让你彻底没有了就医恐慌。你发现自己的积分刚好卡在 65 分尴尬期，差 5 分就能达到高度人才 70 分快速永住门槛。",
+      timeLabel: "日常 · 第 3 年",
+      sceneTitle: "厨房水槽堵塞的下午，与那个笑出来的瞬间",
+      sceneText: "周六下午水槽突然堵了，冒出一股发酸的脏水。查了一下请疏通师傅上门要花两万多日元，你心疼得肉跳。一个人在网上搜‘下水道堵塞自己修’，去百元店买了根十块钱的简易塑料管道条，跪在厨房冰凉的瓷砖地上捅了半个小时。头发和污垢哗啦一声排走、水流打着旋漏下去的那一刻，你瘫坐在地上，两手都是黑色的油污，看着被修好的水槽，忍不住一个人在屋里苦笑了一声。",
       choices: [
         {
-          text: "挑灯夜战！报名半年后的 JLPT N1 考试，并利用周末备战中国软考高级资格证（中日互认+5分）。",
-          subtext: "做题家传统艺能发动！靠应试硬实力强行通关",
-          effects: { fundsDeltaRMB: -5000, healthDelta: -5, languageDelta: 20, prProgressDelta: 30, laozhongDelta: 0 },
-          outcomeNarrative: "做题家基因觉醒！你半年刷完三大本红宝书，N1 拿到 140 高分，加上软考系统分析师证书，总分狂飙到 80 分！直接解锁‘1年拿永住’的绿色通道！"
+          text: "去吉野家吃了碗大份牛肉饭，多要了一份温泉蛋，奖励自己一下。",
+          detail: "生活里极微小、却真真切切属于自己的成就感。",
+          narrative: "店里静悄悄的，旁边的上班族大叔低着头大口扒饭，电视里放着无聊的综艺。你把蛋黄戳破裹着米饭吞下去，胃里暖呼呼的。",
+          fundsDelta: -45
         },
         {
-          text: "跳槽去六本木的纯英语外资企业，工资翻倍，告别日本传统年功序列制。",
-          subtext: "高薪高回报，但外资稳定性略逊",
-          effects: { fundsDeltaRMB: 60000, healthDelta: 15, languageDelta: 10, prProgressDelta: 20, laozhongDelta: -15 },
-          outcomeNarrative: "你的年薪突破了 850 万日元，开会全英文沟通，平时下班再也不用假装加班等领导先走了。你在东京的周末开始变得有滋有味。"
+          text: "冲了个热水澡，把屋子彻底拖了一遍，换上晒干带阳光味的干净被套。",
+          detail: "慢慢把这个租来的小窝打理得越来越像一个家。",
+          narrative: "被子上带着淡淡的洗衣液清香。你坐在窗边看着外面的电线杆和飞过去的乌鸦，心里忽然有一块悬着的地方落了地。",
+          fundsDelta: 0
         }
       ]
     },
     {
       year: 4,
-      title: "安家抉择：低利率零首付买房还是去地方小城？",
-      scenario: "日本房贷利率低至 0.4%~0.7%（近乎白借）。你在东京看了一套晴海旗两居室塔楼，首付甚至只要几十万日元；同时你的朋友劝你搬去福冈或冲绳，享受阳光海风与大房子。",
+      timeLabel: "习惯 · 第 4 年",
+      sceneTitle: "不再看导航的回家路，与隔壁老太太的打招呼",
+      sceneText: "你已经能熟练地在周二早上把可燃垃圾绑好放进收集网，再也没有被贴过黄色的警告贴纸。去区役所更新地址，工作人员说了一串专业术语，你虽然语速慢，但已经能拿出印章和在留卡一件件办妥，手心不再像以前那样冒冷汗。下楼倒垃圾碰见隔壁牵着柴犬的日本老太太，对方微笑着冲你道早安，你下意识自然地回了句‘おはようございます’，两个人微微躬身，擦肩而过。",
       choices: [
         {
-          text: "趁着低利率，在东京或神奈川上车一套次新公寓，正式扎根日本核心资产区。",
-          subtext: "成为有产阶级，资产抗通胀",
-          effects: { fundsDeltaRMB: -40000, healthDelta: 10, languageDelta: 10, prProgressDelta: 25, laozhongDelta: -10 },
-          outcomeNarrative: "拿到了超低息银行贷款，每月房贷比以前租房还便宜 3 万日元！你站在阳台俯瞰东京塔的夜景，终于在这个繁华冷峻的国度有了自己的避风港。"
+          text: "给家里寄了一万块钱，给爸妈在网上买了件保暖羽绒服和一台自动洗脚盆。",
+          detail: "虽然存款没很多，但终于有能力给家里添置点东西了。",
+          narrative: "妈妈发来微信语音，声音里带着点心疼又带着点自豪：‘自己在那边多吃点好的，别老省着。’你听完按了锁屏键，把头靠在窗玻璃上。",
+          fundsDelta: -10000
         },
         {
-          text: "拒绝房奴！开启远程工作模式，搬去海滨城市镰仓或京都租传统町屋，养一只柴犬过惬意慢生活。",
-          subtext: "生活松弛感拉满，远离都市高压",
-          effects: { fundsDeltaRMB: 20000, healthDelta: 35, languageDelta: 15, prProgressDelta: 15, laozhongDelta: -20 },
-          outcomeNarrative: "每天推开木格窗就是紫阳花与江之电电车叮叮当当经过。你的精神内耗彻底治愈，整个人松弛得像变了一个人。"
+          text: "在河边的二手书店淘了两本带插图的生活散文，周末一个人坐在河堤草坪上看书发呆。",
+          detail: "不再焦虑每天必须学多少单词，生活节奏慢了下来。",
+          narrative: "几个日本初中生骑着自行车从河堤上呼啸而过，笑声洒了一路。河水在阳光下泛着细碎的金光，你闭上眼睛晒了半个小时太阳。",
+          fundsDelta: -50
         }
       ]
     },
     {
       year: 5,
-      title: "命运终审：永住绿卡下发的那一天",
-      scenario: "你在日本已经整整生活了五年。你手里的在留卡换成了闪闪发光的‘永住者’审查结果通知书；或者你正在纠结是入籍拿到免签190国的护照，还是保留中国国籍两头跑。",
+      timeLabel: "回望 · 第 5 年",
+      sceneTitle: "五年在留卡换下来的那一天",
+      sceneText: "窗口递出来的塑料卡片上，在留期限一栏印着‘5年’。走出入管局大楼，电车开往熟悉的品川站。你没有发财，银行卡里依然只有几万块钱；你依然习惯在晚上八点去超市看一眼打折贴纸；你依然经常想念老家那碗热腾腾的牛肉面。但你已经不用靠手机翻译过日子，你有了自己熟悉的理发师，你在这个陌生的异国角落，踏踏实实地活了下来。",
       choices: [
         {
-          text: "正式领取日本永久居留卡 (PR)，保留中国护照，获得在日永久工作与社会福利资格！",
-          subtext: "最完美的留退自如状态",
-          effects: { fundsDeltaRMB: 30000, healthDelta: 30, languageDelta: 15, prProgressDelta: 50, laozhongDelta: 10 },
-          outcomeNarrative: "品川入管局窗口前，那张印着‘永住者’字样的卡片递到你手上。从此你不需要依附于任何雇主，在日本全境进退自如，天高任鸟飞。"
-        },
-        {
-          text: "打包五年攒下的积蓄与流利的双语能力，选择回国发展或调任新加坡，把这段经历变成人生勋章。",
-          subtext: "海归精锐，历练完成战略收割",
-          effects: { fundsDeltaRMB: 80000, healthDelta: 20, languageDelta: 10, prProgressDelta: 10, laozhongDelta: 40 },
-          outcomeNarrative: "你坐在回国的成田航班上，看着机翼下的富士山渐渐变小。你战胜了孤独，学会了独处，看清了世界，无论去哪里你都是不可战胜的成熟大人了。"
+          text: "在回程的电车上发了条仅自己可见的朋友圈：‘今天第五年，下班回家。’",
+          detail: "没有任何口号，只是一张电车车窗外普通街景的照片。",
+          narrative: "列车缓缓驶过荒川大桥，夕阳把河面染得通红。你收起手机插进大衣口袋，准备下车去站前的小面包房买明天的早餐。",
+          fundsDelta: 0
         }
       ]
     }
@@ -359,96 +292,251 @@ export const SIM_YEAR_EVENTS: Record<string, SimYearEvent[]> = {
   australia: [
     {
       year: 1,
-      title: "阳光大荒原：打工度假与肉厂/农场开局",
-      scenario: "手握 WHV 打工度假签踏上悉尼。你原本以为落地就是海滩冲浪，结果发现悉尼单间房租高达每周 400 澳币！为了集齐第二年续签资格，你必须决定是先去偏远农场摘草莓，还是在城里找咖啡馆打工。",
+      timeLabel: "落地 · 第 1 年",
+      sceneTitle: "维州小镇的铁皮屋宿舍，与手上磨出的老茧",
+      sceneText: "下了飞机一路转火车和大巴，到了维州一个以苹果和农场出名的小镇。合租的铁皮屋里住了四个不同国家的年轻人，水龙头拧开带着一股轻微的铁锈味。第一天在包装厂打工，站了八个半小时给橘子分类装箱，腰酸得晚上翻个身都要倒吸凉气，手掌内侧磨起了两颗晶莹的水泡。晚上坐在门前台阶上，天黑得特别透彻，南半球的银河像一条银色的河横在头顶，偶尔能听到远处树林里袋鼠跳过的沙沙声。",
       choices: [
         {
-          text: "去昆士兰农场摘蓝莓或肉厂剃骨，虽然每天凌晨4点起床累到散架，但每周到手 1,500 澳币纯存！",
-          subtext: "体力爆肝，快速攒下第一桶金",
-          effects: { fundsDeltaRMB: 50000, healthDelta: -10, languageDelta: 10, prProgressDelta: 20, laozhongDelta: -15 },
-          outcomeNarrative: "虽然手上磨出了老茧，但两个月你的澳洲联邦银行卡里多了 8,000 澳币！看着落日下的红色袋鼠，你感受到了纯体力劳动换来厚厚钞票的踏实感。"
+          text: "去镇上的 Kmart 买了双 25 刀的工装厚袜子和两卷透气胶布，把水泡挑破缠好，第二天继续上工。",
+          detail: "普通人的韧劲全在这些咬着牙的细节里。",
+          narrative: "第二个星期，手上的水泡变成了硬硬的茧子。领到第一周 950 澳币的周薪支票时，看着银行卡里真真切切的数字，你觉得手掌没那么疼了。",
+          fundsDelta: 4500
         },
         {
-          text: "留在墨尔本咖啡馆做 Barista 或奶茶店打工，在市区练习地道 Aussie 英语并融入多元社群。",
-          subtext: "生活优雅舒适，但存钱速度相对平缓",
-          effects: { fundsDeltaRMB: 10000, healthDelta: 20, languageDelta: 25, prProgressDelta: 10, laozhongDelta: 0 },
-          outcomeNarrative: "你学会了用浓郁的澳洲口音向顾客问候‘G'day mate, how's it going?’。你的拿铁拉花技艺飞涨，周末常和世界各地的背包客去大洋路露营。"
+          text: "跟同屋的爱尔兰背包客学着用简易咖啡壶煮黑咖啡，下班一起坐在草地上啃刚烤好的大面包。",
+          detail: "语言在磕磕绊绊的日常里飞速长进。",
+          narrative: "你学会了用浓郁的澳洲俚语说‘No worries mate’。晚上听他们讲在各地农场的见闻，你忽然觉得世界上原来有这么多人都在这么朴素地流浪。",
+          fundsDelta: 0
         }
       ]
     },
     {
       year: 2,
-      title: "人工刺客震撼：修水管收费 $350 带来的世界观重置",
-      scenario: "你合租屋的马桶下水管爆了，叫来一个开着小卡车、满身纹身的澳洲水管工小哥，拧了两下螺丝换了个胶圈，用时 15 分钟，刷卡机敲出 $350 澳币。你当场被西方人工费的尊贵程度彻底震撼。",
+      timeLabel: "谋生 · 第 2 年",
+      sceneTitle: "二手面包车，与墨尔本阴天的咖啡香",
+      sceneText: "农场的工期结束，你攒了 8000 澳币，花 2200 刀买了辆开了 19 万公里的旧丰田凯美瑞。车窗升降有点卡顿，但它能带你去任何地方。你搬到了墨尔本郊区的一个小镇，在一家当地人开的街角咖啡馆找了份服务生的活。每天早上 6 点开门，满屋子都是浓郁的深烘咖啡香气。常客是个每天点一杯 Flat White 的退休老头，看你英语卡壳，会慢吞吞地跟你开玩笑，纠正你的发音。",
       choices: [
         {
-          text: "重塑职业信仰！利用打工攒的学费申请澳洲 TAFE 技工学校（电工/汽修/西厨），准备靠手艺拿 PR！",
-          subtext: "蓝领逆袭之路，澳洲永远的缺人刚需",
-          effects: { fundsDeltaRMB: -40000, healthDelta: 15, languageDelta: 20, prProgressDelta: 30, laozhongDelta: -25 },
-          outcomeNarrative: "你脱下了格子衬衫，穿上了荧光黄的反光背心。看着身边的澳洲同学，你意识到在这里当个手艺精湛的技工，社会地位和收入绝不输写字楼白领。"
+          text: "自己带饭去上班，买了一大块冷冻牛肉和打折土豆，分装成五个玻璃饭盒冻在冰箱里。",
+          detail: "外食太贵，自己做饭是省钱的不二法宝。",
+          narrative: "午休的时候在休息室热土豆炖牛肉，老板闻到香味探头说‘Smells delicious!’，顺手给你倒了一杯刚做好的拿铁。",
+          fundsDelta: -200
         },
         {
-          text: "决定转战护理或幼教紧缺专业，走 189/190 独立技术移民绿色通道，享受联邦高额优先打分。",
-          subtext: "文科与服务业的最稳移民捷径",
-          effects: { fundsDeltaRMB: -50000, healthDelta: 10, languageDelta: 25, prProgressDelta: 35, laozhongDelta: -15 },
-          outcomeNarrative: "你在养老院的实习非常顺利，老人们都夸你耐心温柔。州政府将你的职业列为优先获邀第一梯队，PR 邀请信已经在路上。"
+          text: "报名了周末的急救证书 (First Aid) 培训课程，想为以后转做养老护理员做准备。",
+          detail: "在澳洲，护理和蓝领是永远踏实的饭碗。",
+          narrative: "教室里坐着各个年龄段的人，你认真地在塑料假人身上按压心肺复苏。拿到证书的那天，你把它整整齐齐夹在了护照夹里。",
+          fundsDelta: -180
         }
       ]
     },
     {
       year: 3,
-      title: "偏远地区生活：阿德莱德或珀斯的慢时光",
-      scenario: "为了州担保移民加分，你告别了喧嚣的悉尼，搬到了南澳阿德莱德或西澳珀斯。这里没有早高峰人挤人，街道宽阔，下班就能看到海边火烧云海豚跃出海面。",
+      timeLabel: "沉淀 · 第 3 年",
+      sceneTitle: "一个人看日落的海滩，与那通报喜不报忧的电话",
+      sceneText: "周日傍晚，你开着那辆老丰田去了海边。澳洲的海滩永远空旷干净，海浪一层层涌上来拍在沙滩上。你把折叠椅撑在沙子里，手里拿着一罐两块钱的超市气泡水。手机震动，是家里的微信视频。你整理了一下被海风吹乱的头发，接通视频。老家客厅里电视机声音很大，爸爸问你‘今天吃的啥？’你指了指前面的落日和大海：‘在海边玩呢，这边挺好的，刚吃完烤肉。’",
       choices: [
         {
-          text: "买了辆二手丰田 Hilux 皮卡，周末带上折叠椅和烧烤架去海滩钓盲槽鱼，彻底融入土澳生活。",
-          subtext: "阳光开朗大男孩，户外属性封神",
-          effects: { fundsDeltaRMB: -20000, healthDelta: 40, languageDelta: 20, prProgressDelta: 20, laozhongDelta: -30 },
-          outcomeNarrative: "你晒成了健康的小麦色，以前国内的偏头痛和失眠全不治而愈。每天看着蓝天白云，你终于懂了什么是生活本该有的模样。"
-        },
-        {
-          text: "在华人圈里做兼职代购、小红书旅拍，同时在本地私立诊所打工，双线开花猛存首付。",
-          subtext: "勤劳老中特质在低压澳洲形成降维暴富",
-          effects: { fundsDeltaRMB: 70000, healthDelta: 10, languageDelta: 10, prProgressDelta: 20, laozhongDelta: 15 },
-          outcomeNarrative: "澳洲本地人下班都去喝酒晒太阳，而你利用业余时间把自媒体和小生意做得风生水起，不知不觉手里已经存了 10 万澳币现金！"
-        }
-      ]
-    },
-    {
-      year: 4,
-      title: "EOI 捞人季：雅思 4 个 8 的最后决战",
-      scenario: "澳洲移民局公布最新配额，技术移民打分水涨船高。你目前积分为 85 分，只要能把英语考到 PTE 八炸（相当于雅思 4 个 8），就能稳获本州 190 永居提名！",
-      choices: [
-        {
-          text: "开启做题家狂暴模式！闭门刷 PTE 机经一个月，每天狂练口语跟读与机改写作，必须拿下八炸！",
-          subtext: "冲刺巅峰！不破楼兰终不还",
-          effects: { fundsDeltaRMB: -6000, healthDelta: -10, languageDelta: 30, prProgressDelta: 40, laozhongDelta: 0 },
-          outcomeNarrative: "成绩单弹出来那一刻，四个 85+！你狂吼一声惊动了邻居家的鹦鹉。当晚州政府移民局系统直接向你下发了 Pre-invite 获邀信！"
-        },
-        {
-          text: "寻找优质雇主走 482 雇主担保签证，不硬卷 PTE 分数，用过硬的工作表现锁定担保。",
-          subtext: "靠职场口碑与实际工作业绩破局",
-          effects: { fundsDeltaRMB: 10000, healthDelta: 15, languageDelta: 15, prProgressDelta: 25, laozhongDelta: -10 },
-          outcomeNarrative: "你的诊所老板或雇主对你的敬业大加赞赏，主动为你承担了雇主担保的律师费。你稳稳锁定了工作与身份的双保险。"
+          text: "挂断电话后，一个人默默坐在椅子上看太阳落进海平线，把罐子里的最后一口水喝完。",
+          detail: "异乡人的孤独，在这一刻变得无比平静与柔和。",
+          narrative: "天色渐渐变成深蓝色，远处有小狗在海浪里奔跑。你深吸了一口带着咸味的湿润空气，心里那股长久以来的漂泊感，慢慢平复了下来。",
+          fundsDelta: 0
         }
       ]
     },
     {
       year: 5,
-      title: "澳洲绿卡落定：在海滩举行露天 BBQ",
-      scenario: "第 5 年初夏，你收到了移民局发来的终签准签信 (Visa Grant Notice)。你拥有了在这片阳光充沛的大陆永久居住、享受全民公费医疗 Medicare 与养老金的全部权利。",
+      timeLabel: "扎根 · 第 5 年",
+      sceneTitle: "准签信来的时候，你正跪在后院拔杂草",
+      sceneText: "手机在口袋里震了一下，是一封来自移民局的自动邮件，通知你的永居签证获批了。你戴着沾满泥土的花园手套，站在小出租屋后院的柠檬树下，把那封全英文的信从头到尾看了三遍。没有激动的大喊大叫，也没有开香槟。你只是摘下脏手套，回屋喝了一大杯自来水，然后去附近的华人超市买了一盒平时舍不得买的草莓和一袋速冻水饺，煮了一大碗。",
       choices: [
         {
-          text: "在邦迪海滩 (Bondi Beach) 支起烧烤炉，召集五湖四海的朋友举杯庆祝，正式开启澳洲新篇章！",
-          subtext: "彻底扎根南半球新家园",
-          effects: { fundsDeltaRMB: -5000, healthDelta: 50, languageDelta: 10, prProgressDelta: 50, laozhongDelta: -20 },
-          outcomeNarrative: "金色的阳光洒在大海上，袋鼠在远处草坪跳跃。你看着手里的准签信，回想刚来时在农场手上磨出的水泡，你知道这一切都值得。"
+          text: "就着老干妈把一盘热气腾腾的水饺吃完，窗外是南半球晴朗的蓝天。",
+          detail: "普通的开局，普通的经过，普通的生活。",
+          narrative: "你坐在木椅子上，看着窗台上的阳光慢慢移动。你还是那个普通的自己，但在这个阳光广袤的大陆上，你终于不用再担心下个月该去哪里了。",
+          fundsDelta: -80
+        }
+      ]
+    }
+  ],
+  germany: [
+    {
+      year: 1,
+      timeLabel: "初抵 · 第 1 年",
+      sceneTitle: "那个永远刷不到预约的市政厅，与周日下午空无一人的大街",
+      sceneText: "在柏林郊区租到一个 14 平米的小单间，为了办户籍登记 (Anmeldung)，你每天早晨 6 点定闹钟刷新市政厅退号网页，刷了整整三周才抢到一个下个月的号。第一个周日你想去买洗发水，走上街才发现全城商店超市大门紧闭，街上安静得能听见自己的脚步声。你在冷风里裹紧大衣，最后在加油站小卖部花 4 欧买了块干硬的面包和一瓶水。",
+      choices: [
+        {
+          text: "去 Lidl 买了两大袋 1.2 欧的便宜土豆和一袋洋葱，周末自己在厨房炖了一大锅土豆牛肉汤。",
+          detail: "虽然单调，但热腾腾的汤能抵御漫长干冷的冬天。",
+          narrative: "汤炖得软烂香浓，你盛在深碗里，就着烤得焦脆的黑面包吃完。窗外下着细雨，你看着窗玻璃上的水珠，心里慢慢安定下来。",
+          fundsDelta: -150
         },
         {
-          text: "带着在澳洲赚到的丰厚外汇与健全的体魄，回国成立出海留学咨询工作室，做两边通吃的自由人。",
-          subtext: "跨国资源整合大师",
-          effects: { fundsDeltaRMB: 90000, healthDelta: 30, languageDelta: 15, prProgressDelta: 20, laozhongDelta: 30 },
-          outcomeNarrative: "你保留着澳洲永居绿卡，每年冬天去南半球避寒冲浪，夏天回国内陪伴父母。你活成了所有人羡慕的无国界自由模样。"
+          text: "找同楼的留学生借了辆旧自行车，顺着运河骑了十公里，两岸的落叶铺了厚厚一层。",
+          detail: "德国的大自然不需要门票，安静又开阔。",
+          narrative: "踩着吱呀作响的踏板，冷风吹得脸颊发麻。两旁的榉树叶子金黄灿烂，你停下车拍了一张照片发给爸妈，说‘这边空气特别好’。",
+          fundsDelta: 0
+        }
+      ]
+    },
+    {
+      year: 2,
+      timeLabel: "磨砺 · 第 2 年",
+      sceneTitle: "下午四点就全黑的天空，与那张多算了 300 欧的暖气账单",
+      sceneText: "入冬后的德国，下午四点天就彻底黑透了，阴雨连绵几个月见不到太阳，你开始每天老老实实吞一粒维生素 D。房东寄来去年的暖气物业结算单 (Nebenkosten)，要求补缴 300 欧。你硬着头皮戴着眼镜，一边用翻译软件查德语专业生词，一边列出每个月的用量明细给房东写邮件申诉，来回发了四轮，最后房东退让了 180 欧。",
+      choices: [
+        {
+          text: "去宜家花 12 欧买了个暖黄色光芒的小台灯，晚上放在床头看书，屋里一下子温暖了。",
+          detail: "学会给漫长的冬夜制造属于自己的微小光源。",
+          narrative: "暖黄色的光晕映在白墙上。你泡了一杯薄荷茶，戴上耳机听喜欢的歌，不再觉得四点天黑是一件让人恐慌的事情。",
+          fundsDelta: -90
+        },
+        {
+          text: "报名了每周两晚的民众夜校 (VHS) 德语 B1 班，虽然舌头经常打结，但认识了一起磕绊学德语的朋友。",
+          detail: "在笨拙的开口中，慢慢击碎异国语言的壁垒。",
+          narrative: "班上有叙利亚医生、土耳其厨师和波兰货车司机。大家德语都很破，互相用手势比划着哈哈大笑。下课一起站在校门口抽烟告别，你觉得生活有了点烟火气。",
+          fundsDelta: -1600
+        }
+      ]
+    },
+    {
+      year: 3,
+      timeLabel: "平静 · 第 3 年",
+      sceneTitle: "五点准时熄灯的办公室，与森林里捡到的两颗松果",
+      sceneText: "你在一家当地小物流公司找了份操作员/文员的工作。下午 4 点 55 分，同事们已经开始互相道“Schönen Feierabend”（下班愉快），5 点一到办公室灯光全熄，手机周末从没有过工作消息。周六去附近的黑森林边缘徒步，踩着松软的泥土，你弯腰捡了两颗掉在地上的小松果揣在大衣口袋里，迎面走来牵着大金毛的德国老爷爷，微笑着对你点头：“Hallo”。",
+      choices: [
+        {
+          text: "在林子里长长呼出一口白气，心跳放得极慢，整周的疲劳似乎都被高大的冷杉林吸收了。",
+          detail: "没有无休止的加班和群消息，生活归还给了你自己。",
+          narrative: "踩着厚厚的松针往回走，夕阳穿透树冠洒下光柱。你摸了摸口袋里圆滚滚的松果，忽然明白了为什么德国人如此热爱树林和漫步。",
+          fundsDelta: 0
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "扎根 · 第 5 年",
+      sceneTitle: "拿到永居卡的那天，坐在施普雷河边喝了杯淡啤酒",
+      sceneText: "外管局窗口递出来那张蓝色的居留卡。走出红砖老建筑，微风吹拂着河面。你依然常常抱怨德国火车的晚点、嫌弃周日连个买创可贴的地方都没有。但你已经习惯了这里的界限感，习惯了不被打扰的周末，习惯了把一双徒步鞋穿上好几年。",
+      choices: [
+        {
+          text: "在河边的木长椅上坐下，看一艘货船慢悠悠划开水波。生活很平淡，但也足够安宁。",
+          detail: "告别了狂奔与焦虑，把日子过成了一汪波澜不惊的湖水。",
+          narrative: "夕阳把河面染得金黄。你从书包里拿出一块黑麦面包慢慢嚼着，不慌不忙地等半小时一班的轻轨回家。",
+          fundsDelta: -30
+        }
+      ]
+    }
+  ],
+  spain: [
+    {
+      year: 1,
+      timeLabel: "初抵 · 第 1 年",
+      sceneTitle: "移民局门口的那句“明天再说”，与一欧元的鲜榨橙汁",
+      sceneText: "在瓦伦西亚办居留绿卡，早上七点在移民局门口排长队，工作人员看了看材料耸耸肩说系统坏了：“Mañana, por favor（明天再来吧）”。换作以前你早就急躁上火了，但看着窗外灿烂得不讲道理的大太阳，你忽然没了脾气。走出大厅，在街角小店花 1 欧元买了一大杯鲜榨橙汁，酸甜冰凉，海风吹过来，满街都是盛开的紫薇花。",
+      choices: [
+        {
+          text: "在阳光下慢吞吞走回租住的老平房，顺路去烘焙房买了一根刚出炉的热法棍。",
+          detail: "生活节奏一下子被地中海的阳光拉得极慢极长。",
+          narrative: "回到家把橙汁倒进玻璃杯，就着热乎乎脆香的法棍吃饱。你坐在阳台的帆布椅上晒着太阳打盹，第一次不用惦记闹钟。",
+          fundsDelta: -25
+        },
+        {
+          text: "坐在街心喷泉旁边的石凳上，看着鸽子抢面包屑，给国内的朋友发了张万里无云的蓝天。",
+          detail: "没有雾霾，没有焦躁，阳光不要钱似地倾泻下来。",
+          narrative: "国内的朋友秒回：‘天好蓝啊，真羡慕’。你收起手机笑了笑，看着身边推着婴儿车散步的老夫妇，脚步自然而然慢了下来。",
+          fundsDelta: 0
+        }
+      ]
+    },
+    {
+      year: 2,
+      timeLabel: "慢调 · 第 2 年",
+      sceneTitle: "下午三点的闭店关门，与晚上十点才开始的露天晚餐",
+      sceneText: "你彻底适应了西班牙的“迟钝”。下午两点到五点，街上几乎所有店铺全部关门午休；晚上九点多天色才刚擦黑，广场上的露天餐馆才刚摆出桌椅。你学会了就着炸小青椒和番茄面包慢慢嚼，听着旁边一家三代人热热闹闹地大声说笑，小孩子们踩着滑板车一直疯跑到深夜十一点。",
+      choices: [
+        {
+          text: "学着用当地土法在小铁锅里煮了一盘海鲜饭，藏红花的香气飘满了小巷。",
+          detail: "在异国的小厨房里，找到了属于自己的灶台温度。",
+          narrative: "米饭带着微焦的锅巴，虾肉紧实甜嫩。你倒了小半杯廉价但爽口的白葡萄酒，一个人安安静静把整锅吃得干干净净。",
+          fundsDelta: -60
+        },
+        {
+          text: "傍晚去海边木栈道慢跑三十分钟，看着夕阳一点点把地中海染成金红色。",
+          detail: "不用花钱，就能享受整个大自然的温柔怀抱。",
+          narrative: "海浪拍打着细软的沙滩，海鸥在头顶盘旋。跑完步出了一身透汗，你坐在防波堤上甩着双腿，整个人轻快得像一片羽毛。",
+          fundsDelta: 0
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "自洽 · 第 5 年",
+      sceneTitle: "亲戚问你国外发财了没，你看着窗外三百天的晴天笑了笑",
+      sceneText: "第五年换到了长期居留。老家表哥发微信问你：“在那边赚大钱了吧？买大奔了吗？”你低头看了看自己穿了两年的人字拖，和刚刚在菜市场花 5 欧买的一大袋新鲜无花果，笑着回了句：“没发财，打工糊口。就是这里一年有三百天是大晴天，心情挺好。”",
+      choices: [
+        {
+          text: "靠在阳台铁栏杆上吃了一颗清甜的无花果，阳光晒在手臂上暖洋洋的。",
+          detail: "人生的度量衡，从来不只有存折上的数字。",
+          narrative: "微风吹起白色薄纱窗帘，巷子里传来吉他弹奏的欢快旋律。你洗了洗手，回屋准备今晚的晚餐，心里满当当的都是踏实。",
+          fundsDelta: -35
+        }
+      ]
+    }
+  ],
+  canada: [
+    {
+      year: 1,
+      timeLabel: "初抵 · 第 1 年",
+      sceneTitle: "大雪没过膝盖的清晨，与 Tim Hortons 的两块钱咖啡",
+      sceneText: "十一月的加拿大，推开门积雪直接淹到了小腿肚。零下十几度，你拿着一把红色的塑料大雪铲，吭哧吭哧在门前车道铲雪，睫毛上结了一层细细的白霜。手脚冻得发麻时，你走去街角的 Tim Hortons，花两块加币买了杯 Double-Double 热咖啡和一个热乎乎的蜂蜜甜甜圈，双手捧着纸杯，热气扑在脸上，感觉整个人又活过来了。",
+      choices: [
+        {
+          text: "去二手超市 Value Village 挑了一件厚实的二手羊毛大衣，套上后暖和极了。",
+          detail: "在异国他乡，实用与温暖比面子重要一万倍。",
+          narrative: "虽然样式朴素，但质地扎实。裹上大衣走在雪地里，脚下发出咯吱咯吱的清脆声响，你第一次觉得北国的雪景其实很美。",
+          fundsDelta: -180
+        },
+        {
+          text: "认识了隔壁也在铲雪的华人大叔，互相借了除雪盐，大叔教你冬天怎么给车胎防冻。",
+          detail: "海外普通华人之间最朴素的互帮互助。",
+          narrative: "大叔操着东北口音笑着说‘小伙子多穿点，刚来都这样，习惯就好了’。一把热盐撒在水泥地上，积雪慢慢融化露出灰色的地面。",
+          fundsDelta: -50
+        }
+      ]
+    },
+    {
+      year: 2,
+      timeLabel: "立足 · 第 2 年",
+      sceneTitle: "换了雪胎的旧斯巴鲁，与华人超市里的一袋老干妈",
+      sceneText: "考下了当地驾照，买了一辆十年前的二手四驱斯巴鲁，换上了抓地力强的雪胎。周末开半小时车去大统华华人超市，买了一袋挂面、一瓶老干妈和两颗大白菜，结账时收银阿姨用熟悉的乡音说了句“一共 32 块”。坐在车里听着雨刮器推开挡风玻璃上的积雪，你忽然觉得，即便在地球的另一端，日子也能过出自己的味道。",
+      choices: [
+        {
+          text: "回家在小电炉上热热地煮了一锅热汤面，拌上两勺辣椒酱，吃得额头冒汗。",
+          detail: "胃安顿好了，漂泊的心也就安顿了一大半。",
+          narrative: "热气腾腾的白气在窗户上结了一层水雾。你一边哧溜哧溜吃面，一边看着窗外静静飘落的雪花，屋里温暖如春。",
+          fundsDelta: -80
+        },
+        {
+          text: "夏天开去落基山脚下的湖边露营，湖水蓝得像宝石一样透亮。",
+          detail: "广阔的天地，让人自然而然放下所有执念。",
+          narrative: "支起帐篷生起小营火，晚风吹过松树林带来松脂的清香。坐在折叠椅上看繁星漫天，你心想，人这辈子能这样看看世界，真好。",
+          fundsDelta: -300
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "扎根 · 第 5 年",
+      sceneTitle: "枫叶卡寄到信箱里的那个雨天",
+      sceneText: "信箱里躺着印着枫叶的水印信封，厚厚的硬质塑料卡片。五年了，你度过了五个漫长的冬天，也见证了五个美得惊心动魄的夏天。你没有像那些社交网络上的成功人士一样住进海边豪宅，但你有一份踏实的手艺，一台能在暴风雪里平稳前行的老车，和一个属于自己的温暖壁炉。",
+      choices: [
+        {
+          text: "把信件整整齐齐收进抽屉，去厨房给小火慢炖的牛肉汤加了一小把黑胡椒。",
+          detail: "平凡生活里的最大幸运，莫过于心安即是归处。",
+          narrative: "汤在锅里咕嘟咕嘟翻滚着香气。你靠在灶台边喝了一口热茶，窗外是一排排挂着雨滴的红枫树。生活平淡而长久地向前延展。",
+          fundsDelta: 0
         }
       ]
     }
@@ -456,52 +544,43 @@ export const SIM_YEAR_EVENTS: Record<string, SimYearEvent[]> = {
   thailand: [
     {
       year: 1,
-      title: "降维天堂：清迈的 2000 块无边泳池公寓",
-      scenario: "持 DTV 5年数字游民签证抵达清迈。在宁曼路附近只花了 10,000 泰铢 (约 2,000 RMB)，就租到了一套带大无边泳池、全景健身房的网红公寓。楼下一杯精品冰美式只要 50 泰铢，夜市芒果糯米饭只要 60 泰铢。",
+      timeLabel: "初抵 · 第 1 年",
+      sceneTitle: "巷子里两千块的单身公寓，与楼下 40 泰铢的鸡肉饭",
+      sceneText: "走出清迈机场，一股热带潮湿而温暖的香茅草气息扑面而来。在宁曼路背后的小巷子里，你租下了一间带着小阳台的单身公寓，月租 9000 泰铢（不到两千人民币）。楼下就是个卖海南鸡肉饭的小摊，老奶奶总是多给你舀一勺热腾腾的冬瓜鸡汤。生活成本低得不可思议，你第一次不需要算计买一杯冰咖啡要花掉多大比例的月薪。",
       choices: [
         {
-          text: "过上神仙躺平生活！每天早上在泳池边敲两小时键盘，下午去泰式按摩，晚上逛夜市吃大排档。",
-          subtext: "幸福感瞬间爆棚，生活成本比国内少一半",
-          effects: { fundsDeltaRMB: 30000, healthDelta: 45, languageDelta: 10, prProgressDelta: 20, laozhongDelta: 20 },
-          outcomeNarrative: "你每个月的总花费甚至不到 5,000 人民币，而你赚的远程收入稳稳留在账上。你开始觉得以前在写字楼里焦虑内耗的自己简直像个傻瓜。"
-        },
-        {
-          text: "积极参加清迈与曼谷的 Web3 / 数字游民 Co-working 活动，搭建自己的跨境独立站与海外客户群。",
-          subtext: "以低生活成本为跳板，孵化个人高收入业务",
-          effects: { fundsDeltaRMB: 50000, healthDelta: 25, languageDelta: 25, prProgressDelta: 20, laozhongDelta: -10 },
-          outcomeNarrative: "你在共享空间认识了德国程序员和美国自由设计师，合伙接单做独立产品，美元流水节节攀升！"
-        }
-      ]
-    },
-    {
-      year: 2,
-      title: "四月烟霾考验：泰北烧山季大迁徙",
-      scenario: "每年 3~4 月，清迈周边农田传统焚烧，PM2.5 偶尔破表。看着街头黄蒙蒙的天空，你意识到世界上没有百分之百完美的乌托邦。",
-      choices: [
-        {
-          text: "像候鸟一样迁徙！买张廉航机票直接飞普吉岛或苏梅岛，住在海景别墅里潜水避烟。",
-          subtext: "游民终极形态：哪里气候好就去哪里",
-          effects: { fundsDeltaRMB: -8000, healthDelta: 30, languageDelta: 10, prProgressDelta: 20, laozhongDelta: -10 },
-          outcomeNarrative: "在安达曼海澄澈的玻璃海里浮潜，看着小丑鱼在身边游弋，你明白数字游民的最大特权就是：有腿随时能走。"
-        },
-        {
-          text: "买个顶级空气净化器在公寓闭门打游戏、肝代码，顺便飞回国内探亲吃一个月火锅烧烤。",
-          subtext: "回国满血复活，游民生活张弛有度",
-          effects: { fundsDeltaRMB: -15000, healthDelta: 20, languageDelta: 0, prProgressDelta: 10, laozhongDelta: 30 },
-          outcomeNarrative: "回国跟朋友吃串喝啤酒，朋友们看到你红润的脸色和松弛的状态，纷纷围着你问‘到底怎么润泰国的？’。"
+          text: "花 300 块钱买了一辆二手机车，每天傍晚骑车绕着古城的护城河慢悠悠兜风。",
+          detail: "热带的暖风吹在身上，治愈了国内常年的偏头痛。",
+          narrative: "护城河边的鸽子扑棱棱飞起来，落日把素贴山染成了金黄色。你把车停在路边，买了袋切好的冰镇菠萝，第一次体会到什么叫‘没心没肺的松弛’。",
+          fundsDelta: -300
         }
       ]
     },
     {
       year: 3,
-      title: "无国界自由：第 5 年依然年轻的赛博吉普赛",
-      scenario: "在泰国的几年里，你没有买房背债，没有为了绿卡委曲求全去熬移民监。你存款厚实，精通泰英双语，熟知东南亚每一家顶尖咖啡馆的 WiFi 密码。",
+      timeLabel: "慢调 · 第 3 年",
+      sceneTitle: "雨季下午的咖啡馆屋檐下",
+      sceneText: "清迈的雨季，暴雨总是毫无预兆地倾盆而下。你被困在一间木头搭建的小咖啡馆屋檐下，雨水从瓦片边缘哗啦啦像瀑布一样挂下来。街上的摩托车全停在骑楼下避雨，没有人按喇叭催促，大家都在安静地看雨。你点了一杯 50 泰铢的手冲咖啡，打开手提电脑，敲完今天最后一部分给远程客户的活。",
       choices: [
         {
-          text: "继续续签 DTV 签证，或者加办马来西亚第二家园 (MM2H)，做一辈子的国际游牧神仙！",
-          subtext: "无拘无束，人间逍遥客",
-          effects: { fundsDeltaRMB: 80000, healthDelta: 50, languageDelta: 20, prProgressDelta: 40, laozhongDelta: 0 },
-          outcomeNarrative: "你坐在海滩酒吧，吹着暖风看着夕阳沉入海平线。你对绿卡和身份彻底祛魅，你知道全世界早已都是你的后花园。"
+          text: "合上电脑，坐在木头长凳上听了四十分钟雨声，直到天边重新透出阳光。",
+          detail: "你终于不再催促自己‘必须做点什么有用的人’。",
+          narrative: "雨停了，空气里带着泥土和青草的清新香气。你骑上车穿过湿漉漉的街道，路面积水倒映着蓝天白云，生活简单得像一汪清水。",
+          fundsDelta: -10
+        }
+      ]
+    },
+    {
+      year: 5,
+      timeLabel: "自在 · 第 5 年",
+      sceneTitle: "没有大富大贵，但身体和失眠彻底好了",
+      sceneText: "五年过去，你没有成为身家千万的老板，也没有买下什么豪宅。你的家当依然只有一个大行李箱和一台旧笔记本。但你学会了泰语数字和买菜砍价，你的失眠彻底不药而愈，体检指标全恢复了正常。你明白人生也许不需要那么多宏大的目标，简简单单地活在一个阳光充沛的地方，本身就是一种莫大的福气。",
+      choices: [
+        {
+          text: "在夜市买了两盒芒果糯米饭，一盒留给自己，一盒送给楼下看门的老大爷。",
+          detail: "踏踏实实的烟火日常。",
+          narrative: "大爷双手合十冲你笑着道谢。你踩着人字拖慢吞吞地走上楼梯，清迈的晚风穿堂而过，吹得窗台上的风铃叮当作响。",
+          fundsDelta: -20
         }
       ]
     }
@@ -509,52 +588,43 @@ export const SIM_YEAR_EVENTS: Record<string, SimYearEvent[]> = {
   china_stay: [
     {
       year: 1,
-      title: "工位风云：大饼与凌晨一点的打车报销",
-      scenario: "你决定不折腾出国，安心在原来的城市继续奋斗。年初领导在开年大会上慷慨激昂画了大饼，给你加了 10% 的绩效指标。深夜 11 点，你拖着疲惫的身躯打车回家，路过楼下熟悉的烧烤摊。",
+      timeLabel: "原地 · 第 1 年",
+      sceneTitle: "晚上下班的那碗热汤面，老板多给了一勺牛肉",
+      sceneText: "你没有走。依然住在二环边上租的小屋里，每天挤着 2 号线早高峰。周五晚上加班到快九点，浑身发沉走下天桥。路过常去的那家清真拉面馆，店里飘着浓浓的牛骨汤香气。你点了一碗细面，老板认出你是熟客，往你碗里多舀了一大勺带筋的牛肉块。热汤下肚，浑身的寒气一下子散开了。",
       choices: [
         {
-          text: "下车！点一打烤生蚝、两串羊肉、开一瓶冰啤酒！老中深夜的人间烟火气瞬间洗刷一整天的疲惫。",
-          subtext: "虽然累，但胃和灵魂得到了终极抚慰",
-          effects: { fundsDeltaRMB: -3000, healthDelta: 15, languageDelta: 0, prProgressDelta: 0, laozhongDelta: 30 },
-          outcomeNarrative: "热气腾腾的生蚝咽下去，你打了个饱嗝。你心想‘什么欧美澳洲好山好水，哪有楼下大排档实在？老子就爱这人间烟火！’"
-        },
-        {
-          text: "咽下口水直接回家，洗个热水澡，打开电脑看海外公开课，默默提高自己的核心竞争力。",
-          subtext: "拒绝麻痹，暗中蓄力",
-          effects: { fundsDeltaRMB: 10000, healthDelta: 5, languageDelta: 15, prProgressDelta: 10, laozhongDelta: -10 },
-          outcomeNarrative: "你在疲惫中保持清醒，专业技能在团队中逐渐成为中流砥柱，年底拿到了不错的年终奖。"
+          text: "吃完顺路去超市买了两袋打折的大米和一卷垃圾袋，提着走回出租屋。",
+          detail: "老家的烟火气，虽然琐碎，但也最踏实。",
+          narrative: "推开屋门，屋子里暖烘烘的。你把大米倒进米桶，换上舒适的棉拖鞋，打开电视看地方新闻。那一刻，你觉得留在熟悉的地方也没什么不好。",
+          fundsDelta: -120
         }
       ]
     },
     {
-      year: 2,
-      title: "风暴来袭：部门优化与一人顶两人的现实",
-      scenario: "行业周期震荡，隔壁组被整体裁撤，你们组的预算砍了 30%，但项目交付期反而提前了。你被迫一个人承担起原来两个人的工作量，微信群消息从早响到深夜。",
+      year: 3,
+      timeLabel: "原地 · 第 3 年",
+      sceneTitle: "周日早晨陪父母去早市买菜",
+      sceneText: "周末睡到自然醒，坐公交车回父母家。早上陪妈妈去露天早市，摊贩们大声吆喝着刚从地里拔出来的新鲜白菜。妈妈跟卖鱼的熟人讲了半天价，省了三块钱，脸上笑开了花。回家路上你两手提着沉甸甸的菜篮子，妈妈在旁边絮絮叨叨说着亲戚邻居的闲话。",
       choices: [
         {
-          text: "启动【摸鱼防御机制】！精通‘已收到但在开会’话术，准点打卡下班，周末去公园发呆露营。",
-          subtext: "把工作当成纯领薪水的工具，保护身心健康",
-          effects: { fundsDeltaRMB: 20000, healthDelta: 25, languageDelta: 0, prProgressDelta: 0, laozhongDelta: 10 },
-          outcomeNarrative: "你放下了升职加薪的执念，反而拥有了极高的心理抗压阈值。周末和朋友去爬山野营，过得比谁都滋润。"
-        },
-        {
-          text: "硬着头皮顶上！狂卷项目上线，在管理层面前证明自己的不可替代性，争取拿到组长岗位。",
-          subtext: "迎难而上，卷赢这场淘汰赛",
-          effects: { fundsDeltaRMB: 40000, healthDelta: -25, languageDelta: 0, prProgressDelta: 0, laozhongDelta: 20 },
-          outcomeNarrative: "项目成功上线，你成功升职为技术负责人。虽然发际线后移了两厘米，但银行卡数字的跳动让你获得了短暂的安全感。"
+          text: "中午帮爸爸一起在厨房包韭菜猪肉馅饺子，吃了满满两大盘。",
+          detail: "亲情在身边，是任何异国他乡都换不来的温度。",
+          narrative: "一家三口围在小方桌前蘸着醋吃饺子，电视里播着家长里短的肥皂剧。看着父母眼角越来越多的白发，你心想，至少这一刻，你随时都能陪在他们身边。",
+          fundsDelta: 0
         }
       ]
     },
     {
       year: 5,
-      title: "大彻大悟：守住安稳也是一种非凡的胜利",
-      scenario: "五年过去，身边的朋友有的去了日本、有的去了澳洲，在群里吐槽着无聊或发着海滩照片。而你在熟悉的城市里，熟悉每一个路口的美食，父母在侧，三五老友随时能约出火锅局。",
+      timeLabel: "原地 · 第 5 年",
+      sceneTitle: "给朋友圈点了个赞，继续拖地做饭",
+      sceneText: "偶尔在朋友圈里，看到当年高中同学发在异国海滩或雪山的照片。你停下手指看了两秒，随手点了个赞，然后放下手机，转身把洗好的衣服挂在阳台晾衣绳上。水珠顺着裤脚滴在瓷砖上，楼下传来小孩子放学追逐嬉闹的声音，厨房里小火炖着的排骨汤咕嘟咕嘟冒着热气。生活像流水一样静静向前流淌，平平淡淡，也是一种真正的圆满。",
       choices: [
         {
-          text: "举起酒杯敬自己一杯！世界上只有一种真正的英雄主义，那就是认清生活的真相后依然热爱生活。",
-          subtext: "原地自洽，幸福圆满",
-          effects: { fundsDeltaRMB: 60000, healthDelta: 40, languageDelta: 0, prProgressDelta: 0, laozhongDelta: 50 },
-          outcomeNarrative: "你彻底和生活和解了。你不再羡慕别人镜头里的远方，你在自己熟悉的热土上，把每一碗热汤面、每一次老友聚会，过成了最踏实幸福的黄金岁月。"
+          text: "盛了一碗热气腾腾的排骨汤，坐在沙发上慢慢喝完。",
+          detail: "认清生活的真相后，依然安于自己脚下的方寸之地。",
+          narrative: "夕阳透过阳台照在地板上，把一切镀上了一层柔和的金边。不用去任何远方，你已经在自己的生活里，安顿好了整颗心。",
+          fundsDelta: 0
         }
       ]
     }
