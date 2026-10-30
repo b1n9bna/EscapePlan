@@ -23,7 +23,8 @@ import {
   getResilienceDesc,
   getFatherDynamicStatus,
   getMotherDynamicStatus,
-  getSiblingDynamicStatus
+  getSiblingDynamicStatus,
+  evaluateSoulImprints
 } from '../data/simulation';
 import confetti from 'canvas-confetti';
 import type {
@@ -600,6 +601,21 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       ? 0
       : timeline[timelineIndex]?.age ?? (logEntries[logEntries.length - 1]?.age || 0);
 
+  // 3-Slot Soul Imprints (人生核心灵魂烙印：少年精神底色 · 青年代价与执念 · 岁月终局归宿)
+  const soulImprints = React.useMemo(() => {
+    const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
+    const careerSub = getCareerSubtrack(tags);
+    return evaluateSoulImprints(
+      currentAge,
+      attrs,
+      tags,
+      chosenPath,
+      currentTrack,
+      careerSub,
+      charData.family
+    );
+  }, [currentAge, attrs, tags, chosenPath, gaokaoCalc, charData.family]);
+
   // Dynamic Family Statuses
   const fatherStatus = getFatherDynamicStatus(
     charData.family.fatherAge,
@@ -737,7 +753,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const handleNextNaturalYear = () => {
     // 1. 如果即将迈向或已处于17/18岁且尚未进行高考分流，优先触发高考结算
     if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17 || (!timeline[timelineIndex + 1] && currentAge <= 18))) {
-      const calc = calculateGaokaoOutcome(attrs, tags);
+      const calc = calculateGaokaoOutcome(attrs, tags, charData.family);
       setGaokaoCalc(calc);
       setShowGaokaoModal(true);
       return;
@@ -762,7 +778,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
     // Check if Age 18 milestone trigger
     if ((nextNode.age >= 18 || currentNode.age === 17) && !gaokaoCalc) {
-      const calc = calculateGaokaoOutcome(attrs, tags);
+      const calc = calculateGaokaoOutcome(attrs, tags, charData.family);
       setGaokaoCalc(calc);
       setShowGaokaoModal(true);
       return;
@@ -811,7 +827,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
     // If currently at 17yo or gaokao not resolved, trigger Gaokao directly
     if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17 || (!timeline[timelineIndex + 1] && currentAge <= 18))) {
-      const calc = calculateGaokaoOutcome(attrs, tags);
+      const calc = calculateGaokaoOutcome(attrs, tags, charData.family);
       setGaokaoCalc(calc);
       setShowGaokaoModal(true);
       return;
@@ -870,7 +886,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setTimelineIndex(targetIdx);
       scrollToFeedBottom();
     } else if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)) {
-      const calc = calculateGaokaoOutcome(attrs, tags);
+      const calc = calculateGaokaoOutcome(attrs, tags, charData.family);
       setGaokaoCalc(calc);
       setShowGaokaoModal(true);
     }
@@ -1132,9 +1148,14 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const handleCopyRecord = () => {
     const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
     const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries);
-    const text = `【逃跑计划 · 一生因果纪要档案】
+    const imprintsText = soulImprints
+      .filter((i) => i.isUnlocked)
+      .map((i) => `🏅 ${i.title}（${i.phaseName}）\n   ${i.subtitle}\n   “${i.quote}”`)
+      .join('\n\n');
+
+    const text = `【未走的那条路 · 一生因果纪要档案】
 代号/姓名：${charData.name}（${charData.gender}）
-出生地：${charData.family.region}（${birthYear}年）
+出生地：${charData.family.province ? `${charData.family.province} · ` : ""}${charData.family.region}（${birthYear}年）
 阶层背景：${charData.family.wealthTier}
 求学与职业轨道：${
       currentTrack === '985_211'
@@ -1145,6 +1166,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     }
 人生航道：${chosenPath === 'emigrate' ? '奔赴异邦开拓' : '扎根故土深耕'}
 终局个人资产：¥${attrs.savings.toLocaleString()}\n老家父母储备：¥${attrs.familySavings.toLocaleString()}
+
+🏅 六十三载核心灵魂烙印：
+${imprintsText}
 
 🏆 达成终局：No.${finalVerdict.ending.number < 10 ? '0' : ''}${finalVerdict.ending.number} ${finalVerdict.ending.title} [${finalVerdict.ending.rarity}]
 ${finalVerdict.ending.tagline}
@@ -1336,46 +1360,36 @@ ${logEntries
             </div>
           </div>
 
-          {/* Bespoke Birth Scene Card */}
-          <div className={`p-4 sm:p-5 rounded-xl border space-y-2 transition-colors ${
-            isLight ? "bg-amber-50/70 border-amber-200/90 text-stone-800" : "bg-[#181A24] border-amber-500/25 text-stone-200"
+          {/* Birthplace Location Header */}
+          <div className={`p-3.5 sm:p-4 rounded-xl border flex flex-wrap items-center justify-between gap-2 transition-colors ${
+            isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06] text-stone-200"
           }`}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className={`font-semibold flex items-center gap-2 font-reading-sans ${
-                isLight ? "text-amber-900" : "text-amber-300"
-              }`}>
-                <span className="text-lg">{currentSlide.icon}</span>
-                <span className="text-sm sm:text-base font-bold font-narrative-serif">初临人间与第一声啼哭</span>
-                {charData.family.province && (
-                  <span className={`text-[11px] px-2.5 py-0.5 rounded-full border font-mono-num font-medium ${
-                    isLight ? "bg-amber-200/80 border-amber-300 text-amber-950" : "bg-amber-500/20 border-amber-500/40 text-amber-300"
-                  }`}>
-                    {charData.family.province}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-xs ${isLight ? "text-stone-600" : "text-stone-400"}`}>
-                  {charData.family.hospitalName} · {charData.family.cityOrCounty}
-                </span>
-                <button
-                  onClick={() => setShowProvincePicker(true)}
-                  className={`text-[11px] px-2 py-0.5 rounded border transition-all ${
-                    isLight
-                      ? "bg-white hover:bg-stone-100 border-amber-300 text-amber-900 font-medium"
-                      : "bg-white/[0.06] hover:bg-white/[0.1] border-amber-500/30 text-amber-300"
-                  }`}
-                  title="切换出生省份"
-                >
-                  换省份
-                </button>
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">{currentSlide.icon}</span>
+              <div>
+                <div className={`font-semibold text-xs sm:text-sm font-reading-sans ${
+                  isLight ? "text-stone-900" : "text-stone-100"
+                }`}>
+                  降生属地：{charData.family.province ? `${charData.family.province} · ` : ""}{charData.family.cityOrCounty}
+                </div>
+                <div className={`text-[11px] font-reading-sans ${
+                  isLight ? "text-stone-500" : "text-stone-400"
+                }`}>
+                  出生医院：{charData.family.hospitalName}
+                </div>
               </div>
             </div>
-            <p className={`text-xs sm:text-[13.5px] leading-relaxed font-reading-sans tracking-[0.04em] ${
-              isLight ? "text-stone-800" : "text-stone-300"
-            }`}>
-              {charData.family.birthScene}
-            </p>
+            <button
+              onClick={() => setShowProvincePicker(true)}
+              className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
+                isLight
+                  ? "bg-white hover:bg-stone-100 border-amber-300 text-amber-900 shadow-sm"
+                  : "bg-white/[0.06] hover:bg-white/[0.1] border-amber-500/40 text-amber-300 shadow-sm"
+              }`}
+              title="切换出生省份"
+            >
+              换省份
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
@@ -2068,25 +2082,73 @@ ${logEntries
             </div>
           </div>
 
-          {/* Tags */}
-          <div className={`border rounded-xl p-4 space-y-2 shadow-sm transition-colors ${
+          {/* 3-Slot Soul Imprints (人生核心灵魂烙印：少年精神底色 · 青年代价与执念 · 岁月终局归宿) */}
+          <div className={`border rounded-xl p-3.5 sm:p-4 space-y-2.5 shadow-sm transition-colors ${
             isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
           }`}>
-            <span className={`text-xs font-semibold block font-narrative-serif ${
-              isLight ? "text-amber-900" : "text-[#D4A359]"
-            }`}>
-              成长烙印印记
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {tags.map((t) => (
-                <span
-                  key={t}
-                  className={`px-2.5 py-0.5 rounded border text-[11px] font-reading-sans ${
-                    isLight ? "bg-stone-100 border-stone-300 text-stone-800 font-medium" : "bg-[#181B26] border-white/[0.08] text-stone-300"
+            <div className="flex items-center justify-between">
+              <span className={`text-xs font-bold block font-narrative-serif flex items-center gap-1.5 ${
+                isLight ? "text-amber-900" : "text-[#D4A359]"
+              }`}>
+                <span>🏅</span> 人生核心灵魂烙印
+              </span>
+              <span className={`text-[10px] font-mono-num font-medium px-1.5 py-0.5 rounded ${
+                isLight ? "bg-stone-100 text-stone-500" : "bg-white/[0.04] text-stone-400"
+              }`}>
+                三阶沉淀 · 不灭印记
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {soulImprints.map((imprint) => (
+                <div
+                  key={imprint.slot}
+                  className={`p-2.5 rounded-lg border transition-all ${
+                    imprint.isUnlocked
+                      ? isLight
+                        ? "bg-amber-50/70 border-amber-300 text-stone-900 shadow-sm"
+                        : "bg-amber-950/20 border-amber-500/30 text-amber-100 shadow-sm"
+                      : isLight
+                        ? "bg-stone-50/80 border-stone-200 text-stone-500 border-dashed"
+                        : "bg-white/[0.02] border-white/[0.07] text-stone-400 border-dashed"
                   }`}
                 >
-                  {t}
-                </span>
+                  <div className="flex items-start gap-2">
+                    <span className="text-base mt-0.5">{imprint.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-xs font-bold truncate ${
+                          imprint.isUnlocked
+                            ? isLight ? "text-amber-950" : "text-amber-200"
+                            : isLight ? "text-stone-600" : "text-stone-400"
+                        }`}>
+                          {imprint.title}
+                        </span>
+                        <span className={`text-[10px] shrink-0 px-1.5 py-0.5 rounded font-mono-num font-medium ${
+                          imprint.isUnlocked
+                            ? isLight ? "bg-amber-200/70 text-amber-950" : "bg-amber-500/20 text-amber-300"
+                            : isLight ? "bg-stone-200/60 text-stone-600" : "bg-white/[0.05] text-stone-400"
+                        }`}>
+                          {imprint.phaseName}
+                        </span>
+                      </div>
+                      <p className={`text-[11px] leading-tight mt-0.5 font-reading-sans ${
+                        imprint.isUnlocked
+                          ? isLight ? "text-stone-700" : "text-stone-300"
+                          : isLight ? "text-stone-500 italic" : "text-stone-400 italic"
+                      }`}>
+                        {imprint.subtitle}
+                      </p>
+                      {imprint.isUnlocked && (
+                        <p className={`mt-1.5 pt-1.5 border-t text-[10.5px] leading-relaxed font-reading-sans ${
+                          isLight ? "border-amber-200/80 text-amber-900/90" : "border-white/[0.06] text-amber-200/80"
+                        }`}>
+                          “{imprint.quote}”
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -2423,25 +2485,60 @@ ${logEntries
                     {finalVerdict.verdictText}
                   </div>
 
-                  {/* Life Tags Badges */}
-                  <div className="space-y-1.5">
-                    <span className={`text-xs font-semibold block font-narrative-serif ${
-                      isLight ? "text-stone-700 font-bold" : "text-stone-400"
-                    }`}>
-                      六十三载岁月烙印
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {tags.map((t) => (
-                        <span
-                          key={t}
-                          className={`px-2.5 py-0.5 rounded-full text-xs font-reading-sans border ${
+                  {/* 3 Golden Lifetime Soul Imprints (人生核心灵魂烙印) */}
+                  <div className={`p-4 sm:p-5 rounded-xl border space-y-3 ${
+                    isLight ? "bg-amber-50/50 border-amber-200/90 text-stone-800" : "bg-[#181A24] border-amber-500/20 text-stone-200"
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div className={`text-xs sm:text-sm font-bold flex items-center gap-2 font-narrative-serif ${
+                        isLight ? "text-amber-950" : "text-amber-300"
+                      }`}>
+                        <span>🏅</span>
+                        <span>六十三载 · 人生核心灵魂烙印</span>
+                      </div>
+                      <span className={`text-[11px] font-mono-num ${isLight ? "text-stone-500" : "text-stone-400"}`}>
+                        灵魂沉淀 · 绝非流水账
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {soulImprints.filter(imp => imp.isUnlocked).map((imprint) => (
+                        <div
+                          key={imprint.slot}
+                          className={`p-3 sm:p-3.5 rounded-xl border transition-all ${
                             isLight
-                              ? "bg-stone-100 text-stone-800 border-stone-300 font-medium"
-                              : "bg-[#181B26] text-stone-300 border-white/[0.08]"
+                              ? "bg-white border-amber-300 shadow-sm"
+                              : "bg-[#141620] border-amber-500/30 shadow-sm"
                           }`}
                         >
-                          {t}
-                        </span>
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl mt-0.5">{imprint.icon}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center justify-between gap-1">
+                                <span className={`text-sm font-bold ${
+                                  isLight ? "text-amber-950" : "text-amber-200"
+                                }`}>
+                                  {imprint.title}
+                                </span>
+                                <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${
+                                  isLight ? "bg-amber-100 border-amber-300 text-amber-950" : "bg-amber-500/20 border-amber-500/40 text-amber-300"
+                                }`}>
+                                  {imprint.phaseName}
+                                </span>
+                              </div>
+                              <div className={`text-xs mt-1 font-medium font-reading-sans ${
+                                isLight ? "text-stone-700" : "text-stone-300"
+                              }`}>
+                                {imprint.subtitle}
+                              </div>
+                              <div className={`mt-2 pt-2 border-t text-xs leading-relaxed font-reading-sans ${
+                                isLight ? "border-amber-200/70 text-amber-950/80" : "border-white/[0.06] text-amber-200/80"
+                              }`}>
+                                “{imprint.quote}”
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>

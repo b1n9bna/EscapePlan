@@ -3,6 +3,10 @@
 // 逃跑计划 · 中国式命运交互电影数据模型 (三段式驾驶舱 + 0~63岁全周期因果链)
 // ============================================================================
 
+import { getProvincialGaokaoOptions } from './provincial_routes';
+export * from './soul_imprints';
+export * from './provincial_routes';
+
 export interface FamilyOrigin {
   region: string;
   province?: string;
@@ -2363,15 +2367,15 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
   // --------------------------------------------------------------------------
   1: [
     {
-      id: "age_1_zhuazhou",
+      id: "age_1_steps",
       age: 1,
       stageName: "幼芽期 · 1岁",
-      title: "摇晃的脚步与周岁抓周",
+      title: "摇晃的脚步与学步的晨光",
       scene:
-        "在老旧木门槛与水泥地之间，你松开母亲的手，摇摇晃晃迈开了人生的第一步。周岁抓周礼上，八仙桌上铺着大红方布，亲戚们围在四周看热闹。你在旧算盘、发黄的书本、生锈的螺丝刀与零钞之间好奇张望，一把抓住了生锈的螺丝刀，惹得满屋大人发出欢笑。",
+        "在老旧木门槛与水磨石地面之间，你松开母亲的手，摇摇晃晃迈开了人生的第一步。阳光斜照进简朴的堂屋，院落里传来邻居家炒菜的滋滋声与远处的市井人声。你摔倒了又自己爬起来，引得疲惫归家的父亲脸上露出了难得的笑意。",
       type: "natural",
       naturalDelta: { health: 5, cognition: 5, resilience: 5 },
-      naturalTags: ["周岁学步", "螺丝手艺"]
+      naturalTags: ["周岁学步"]
     },
     {
       id: "age_1_scar",
@@ -3395,49 +3399,16 @@ export function generateTimelineForCharacter(
       continue;
     }
 
-    // 1岁：【周岁抓周礼】告别单调机械连点！第一岁就拥有决定性格底色的高光抉择！
+    // 1岁：【摇晃学步与晨昏人间】纯自然成长纪实，彻底告别刻意的人工暗示抓周
     if (age === 1) {
       result.push({
-        id: `age_1_zhuazhou_${family.region}`,
+        id: `age_1_steps_${family.region}`,
         age: 1,
         stageName: "幼芽期 · 1岁",
-        title: "周岁抓周礼与命定信物",
-        scene: "八仙桌上铺着大红方布，亲戚街坊围在四周看热闹。母亲把你放在红布中央，桌上摆着旧算盘、发黄的字典、小螺丝刀和一张折叠整齐的纸币。长辈们拍着手催促：“宝宝快抓，看看这辈子奔什么前程！”",
-        type: "choice",
-        choices: [
-          {
-            stanceBadge: "偏锋商感",
-            text: "一把抓过旧算盘与账本，小手拨弄算珠噼啪作响！",
-            detail: "对数字、流水与利益交易天然敏感，引得周围亲友夸赞这娃天生有财商会做买卖。",
-            reaction: "长辈们笑得合不拢嘴，父亲把一块珍藏的老银圆塞进了你的贴身荷包当作启动资金。",
-            delta: { cognition: 20, savings: 300, happiness: 15 },
-            addTags: ["早慧商感", "精打细算"]
-          },
-          {
-            stanceBadge: "苦修书香",
-            text: "伸手抱住发黄的新华字典与毛笔，安静翻看纸页！",
-            detail: "不哭不闹喜静爱书，眉宇间流露出对文字符号与应试求知的本能好奇与沉稳专注。",
-            reaction: "外公推了推老花镜欣慰点头：“是个读书的硬苗子，往后准有大出息！”",
-            delta: { academicCapital: 25, cognition: 20, inferiority: -10 },
-            addTags: ["书香初萌", "好学幼苗"]
-          },
-          {
-            stanceBadge: "硬核工匠",
-            text: "攥住沉甸甸的小扳手与螺丝刀，在木桌缝里专注捣鼓！",
-            detail: "专注摆弄机械构件与实体工具，自小展现出过硬的动手实操天性与工匠底色。",
-            reaction: "开修理铺的二叔拍腿大笑：“好手艺人！凭真力气吃饭走遍天下都不慌！”",
-            delta: { resilience: 25, social: 15, health: 15 },
-            addTags: ["工匠天分", "动手实操"]
-          },
-          {
-            stanceBadge: "旷野出海",
-            text: "抓起那张花花绿绿的纸币，眼睛直勾勾望着门外飞鸟！",
-            detail: "自小对辽阔未知的远方充满向往，天性不受故土温室的规训与拘束，神往世界。",
-            reaction: "母亲轻轻把你抱在怀里擦汗：“这孩子心大得很，往后怕是留不住在家门口哟。”",
-            delta: { rebellion: 30, happiness: 25, kinshipGuilt: -5 },
-            addTags: ["向往辽阔", "天性不羁"]
-          }
-        ]
+        title: "摇晃的学步与最初的人间温度",
+        scene: `在${family.housing.split('（')[0]}的门槛前，你松开母亲粗糙温暖的双手，摇摇晃晃迈开了人生的第一步。屋外是熟悉的${family.regionDetail.split('|')[0].trim()}，锅灶里翻滚着粗茶淡饭的香气。你摔倒在地上没有哭闹，扶着长板凳站起来，引得疲惫归家的父母脸上露出了难得的宽慰笑容。这一年，你慢慢看清了身边大人的喜怒哀乐。`,
+        type: "natural",
+        naturalDelta: { health: 5, resilience: 5, happiness: 5 }
       });
       continue;
     }
@@ -6030,21 +6001,25 @@ export interface GaokaoCalculation {
 
 export function calculateGaokaoOutcome(
   attrs: CharacterAttributes,
-  tags: string[] = []
+  tags: string[] = [],
+  family?: FamilyOrigin
 ): GaokaoCalculation {
+  const province = family?.province;
+
   // If Vocational / Artisan Track from 0~17
   if (tags.includes("职教蓝领") || tags.includes("手艺人底色") || tags.includes("早期打工")) {
+    const provOptions = getProvincialGaokaoOptions(province, "junior_college");
     return {
       degreeTrack: "junior_college",
-      title: "【公办全日制大专 · 实用技能定向】",
+      title: province ? `【${province}公办全日制大专 · 实用技能定向】` : "【公办全日制大专 · 实用技能定向】",
       scoreText: "对口高职高考考分 488 分，被省内公办职业技术学院王牌工科/护理专业录取",
       verdict:
         "你在十五岁那年没有挤上普高的独木桥，避开了三年无休止的题海折磨。在实训机床和实操图纸前，你练就了一双带老茧的双手。虽然亲友聚会时长辈总爱念叨‘专科到底不如本科’，但你早已学会靠具体手艺自立。",
       academicCapitalDesc: "实用技能在身，虽然学历门槛受限，但你在蓝领与一线操作岗位拥有极强的生存韧性。",
       psychologicalDossier: `生存韧劲：${attrs.resilience}%，自卑创伤：${attrs.inferiority}%。你更早接触了社会的冷暖，骨子里少了一份文人的清高，多了一份现实的生存嗅觉。`,
       firstStepChoice: {
-        prompt: "面对大专三年的时光，你的核心规划是：",
-        options: [
+        prompt: `面对${province ? province : "大专"}三年的时光，你的核心规划是：`,
+        options: (provOptions && provOptions.length > 0) ? provOptions : [
           {
             text: "扎根实训基地苦练数控机床与精密维保绝活，考取高级工职业资格，靠手艺硬核立足",
             detail: "不再向家里伸手要生活费，利用一切实训与假期在工厂一线打磨不可替代的实操硬功夫。",
@@ -6100,17 +6075,18 @@ export function calculateGaokaoOutcome(
 
   // Tier 1: 985/211 重点大学 (全省排名前1.2%，必须同时满足总分>=635、做题资本>=75、见识认知>=65，且身体未被透支崩溃)
   if (finalScore >= 620 && (attrs.academicCapital || 0) >= 68 && (attrs.cognition || 0) >= 55 && (attrs.health || 0) >= 28) {
+    const provOptions = getProvincialGaokaoOptions(province, "985_211");
     return {
       degreeTrack: "985_211",
-      title: "【985/211重点大学 · 顶尖高校录取】",
+      title: province ? `【${province}顶尖重点高校 · 录取榜首】` : "【985/211重点大学 · 顶尖高校录取】",
       scoreText: `高考总分 ${finalScore} 分（全省排位前 1.2%），稳稳斩获顶尖重点大学录取通知书！`,
       verdict:
         "你在长达十二年的应试长跑中脱颖而出！红榜挂在校门前，校长和老师亲自送来喜报与奖学金，亲友们把你看作改写门楣的骄傲。你用十二年的极致自律与做题硬功夫换来了这张稀缺门票，未来不同赛道的宏大版图正向你展开。",
       academicCapitalDesc: "重点大学文凭到手，拥有顶尖校友网络与各行业核心选拔入场券，同时也承载着整个家庭更沉重的期许。",
       psychologicalDossier: `家庭牵绊：${attrs.kinshipGuilt}%，应试底盘：${attrs.academicCapital}%。你赢下了最艰难的第一道独木桥，骨子里充满底气。`,
       firstStepChoice: {
-        prompt: "面对名校王牌志愿与未来赛道，你的根本立志是：",
-        options: [
+        prompt: `面对${province ? `${province}本省及全国` : "名校"}王牌志愿与未来赛道，你的根本立志是：`,
+        options: (provOptions && provOptions.length > 0) ? provOptions : [
           {
             text: "攻读重点大学王牌计算机/电子信息工程专业，立志用技术硬实力在市场立足",
             detail: "名校理工硬核底蕴，面向前沿科技与高端研发，毕业后立志用代码与工程能力改变家庭阶层。",
@@ -6136,17 +6112,18 @@ export function calculateGaokaoOutcome(
 
   // Tier 2: 普通公办本科（双非本一/二本，490~634分，绝大多数本科生的真实天地）
   if (finalScore >= 490) {
+    const provOptions = getProvincialGaokaoOptions(province, "double_non");
     return {
       degreeTrack: "double_non",
-      title: "【沿海普通公办本科（双非一本/二本） · 真实而厚重的大多数】",
+      title: province ? `【${province}公办本科（双非一本/二本） · 真实而厚重的大多数】` : "【沿海普通公办本科（双非一本/二本） · 真实而厚重的大多数】",
       scoreText: `高考总分 ${finalScore} 分（超省控公办本科线），被二线省会公办综合性大学录取`,
       verdict:
         "不高不低的分数，折射出你十二年来既不甘摆烂又未曾彻底疯狂的真实写照。你跨过了全日制本科的门槛，没有名校天生光环加持，但也免去了高处不胜寒的重压。未来的路，全看你在大学四年的主动突围。",
       academicCapitalDesc: "正规公办本科文凭，够得着绝大多数企业与体制内考编的基本门槛，关键在于个人专业与实操积累。",
       psychologicalDossier: `独立倾向：${attrs.rebellion}%，抗压韧劲：${attrs.resilience}%。你深知自己是一介凡人，必须更早找准立足社会的生态位。`,
       firstStepChoice: {
-        prompt: "迈入大学校园，你为自己确立的突围支点是：",
-        options: [
+        prompt: `迈入${province ? province : "大学"}校园，你为自己确立的突围支点是：`,
+        options: (provOptions && provOptions.length > 0) ? provOptions : [
           {
             text: "选择实用型软件工程与智能物联专业，大学四年疯狂自学做项目，靠硬实战经验突围",
             detail: "深知学历并非王牌，早早泡在机房与开源社区，通过真实企业项目锤炼专业实操技能。",
@@ -6171,17 +6148,18 @@ export function calculateGaokaoOutcome(
   }
 
   // Tier 3: 公办高等职业技术学院 / 专科定向 (< 490 分)
+  const provOptions = getProvincialGaokaoOptions(province, "junior_college");
   return {
     degreeTrack: "junior_college",
-    title: "【省会普通公办大专 · 现实的冷水与重新出发】",
+    title: province ? `【${province}普通公办大专 · 现实的冷水与重新出发】` : "【省会普通公办大专 · 现实的冷水与重新出发】",
     scoreText: `高考总分 ${finalScore} 分（未达本科省控线），录取至省属公办职业技术学院`,
     verdict:
       "出分那一晚，客厅里一片沉寂。父母在阳台上长吁短叹，十二年的应试长跑在这一刻画上了句号。你意识到自己在死板做题应试上并不占优，但也终于放下了虚浮的执念，开始思考最务实的谋生出路。",
     academicCapitalDesc: "大专文凭，在遍地本科生的时代稍显单薄，但只要练就一身过硬的独门手艺，照样能在社会稳稳立足。",
     psychologicalDossier: `生存韧性：${attrs.resilience}%，心理压力：${attrs.inferiority + 15}%。家人的叹息如针扎，但你也彻底放下了应试的沉重包袱。`,
     firstStepChoice: {
-      prompt: "拿着大专通知书，你的第一步打算：",
-      options: [
+      prompt: `拿着${province ? province : "大专"}通知书，你的第一步打算：`,
+      options: (provOptions && provOptions.length > 0) ? provOptions : [
         {
           text: "坦然接纳现实：大专学一门实用精密数控或维保手艺，周末打工自给自足不再要钱",
           detail: "贫穷和挫败不再能轻易击垮你，你把身段放到最低，在具体的工业与社会泥土里摸爬滚打。",
@@ -8384,9 +8362,9 @@ export interface AchievementDef {
 
 export const ACHIEVEMENT_DEFS: AchievementDef[] = [
   {
-    id: "ach_zhazhou",
-    title: "天命初启",
-    description: "在一岁周岁抓周礼上选出你的命定信物",
+    id: "ach_early_steps",
+    title: "初涉人间",
+    description: "在故土门槛前稳稳迈开人生的第一步",
     iconName: "Sparkles",
     rarity: "blue"
   },
@@ -8553,8 +8531,8 @@ export function evaluateLifetimeAchievements(
 ): AchievementDef[] {
   const earned: AchievementDef[] = [];
 
-  // ach_zhazhou
-  if (tags.some(t => t.includes("抓周") || t.includes("幼苗") || t.includes("商感") || t.includes("工匠天分") || t.includes("天性不羁"))) {
+  // ach_early_steps
+  if (logEntries.some(e => e.age <= 1)) {
     earned.push(ACHIEVEMENT_DEFS[0]);
   }
   // Track achievements
