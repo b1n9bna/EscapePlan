@@ -38,10 +38,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'sim'
                   ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <Gamepad2 className="w-4 h-4 text-amber-200" />
+              <Gamepad2 className={`w-4 h-4 ${activeTab === 'sim' ? 'text-white' : 'text-amber-400'}`} />
               <span>人生模拟</span>
             </button>
 
@@ -50,10 +50,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'subclasses'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className={`w-4 h-4 ${activeTab === 'subclasses' ? 'text-white' : 'text-sky-400'}`} />
               <span>政策与算分</span>
             </button>
 
@@ -62,10 +62,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'reality'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <Calculator className="w-4 h-4" />
+              <Calculator className={`w-4 h-4 ${activeTab === 'reality' ? 'text-white' : 'text-amber-400'}`} />
               <span>税后沙盒</span>
             </button>
 
@@ -74,10 +74,10 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'diy'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <CheckSquare className="w-4 h-4" />
+              <CheckSquare className={`w-4 h-4 ${activeTab === 'diy' ? 'text-white' : 'text-emerald-400'}`} />
               <span>手搓路线</span>
             </button>
           </nav>

@@ -38,6 +38,7 @@ import {
   Brain,
   Smile,
   Users,
+  User,
   Coins,
   Shield,
   Home,
@@ -328,13 +329,13 @@ const EndingCodexModal: React.FC<{
                     </span>
                   </div>
                   {isUnlocked ? (
-                    <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1 font-reading-sans">
-                      <Check className="w-3.5 h-3.5" />
+                    <span className="text-[11px] text-emerald-300 font-medium flex items-center gap-1 bg-emerald-950/40 border border-emerald-800/50 px-2 py-0.5 rounded-full font-reading-sans">
+                      <Check className="w-3 h-3 text-emerald-300" />
                       已解锁
                     </span>
                   ) : (
-                    <span className="text-[11px] text-stone-500 flex items-center gap-1 font-reading-sans">
-                      <Lock className="w-3 h-3" />
+                    <span className="text-[11px] text-stone-300 flex items-center gap-1 bg-white/[0.05] border border-white/[0.1] px-2 py-0.5 rounded-full font-reading-sans">
+                      <Lock className="w-3 h-3 text-stone-300" />
                       未解锁
                     </span>
                   )}
@@ -1111,7 +1112,7 @@ ${logEntries
               disabled={isSpinning}
               className="px-4 py-2 rounded-xl bg-[#181B26] hover:bg-[#1E2230] border border-white/[0.08] text-stone-200 text-xs sm:text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50 active:scale-[0.98]"
             >
-              <RotateCcw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin' : ''}`} />
+              <RotateCcw className={`w-3.5 h-3.5 text-amber-300 ${isSpinning ? 'animate-spin' : ''}`} />
               重新投胎
             </button>
           </div>
@@ -1140,46 +1141,54 @@ ${logEntries
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-1.5 hover:border-white/[0.12] transition-colors">
-              <div className="text-[#D4A359] font-semibold flex items-center gap-1.5 font-reading-sans">
-                <Users className="w-4 h-4" />
-                父亲：{charData.family.fatherAge}岁 · {charData.family.fatherJob}
+            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+              <div className="text-amber-300 font-semibold flex items-center gap-2.5 font-reading-sans">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <User className="w-3.5 h-3.5 text-amber-300" />
+                </div>
+                <span>父亲：{charData.family.fatherAge}岁 · {charData.family.fatherJob}</span>
               </div>
-              <p className="text-stone-300 leading-relaxed text-xs sm:text-[13px] font-reading-sans">
+              <p className="text-stone-300 leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8">
                 {charData.family.fatherTrait}
               </p>
             </div>
 
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-1.5 hover:border-white/[0.12] transition-colors">
-              <div className="text-[#D4A359] font-semibold flex items-center gap-1.5 font-reading-sans">
-                <Users className="w-4 h-4" />
-                母亲：{charData.family.motherAge}岁 · {charData.family.motherJob}
+            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+              <div className="text-rose-300 font-semibold flex items-center gap-2.5 font-reading-sans">
+                <div className="w-6 h-6 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center shrink-0">
+                  <User className="w-3.5 h-3.5 text-rose-300" />
+                </div>
+                <span>母亲：{charData.family.motherAge}岁 · {charData.family.motherJob}</span>
               </div>
-              <p className="text-stone-300 leading-relaxed text-xs sm:text-[13px] font-reading-sans">
+              <p className="text-stone-300 leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8">
                 {charData.family.motherTrait}
               </p>
             </div>
 
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-1.5 hover:border-white/[0.12] transition-colors">
-              <div className="text-stone-300 font-semibold flex items-center gap-1.5 font-reading-sans">
-                <Home className="w-4 h-4 text-stone-400" />
-                居住环境与家庭资产
+            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+              <div className="text-teal-300 font-semibold flex items-center gap-2.5 font-reading-sans">
+                <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
+                  <Home className="w-3.5 h-3.5 text-teal-300" />
+                </div>
+                <span>居住环境与家庭资产</span>
               </div>
-              <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-reading-sans">
+              <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8">
                 {charData.family.housing}
               </p>
-              <p className="text-stone-400 text-xs mt-1 font-reading-sans">{charData.family.wealthDetail}</p>
+              <p className="text-stone-400 text-xs mt-1 font-reading-sans pl-8">{charData.family.wealthDetail}</p>
             </div>
 
-            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-1.5 hover:border-white/[0.12] transition-colors">
-              <div className="text-stone-300 font-semibold flex items-center gap-1.5 font-reading-sans">
-                <Shield className="w-4 h-4 text-stone-400" />
-                同胞与情感底色
+            <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
+              <div className="text-sky-300 font-semibold flex items-center gap-2.5 font-reading-sans">
+                <div className="w-6 h-6 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
+                  <Shield className="w-3.5 h-3.5 text-sky-300" />
+                </div>
+                <span>同胞与情感底色</span>
               </div>
-              <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-reading-sans">
+              <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8">
                 {charData.family.siblings} — {charData.family.siblingsDetail}
               </p>
-              <p className="text-[#D4A359]/80 text-xs mt-1 font-reading-sans">{charData.family.emotionalTone}</p>
+              <p className="text-[#D4A359]/90 text-xs mt-1 font-reading-sans pl-8">{charData.family.emotionalTone}</p>
             </div>
           </div>
 
@@ -1206,8 +1215,10 @@ ${logEntries
       {/* Cockpit Top Bar */}
       <header className="h-12 border-b border-white/[0.07] bg-[#0E1017] px-4 sm:px-6 flex items-center justify-between shrink-0 text-xs text-stone-300">
         <div className="flex items-center gap-3">
-          <span className="font-semibold text-stone-100 flex items-center gap-1.5 font-narrative-serif text-sm">
-            <Calendar className="w-3.5 h-3.5 text-[#D4A359]" />
+          <span className="font-semibold text-stone-100 flex items-center gap-2 font-narrative-serif text-sm">
+            <span className="w-6 h-6 rounded-lg bg-[#D4A359]/15 border border-[#D4A359]/30 flex items-center justify-center shrink-0">
+              <Calendar className="w-3.5 h-3.5 text-[#E0B26A]" />
+            </span>
             公历 {birthYear + currentAge} 年 · {currentAge} 岁
           </span>
           <span className="hidden sm:inline-block text-stone-600">|</span>
@@ -1277,10 +1288,10 @@ ${logEntries
           </span>
           <button
             onClick={handleRestart}
-            className="flex items-center gap-1 text-stone-400 hover:text-stone-200 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#13151F] hover:bg-[#181B26] border border-white/[0.08] text-stone-300 hover:text-white transition-all text-xs font-reading-sans group"
             title="重新投胎"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3.5 h-3.5 text-stone-300 group-hover:text-amber-300 group-hover:rotate-180 transition-all duration-300" />
             <span>重新投胎</span>
           </button>
         </div>
@@ -1307,11 +1318,13 @@ ${logEntries
             <div className="text-xs text-stone-400 space-y-1.5 font-reading-sans">
               <div>出生：{charData.family.region}</div>
               <div>阶层：{charData.family.wealthTier}</div>
-              <div className="flex items-center gap-1.5 pt-1.5 border-t border-white/[0.06]">
-                <Coins className="w-3.5 h-3.5 text-[#D4A359]" />
+              <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <Coins className="w-3.5 h-3.5 text-amber-300" />
+                </div>
                 <span className="text-stone-300">个人现金：</span>
                 <span
-                  className={`font-mono-num font-semibold ${
+                  className={`font-mono-num font-semibold text-sm ${
                     attrs.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'
                   }`}
                 >
@@ -1339,10 +1352,12 @@ ${logEntries
             </span>
 
             {/* Health */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-reading-sans">
-                <span className="text-stone-300 flex items-center gap-1.5">
-                  <HeartPulse className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs font-reading-sans">
+                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                  <div className="w-5 h-5 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                    <HeartPulse className="w-3 h-3 text-emerald-300" />
+                  </div>
                   体魄
                 </span>
                 <span className="font-mono-num text-emerald-400 font-semibold">{attrs.health}%</span>
@@ -1353,32 +1368,36 @@ ${logEntries
                   style={{ width: `${Math.min(100, Math.max(0, attrs.health))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans">{getHealthDesc(attrs.health)}</div>
+              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getHealthDesc(attrs.health)}</div>
             </div>
 
             {/* Happiness */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-reading-sans">
-                <span className="text-stone-300 flex items-center gap-1.5">
-                  <Smile className="w-3.5 h-3.5 text-[#D4A359]" />
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs font-reading-sans">
+                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                  <div className="w-5 h-5 rounded-md bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                    <Smile className="w-3 h-3 text-amber-300" />
+                  </div>
                   心境
                 </span>
-                <span className="font-mono-num text-[#D4A359] font-semibold">{attrs.happiness}%</span>
+                <span className="font-mono-num text-amber-400 font-semibold">{attrs.happiness}%</span>
               </div>
               <div className="h-1.5 rounded-full bg-[#1C1F2B] overflow-hidden">
                 <div
-                  className="h-full bg-[#D4A359] rounded-full transition-all duration-300"
+                  className="h-full bg-amber-400 rounded-full transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.max(0, attrs.happiness))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans">{getHappinessDesc(attrs.happiness)}</div>
+              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getHappinessDesc(attrs.happiness)}</div>
             </div>
 
             {/* Cognition */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-reading-sans">
-                <span className="text-stone-300 flex items-center gap-1.5">
-                  <Brain className="w-3.5 h-3.5 text-sky-400" />
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs font-reading-sans">
+                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                  <div className="w-5 h-5 rounded-md bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
+                    <Brain className="w-3 h-3 text-sky-300" />
+                  </div>
                   见识
                 </span>
                 <span className="font-mono-num text-sky-400 font-semibold">{attrs.cognition}%</span>
@@ -1389,14 +1408,16 @@ ${logEntries
                   style={{ width: `${Math.min(100, Math.max(0, attrs.cognition))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans">{getCognitionDesc(attrs.cognition)}</div>
+              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getCognitionDesc(attrs.cognition)}</div>
             </div>
 
             {/* Social */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-reading-sans">
-                <span className="text-stone-300 flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-purple-400" />
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-xs font-reading-sans">
+                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                  <div className="w-5 h-5 rounded-md bg-purple-500/15 border border-purple-500/30 flex items-center justify-center shrink-0">
+                    <Users className="w-3 h-3 text-purple-300" />
+                  </div>
                   人脉
                 </span>
                 <span className="font-mono-num text-purple-400 font-semibold">{attrs.social}%</span>
@@ -1407,7 +1428,7 @@ ${logEntries
                   style={{ width: `${Math.min(100, Math.max(0, attrs.social))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans">{getSocialDesc(attrs.social)}</div>
+              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getSocialDesc(attrs.social)}</div>
             </div>
           </div>
 
@@ -1791,7 +1812,7 @@ ${logEntries
                           {choice.text}
                         </span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-stone-500 group-hover:text-[#D4A359] transition-transform group-hover:translate-x-1 shrink-0 ml-3" />
+                      <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-300 transition-transform group-hover:translate-x-1 shrink-0 ml-3" />
                     </button>
                   ))}
                 </div>
@@ -1839,19 +1860,19 @@ ${logEntries
                       className={`px-3 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98] ${
                         isAutoPlaying
                           ? 'bg-[#D4A359]/20 border-[#D4A359] text-[#D4A359] shadow-sm shadow-amber-950/40'
-                          : 'bg-[#181B26] border-white/[0.08] hover:border-white/[0.16] text-stone-300'
+                          : 'bg-[#181B26] border-white/[0.08] hover:border-white/[0.16] text-stone-200'
                       }`}
                       title="自动推进时光流转 (快捷键: A)"
                     >
                       {isAutoPlaying ? (
                         <>
-                          <Pause className="w-3.5 h-3.5 fill-[#D4A359]" />
+                          <Pause className="w-3.5 h-3.5 fill-[#D4A359] text-[#D4A359]" />
                           <span>暂停</span>
                           <span className="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-ping ml-0.5" />
                         </>
                       ) : (
                         <>
-                          <Play className="w-3.5 h-3.5" />
+                          <Play className="w-3.5 h-3.5 text-amber-300 fill-amber-300/20" />
                           <span>自动流转</span>
                         </>
                       )}
@@ -1859,9 +1880,11 @@ ${logEntries
 
                     {/* Speed Slider (Volume-Slider Style) */}
                     <div className="flex items-center gap-2 bg-[#13151F] px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/[0.08]">
-                      <Gauge className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                      <div className="w-5 h-5 rounded-md bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                        <Gauge className="w-3 h-3 text-amber-300" />
+                      </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-stone-400 whitespace-nowrap hidden sm:inline">流速</span>
+                        <span className="text-[11px] text-stone-300 whitespace-nowrap hidden sm:inline">流速</span>
                         <input
                           type="range"
                           min="0.5"
@@ -1872,7 +1895,7 @@ ${logEntries
                           className="w-14 sm:w-20 h-1 bg-[#1C1F2B] rounded-lg appearance-none cursor-pointer accent-[#D4A359]"
                           title={`流转间隔：${autoPlaySpeed} 秒/岁（拖动左右调节快慢）`}
                         />
-                        <span className="text-[11px] font-mono-num text-[#D4A359] w-8 text-right font-medium">
+                        <span className="text-[11px] font-mono-num text-amber-300 w-8 text-right font-medium">
                           {autoPlaySpeed.toFixed(1)}s
                         </span>
                       </div>
@@ -1881,10 +1904,10 @@ ${logEntries
                     {/* Skip Directly to Next Choice */}
                     <button
                       onClick={handleSkipToNextDecision}
-                      className="px-2.5 py-1.5 rounded-xl bg-[#181B26] hover:bg-[#1E2230] border border-white/[0.08] hover:border-white/[0.16] text-stone-300 text-xs font-medium flex items-center gap-1 transition-all active:scale-[0.98]"
+                      className="px-2.5 py-1.5 rounded-xl bg-[#181B26] hover:bg-[#1E2230] border border-white/[0.08] hover:border-white/[0.16] text-stone-200 text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98]"
                       title="跳过平稳过渡年，一键直达下一个人生关键抉择或高考分流"
                     >
-                      <FastForward className="w-3.5 h-3.5 text-[#D4A359]" />
+                      <FastForward className="w-3.5 h-3.5 text-amber-300" />
                       <span className="hidden sm:inline">直达抉择</span>
                     </button>
                   </div>
@@ -1948,15 +1971,17 @@ ${logEntries
           </span>
 
           {/* Father Dynamic Card */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
-            <div className="flex items-center justify-between text-[#D4A359] font-semibold font-reading-sans">
-              <span className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5" />
+          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+            <div className="flex items-center justify-between font-reading-sans">
+              <span className="flex items-center gap-2 text-amber-300 font-semibold">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <User className="w-3.5 h-3.5 text-amber-300" />
+                </div>
                 父亲：{fatherStatus.age}岁
               </span>
               <span className="text-stone-400 font-normal">{charData.family.fatherJob}</span>
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed pt-1 font-reading-sans">
+            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
               {fatherStatus.status}
             </div>
             <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans">
@@ -1965,15 +1990,17 @@ ${logEntries
           </div>
 
           {/* Mother Dynamic Card */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
-            <div className="flex items-center justify-between text-[#D4A359] font-semibold font-reading-sans">
-              <span className="flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5" />
+          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+            <div className="flex items-center justify-between font-reading-sans">
+              <span className="flex items-center gap-2 text-rose-300 font-semibold">
+                <div className="w-6 h-6 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center shrink-0">
+                  <User className="w-3.5 h-3.5 text-rose-300" />
+                </div>
                 母亲：{motherStatus.age}岁
               </span>
               <span className="text-stone-400 font-normal">{charData.family.motherJob}</span>
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed pt-1 font-reading-sans">
+            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
               {motherStatus.status}
             </div>
             <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans">
@@ -1982,25 +2009,29 @@ ${logEntries
           </div>
 
           {/* Siblings */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
-            <div className="text-[#D4A359] font-semibold flex items-center justify-between font-reading-sans">
-              <span className="flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5" />
+          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+            <div className="text-sky-300 font-semibold flex items-center justify-between font-reading-sans">
+              <span className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
+                  <Shield className="w-3.5 h-3.5 text-sky-300" />
+                </div>
                 同胞：{siblingStatus.label}
               </span>
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed pt-1 font-reading-sans">
+            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
               {siblingStatus.status}
             </div>
           </div>
 
           {/* Housing & Family Assets */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
-            <div className="text-stone-300 font-semibold flex items-center gap-1.5 font-reading-sans">
-              <Home className="w-3.5 h-3.5 text-stone-400" />
+          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
+            <div className="text-teal-300 font-semibold flex items-center gap-2 font-reading-sans">
+              <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
+                <Home className="w-3.5 h-3.5 text-teal-300" />
+              </div>
               家庭居所与月度压力
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans">
+            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
               {charData.family.housing}
             </div>
             <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans">
@@ -2075,7 +2106,7 @@ ${logEntries
                         <div className="text-xs text-stone-400 leading-relaxed font-reading-sans">{opt.detail}</div>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-stone-500 group-hover:text-[#D4A359] transition-transform group-hover:translate-x-1 shrink-0 mt-1 ml-3" />
+                    <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-300 transition-transform group-hover:translate-x-1 shrink-0 mt-1 ml-3" />
                   </button>
                 ))}
               </div>
