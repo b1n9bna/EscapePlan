@@ -7,6 +7,8 @@ import {
   calculateGaokaoOutcome,
   generateAdultMilestones,
   generateFinalLifetimeVerdict,
+  detectCrisisWarning,
+  ENDING_CODEX_DEFS,
   getHealthDesc,
   getHappinessDesc,
   getCognitionDesc,
@@ -20,6 +22,7 @@ import {
   getMotherDynamicStatus,
   getSiblingDynamicStatus
 } from '../data/simulation';
+import confetti from 'canvas-confetti';
 import type {
   CharacterAttributes,
   LifeEventNode,
@@ -43,7 +46,17 @@ import {
   ExternalLink,
   ChevronRight,
   Calendar,
-  Compass
+  Compass,
+  BookOpen,
+  Award,
+  AlertTriangle,
+  X,
+  Lock,
+  Wrench,
+  Briefcase,
+  Landmark,
+  HeartHandshake,
+  ShieldAlert
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -65,6 +78,298 @@ interface ChronicleLogEntry {
   tagsAdded?: string[];
   reflection?: string;
 }
+
+
+// ============================================================================
+// SVG 5-AXIS RADAR CHART COMPONENT (五维人生格局图)
+// ============================================================================
+const RadarChart: React.FC<{
+  radar: {
+    wealth: number;
+    health: number;
+    cognition: number;
+    autonomy: number;
+    kinship: number;
+  };
+}> = ({ radar }) => {
+  const size = 200;
+  const center = size / 2;
+  const radius = 62;
+
+  const axes = [
+    { label: '财富充裕', val: radar.wealth },
+    { label: '身心康宁', val: radar.health },
+    { label: '见识格局', val: radar.cognition },
+    { label: '自由旷野', val: radar.autonomy },
+    { label: '亲族温度', val: radar.kinship }
+  ];
+
+  const getPoint = (idx: number, ratio: number) => {
+    const angle = ((idx * 72 - 90) * Math.PI) / 180;
+    return {
+      x: center + radius * ratio * Math.cos(angle),
+      y: center + radius * ratio * Math.sin(angle)
+    };
+  };
+
+  const getLabelPoint = (idx: number) => {
+    const angle = ((idx * 72 - 90) * Math.PI) / 180;
+    return {
+      x: center + (radius + 18) * Math.cos(angle),
+      y: center + (radius + 14) * Math.sin(angle)
+    };
+  };
+
+  const rings = [0.33, 0.66, 1.0];
+  const ringPolygons = rings.map((r) =>
+    axes.map((_, i) => {
+      const p = getPoint(i, r);
+      return `${p.x},${p.y}`;
+    }).join(' ')
+  );
+
+  const playerPoints = axes.map((a, i) => {
+    const p = getPoint(i, Math.min(100, Math.max(15, a.val)) / 100);
+    return `${p.x},${p.y}`;
+  }).join(' ');
+
+  return (
+    <div className="flex flex-col items-center justify-center p-3 bg-[#0B0C12] border border-stone-800/80 rounded-2xl">
+      <div className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+        <Sparkles className="w-3.5 h-3.5" />
+        五维人生格局图
+      </div>
+      <svg width={size} height={size} className="overflow-visible">
+        <defs>
+          <radialGradient id="radarGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#b45309" stopOpacity="0.15" />
+          </radialGradient>
+        </defs>
+
+        {ringPolygons.map((pts, idx) => (
+          <polygon
+            key={idx}
+            points={pts}
+            fill="none"
+            stroke="#292524"
+            strokeWidth="1"
+            strokeDasharray={idx < 2 ? '3,3' : undefined}
+          />
+        ))}
+
+        {axes.map((_, i) => {
+          const p = getPoint(i, 1.0);
+          return (
+            <line
+              key={i}
+              x1={center}
+              y1={center}
+              x2={p.x}
+              y2={p.y}
+              stroke="#292524"
+              strokeWidth="1"
+            />
+          );
+        })}
+
+        <polygon
+          points={playerPoints}
+          fill="url(#radarGrad)"
+          stroke="#f59e0b"
+          strokeWidth="2"
+          className="transition-all duration-700 ease-out"
+        />
+
+        {axes.map((a, i) => {
+          const p = getPoint(i, Math.min(100, Math.max(15, a.val)) / 100);
+          return (
+            <circle
+              key={i}
+              cx={p.x}
+              cy={p.y}
+              r="3.5"
+              fill="#fbbf24"
+              stroke="#0C0E14"
+              strokeWidth="1.5"
+            />
+          );
+        })}
+
+        {axes.map((a, i) => {
+          const lp = getLabelPoint(i);
+          return (
+            <text
+              key={i}
+              x={lp.x}
+              y={lp.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="text-[10px] fill-stone-300 font-sans"
+            >
+              {a.label}
+              <tspan className="fill-amber-400 font-mono font-semibold ml-0.5"> {a.val}</tspan>
+            </text>
+          );
+        })}
+      </svg>
+    </div>
+  );
+};
+
+// ============================================================================
+// ACHIEVEMENT ICON HELPER
+// ============================================================================
+const renderAchievementIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'Sparkles':
+      return <Sparkles className="w-4 h-4 text-amber-400" />;
+    case 'GraduationCap':
+      return <GraduationCap className="w-4 h-4 text-sky-400" />;
+    case 'Wrench':
+      return <Wrench className="w-4 h-4 text-amber-500" />;
+    case 'Briefcase':
+      return <Briefcase className="w-4 h-4 text-purple-400" />;
+    case 'Coins':
+      return <Coins className="w-4 h-4 text-yellow-400" />;
+    case 'Landmark':
+      return <Landmark className="w-4 h-4 text-emerald-400" />;
+    case 'Smile':
+      return <Smile className="w-4 h-4 text-amber-400" />;
+    case 'HeartHandshake':
+      return <HeartHandshake className="w-4 h-4 text-rose-400" />;
+    case 'Compass':
+      return <Compass className="w-4 h-4 text-sky-400" />;
+    case 'Home':
+      return <Home className="w-4 h-4 text-teal-400" />;
+    case 'ShieldAlert':
+      return <ShieldAlert className="w-4 h-4 text-orange-400" />;
+    default:
+      return <Award className="w-4 h-4 text-amber-400" />;
+  }
+};
+
+// ============================================================================
+// 16 种终局图鉴弹窗 (Ending Codex Modal)
+// ============================================================================
+const EndingCodexModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  unlockedIds: string[];
+}> = ({ isOpen, onClose, unlockedIds }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+      <div className="bg-[#12131D] border border-stone-800 rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl">
+        <div className="px-5 sm:px-6 py-4 border-b border-stone-800 flex items-center justify-between shrink-0 bg-[#0E0F16]">
+          <div className="flex items-center gap-2.5">
+            <BookOpen className="w-5 h-5 text-amber-400" />
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-stone-100 flex items-center gap-2">
+                <span>一生结局图鉴</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-950/70 border border-amber-800/60 text-amber-300 font-mono">
+                  已收集 {unlockedIds.length} / 16
+                </span>
+              </h2>
+              <p className="text-xs text-stone-400">
+                探索不同阶层起点、求学分流与出海抉择，集齐全部 16 大宿命篇章
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-stone-400 hover:text-stone-100 hover:bg-stone-800 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-4 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1">
+          {ENDING_CODEX_DEFS.map((ed) => {
+            const isUnlocked = unlockedIds.includes(ed.id);
+
+            return (
+              <div
+                key={ed.id}
+                className={`p-4 rounded-xl border transition-all ${
+                  isUnlocked
+                    ? ed.rarity === 'SSR'
+                      ? 'bg-amber-950/20 border-amber-500/80 shadow-md shadow-amber-950/30'
+                      : ed.rarity === 'SR'
+                      ? 'bg-purple-950/20 border-purple-600/70'
+                      : 'bg-stone-900/60 border-stone-700/80'
+                    : 'bg-[#0A0B10] border-stone-800/70 opacity-60'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded font-mono ${
+                        ed.rarity === 'SSR'
+                          ? 'bg-amber-500 text-stone-950 font-bold'
+                          : ed.rarity === 'SR'
+                          ? 'bg-purple-600 text-stone-100 font-bold'
+                          : 'bg-stone-800 text-stone-300'
+                      }`}
+                    >
+                      {ed.rarity}
+                    </span>
+                    <span className="text-xs font-mono text-stone-400">
+                      No.{ed.number < 10 ? '0' : ''}{ed.number}
+                    </span>
+                    <span className="text-[11px] text-stone-400 font-sans">
+                      · {ed.trackHint}
+                    </span>
+                  </div>
+                  {isUnlocked ? (
+                    <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      已解锁
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-stone-500 flex items-center gap-1">
+                      <Lock className="w-3 h-3" />
+                      未解锁
+                    </span>
+                  )}
+                </div>
+
+                <h3 className={`text-sm font-bold mb-1 ${isUnlocked ? 'text-stone-100' : 'text-stone-400'}`}>
+                  {ed.title}
+                </h3>
+                <div className="text-[11px] text-amber-400/90 italic font-serif mb-2">
+                  {ed.tagline}
+                </div>
+
+                {isUnlocked ? (
+                  <p className="text-xs text-stone-300 leading-relaxed">
+                    {ed.description}
+                  </p>
+                ) : (
+                  <div className="text-xs text-stone-400 bg-[#0E0F14] p-2.5 rounded-lg border border-stone-800/80">
+                    <span className="text-amber-400/90 font-medium block mb-0.5">解锁线索：</span>
+                    {ed.unlockCondition}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="px-6 py-3 border-t border-stone-800 bg-[#0E0F16] flex items-center justify-between text-xs text-stone-400 shrink-0">
+          <span>图鉴记录已持久化保存在当前浏览器</span>
+          <button
+            onClick={onClose}
+            className="px-4 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold"
+          >
+            返回模拟
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   onNavigateToSubclasses,
@@ -135,6 +440,47 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Copy success state
   const [copied, setCopied] = useState(false);
 
+  // Unlocked Endings (Persisted in LocalStorage)
+  const [unlockedEndings, setUnlockedEndings] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('escape_plan_unlocked_endings');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showCodexModal, setShowCodexModal] = useState(false);
+
+  // Confetti trigger once at Age 63
+  const confettiFiredRef = useRef(false);
+  useEffect(() => {
+    if (logEntries.some((e) => e.age === 63) && !confettiFiredRef.current) {
+      confettiFiredRef.current = true;
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch {}
+    }
+  }, [logEntries]);
+
+  // Register newly unlocked ending into LocalStorage
+  useEffect(() => {
+    if (logEntries.some((e) => e.age === 63)) {
+      const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
+      const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries);
+      if (!unlockedEndings.includes(finalVerdict.ending.id)) {
+        const updated = [...unlockedEndings, finalVerdict.ending.id];
+        setUnlockedEndings(updated);
+        try {
+          localStorage.setItem('escape_plan_unlocked_endings', JSON.stringify(updated));
+        } catch {}
+      }
+    }
+  }, [logEntries.length, chosenPath, gaokaoCalc, attrs, tags]);
+
   // Derived current age strictly driven by active timeline node
   const currentAge =
     gamePhase === 'setup'
@@ -156,6 +502,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     charData.family.siblingType || 'only_child',
     currentAge
   );
+
+  // Active Crisis Detection
+  const crisisWarning = detectCrisisWarning(attrs, tags);
 
   const currentNode = timeline[timelineIndex] || timeline[0];
   const isChoiceNode = currentNode.type === 'choice' && currentNode.choices && currentNode.choices.length > 0;
@@ -370,6 +719,12 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       return;
     }
 
+    // ★★★ 中年关键抉择 (30, 35, 42岁)：选完后停留在当前年龄看反馈，通过底部按钮跨入下一岁阶段 ★★★
+    if (currentNode.age >= 30) {
+      scrollToFeedBottom();
+      return;
+    }
+
     if (nextIdx >= timeline.length) {
       return;
     }
@@ -472,6 +827,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   };
 
   const handleRestart = () => {
+    confettiFiredRef.current = false;
     const fresh = generateRandomFamily();
     setCharData(fresh);
     setTimeline(generateTimelineForCharacter(fresh.family, fresh.gender));
@@ -487,12 +843,11 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   const handleCopyRecord = () => {
     const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
-    const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags);
+    const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries);
     const text = `【逃跑计划 · 一生因果纪要档案】
 代号/姓名：${charData.name}（${charData.gender}）
 出生地：${charData.family.region}（${birthYear}年）
 阶层背景：${charData.family.wealthTier}
-住房条件：${charData.family.housing}
 求学与职业轨道：${
       currentTrack === '985_211'
         ? '985/211 核心技术与学术精英'
@@ -503,12 +858,21 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 人生航道：${chosenPath === 'emigrate' ? '奔赴异邦开拓' : '扎根故土深耕'}
 终局个人储蓄：¥${attrs.savings.toLocaleString()}
 
-【六十三岁终局判词】
-${finalVerdict.summaryTitle}
-${finalVerdict.tagline}
-${finalVerdict.verdictText}
+🏆 达成终局：No.${finalVerdict.ending.number < 10 ? '0' : ''}${finalVerdict.ending.number} ${finalVerdict.ending.title} [${finalVerdict.ending.rarity}]
+${finalVerdict.ending.tagline}
+${finalVerdict.ending.description}
 
-【生平关键年轮与抉择轨迹】
+📊 五维人生格局：
+• 财富充裕：${finalVerdict.radar.wealth} / 100
+• 身心康宁：${finalVerdict.radar.health} / 100
+• 见识格局：${finalVerdict.radar.cognition} / 100
+• 自由旷野：${finalVerdict.radar.autonomy} / 100
+• 亲族温度：${finalVerdict.radar.kinship} / 100
+
+🎖️ 斩获人生成就：
+${finalVerdict.achievements.map((a) => `[${a.title}] ${a.description}`).join('\n')}
+
+📜 生平关键年轮与抉择轨迹：
 ${logEntries
   .map(
     (e) =>
@@ -724,9 +1088,25 @@ ${logEntries
           >
             家庭
           </button>
+          <button
+            onClick={() => setShowCodexModal(true)}
+            className="px-2 py-1 rounded-md text-amber-400 hover:text-amber-300 flex items-center gap-1 border-l border-stone-800 ml-0.5"
+            title="结局图鉴"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>{unlockedEndings.length}/16</span>
+          </button>
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
+          <button
+            onClick={() => setShowCodexModal(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 hover:border-amber-700/60 text-amber-300 transition-colors text-xs"
+            title="查看一生结局图鉴"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+            <span>结局图鉴 ({unlockedEndings.length}/16)</span>
+          </button>
           <span className="text-stone-400">
             储蓄：
             <span
@@ -782,6 +1162,17 @@ ${logEntries
               </div>
             </div>
           </div>
+
+          {/* Active Crisis Alert Banner in Left Panel */}
+          {crisisWarning && (
+            <div className="bg-rose-950/40 border border-rose-800/80 rounded-xl p-3 flex items-start gap-2.5 animate-pulse text-xs text-rose-200">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <div>
+                <div className="font-semibold text-rose-300 text-[11px]">{crisisWarning.title}</div>
+                <div className="text-[10px] text-stone-300 mt-0.5 leading-snug">{crisisWarning.desc}</div>
+              </div>
+            </div>
+          )}
 
           {/* 4 Core Attributes Meters */}
           <div className="bg-[#0E0F14] border border-stone-800/90 rounded-xl p-3.5 space-y-3">
@@ -928,6 +1319,16 @@ ${logEntries
             ref={feedContainerRef}
             className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 scroll-smooth"
           >
+            {/* Crisis Toast Alert inside Chronicle Feed */}
+            {crisisWarning && !logEntries.some((e) => e.age === 63) && (
+              <div className="bg-rose-950/40 border-2 border-rose-800/80 rounded-2xl p-4 sm:p-5 flex items-start gap-3 shadow-lg animate-pulse">
+                <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-rose-300">{crisisWarning.title}</h4>
+                  <p className="text-xs text-rose-200/90 leading-relaxed">{crisisWarning.desc}</p>
+                </div>
+              </div>
+            )}
             {logEntries.map((entry, idx) => (
               <div
                 key={entry.id + idx}
@@ -1025,52 +1426,99 @@ ${logEntries
               </div>
             ))}
 
-            {/* ★★★ 六十三岁法定退休：在三栏中流直接展开一生因果纪要档案 ★★★ */}
+            {/* ★★★ 六十三岁法定退休：重磅终局卡片（五维雷达图 + 16终局图鉴 + 成就徽章） ★★★ */}
             {logEntries.some((e) => e.age === 63) && (() => {
               const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
-              const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags);
+              const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries);
 
               return (
-                <div className="bg-[#141622] border-2 border-amber-600/80 rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 animate-fadeIn">
+                <div className="bg-[#141622] border-2 border-amber-600/80 rounded-2xl p-5 sm:p-7 shadow-2xl space-y-6 animate-fadeIn">
                   {/* Badge & Title */}
-                  <div className="text-center pb-4 border-b border-stone-800/80 space-y-2">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-700/60 text-amber-300 text-xs">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      公历 {birthYear + 63} 年 · 六十三岁 · 法定退休一生手记
+                  <div className="text-center pb-4 border-b border-stone-800/80 space-y-2.5">
+                    <div className="flex items-center justify-center gap-2">
+                      <span
+                        className={`text-xs font-bold px-2.5 py-0.5 rounded font-mono shadow-sm ${
+                          finalVerdict.ending.rarity === 'SSR'
+                            ? 'bg-amber-500 text-stone-950 font-bold'
+                            : finalVerdict.ending.rarity === 'SR'
+                            ? 'bg-purple-600 text-stone-100 font-bold'
+                            : 'bg-stone-800 text-stone-300'
+                        }`}
+                      >
+                        {finalVerdict.ending.rarity}
+                      </span>
+                      <span className="text-xs font-mono text-amber-300/80">
+                        终局 No.{finalVerdict.ending.number < 10 ? '0' : ''}{finalVerdict.ending.number} / 16
+                      </span>
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-amber-400">
+
+                    <h2 className="text-2xl sm:text-3xl font-bold text-amber-400 tracking-tight">
                       {finalVerdict.summaryTitle}
                     </h2>
-                    <div className="text-xs sm:text-sm text-stone-300 font-serif italic">
+                    <div className="text-xs sm:text-sm text-stone-300 font-serif italic max-w-xl mx-auto">
                       {finalVerdict.tagline}
                     </div>
                   </div>
 
-                  {/* Key Profile Summary */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
-                      <span className="text-stone-400 block text-[11px]">姓名 / 性别</span>
-                      <span className="text-stone-100 font-medium">{charData.name} · {charData.gender}</span>
-                    </div>
-                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
-                      <span className="text-stone-400 block text-[11px]">出生地背景</span>
-                      <span className="text-stone-100 font-medium truncate block">{charData.family.region}</span>
-                    </div>
-                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
-                      <span className="text-stone-400 block text-[11px]">求学与职业轨道</span>
-                      <span className="text-amber-400 font-medium truncate block">
-                        {currentTrack === '985_211'
-                          ? '985/211 核心精英'
-                          : currentTrack === 'junior_college'
-                          ? '公办职教 实用工匠'
-                          : '普通双非 务实骨干'}
-                      </span>
-                    </div>
-                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
-                      <span className="text-stone-400 block text-[11px]">终局个人储蓄</span>
-                      <span className={`font-mono font-bold ${attrs.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        ¥{attrs.savings.toLocaleString()}
-                      </span>
+                  {/* 2-Column: Radar Chart + Key Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                    <RadarChart radar={finalVerdict.radar} />
+
+                    <div className="space-y-2.5">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                          <span className="text-stone-400 block text-[11px]">姓名 / 性别</span>
+                          <span className="text-stone-100 font-medium">{charData.name} · {charData.gender}</span>
+                        </div>
+                        <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                          <span className="text-stone-400 block text-[11px]">出生地背景</span>
+                          <span className="text-stone-100 font-medium truncate block">{charData.family.region}</span>
+                        </div>
+                        <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                          <span className="text-stone-400 block text-[11px]">求学分流</span>
+                          <span className="text-amber-400 font-medium truncate block">
+                            {currentTrack === '985_211'
+                              ? '985/211 核心精英'
+                              : currentTrack === 'junior_college'
+                              ? '公办职教 实用工匠'
+                              : '普通双非 务实骨干'}
+                          </span>
+                        </div>
+                        <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                          <span className="text-stone-400 block text-[11px]">终局个人储蓄</span>
+                          <span className={`font-mono font-bold ${attrs.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            ¥{attrs.savings.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Earned Achievements Shelf */}
+                      <div className="bg-[#0E0F14] p-3 rounded-xl border border-stone-800 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-semibold text-stone-300">
+                          <span className="flex items-center gap-1.5 text-amber-400">
+                            <Award className="w-3.5 h-3.5" />
+                            斩获人生成就 ({finalVerdict.achievements.length}/12)
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {finalVerdict.achievements.map((ach) => (
+                            <div
+                              key={ach.id}
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] border ${
+                                ach.rarity === 'gold'
+                                  ? 'bg-amber-950/40 border-amber-600/60 text-amber-200'
+                                  : ach.rarity === 'purple'
+                                  ? 'bg-purple-950/40 border-purple-600/60 text-purple-200'
+                                  : 'bg-stone-800/80 border-stone-700 text-stone-300'
+                              }`}
+                              title={ach.description}
+                            >
+                              {renderAchievementIcon(ach.iconName)}
+                              <span className="font-medium">{ach.title}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -1113,13 +1561,21 @@ ${logEntries
                       )}
                     </button>
 
+                    <button
+                      onClick={() => setShowCodexModal(true)}
+                      className="py-3 px-4 rounded-xl border border-amber-700/60 bg-amber-950/40 hover:bg-amber-900/50 text-amber-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
+                    >
+                      <BookOpen className="w-4 h-4 text-amber-400" />
+                      <span>查看16大结局图鉴</span>
+                    </button>
+
                     {chosenPath === 'emigrate' && (
                       <button
                         onClick={() => onNavigateToSubclasses()}
                         className="py-3 px-4 rounded-xl border border-sky-800/80 bg-sky-950/40 hover:bg-sky-900/50 text-sky-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
                       >
                         <Compass className="w-4 h-4" />
-                        <span>查看现实出海路径参考</span>
+                        <span>出海参考</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -1128,7 +1584,7 @@ ${logEntries
                       onClick={() => onNavigateToDIY()}
                       className="py-3 px-4 rounded-xl border border-stone-800 bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
                     >
-                      <span>DIY落地指南</span>
+                      <span>DIY指南</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </button>
 
@@ -1293,6 +1749,15 @@ ${logEntries
           </div>
         </aside>
       </div>
+
+      {/* ================================================================= */}
+      {/* 16 种终局图鉴弹窗 (ENDING CODEX MODAL)                            */}
+      {/* ================================================================= */}
+      <EndingCodexModal
+        isOpen={showCodexModal}
+        onClose={() => setShowCodexModal(false)}
+        unlockedIds={unlockedEndings}
+      />
 
       {/* ================================================================= */}
       {/* MODAL: 18yo GAOKAO CALCULATED OUTCOME MODAL                       */}

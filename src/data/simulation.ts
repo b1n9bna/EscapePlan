@@ -2124,7 +2124,7 @@ export function generateTimelineForCharacter(
 
   // 仅生成 0 ~ 18 岁（童年到高考）：19~27岁成人职场由高考分流引擎精准赋予，彻底杜绝混入错误分轨剧本！
   for (let age = 0; age <= 18; age++) {
-    // 0岁：严格契合出生地医院与生活区，绝不出现“地级市生活区却在县医院出生”的矛盾
+    // 0岁：严格契合出生地医院与生活区
     if (age === 0) {
       result.push({
         id: `age_0_${family.region}`,
@@ -2139,17 +2139,81 @@ export function generateTimelineForCharacter(
       continue;
     }
 
-    // 3岁：若配置了三年后添弟或添妹，精准在此年龄节点触发降生事件，因果完全闭环！
+    // 1岁：【周岁抓周礼】告别单调机械连点！第一岁就拥有决定性格底色的高光抉择！
+    if (age === 1) {
+      result.push({
+        id: `age_1_zhuazhou_${family.region}`,
+        age: 1,
+        stageName: "幼芽期 · 1岁",
+        title: "周岁抓周礼与命定信物",
+        scene: "八仙桌上铺着大红方布，亲戚街坊围在四周看热闹。母亲把你放在红布中央，桌上摆着旧算盘、发黄的字典、小螺丝刀和一张折叠整齐的纸币。长辈们拍着手催促：“宝宝快抓，看看这辈子奔什么前程！”",
+        type: "choice",
+        choices: [
+          {
+            text: "一把抓过旧算盘与账本，小手拨弄算珠噼啪响",
+            detail: "对数字和交易天然敏感，引得周围亲友夸赞这娃天生有财商会持家。",
+            reaction: "长辈们笑得合不拢嘴，父亲把一块银圆塞进了你的贴身荷包。",
+            delta: { cognition: 15, savings: 200, happiness: 10 },
+            addTags: ["早慧商感", "精打细算"]
+          },
+          {
+            text: "伸手抱住发黄的新华字典与毛笔，安静翻看纸页",
+            detail: "不哭不闹喜静爱书，眉宇间流露出对文字与做题知识的本能好奇。",
+            reaction: "外公推了推老花镜欣慰点头：“是个读书的苗子，往后准有出息。”",
+            delta: { cognition: 15, academicCapital: 20, inferiority: -5 },
+            addTags: ["书香初萌", "好学幼苗"]
+          },
+          {
+            text: "攥住沉甸甸的小扳手与螺丝刀，在木桌缝里捣鼓",
+            detail: "专注摆弄机械与实物构件，自小展现出过硬的动手实操天性。",
+            reaction: "开修理铺的二叔拍腿大笑：“好手艺人！凭真力气吃饭走遍天下不慌！”",
+            delta: { resilience: 20, social: 10, health: 10 },
+            addTags: ["工匠天分", "动手实操"]
+          },
+          {
+            text: "抓起那张花花绿绿的纸币，眼睛直勾勾望着门外飞鸟",
+            detail: "自小对辽阔未知的远方充满渴望，天性不受规训与拘束。",
+            reaction: "母亲轻轻把你抱在怀里擦汗：“这孩子心大，往后怕是留不住在家门口哟。”",
+            delta: { rebellion: 25, happiness: 20, kinshipGuilt: -5 },
+            addTags: ["向往辽阔", "天性不羁"]
+          }
+        ]
+      });
+      continue;
+    }
+
+    // 3岁：手足降生或邻里社交抉择（因果闭环且充满人性博弈）
     if (age === 3 && family.siblingType === "younger_brother") {
       result.push({
         id: "age_3_younger_brother",
         age: 3,
         stageName: "幼儿期 · 3岁",
         title: "添弟之喜与悄然倾斜的天平",
-        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个弟弟。全家人围着襁褓团团转，爷爷奶奶笑逐颜开。父亲在走廊给亲友分发红鸡蛋与喜糖；母亲虚弱地揽着你轻声叮嘱：“你做姐姐了，以后要懂事，多让着弟弟。”你踮起脚尖看着摇篮里那个红皱皱的小婴儿，第一次隐约体会到了家里重心的转移。`,
-        type: "natural",
-        naturalDelta: { inferiority: 10, kinshipGuilt: 15, resilience: 10 },
-        naturalTags: ["家中添弟"]
+        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个弟弟。家里围满了道喜的亲友，父亲在走廊分发红鸡蛋。母亲将你揽在床边轻声叮嘱：“你做姐姐了，以后要多懂事，好吃的先紧着弟弟。”你看着襁褓里那个通红的小婴儿，第一次隐约体会到了重心的转移。`,
+        type: "choice",
+        choices: [
+          {
+            text: "乖乖点头，把自己兜里舍不得吃的半块饼干轻轻放到摇篮边",
+            detail: "过早学会了迎合大人的懂事期待，把委屈与隐忍藏在心底深处。",
+            reaction: "长辈们纷纷夸你‘长姐有担当’，但你的内心悄悄多了一层懂事的拘谨。",
+            delta: { kinshipGuilt: 20, inferiority: 10, resilience: 15 },
+            addTags: ["早熟懂事", "长姐担当"]
+          },
+          {
+            text: "抱紧父母的大腿哭闹委屈，不许他们抱别的孩子",
+            detail: "勇敢表达自己的不安与失落，绝不委屈自己的天然情感。",
+            reaction: "虽然被父亲轻轻训斥了几句，但母亲心疼地把你抱在怀里温声安慰，护住了你的自尊。",
+            delta: { rebellion: 20, inferiority: -10, happiness: 10 },
+            addTags: ["捍卫关爱", "天性自我"]
+          },
+          {
+            text: "好奇地伸手戳戳弟弟粉嫩的小脸，自己搬小板凳去门口搭积木",
+            detail: "自得其乐，不依赖大人的时刻关注，展现出强大的自洽能力。",
+            reaction: "你沉浸在自己的小世界里，从小就习惯了独立自足的生活节奏。",
+            delta: { cognition: 15, happiness: 15, resilience: 10 },
+            addTags: ["自得其乐", "独立自洽"]
+          }
+        ]
       });
       continue;
     }
@@ -2159,11 +2223,67 @@ export function generateTimelineForCharacter(
         id: "age_3_younger_sister",
         age: 3,
         stageName: "幼儿期 · 3岁",
-        title: "添妹之喜与全家的欢欣",
-        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个妹妹。小小的病房里摆满了亲友送来的婴儿衣物，母亲虚弱地将妹妹抱给你看：“看，这是你的小妹妹。”你伸出小手碰了碰她粉嫩的脸蛋，家里从此多了一份轻柔的欢声笑语。`,
-        type: "natural",
-        naturalDelta: { happiness: 10, kinshipGuilt: 10 },
-        naturalTags: ["家中添妹"]
+        title: "添妹之喜与手足初啼",
+        scene: `三岁这年深秋，母亲在${family.hospitalName}为你添了一个妹妹。小小的病房里摆满了婴儿衣物，母亲虚弱地将妹妹抱给你看：“看，这是你的小妹妹，以后你们手足要互相照应。”`,
+        type: "choice",
+        choices: [
+          {
+            text: "主动伸出小手牵着妹妹软绵绵的小拇指，咯咯笑起来",
+            detail: "天性温厚，发自内心地接纳新生命的到来，手足情深初萌芽。",
+            reaction: "妹妹也停止了啼哭，小小的手抓着你的手指，病房里满是温情暖意。",
+            delta: { happiness: 20, social: 15, kinshipGuilt: 10 },
+            addTags: ["手足情深", "温厚纯良"]
+          },
+          {
+            text: "把家里分给自己的水果糖偷偷藏在小抽屉里，警惕看着新成员",
+            detail: "对家庭资源的变化有着超乎年龄的警觉，自我防御意识极强。",
+            reaction: "你默默守护自己的小天地，更早地体会到了人间的竞争与生存本能。",
+            delta: { resilience: 15, inferiority: 5, savings: 50 },
+            addTags: ["早熟警觉", "自我防御"]
+          },
+          {
+            text: "开心地拿出自己最喜欢的布娃娃塞进摇篮跟她分享",
+            detail: "乐于分享与付出，天生具备温暖周围人的感染力与亲和力。",
+            reaction: "全家人看着你们两姐妹相视而笑，家庭氛围变得格外温馨舒缓。",
+            delta: { happiness: 25, social: 20 },
+            addTags: ["慷慨分享", "乐天温情"]
+          }
+        ]
+      });
+      continue;
+    }
+
+    if (age === 3 && family.siblingType === "only_child") {
+      result.push({
+        id: "age_3_only_child",
+        age: 3,
+        stageName: "幼儿期 · 3岁",
+        title: "水泥地坝上的滑板车与地盘之争",
+        scene: `三岁这年，你在${family.cityOrCounty}生活区的水泥地上骑着塑料小三轮。邻居家大两岁的小孩猛冲过来推搡你，想要抢走你的车把。周围大人在一旁闲聊看着。`,
+        type: "choice",
+        choices: [
+          {
+            text: "死死抓紧车把不松手，瞪圆眼睛大声喊‘这是我的！’",
+            detail: "虽小但骨气硬，绝不轻易向强权与退让妥协，死守阵地。",
+            reaction: "对方被你的气势震住讪讪走开，邻里长辈都夸这小家伙‘骨头真硬’。",
+            delta: { resilience: 20, rebellion: 15, inferiority: -10 },
+            addTags: ["寸步不让", "天生硬骨"]
+          },
+          {
+            text: "扭头跑回母亲身后，拉着母亲的衣角寻求庇护",
+            detail: "懂得借力与规避无谓的冲突，在家庭的羽翼下安全成长。",
+            reaction: "母亲走过来温声化解了争执，你感受到了家庭作为庇护所的安全感。",
+            delta: { kinshipGuilt: 15, happiness: 10, resilience: 5 },
+            addTags: ["家风温软", "趋利避害"]
+          },
+          {
+            text: "松开塑料车，蹲在路边专心致志看砖缝里的大黑蚂蚁搬家",
+            detail: "对世俗的争抢漠不关心，拥有独特的观察视角与精神自足。",
+            reaction: "抢车的小孩觉得没趣自讨没趣地骑走了，你沉浸在微观世界里。",
+            delta: { cognition: 20, happiness: 15, inferiority: -5 },
+            addTags: ["微观哲思", "淡泊自得"]
+          }
+        ]
       });
       continue;
     }
@@ -3359,6 +3479,10 @@ export function evaluate27YearOldLife(
 // 成人中后期宏大人生里程碑生成引擎（28 ~ 63 岁：完全契合学历与命运选择）
 // ============================================================================
 
+// ============================================================================
+// 成年篇章：27岁~63岁（打破PPT，中年30岁、35岁、42岁赋予真实关键抉择！）
+// ============================================================================
+
 export function generateAdultMilestones(
   track: "985_211" | "double_non" | "junior_college",
   chosenPath: "emigrate" | "stay",
@@ -3372,43 +3496,82 @@ export function generateAdultMilestones(
         id: "adult_985_emigrate_30",
         age: 30,
         stageName: "三十而立 · 30岁",
-        title: "海外研发核心与全球技术视野",
-        scene: `走向海外的第三年，凭借985扎实的技术底蕴与顶级工程能力，你在海外科技枢纽（硅谷/温哥华/慕尼黑）研发中心主导大规模高并发底层架构。年薪换算折合超45万人民币，租下距海湾半小时车程的联排居所。这里没有无意义的繁琐酒局，周末在峡湾边骑行或参与开源社区交流。手头外币储蓄稳步突破五十万大关。`,
-        type: "milestone",
-        naturalDelta: { savings: 200000, cognition: 25, happiness: 20, resilience: 15 },
-        naturalTags: ["海外核心架构", "资本原始积累"],
-        reflection: "你脱离了熟人社会的攀比与形式主义，在纯粹的技术与规范契约中找到了专注的从容。"
+        title: "海外研发中坚与生活重心的分野",
+        scene: `走向海外的第三年，凭借985扎实的技术底蕴与顶级工程能力，你在海外科技枢纽（硅谷/温哥华/慕尼黑）独立负责核心微服务架构。年薪折合45万，手握大额储蓄。站在三十岁门槛上，你面临生活重心的取舍：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【深耕硬核架构】主攻底层高并发与开源贡献，冲刺高级主任工程师(Staff)",
+            detail: "把精力倾注在技术攻坚上，在开源基金会中留下名字，收入与专业话语权稳步跃升。",
+            reaction: "你的技术方案被写入团队最佳实践，海内外猎头纷纷抛来橄榄枝。",
+            delta: { savings: 180000, cognition: 25, resilience: 15 },
+            addTags: ["架构大拿", "技术护城河"]
+          },
+          {
+            text: "【身心通透松弛】享受严格的工时平衡，下午五点关电脑去海湾划皮划艇",
+            detail: "彻底告别单向度内卷，将周末交给自然风光、户外徒步与自制烘焙，找回纯粹的快乐。",
+            reaction: "精神焕发，身体亚健康完全消失，你活出了令人羡慕的健康松弛感。",
+            delta: { happiness: 30, health: 25, inferiority: -20 },
+            addTags: ["身心通透", "自然滋养"]
+          }
+        ]
       },
       {
         id: "adult_985_emigrate_35",
         age: 35,
         stageName: "三十五岁关隘 · 35岁",
-        title: "永久居留获批与研发黄金期",
-        scene: `三十五岁生日这周，你的永久居留资格（绿卡/枫叶卡/欧盟蓝卡）正式获批，并晋升为资深高级工程师并享有带薪年假。在当地职场文化中，三十五岁正是研发工程师的黄金成熟期，无人以年龄卡人，工龄与经验受到高度敬重。你购置了带花园的永久产权住宅，在暖阳照拂的院子里栽下了第一棵枫树。`,
-        type: "milestone",
-        naturalDelta: { savings: 400000, resilience: 25, happiness: 25 },
-        naturalTags: ["海外永居落地", "免受年龄焦虑"],
-        reflection: "当同龄人在国内面临35岁优化焦虑时，你手握稀缺技术与永居身份，拥有了免于恐惧的从容自由。"
+        title: "永久居留获批与中年天花板破局",
+        scene: `三十五岁生日这周，你的永久居留资格（绿卡/枫叶卡/欧盟蓝卡）正式获批。国内同龄人正遭遇35岁优化浪潮，而你在异国职场面对华人工程师的玻璃天花板：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【突破跨文化管理】主动锻炼公众演讲与跨文化沟通，带多元背景工程团队",
+            detail: "走出华人技术舒适圈，主动向资深管理岗位冲刺，赢得跨国同行尊重。",
+            reaction: "管理层高度认可你的全局协调力，团队交付质量名列前茅。",
+            delta: { social: 25, savings: 250000, resilience: 20 },
+            addTags: ["跨文化管理者", "破局领导力"]
+          },
+          {
+            text: "【深耕独立专家】坚持个人贡献者(IC)路线，每年休满带薪假，专注后院花木",
+            detail: "不趟人事政治的混水，手握稀缺核心技术，享受无拘无束的专家尊严与家庭陪伴。",
+            reaction: "生活宁静惬意，后院栽下的枫树亭亭玉立，你在远离焦虑中自得其乐。",
+            delta: { happiness: 25, resilience: 20, health: 15 },
+            addTags: ["自在专家", "岁月静好"]
+          }
+        ]
       },
       {
         id: "adult_985_emigrate_42",
         age: 42,
         stageName: "四十二岁岁月 · 42岁",
-        title: "跨洋牵挂与血亲就医托底",
-        scene: `老家父亲突发急症住院，你第一时间请假并订购最快班次的跨洋机票。在${city}三甲医院，你用丰厚的外币积蓄请到了最好的特护与医疗照护，握着父亲枯瘦的手度过了危险期。虽远隔重洋有身不由己的遗憾，但你雄厚的财力为双亲撑起了最体面的托底。父亲出院后轻叹：“你在外面过得硬实，爹就安心了。”`,
-        type: "milestone",
-        naturalDelta: { savings: -90000, kinshipGuilt: 15, resilience: 20 },
-        naturalTags: ["跨洋反哺", "至孝托底"],
-        reflection: "跨洋移居终究要面对距离的遗憾，但你用强大的经济实力为双亲撑起了最体面的医疗托底。"
+        title: "关山难越与双亲重疾托底",
+        scene: `老家父亲突发急症住院，你连夜订购跨洋机票飞回${city}。面对病榻前的医疗费用与照护开销：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【动用外币储蓄托底】请三甲医院最好的专家手术与顶级护工，并亲自床前侍奉半月",
+            detail: "虽远隔重洋有身不由己的遗憾，但你用雄厚的外币财力为双亲撑起了最体面的医疗托底。",
+            reaction: "父亲度过危险期，出院时拉着你的手老泪纵横：“你在外面过得硬实，爹就踏实了。”",
+            delta: { savings: -80000, kinshipGuilt: -30, resilience: 20 },
+            addTags: ["至孝托底", "血脉相守"]
+          },
+          {
+            text: "【置办省城电梯新居】在老家省城全款置办带电梯的高品质适老公寓并购买大额大病保单",
+            detail: "彻底解决老旧小区上下楼与医疗看护隐患，为父母晚年构筑长期无忧的养老壁垒。",
+            reaction: "老家亲朋好友交口称赞，父母搬入窗明几净的新居，晚年有了最稳固的依靠。",
+            delta: { savings: -150000, kinshipGuilt: -35, happiness: 25 },
+            addTags: ["长效安老", "光耀故土"]
+          }
+        ]
       },
       {
         id: "adult_985_emigrate_52",
         age: 52,
         stageName: "五十二岁荣枯 · 52岁",
         title: "下一代跨文化成长与超脱心境",
-        scene: `你的孩子在海外名校攻读前沿科学，思维敏捷，自信松弛，讲一口纯正母语与流利外语。晚餐桌上，他以平等的姿态与你探讨全球经济与AI哲学。你看着眼前这个完全免受应试规训的下一代，彻底释怀了东亚家庭过度的代际焦虑，微笑着收回了干涉的手。`,
+        scene: `你的孩子在海外名校攻读前沿科学，思维敏捷，自信松弛，讲一口纯正母语与流利外语。晚餐桌上，他以平等的姿态与你探讨全球经济与哲学。你看着眼前这个完全免受应试规训的下一代，彻底释怀了东亚家庭过度的代际焦虑，微笑着收回了干涉的手。`,
         type: "milestone",
-        naturalDelta: { savings: 350000, happiness: 25, cognition: 20 },
+        naturalDelta: { savings: 250000, happiness: 25, cognition: 20 },
         naturalTags: ["下一代松弛", "跨文化超脱"],
         reflection: "你用一代人的跨洋跋涉，彻底斩断了匮乏与攀比的代际循环，给孩子换来了辽阔的选择权。"
       },
@@ -3417,7 +3580,7 @@ export function generateAdultMilestones(
         age: 63,
         stageName: "六十三岁退休 · 63岁",
         title: "全球双重年金与无憾生平",
-        scene: `六十三岁这年，你按期办理了国际双重年金与海外法定退休。海风拂过宽敞的向阳露台，你卡内折合储蓄超三百万人民币，享有全额医疗覆盖。偶尔受邀回国给母校学弟学妹开展学术讲座，与旧友举杯畅叙半生沧桑。世界之大，你完完整整走出了属于自己的传奇篇章。`,
+        scene: `六十三岁这年，你按期办理了国际双重年金与海外法定退休。海风拂过宽敞的向阳露台，你卡内折合储蓄充足，享有全额医疗覆盖。偶尔受邀回国给母校学弟学妹开展学术讲座，与旧友举杯畅叙半生沧桑。世界之大，你完完整整走出了属于自己的传奇篇章。`,
         type: "milestone",
         naturalDelta: { happiness: 30, resilience: 30 },
         naturalTags: ["全球荣休", "一生无悔"],
@@ -3432,34 +3595,73 @@ export function generateAdultMilestones(
         id: "adult_985_stay_30",
         age: 30,
         stageName: "三十而立 · 30岁",
-        title: "行业中层核心与省城立足",
-        scene: `三十而立，凭借985学历底蕴与踏实的技术业务交付，你在部门晋升为资深技术骨干或在省直机关提任为科室副科级业务中坚。在${city}较好地段用公积金和积蓄付了首付购置了温馨住房。存折结余二十多万元，工作安稳体面，成为父母在亲友面前最放心的依靠。`,
-        type: "milestone",
-        naturalDelta: { savings: 120000, social: 20, cognition: 20 },
-        naturalTags: ["业务中坚", "省城立足"],
-        reflection: "熟人社会的规则虽繁复，但凭借过硬的专业能力，你稳稳站住了脚跟。"
+        title: "行业中层骨干与省城买房抉择",
+        scene: `三十而立，凭借985学历底蕴与扎实的业务交付，你在部门晋升为资深技术骨干或省直机关科室副科级业务中坚。老家父母拿出多年积蓄催促你在${city}置业成家：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【顺应期待付首付】用公积金和父母帮衬付首付购置省城温馨品质房，扎根立足",
+            detail: "在省城有了自己的户口与砖石屋檐，成为家族中人人羡慕的省城立足栋梁。",
+            reaction: "父母逢人便讲你在省城买了房，你的社会资本与家庭安心感大幅提升。",
+            delta: { social: 25, kinshipGuilt: -20, savings: -80000 },
+            addTags: ["省城扎根", "体面立足"]
+          },
+          {
+            text: "【现金为王拒绝高杠杆】说服父母保留流动现金抵御周期，自己租住高品质公寓",
+            detail: "保持极高的财务灵活性与现金流，拒绝将两代人捆绑在沉重的三十年房贷上。",
+            reaction: "手里握着充足的现金储备，在职场面对变动时拥有极大的心理底气与转圜空间。",
+            delta: { savings: 120000, rebellion: 20, resilience: 20 },
+            addTags: ["清醒自持", "现金安全垫"]
+          }
+        ]
       },
       {
         id: "adult_985_stay_35",
         age: 35,
         stageName: "三十五岁关隘 · 35岁",
-        title: "风浪中的定海神针与硬核壁垒",
-        scene: `面对经济周期调整与行业降本增效，不少边缘团队被重组裁撤，而你凭借不可替代的底层核心技术壁垒或扎实政绩稳坐钓鱼台，甚至逆势主导了省级重点产业攻坚专项。老家父母逢人便夸你的出息，亲友街坊上门求助，你处变不惊，展现出领军骨干的沉着。`,
-        type: "milestone",
-        naturalDelta: { savings: 300000, resilience: 25, inferiority: -20 },
-        naturalTags: ["定海神针", "核心壁垒"],
-        reflection: "985的金字招牌与多年心血构建了最坚固的护城河，你在激流之中稳稳立住阵脚。"
+        title: "行业周期风浪与定海神针",
+        scene: `面对经济周期调整与行业降本增效，不少边缘团队被重组裁撤。作为三十五岁的资深业务中坚，你面临职场长线走向的抉择：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【主动领衔核心专项】啃下别人不敢碰的底层高难技术攻坚，构筑不可替代壁垒",
+            detail: "凭借扎实的理工功底与耐力，逆势主导完成省级产业重点项目，确立不可动摇的地位。",
+            reaction: "项目顺利验收，领导当众嘉奖，你在激流之中稳稳立住了阵脚。",
+            delta: { resilience: 25, savings: 150000, cognition: 20 },
+            addTags: ["定海神针", "核心壁垒"]
+          },
+          {
+            text: "【平稳转轨省直事业单位】通过人才引进转入省属科研院所或高校，求取确定性",
+            detail: "牺牲部分市场化高薪，换取稳定体面的作息、充足年假与确定性医疗养老保障。",
+            reaction: "作息规律，身体从长年加班中恢复，有了更多时间陪伴家人与子女成长。",
+            delta: { health: 25, happiness: 25, social: 15 },
+            addTags: ["稳健转轨", "从容体制"]
+          }
+        ]
       },
       {
         id: "adult_985_stay_42",
         age: 42,
         stageName: "四十二岁岁月 · 42岁",
         title: "熟人资源网络与病榻前尽孝",
-        scene: `父亲年逾古稀突发重疾，你通过多年积累的本地三甲医院医疗网络，迅速协调到了专家病房与顶尖手术团队。下班后你亲自开车在医院照料看护，送汤喂药。父亲拉着你的手老泪纵横：“多亏你在跟前撑着，咱们全家这辈子踏实！”`,
-        type: "milestone",
-        naturalDelta: { savings: -60000, kinshipGuilt: -25, happiness: 25 },
-        naturalTags: ["床前尽孝", "家族基石"],
-        reflection: "留在家乡的意义在这一刻尽显：不仅有事业的体面，更能亲手守住亲人的晚年安康。"
+        scene: `父亲年逾古稀突发重疾，你作为留在身边的核心家庭顶梁柱：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【调动省城医疗人脉资源】协调三甲医院专家床位，下班后亲自陪护端汤喂药",
+            detail: "亲历亲为侍奉床前，用多年经营的本地人脉让父母感受到最体贴入微的安全感。",
+            reaction: "父亲康复出院拉着你的手老泪纵横：“多亏你在跟前撑着，全家这辈子踏实！”",
+            delta: { kinshipGuilt: -35, happiness: 25, savings: -40000 },
+            addTags: ["床前尽孝", "家族基石"]
+          },
+          {
+            text: "【牵头设立家族互助基金】出资为全家老人购置商业补充医疗险并资助晚辈求学",
+            detail: "凭借自身的丰厚储蓄与声望，成为整个大家庭的经济庇护所与威望核心。",
+            reaction: "亲友上门请教，你在宗族网络中赢得了极高敬重与德高望重的好名声。",
+            delta: { social: 30, savings: -60000, resilience: 20 },
+            addTags: ["宗族栋梁", "德高望重"]
+          }
+        ]
       },
       {
         id: "adult_985_stay_52",
@@ -3468,7 +3670,7 @@ export function generateAdultMilestones(
         title: "认知赋能与下一代名校传承",
         scene: `你的孩子面临高考与大学选拔。得益于你多年在省城积累的深厚认知与精准视野，你为孩子提供了极具前瞻性的学业与志愿规划，孩子顺利保送至顶尖双一流名校。两代人的知识改变命运在这一刻完成闭环，家族阶层稳步夯实。`,
         type: "milestone",
-        naturalDelta: { savings: 250000, social: 25, happiness: 25 },
+        naturalDelta: { savings: 200000, social: 25, happiness: 25 },
         naturalTags: ["两代名校", "阶层夯实"],
         reflection: "一代人的知识改变命运，两代人的阶层稳步抬升。你兑现了家庭赋予你的所有期待。"
       },
@@ -3492,41 +3694,80 @@ export function generateAdultMilestones(
         id: "adult_double_emigrate_30",
         age: 30,
         stageName: "三十而立 · 30岁",
-        title: "跨越学历门槛与第一笔外币储蓄",
-        scene: `靠着毕业前几年的自考语言与职业技术认证，你成功在海外换取了正式工作签证。在当地综合企业担任业务管理或技术支持。虽然国内求职常看第一学历，但在这里没人打听你的高考分数，只看你的执行力与踏实作风。卡内外币存款折合超25万人民币。`,
-        type: "milestone",
-        naturalDelta: { savings: 100000, cognition: 20, happiness: 20 },
-        naturalTags: ["打破学历枷锁", "外币立足"],
-        reflection: "只要换一个赛道，普通人也能彻底摆脱唯学历论的窒息感。"
+        title: "打破学历枷锁与异邦扎根",
+        scene: `在海外综合企业担任业务管理或技术支持，没人打听你的高考分数，只看你的执行力与踏实作风。卡内折合储蓄突破二十万。面对三十岁的长远规划：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【考取当地执业资质】精进当地语言，考取行业核心证书，争取核心雇主担保",
+            detail: "踏踏实实考证钻研，凭借扎实肯干赢得当地高管高度信赖，锁定长约。",
+            reaction: "雇主主动为你办理工作签证延期与永久居留担保，未来彻底稳定下来。",
+            delta: { cognition: 20, savings: 100000, resilience: 15 },
+            addTags: ["逆风立足", "执业资质"]
+          },
+          {
+            text: "【合伙开创商贸服务】融入当地华人与多元社区，兼职开创中外小额贸易渠道",
+            detail: "发挥中国人的勤劳与商业敏感，打通货源链路，多渠道积累个人资本。",
+            reaction: "小生意渐渐红火，你赚到了属于自己的第一笔丰厚外币提成。",
+            delta: { social: 25, savings: 120000, rebellion: 15 },
+            addTags: ["商业敏锐", "异邦弄潮"]
+          }
+        ]
       },
       {
         id: "adult_double_emigrate_35",
         age: 35,
         stageName: "三十五岁关隘 · 35岁",
-        title: "永居落地与摆脱35岁魔咒",
-        scene: `成功拿下海外永久居留身份，在距市中心半小时车程的小镇贷款买下一栋带草坪的木屋。每天下午5点准时下班，后备箱装着露营帐篷。周末带着全家去郊野湖畔野餐，周围邻里友善互助。你终于确信：在这里，没有人会因为你年满35岁就催促你下岗。`,
-        type: "milestone",
-        naturalDelta: { savings: 160000, resilience: 25, inferiority: -20 },
-        naturalTags: ["永居落地", "从容松弛"],
-        reflection: "尊重契约与平等的环境，让你重新找回了身为普通劳动者的松弛与尊严。"
+        title: "永居落地与摆脱三十五岁魔咒",
+        scene: `三十五岁生日，海外永久居留资格顺利落定。没有中年下岗危机，下午五点准时下班：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【小镇木屋与旷野生活】在近郊小镇按揭买下一栋带草坪的木屋，享受周末野营",
+            detail: "彻底远离内卷焦虑，周围邻里友善互助，在清新的空气与阳光中找回松弛。",
+            reaction: "身心舒展坦荡，你终于确信：在这里没有人会因年龄逼迫你下岗。",
+            delta: { happiness: 30, health: 20, inferiority: -25 },
+            addTags: ["永居落地", "从容松弛"]
+          },
+          {
+            text: "【邀请父母海外旅居】为老家父母办理探亲签证，接他们来体验两个月异国田园",
+            detail: "父母看着你窗明几净的大房子和安稳体面的生活，激动落泪，彻底放下了悬着的心。",
+            reaction: "全家在后院草坪上野餐合影，两代人的代际心结在这一刻彻底冰释。",
+            delta: { kinshipGuilt: -30, happiness: 25, savings: -30000 },
+            addTags: ["光照故土", "两地安心"]
+          }
+        ]
       },
       {
         id: "adult_double_emigrate_42",
         age: 42,
         stageName: "四十二岁岁月 · 42岁",
         title: "关山难越与跨洋亲情托底",
-        scene: `国内老家父母上了岁数，你定期汇款资助弟弟妹妹照料父母，并每两年回国探亲一次。看着老屋被翻修一新，父母拿着你寄回的外币在亲友面前有了底气。尽管偶尔思乡，但你给两代人撑起了一片新的天空。`,
-        type: "milestone",
-        naturalDelta: { savings: -50000, kinshipGuilt: 15, happiness: 20 },
-        naturalTags: ["跨洋汇款", "两地安心"],
-        reflection: "虽然背井离乡，但你的担当让大洋两端都拥有了平静与宽慰。"
+        scene: `国内老家父母上了岁数，面对距离与亲情的考量：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【定期大额汇款托底】长期汇款资助国内弟弟妹妹照料父母，并出资全额医疗费",
+            detail: "用实打实的外币储蓄作为老家防线，让双亲在亲友面前有了最踏实的底气。",
+            reaction: "国内手足齐心协力照料父母，你在大洋彼岸成为了全家最坚强的后盾。",
+            delta: { savings: -50000, kinshipGuilt: -25, happiness: 20 },
+            addTags: ["跨洋后盾", "血亲托底"]
+          },
+          {
+            text: "【每两年回国长假探亲】每年积攒带薪假回国住满一个月，陪父母走亲访友做体检",
+            detail: "弥补距离上的缺憾，亲自把温情与陪伴还给年迈的双亲。",
+            reaction: "父母逢年过节拉着你的手舍不得放开，彼此珍惜每一段相处的时光。",
+            delta: { kinshipGuilt: -35, happiness: 25, savings: -35000 },
+            addTags: ["常伴膝下", "温情相依"]
+          }
+        ]
       },
       {
         id: "adult_double_emigrate_52",
         age: 52,
         stageName: "五十二岁荣枯 · 52岁",
         title: "多元成长与下一代松弛",
-        scene: `孩子在当地公立中学健康成长，热爱户外运动与艺术摄影，无需承受中高考模拟考的千军万马重压。你经营的业务收入稳定，在多元社区里结识了来自各国的挚友，日子过得平静而有滋有味。`,
+        scene: `孩子在当地公立中学健康成长，热爱户外运动与艺术摄影，无需承受千军万马的应试重压。你经营的业务收入稳定，在多元社区里结识了来自各国的挚友，日子过得平静而有滋有味。`,
         type: "milestone",
         naturalDelta: { savings: 150000, happiness: 25 },
         naturalTags: ["家庭和睦", "松弛土壤"],
@@ -3552,34 +3793,73 @@ export function generateAdultMilestones(
         id: "adult_double_stay_30",
         age: 30,
         stageName: "三十而立 · 30岁",
-        title: "民企业务骨干与成家立业",
-        scene: `经过数年职场摸爬滚打，你在${city}民企升任业务主管或考入了市级事业单位。在父母帮衬下按揭了首套房，每月还贷稳稳当当。过年回家拎着大包小包年货，在熟人圈子里过着平稳踏实的日子。`,
-        type: "milestone",
-        naturalDelta: { savings: 60000, social: 20, resilience: 15 },
-        naturalTags: ["成家立业", "平稳踏实"],
-        reflection: "虽然免不了日常琐碎，但在熟悉的烟火气里，你找到了属于普通人的确定感。"
+        title: "民企业务主管与成家立业抉择",
+        scene: `在${city}成长型民企升任业务主管或考入事业单位，月薪破万，小有积蓄。面对婚恋成家的现实问题：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【按揭首套刚需房成家】在父母帮衬下付了首付买下温馨两居室，步入婚姻",
+            detail: "在熟悉的烟火气中安下家来，每月公积金与工资按期还贷，平稳踏实。",
+            reaction: "小家庭充满欢声笑语，在熟人社交圈子里过上了安居乐业的市井生活。",
+            delta: { happiness: 25, social: 20, savings: -50000 },
+            addTags: ["成家立业", "平稳踏实"]
+          },
+          {
+            text: "【稳扎稳打多攒现金】暂缓买房与大额消费，把储蓄放在稳健理财中防身",
+            detail: "不让房贷压垮现金流，在企业中踏实积累核心业务客户，提高抗风险壁垒。",
+            reaction: "存折储蓄突破十五万，面对生活风浪拥有极高的自主掌控权。",
+            delta: { savings: 80000, resilience: 20, inferiority: -10 },
+            addTags: ["稳扎稳打", "理性务实"]
+          }
+        ]
       },
       {
         id: "adult_double_stay_35",
         age: 35,
         stageName: "三十五岁关隘 · 35岁",
-        title: "顶住风浪的中坚防守",
-        scene: `面对35岁的职场分水岭，你用多年积累的为人处世经验和勤勉守住了阵地。上有老下有小，你成了全家的主心骨。周末开车载着父母妻儿去郊区农家乐，看着后视镜里的欢声笑语，觉得一切辛苦都值得。`,
-        type: "milestone",
-        naturalDelta: { savings: 80000, kinshipGuilt: -10, resilience: 20 },
-        naturalTags: ["家庭支柱", "中年坚守"],
-        reflection: "成年人的世界虽不轻松，但你的肩膀扛起了遮风挡雨的港湾。"
+        title: "中年风浪与家庭主心骨防守",
+        scene: `面对35岁职场分水岭，民企面临架构调整，上有老下有小，你成了全家的主心骨：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【守住基本盘并拓展副业】下班后与老同学合伙承接线上运营小项目，增加副业收入",
+            detail: "起早贪黑勤恳打拼，用两条腿走路的稳健策略为全家筑牢现金防线。",
+            reaction: "副业月入数千元，家庭财务抗打击能力大幅增强，从容度过职场阵痛期。",
+            delta: { savings: 100000, resilience: 25, health: -5 },
+            addTags: ["硬核防守", "中年梁柱"]
+          },
+          {
+            text: "【陪伴家人与孩子教育】守好本职工作，把更多精力投入到陪伴父母与辅导孩子",
+            detail: "不盲目攀比富贵，把家常饭菜做热腾，让家庭充满包容与温暖的情感支持。",
+            reaction: "后视镜里满是全家周末农家乐的欢声笑语，一家人其乐融融。",
+            delta: { happiness: 30, kinshipGuilt: -20, health: 15 },
+            addTags: ["家庭温情", "市井知足"]
+          }
+        ]
       },
       {
         id: "adult_double_stay_42",
         age: 42,
         stageName: "四十二岁岁月 · 42岁",
-        title: "床前尽孝与手足互助",
-        scene: `父亲生病住院，你与兄弟姐妹轮流排班陪护，送汤喂药，无微不至。同乡医生和老同学帮了不少忙。虽然忙碌得瘦了一圈，但父亲康复出院时，一家人齐聚一堂吃了顿热气腾腾的家常菜。`,
-        type: "milestone",
-        naturalDelta: { savings: -40000, kinshipGuilt: -25, happiness: 20 },
-        naturalTags: ["手足互助", "市井深情"],
-        reflection: "本土熟人社会的温情在困难时刻化作了最实打实的支撑。"
+        title: "床前尽孝与手足齐心守望",
+        scene: `父亲生病住院，你与兄弟姐妹轮流排班陪护：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【手足排班亲自侍奉】白天上班晚上陪床，送汤喂药无微不至，亲力亲为",
+            detail: "浓厚的本土手足亲情在这一刻化作最坚实的互助网络，让父母倍感欣慰。",
+            reaction: "老人康复出院时全家围坐吃热气腾腾的家常菜，风雨同舟的亲情弥足珍贵。",
+            delta: { kinshipGuilt: -35, happiness: 20, resilience: 15 },
+            addTags: ["手足互助", "市井深情"]
+          },
+          {
+            text: "【翻新老宅安享晚年】出资牵头将老家老屋改造为舒适的适老化平房，安顿双亲",
+            detail: "彻底解决老家水暖与如厕问题，让父母在熟悉的街坊故土上安享清福。",
+            reaction: "父母逢人便夸你孝顺懂事，家族长辈皆称赞你有情有义有担当。",
+            delta: { savings: -40000, kinshipGuilt: -30, social: 20 },
+            addTags: ["老宅重温", "孝悌担当"]
+          }
+        ]
       },
       {
         id: "adult_double_stay_52",
@@ -3612,34 +3892,73 @@ export function generateAdultMilestones(
         id: "adult_college_emigrate_30",
         age: 30,
         stageName: "三十而立 · 30岁",
-        title: "稀缺技术工签立足与高薪蓝领",
-        scene: `凭借一手过硬的数控机床、特种焊接或汽修实操绝活，你通过紧缺工种评估在海外拿下了高薪技术工签。当地极度紧缺一线熟练技师，时薪折合人民币近400元。开上了二手皮卡，在当地工会受到高度尊重。`,
-        type: "milestone",
-        naturalDelta: { savings: 180000, inferiority: -30, happiness: 25 },
-        naturalTags: ["海外高薪蓝领", "手艺立足"],
-        reflection: "在这里，劳动者的双手被真正敬重，你用手艺换来了前所未有的尊严。"
+        title: "稀缺技术工签立足与蓝领高薪",
+        scene: `凭借数控机床、特种焊接或汽修实操绝活，你在海外通过紧缺工种评估拿下高薪技术工签，时薪折合近400元。面对三十岁的长线走向：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【冲击特级官方工匠认证】精进数控编程与特种工艺，冲刺当地工会高级技师",
+            detail: "成为车间里不可替代的技术权威，享受工会顶级医疗与失业保障。",
+            reaction: "厂长当众聘你为年轻技师指导导师，你的收入与地位甚至超过普通白领。",
+            delta: { savings: 150000, inferiority: -30, resilience: 20 },
+            addTags: ["特级大工", "手艺立足"]
+          },
+          {
+            text: "【组建海外华人施工小队】购置二手工程车与全套设备，承包住宅改装与汽修",
+            detail: "凭借中国人能吃苦、讲信誉的特点，在当地华人社区树立过硬口碑，自立门户。",
+            reaction: "工程单源源不断，你早早尝到了当实体小老板的甜头，现金滚滚而来。",
+            delta: { savings: 180000, social: 25, rebellion: 20 },
+            addTags: ["独立匠人", "自立门面"]
+          }
+        ]
       },
       {
         id: "adult_college_emigrate_35",
         age: 35,
         stageName: "三十五岁关隘 · 35岁",
-        title: "特级工匠认证与永久居留",
-        scene: `拿下当地官方特级工匠认证与永久居留权，成为车间技术骨干导师。在当地按揭买下一栋安静舒适的独栋平房，生活规律惬意。国内那些曾经看轻专科职教的亲友纷纷投来敬佩的目光。`,
-        type: "milestone",
-        naturalDelta: { savings: 200000, resilience: 25, happiness: 25 },
-        naturalTags: ["特级工匠", "扬眉吐气"],
-        reflection: "凭真本事吃饭，走遍天下都不怕。你彻底扭转了人生的底层剧本。"
+        title: "独栋平房安居与彻底打破学历偏见",
+        scene: `拿下当地官方永久居留权，三十五岁生日，国内曾经看轻专科职教的亲戚打来电话打听近况：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【小镇独栋平房置业】在安静的近郊按揭买下带车库的独栋平房，生活规律惬意",
+            detail: "下午四点半收工回家修整院子，靠一身真手艺吃遍四方，彻底释怀了学历的包袱。",
+            reaction: "邻里工友周末聚在后院喝啤酒烤肉，你活出了蓝领劳动者的最高尊严。",
+            delta: { happiness: 30, resilience: 25, inferiority: -30 },
+            addTags: ["特级工匠", "扬眉吐气"]
+          },
+          {
+            text: "【兼职技工培训导师】受邀到当地公立职业技术学院兼职授课，传授实操手艺",
+            detail: "把中国技工严谨扎实的技术传承下去，赢得了当地学生与社会的广泛赞誉。",
+            reaction: "成为受人尊敬的行业导师，社会地位显著提高，打破了所有固化偏见。",
+            delta: { social: 30, cognition: 20, happiness: 25 },
+            addTags: ["工匠导师", "受人敬仰"]
+          }
+        ]
       },
       {
         id: "adult_college_emigrate_42",
         age: 42,
         stageName: "四十二岁岁月 · 42岁",
         title: "跨国反哺与老屋重光",
-        scene: `你给老家父母汇去十多万元积蓄，不仅给父母治好了多年的慢性病，还翻修了老家住房并给父母买了充足的医疗保障。老家村里镇上亲友提起你都竖大拇指，父母在乡亲面前腰杆挺得笔直。`,
-        type: "milestone",
-        naturalDelta: { savings: -40000, kinshipGuilt: -30, happiness: 25 },
-        naturalTags: ["老屋重光", "光宗耀祖"],
-        reflection: "远行的游子用实打实的成就，给两代人的故土守望换回了最高的荣光。"
+        scene: `老家父母上了年纪，你作为在大洋彼岸站稳脚跟的手艺人：`,
+        type: "choice",
+        choices: [
+          {
+            text: "【真金白银反哺故土】汇款十多万元全款翻新老家平房并为父母存足医疗储备金",
+            detail: "村里镇上人人提起你都竖大拇指，父母在乡亲面前腰杆挺得笔直。",
+            reaction: "父母拿着你的汇款在老家看病修房，晚年衣食无忧，满心都是自豪与宽慰。",
+            delta: { savings: -60000, kinshipGuilt: -35, happiness: 25 },
+            addTags: ["光耀门楣", "实打实尽孝"]
+          },
+          {
+            text: "【接双亲海外小住体验】为父母办理探亲签证，接他们来异国农场小住半年吹海风",
+            detail: "让辛苦了一辈子的普通工人父母亲眼看看世界的辽阔与你奋斗出的宽阔天地。",
+            reaction: "父亲摸着你车库里气派的工具车老泪纵横：“好儿女，给老祖宗争脸了！”",
+            delta: { savings: -40000, kinshipGuilt: -30, happiness: 30 },
+            addTags: ["开阔天伦", "无悔人间"]
+          }
+        ]
       },
       {
         id: "adult_college_emigrate_52",
@@ -3648,7 +3967,7 @@ export function generateAdultMilestones(
         title: "技艺传家与下一代从容",
         scene: `孩子在当地公立学校成长，既学会了流利外语，也跟着你在车库里学会了修理机器与动手创作。家庭财务殷实无债，没有课外补习班的疯狂攀比，一家人每年驾车穿越大陆去海滨度假。`,
         type: "milestone",
-        naturalDelta: { savings: 250000, happiness: 25 },
+        naturalDelta: { savings: 200000, happiness: 25 },
         naturalTags: ["技艺传家", "富足无忧"],
         reflection: "双手挣来的基业最坚固，下一代享受着真正自由宽松的成长土壤。"
       },
@@ -3673,33 +3992,72 @@ export function generateAdultMilestones(
       age: 30,
       stageName: "三十而立 · 30岁",
       title: "自立门户与实体门店起步",
-      scene: `靠着在工厂车间摸爬滚打学到的过硬手艺与良好人缘，你在${city}汽修街盘下了一间门面，成立了自己的维修工坊或模具实体店。凭着做事地道公道，客户源源不断，一年下来有了稳定扎实的结余。`,
-      type: "milestone",
-      naturalDelta: { savings: 80000, social: 20, resilience: 20 },
-      naturalTags: ["自立门户", "实体老板"],
-      reflection: "不做坐吃山空的打工人，自己的一双手就是最稳妥的印钞机。"
+      scene: `靠着在工厂车间摸爬滚打学到的过硬手艺与良好人缘，你在${city}汽修街或模具街盘下了一间门面。面对起步阶段的运营抉择：`,
+      type: "choice",
+      choices: [
+        {
+          text: "【诚信公道做精做细】坚守绝不换假件、价格透明的规矩，扎扎实实做熟客口碑",
+          detail: "做事地道公道，虽然起步慢一点，但回头客源源不断，一年下来有了扎实结余。",
+          reaction: "老街上的车主和周边工厂都认准你的招牌，铺子经营稳如泰山。",
+          delta: { savings: 80000, social: 20, resilience: 20 },
+          addTags: ["自立门户", "诚信掌柜"]
+        },
+        {
+          text: "【承接园区批量维保】起早贪黑承接工业园机械设备的巡检与应急抢修外包",
+          detail: "吃常人吃不下的苦，24小时随叫随到，快速拿下园区重点企业的定点合作。",
+          reaction: "现金流迅速滚大，当年净结余突破十万元，在同行中脱颖而出。",
+          delta: { savings: 120000, resilience: 25, health: -5 },
+          addTags: ["硬核拼搏", "实业突破"]
+        }
+      ]
     },
     {
       id: "adult_college_stay_35",
       age: 35,
       stageName: "三十五岁关隘 · 35岁",
       title: "实体老板的底气与乡邻敬重",
-      scene: `店铺规模稳步扩大，带了两个技术学徒，在老家县城按揭买了套电梯房，添置了一辆实用的SUV。逢年过节门庭若市，亲戚邻里谁家机械车辆有故障都来找你，父母逢人便讲你手艺好、能干，在熟人社会受尽敬重。`,
-      type: "milestone",
-      naturalDelta: { savings: 100000, inferiority: -25, happiness: 25 },
-      naturalTags: ["实体掌柜", "乡邻敬重"],
-      reflection: "凭手艺和勤奋站稳脚跟，生活热气腾腾，活出了最接地气的尊严。"
+      scene: `店铺规模稳步扩大，带了两个技术学徒，在老家县城按揭买了套电梯房，添置了一辆实用的SUV：`,
+      type: "choice",
+      choices: [
+        {
+          text: "【传帮带徒扩大产能】系统培养两名技术过硬的徒弟，自己逐步转向统筹与质检",
+          detail: "不再单靠出卖个人体力，靠手艺标准与管理把小工坊做成老街排头兵。",
+          reaction: "店铺业务从容有序，你的时间更加自由，逢年过节门庭若市备受敬重。",
+          delta: { social: 25, savings: 100000, happiness: 20 },
+          addTags: ["带徒传艺", "实业有成"]
+        },
+        {
+          text: "【帮扶乡邻排忧解难】老家乡亲谁家机械农具坏了都热心免费调试，积累极佳乡谊",
+          detail: "不忘本、接地气，凭借一身好手艺在熟人社会赢得了人人称道的口碑。",
+          reaction: "父母逢人便讲你孝顺能干，你在老家赢得了至高声誉与坚实的人情后盾。",
+          delta: { social: 30, kinshipGuilt: -25, happiness: 25 },
+          addTags: ["乡邻楷模", "积善成德"]
+        }
+      ]
     },
     {
       id: "adult_college_stay_42",
       age: 42,
       stageName: "四十二岁岁月 · 42岁",
       title: "守在身边的孝道与贴心依靠",
-      scene: `父母上了岁数，由于你就在老家开店，只要一个电话，十分钟内就能开车赶到父母身边。日常就医、买菜、陪护从不假手于人。父母常欣慰地说：“还是你在身边最贴心，比那些跑得老远的顶用多了。”`,
-      type: "milestone",
-      naturalDelta: { savings: 60000, kinshipGuilt: -30, happiness: 25 },
-      naturalTags: ["贴身尽孝", "知足长乐"],
-      reflection: "守在故土的一方天地，给父母最踏实的陪伴，这就是最踏实的幸福。"
+      scene: `父母上了岁数，由于你就在老家开店，只要一个电话，十分钟内就能开车赶到父母身边：`,
+      type: "choice",
+      choices: [
+        {
+          text: "【随时在场的床前陪伴】日常就医、买菜、陪护从不假手于人，亲自开车接送照拂",
+          detail: "守在故土的最大价值就是风雨来临你在场，给年迈父母最踏实的贴身陪伴。",
+          reaction: "父母逢人便欣慰地说：“还是你在身边最贴心，比跑得老远的顶用多了！”",
+          delta: { kinshipGuilt: -40, happiness: 25, resilience: 15 },
+          addTags: ["贴身尽孝", "寸草春晖"]
+        },
+        {
+          text: "【改善老家全套养老设施】出资为老屋加装全屋适老扶手、地暖、制氧与大额医疗备用金",
+          detail: "用自己的双手创造真金白银，让父母晚年生活舒适体面，无后顾之忧。",
+          reaction: "父母安享舒适晚年，你用实实在在的手艺饭兑现了对家庭的全部承诺。",
+          delta: { savings: -40000, kinshipGuilt: -30, happiness: 25 },
+          addTags: ["家业厚实", "至孝担当"]
+        }
+      ]
     },
     {
       id: "adult_college_stay_52",
@@ -3727,69 +4085,475 @@ export function generateAdultMilestones(
 }
 
 // ============================================================================
-// 63 岁终局一生判词（深度契合学历阶层与命运抉择）
+// 危机预警检测引擎 (Crisis Detection Engine)
+// ============================================================================
+
+export interface CrisisWarning {
+  type: "health" | "inferiority" | "poverty";
+  title: string;
+  desc: string;
+}
+
+export function detectCrisisWarning(
+  attrs: CharacterAttributes,
+  tags: string[] = []
+): CrisisWarning | null {
+  if (attrs.health < 35 && !tags.includes("已化解健康危机")) {
+    return {
+      type: "health",
+      title: "【身体红灯警报】过度透支，体能逼近极限",
+      desc: "长期高压劳碌使你的抵抗力跌破警戒线，频现偏头痛与关节劳损。若继续透支，恐在重要关隘引发连锁反应！"
+    };
+  }
+  if (attrs.savings < 0 && !tags.includes("已化解债务危机")) {
+    return {
+      type: "poverty",
+      title: "【财务赤字警报】现金告急，生活拮据",
+      desc: "账面现金结余跌入负数，柴米油盐与生活开销步步紧逼，需要尽快稳住财务阵脚！"
+    };
+  }
+  if (attrs.inferiority > 75 && !tags.includes("已打破自卑枷锁")) {
+    return {
+      type: "inferiority",
+      title: "【心魔暗生警报】严重自卑与配得感缺失",
+      desc: "同辈攀比与熟人社会的审视让你心理负荷过载，在关键机遇面前往往本能地退缩内耗。"
+    };
+  }
+  return null;
+}
+
+// ============================================================================
+// 16 种终局图鉴系统 (Ending Codex) 与评析引擎
+// ============================================================================
+
+export interface EndingDef {
+  id: string; // ED-01 ~ ED-16
+  number: number;
+  title: string;
+  tagline: string;
+  rarity: "SSR" | "SR" | "R";
+  trackHint: string;
+  description: string;
+  unlockCondition: string;
+}
+
+export const ENDING_CODEX_DEFS: EndingDef[] = [
+  {
+    id: "ED-01",
+    number: 1,
+    title: "【全球卓越 · 拓疆智者】",
+    tagline: "“以才智立身四海，天地辽阔，皆为舞台。”",
+    rarity: "SSR",
+    trackHint: "985/211 + 跨洋出海",
+    description: "你凭借顶尖的名校才识与硬核技术，勇敢迈出国门。在尊重专注与技术创新的广阔天地中，你主导前沿工程，积攒下丰厚资产，彻底远离了狭窄赛道的内卷与年龄焦虑。用一生的从容与豁达，为自己和后代开辟了一条宽广无比的人生航道。",
+    unlockCondition: "985学历 + 跨洋出海 + 认知>=60"
+  },
+  {
+    id: "ED-02",
+    number: 2,
+    title: "【学术长青 · 杏坛归鸿】",
+    tagline: "“守得书斋冷与热，桃李天涯，学问自成。”",
+    rarity: "SR",
+    trackHint: "985/211 + 出海深造",
+    description: "你不为浮躁的名利所动，在海外名校与国际实验室深耕前沿科学。晚年兼任讲座教授，将学术火种带回故土，弟子遍布天下，赢得了知识分子最崇高的清誉与尊严。",
+    unlockCondition: "985学历 + 跨洋出海 + 获得学术标签"
+  },
+  {
+    id: "ED-03",
+    number: 3,
+    title: "【省府中坚 · 治世栋梁】",
+    tagline: "“深耕厚土成大器，泽被家族，无愧今生。”",
+    rarity: "SSR",
+    trackHint: "985/211 + 扎根故土",
+    description: "你选择留在生你养你的厚重土地。凭借名校基石与卓越实干，你在行业与体制中步步为营，成为了不可替代的中流砥柱。你为家庭提供了最坚固的庇护，在父母病榻前尽到了至孝，也为下一代搭建了稳固高耸的阶梯。",
+    unlockCondition: "985学历 + 扎根故土 + 社交>=50"
+  },
+  {
+    id: "ED-04",
+    number: 4,
+    title: "【硬核架构 · 稳健立足】",
+    tagline: "“一行代码一砖石，手握真功，风雨不动安如山。”",
+    rarity: "SR",
+    trackHint: "985/211 + 扎根故土",
+    description: "在瞬息万变的商业浪潮中，你凭借扎实过硬的技术壁垒稳坐中军。不炒房、不盲目杠杆，在省城有房有车手握大额安全垫，过上了最稳当、最体面的工程师人生。",
+    unlockCondition: "985学历 + 扎根故土 + 储蓄>=20万"
+  },
+  {
+    id: "ED-05",
+    number: 5,
+    title: "【旷野行者 · 异邦松弛】",
+    tagline: "“告别狭窄赛道，在辽阔人间找寻真正的自我。”",
+    rarity: "SSR",
+    trackHint: "双非本科 + 跨洋出海",
+    description: "二十七岁那年你毅然斩断了沉闷的内卷循环，跨洋开拓属于自己的生活。在异国多元包容的土地上，你用诚实的工作赢得了体面的住所与内心的松弛。没有了唯学历论的束缚与过度的人情消耗，你活出了真正属于自己的节奏。",
+    unlockCondition: "双非学历 + 跨洋出海 + 幸福>=70"
+  },
+  {
+    id: "ED-06",
+    number: 6,
+    title: "【异邦生根 · 岁月从容】",
+    tagline: "“不问出处唯凭实干，他乡亦是心安处。”",
+    rarity: "SR",
+    trackHint: "双非本科 + 跨洋出海",
+    description: "靠着脚踏实地的积累与自考资质，你在异国稳稳拿到永居，买下了带花园的小家。下午五点准时下班，彻底告别了35岁中年危机，用两代人的从容兑现了出海的初心。",
+    unlockCondition: "双非学历 + 跨洋出海 + 稳步立足"
+  },
+  {
+    id: "ED-07",
+    number: 7,
+    title: "【市井梁柱 · 踏实无悔】",
+    tagline: "“肩挑岁月风雨，脚踏实地，自有人间至味。”",
+    rarity: "SR",
+    trackHint: "双非本科 + 扎根故土",
+    description: "你留在了这片熟人温厚的土地上。面对生活的每一次风雨挑战，你用普通人最可贵的勤勉与韧性稳稳接招。你在职场中守住了尊严，在父母身边尽到了孝心，在柴米油盐中守护了小家的温暖。",
+    unlockCondition: "双非学历 + 扎根故土 + 韧劲>=40"
+  },
+  {
+    id: "ED-08",
+    number: 8,
+    title: "【小康安乐 · 岁月静好】",
+    tagline: "“一生平安无大浪，柴米油盐皆温情。”",
+    rarity: "R",
+    trackHint: "双非本科 + 扎根故土",
+    description: "没有波澜壮阔的史诗，只有热气腾腾的家常便饭。在二线小城与相濡以沫的家人相守，老人安康、儿女成才，平平安安就是最大的福分。",
+    unlockCondition: "双非学历 + 扎根故土 + 幸福>=60"
+  },
+  {
+    id: "ED-09",
+    number: 9,
+    title: "【特级大工 · 异国尊荣】",
+    tagline: "“一技在手走天下，靠真本领赢得无上尊重。”",
+    rarity: "SSR",
+    trackHint: "专科职教 + 跨洋出海",
+    description: "你在年轻时就认准了实用手艺的千钧力量。走向海外后，你在尊重技术工人的社会里大放异彩。你的一双手创造了丰厚的外币资产与宽敞的居所，彻底击碎了偏见与学历牢笼。你活出了蓝领劳动者的最高尊严。",
+    unlockCondition: "专科职教 + 跨洋出海 + 获得特级工匠"
+  },
+  {
+    id: "ED-10",
+    number: 10,
+    title: "【跨国技工 · 自强立身】",
+    tagline: "“一双手打出真金白银，打破学历枷锁。”",
+    rarity: "SR",
+    trackHint: "专科职教 + 跨洋出海",
+    description: "开着二手皮卡，带着整套工具，在异邦依靠真本事做自己的小老板。不欠外债、不奉迎权贵，凭一身力气吃遍四方，赢得了同行与雇主的真心赞叹。",
+    unlockCondition: "专科职教 + 跨洋出海 + 储蓄>=15万"
+  },
+  {
+    id: "ED-11",
+    number: 11,
+    title: "【实业掌柜 · 乡邻楷模】",
+    tagline: "“凭良心做手艺，守在故土，热气腾腾赢尽赞誉。”",
+    rarity: "SSR",
+    trackHint: "专科职教 + 扎根故土",
+    description: "你没有被坐办公室的虚名所累，凭借过硬实操与诚信经营，在生养你的家乡打拼出了属于自己的实体基业。你是老街上人人称道的技术行家，更是父母床前随叫随到的坚强依靠。",
+    unlockCondition: "专科职教 + 扎根故土 + 社交>=45"
+  },
+  {
+    id: "ED-12",
+    number: 12,
+    title: "【市井能人 · 踏实自足】",
+    tagline: "“双手挣来衣食饭，堂堂正正过一生。”",
+    rarity: "R",
+    trackHint: "专科职教 + 扎根故土",
+    description: "开着自己的一方门店，靠实打实的技术服务邻里。虽无惊天伟业，但每天有茶喝、有账算、有家人相伴，活出了最接地气的快活自如。",
+    unlockCondition: "专科职教 + 扎根故土 + 幸福>=55"
+  },
+  {
+    id: "ED-13",
+    number: 13,
+    title: "【逆流破壁 · 破局重生】",
+    tagline: "“生于泥淖，终于山巅；一代人的跋涉，两代人的破茧。”",
+    rarity: "SSR",
+    trackHint: "贫寒开局逆袭",
+    description: "从一穷二白、甚至经不起任何风浪的原生家庭开局，你靠着非凡的意志与自律一路逆风翻盘。你不仅亲手撕碎了贫困的魔咒，更彻底斩断了代际自卑的枷锁，创造了独属于自己的奇迹。",
+    unlockCondition: "拮据/贫寒家境 + 储蓄>=25万 + 自卑<=25"
+  },
+  {
+    id: "ED-14",
+    number: 14,
+    title: "【通透隐逸 · 自足长乐】",
+    tagline: "“不汲汲于富贵，不戚戚于贫贱，心宽天地自宽。”",
+    rarity: "SSR",
+    trackHint: "极高心智境界",
+    description: "你早早参透了东亚社会的比较牢笼，主动退出了无休无止的虚荣踩踏。身心安宁、不卑不亢，在自己喜欢的一方天地里自适其适，活出了常人穷极一生也难以企及的生命大通透。",
+    unlockCondition: "幸福>=85 + 自卑<=15"
+  },
+  {
+    id: "ED-15",
+    number: 15,
+    title: "【血脉相依 · 至孝担当】",
+    tagline: "“父母在，人生尚有来处；床前尽孝，无愧青天。”",
+    rarity: "SR",
+    trackHint: "家庭托底核心",
+    description: "在人生的每一次十字路口，你始终把家人放在最深厚的位置。当疾病与晚年风雨来临时，你用宽阔的肩膀与实打实的付出为父母撑起了完整的晴空。你这一生至情至性，问心无愧。",
+    unlockCondition: "亲缘负疚<=10 + 获得至孝标签"
+  },
+  {
+    id: "ED-16",
+    number: 16,
+    title: "【独立独行 · 四海为家】",
+    tagline: "“身若流云心似野马，大地山川任由驰骋。”",
+    rarity: "SR",
+    trackHint: "极高反叛独立",
+    description: "你拒绝了熟人社会所有的条条框框，也不受任何传统叙事的绑架。走到哪算哪，干到哪学到哪，把人世间当成一场纯粹的体验与漂泊，活得肆意坦荡、洒脱从容。",
+    unlockCondition: "反叛>=70 + 独立自由"
+  }
+];
+
+// ============================================================================
+// 12 大人生徽章成就系统 (Achievements)
+// ============================================================================
+
+export interface AchievementDef {
+  id: string;
+  title: string;
+  description: string;
+  iconName: string;
+  rarity: "gold" | "purple" | "blue";
+}
+
+export const ACHIEVEMENT_DEFS: AchievementDef[] = [
+  {
+    id: "ach_zhazhou",
+    title: "天命初启",
+    description: "在一岁周岁抓周礼上选出你的命定信物",
+    iconName: "Sparkles",
+    rarity: "blue"
+  },
+  {
+    id: "ach_985",
+    title: "金榜题名",
+    description: "高考成功考入 985/211 顶尖名校阶层",
+    iconName: "GraduationCap",
+    rarity: "gold"
+  },
+  {
+    id: "ach_artisan",
+    title: "大工匠心",
+    description: "公办职教毕业，凭一手过硬实操绝活在社会站稳脚跟",
+    iconName: "Wrench",
+    rarity: "purple"
+  },
+  {
+    id: "ach_double_pillar",
+    title: "务实中坚",
+    description: "双非学子在市井风浪中杀出重围成为业务骨干",
+    iconName: "Briefcase",
+    rarity: "purple"
+  },
+  {
+    id: "ach_first_pot",
+    title: "第一桶金",
+    description: "青年期个人流动现金储蓄突破 10 万元",
+    iconName: "Coins",
+    rarity: "blue"
+  },
+  {
+    id: "ach_millionaire",
+    title: "仓廪充实",
+    description: "退休前个人结余储蓄突破 50 万元",
+    iconName: "Landmark",
+    rarity: "gold"
+  },
+  {
+    id: "ach_break_cycle",
+    title: "斩断代际",
+    description: "自卑值降至 15 以下，活出完全的坦荡与松弛",
+    iconName: "Smile",
+    rarity: "gold"
+  },
+  {
+    id: "ach_filial",
+    title: "至孝担当",
+    description: "在四十二岁面对双亲风浪时完成深情托底",
+    iconName: "HeartHandshake",
+    rarity: "gold"
+  },
+  {
+    id: "ach_wild",
+    title: "奔赴旷野",
+    description: "二十七岁决然选择跨洋出海开拓新生活",
+    iconName: "Compass",
+    rarity: "purple"
+  },
+  {
+    id: "ach_roots",
+    title: "扎根厚土",
+    description: "二十七岁决然选择深耕故土守护亲情",
+    iconName: "Home",
+    rarity: "purple"
+  },
+  {
+    id: "ach_crisis_survivor",
+    title: "逆风破茧",
+    description: "曾克服严重的身体或财务赤字危机并顽强前行",
+    iconName: "ShieldAlert",
+    rarity: "blue"
+  },
+  {
+    id: "ach_retire_grand",
+    title: "功德圆满",
+    description: "顺利抵达六十三岁法定退休并留下生平手记",
+    iconName: "Award",
+    rarity: "gold"
+  }
+];
+
+// ============================================================================
+// 终局判词与徽章计算引擎 (Evaluation Helpers)
 // ============================================================================
 
 export interface LifetimeVerdict {
   summaryTitle: string;
   verdictText: string;
   tagline: string;
+  ending: EndingDef;
+  achievements: AchievementDef[];
+  radar: {
+    wealth: number;
+    health: number;
+    cognition: number;
+    autonomy: number;
+    kinship: number;
+  };
+}
+
+export function evaluateLifetimeEnding(
+  track: "985_211" | "double_non" | "junior_college",
+  path: "emigrate" | "stay",
+  attrs: CharacterAttributes,
+  tags: string[] = []
+): EndingDef {
+  // 隐藏典藏结局判定
+  if (attrs.happiness >= 85 && attrs.inferiority <= 15) {
+    return ENDING_CODEX_DEFS[13]; // ED-14 通透隐逸
+  }
+  if (attrs.rebellion >= 72 && (tags.includes("向往辽阔") || tags.includes("天性不羁"))) {
+    return ENDING_CODEX_DEFS[15]; // ED-16 独立独行
+  }
+  if (attrs.savings >= 250000 && attrs.inferiority <= 20 && tags.includes("初临人间")) {
+    if (attrs.kinshipGuilt <= 15 && tags.some(t => t.includes("托底") || t.includes("尽孝"))) {
+      return ENDING_CODEX_DEFS[14]; // ED-15 血脉相依
+    }
+  }
+
+  // 轨道对应常规结局判定
+  if (track === "985_211") {
+    if (path === "emigrate") {
+      return tags.some(t => t.includes("科研") || t.includes("学术"))
+        ? ENDING_CODEX_DEFS[1] // ED-02 学术长青
+        : ENDING_CODEX_DEFS[0]; // ED-01 全球卓越
+    } else {
+      return attrs.social >= 50
+        ? ENDING_CODEX_DEFS[2] // ED-03 省府中坚
+        : ENDING_CODEX_DEFS[3]; // ED-04 硬核架构
+    }
+  }
+
+  if (track === "junior_college") {
+    if (path === "emigrate") {
+      return tags.some(t => t.includes("特级"))
+        ? ENDING_CODEX_DEFS[8] // ED-09 特级大工
+        : ENDING_CODEX_DEFS[9]; // ED-10 跨国技工
+    } else {
+      return attrs.social >= 45
+        ? ENDING_CODEX_DEFS[10] // ED-11 实业掌柜
+        : ENDING_CODEX_DEFS[11]; // ED-12 市井能人
+    }
+  }
+
+  // 双非本科
+  if (path === "emigrate") {
+    return attrs.happiness >= 70
+      ? ENDING_CODEX_DEFS[4] // ED-05 旷野行者
+      : ENDING_CODEX_DEFS[5]; // ED-06 异邦生根
+  } else {
+    return attrs.resilience >= 40
+      ? ENDING_CODEX_DEFS[6] // ED-07 市井梁柱
+      : ENDING_CODEX_DEFS[7]; // ED-08 小康安乐
+  }
+}
+
+export function evaluateLifetimeAchievements(
+  track: "985_211" | "double_non" | "junior_college",
+  path: "emigrate" | "stay",
+  attrs: CharacterAttributes,
+  tags: string[] = [],
+  logEntries: any[] = []
+): AchievementDef[] {
+  const earned: AchievementDef[] = [];
+
+  // ach_zhazhou
+  if (tags.some(t => t.includes("抓周") || t.includes("幼苗") || t.includes("商感") || t.includes("工匠天分") || t.includes("天性不羁"))) {
+    earned.push(ACHIEVEMENT_DEFS[0]);
+  }
+  // Track achievements
+  if (track === "985_211") earned.push(ACHIEVEMENT_DEFS[1]);
+  if (track === "junior_college") earned.push(ACHIEVEMENT_DEFS[2]);
+  if (track === "double_non") earned.push(ACHIEVEMENT_DEFS[3]);
+
+  // First pot
+  if (attrs.savings >= 100000 || logEntries.some(e => e.statDelta?.savings >= 80000)) {
+    earned.push(ACHIEVEMENT_DEFS[4]);
+  }
+  // Half million / Millionaire
+  if (attrs.savings >= 400000) {
+    earned.push(ACHIEVEMENT_DEFS[5]);
+  }
+  // Break cycle
+  if (attrs.inferiority <= 15) {
+    earned.push(ACHIEVEMENT_DEFS[6]);
+  }
+  // Filial
+  if (tags.some(t => t.includes("尽孝") || t.includes("托底") || t.includes("反哺"))) {
+    earned.push(ACHIEVEMENT_DEFS[7]);
+  }
+  // Path
+  if (path === "emigrate") earned.push(ACHIEVEMENT_DEFS[8]);
+  if (path === "stay") earned.push(ACHIEVEMENT_DEFS[9]);
+
+  // Crisis survivor
+  if (attrs.health < 35 || attrs.savings < 0 || attrs.inferiority > 75) {
+    earned.push(ACHIEVEMENT_DEFS[10]);
+  }
+
+  // Grand retire
+  if (logEntries.some(e => e.age >= 63)) {
+    earned.push(ACHIEVEMENT_DEFS[11]);
+  }
+
+  return earned;
+}
+
+export function calculateLifetimeRadar(attrs: CharacterAttributes) {
+  return {
+    wealth: Math.min(98, Math.max(18, Math.round((attrs.savings + 50000) / 7000))),
+    health: Math.min(98, Math.max(18, attrs.health)),
+    cognition: Math.min(98, Math.max(18, attrs.cognition)),
+    autonomy: Math.min(98, Math.max(18, Math.round((attrs.rebellion * 0.6) + ((100 - attrs.inferiority) * 0.4)))),
+    kinship: Math.min(98, Math.max(18, Math.round((attrs.social * 0.5) + ((100 - attrs.kinshipGuilt * 0.6) * 0.5))))
+  };
 }
 
 export function generateFinalLifetimeVerdict(
   path: "emigrate" | "stay",
   track: "985_211" | "double_non" | "junior_college" = "double_non",
-  _attrs: CharacterAttributes,
-  _tags: string[] = []
+  attrs: CharacterAttributes,
+  tags: string[] = [],
+  logEntries: any[] = []
 ): LifetimeVerdict {
-  if (path === "emigrate") {
-    if (track === "985_211") {
-      return {
-        summaryTitle: "【全球卓越 · 拓疆智者】",
-        tagline: "“以才智立身四海，天地辽阔，皆为舞台。”",
-        verdictText:
-          "你凭借顶尖的名校才识与硬核技术，勇敢迈出国门。在尊重专注与技术创新的广阔天地中，你主导前沿工程，积攒下丰厚资产，彻底远离了狭窄赛道的内卷与年龄焦虑。虽偶有跨洋对故土的思念，但你用一生的从容与豁达，为自己和后代开辟了一条宽广无比的人生航道。"
-      };
-    }
-    if (track === "junior_college") {
-      return {
-        summaryTitle: "【特级工匠 · 异邦尊荣】",
-        tagline: "“一技在手走天下，靠真本领赢得无上尊重。”",
-        verdictText:
-          "你在年轻时就认准了实用手艺的千钧力量。走向海外后，你在尊重技术工人的社会里大放异彩。你的一双手创造了丰厚的外币资产与宽敞的居所，彻底击碎了偏见与学历牢笼。你活出了蓝领劳动者的最高尊严，用一把焊枪与机床在世界上刻下了自豪的名字。"
-      };
-    }
-    return {
-      summaryTitle: "【开阔行者 · 自由立身】",
-      tagline: "“告别既定轨道，在辽阔人间找寻真正的自我。”",
-      verdictText:
-        "二十七岁那年你毅然斩断了沉闷的内卷循环，跨洋开拓属于自己的生活。在异国多元包容的土地上，你用诚实的工作赢得了体面的住所与内心的松弛。没有了唯学历论的束缚与过度的人情消耗，你活出了真正属于自己的节奏，平静而丰盈。"
-    };
-  } else {
-    // 留在国内
-    if (track === "985_211") {
-      return {
-        summaryTitle: "【中流砥柱 · 德隆望尊】",
-        tagline: "“深耕厚土成大器，泽被家族，无愧今生。”",
-        verdictText:
-          "你选择留在生你养你的厚重土地。凭借名校基石与卓越实干，你在行业与体制中步步为营，成为了不可替代的中流砥柱。你为家庭提供了最坚固的庇护，在父母病榻前尽到了贴身侍奉的至孝，也为下一代搭建了稳固高耸的阶梯。你这一生深沉厚重，在熟悉的人间烟火中赢得了无上尊严。"
-      };
-    }
-    if (track === "junior_college") {
-      return {
-        summaryTitle: "【实业掌柜 · 乡邻楷模】",
-        tagline: "“凭良心做手艺，守在故土，热气腾腾赢尽赞誉。”",
-        verdictText:
-          "你没有被坐办公室的虚名所累，凭借过硬实操与诚信经营，在生养你的家乡打拼出了属于自己的实体基业。你是老街上人人称道的技术行家，更是父母床前随叫随到的坚强依靠。你凭一双手挣出了真金白银与堂堂正正的声望，热热闹闹、心满意足地度过了一生。"
-      };
-    }
-    return {
-      summaryTitle: "【市井梁柱 · 踏实无悔】",
-      tagline: "“肩挑岁月风雨，脚踏实地，自有人间至味。”",
-      verdictText:
-        "你留在了这片熟人温厚的土地上。面对生活的每一次风雨挑战，你用普通人最可贵的勤勉与韧性稳稳接招。你在职场中守住了尊严，在父母身边尽到了孝心，在柴米油盐中守护了小家的温暖。你这一生平凡而坚韧，热气腾腾，是一切美好生活的坚实脊梁。"
-    };
-  }
+  const ending = evaluateLifetimeEnding(track, path, attrs, tags);
+  const achievements = evaluateLifetimeAchievements(track, path, attrs, tags, logEntries);
+  const radar = calculateLifetimeRadar(attrs);
+
+  return {
+    summaryTitle: ending.title,
+    verdictText: ending.description,
+    tagline: ending.tagline,
+    ending,
+    achievements,
+    radar
+  };
 }
 
 // Legacy export for compatibility
