@@ -3,6 +3,7 @@ import {
   generateRandomFamily,
   K12_EVENTS,
   CAREER_EVENTS,
+  evaluate18YearOldGaokao,
   evaluate27YearOldLife,
   PARALLEL_LIVES_MILESTONES,
   generateFinalLifetimeVerdict,
@@ -11,6 +12,7 @@ import {
 import type {
   LifeChoice,
   LifeDiagnosis,
+  GaokaoDossier,
   CountryOption
 } from '../data/simulation';
 import {
@@ -20,7 +22,8 @@ import {
   Copy,
   Check,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  GraduationCap
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -41,9 +44,16 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   onNavigateToDIY
 }) => {
   // Gameplay Stages:
-  // 'setup' -> 'growth' (ages 6 to 27) -> 'growth_outcome' -> 'diagnosis' (age 27 fork) -> 'parallel' (ages 30 to 63) -> 'verdict' (retirement at 63)
+  // 'setup'
+  // ➔ 'growth' (ages 6 to 18)
+  // ➔ 'growth_outcome'
+  // ➔ 'gaokao_checkpoint' (age 18 adult milestone verdict)
+  // ➔ 'growth' (ages 20 to 27)
+  // ➔ 'diagnosis' (age 27 fork)
+  // ➔ 'parallel' (ages 30 to 63)
+  // ➔ 'verdict' (retirement at 63)
   const [gameState, setGameState] = useState<
-    'setup' | 'growth' | 'growth_outcome' | 'diagnosis' | 'parallel' | 'verdict'
+    'setup' | 'growth' | 'growth_outcome' | 'gaokao_checkpoint' | 'diagnosis' | 'parallel' | 'verdict'
   >('setup');
 
   // Player Baseline
@@ -69,6 +79,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     reaction: string;
   } | null>(null);
 
+  // Age 18 Gaokao Checkpoint
+  const [gaokaoDossier, setGaokaoDossier] = useState<GaokaoDossier | null>(null);
+
   // Age 27 Diagnosis
   const [diagnosis, setDiagnosis] = useState<LifeDiagnosis | null>(null);
   const [chosenPath, setChosenPath] = useState<'stay' | 'emigrate'>('emigrate');
@@ -93,6 +106,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setResilience(50);
       setTags([]);
       setIsRolling(false);
+      setGameState('setup');
     }, 150);
   };
 
@@ -107,11 +121,12 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setCurrentEventIdx(0);
     setHistoryNotes([]);
     setCurrentPendingReaction(null);
+    setGaokaoDossier(null);
     setGameState('growth');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // User selects an option in the 6~27 growth phase
+  // User selects an option in the growth phase
   const handleChooseGrowth = (choice: LifeChoice) => {
     const currentEvt = allGrowthEvents[currentEventIdx];
 
@@ -121,9 +136,10 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setInstitutional((prev) => Math.min(100, Math.max(0, prev + choice.institutionalDelta)));
     setResilience((prev) => Math.min(100, Math.max(0, prev + choice.resilienceDelta)));
 
-    if (choice.addTags) {
-      setTags((prev) => Array.from(new Set([...prev, ...(choice.addTags || [])])));
-    }
+    const nextTags = choice.addTags
+      ? Array.from(new Set([...tags, ...(choice.addTags || [])]))
+      : tags;
+    setTags(nextTags);
 
     const note: LifeHistoryNote = {
       age: currentEvt.age,
@@ -138,20 +154,37 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setGameState('growth_outcome');
   };
 
-  // Move from choice reaction to the next growth year
+  // Move from choice reaction to the next growth node or checkpoint
   const handleNextGrowthNode = () => {
+    // If just finished K-12 (index === K12_EVENTS.length - 1, which is Age 18 Gaokao)
+    if (currentEventIdx === K12_EVENTS.length - 1) {
+      const dossier = evaluate18YearOldGaokao(autonomy, kinshipTies, institutional, tags);
+      setGaokaoDossier(dossier);
+      setGameState('gaokao_checkpoint');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     if (currentEventIdx < allGrowthEvents.length - 1) {
       setCurrentEventIdx((prev) => prev + 1);
       setCurrentPendingReaction(null);
       setGameState('growth');
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } else {
-      // Finished age 27! Calculate diagnosis
+      // Finished age 27! Calculate 27yo diagnosis
       const diag = evaluate27YearOldLife(autonomy, kinshipTies, institutional, savings, tags);
       setDiagnosis(diag);
       setGameState('diagnosis');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  // Transition from 18yo Gaokao checkpoint to college & career
+  const handleProceedFromGaokao = () => {
+    setCurrentEventIdx(K12_EVENTS.length); // first career event (age 20)
+    setCurrentPendingReaction(null);
+    setGameState('growth');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Commit to Age 27 Fork (Stay vs Emigrate)
@@ -165,7 +198,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Progress through Parallel Lives (30, 35, 42, 52, 63)
   const handleNextParallelMilestone = () => {
     const currentMile = PARALLEL_LIVES_MILESTONES[parallelIdx];
-    // Record into history
     const note: LifeHistoryNote = {
       age: currentMile.age,
       stageName: currentMile.title,
@@ -180,7 +212,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setParallelIdx((prev) => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Reached 63! Retirement verdict
       setGameState('verdict');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -188,7 +219,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // Copy full chronicle
   const handleCopyChronicle = () => {
-    const verdict = generateFinalLifetimeVerdict(chosenPath, autonomy, kinshipTies);
+    const verdict = generateFinalLifetimeVerdict(chosenPath, autonomy, kinshipTies, tags);
     const text = `【逃跑计划 · 六十三载人生手札】
 人物：${charData.name}（${charData.gender}）
 籍贯：${charData.family.region}
@@ -314,7 +345,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
               <ArrowRight className="w-5 h-5" />
             </button>
             <p className="text-center text-xs text-stone-500 font-serif mt-2.5">
-              从小学、中考分流、高考到毕业五年，每一次抉择都将塑造你的骨骼
+              从小学、初中、中考分流、高中血拼到毕业五年，每一次抉择都将决定你的骨骼
             </p>
           </div>
         </div>
@@ -323,7 +354,82 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   }
 
   // =========================================================================
-  // VIEW 2 & 3: GROWTH PHASE (6 ~ 27 岁：应试铁笼到社会前五年)
+  // VIEW 2: 18-YEAR-OLD GAOKAO CHECKPOINT (十八岁成人礼与高考命运裁决)
+  // =========================================================================
+  if (gameState === 'gaokao_checkpoint' && gaokaoDossier) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <div className="text-center mb-8">
+          <span className="text-xs font-serif px-3 py-1 rounded-full bg-amber-950/50 text-amber-300 border border-amber-800/50 inline-flex items-center gap-1.5 mb-3">
+            <GraduationCap className="w-3.5 h-3.5" />
+            十八岁 · 高考成年礼命运审判
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight mb-2">
+            十二载应试铁笼终章
+          </h1>
+          <p className="text-base text-stone-400 font-serif">
+            从六岁到十八岁，你的第一个人生阶梯在此凝固
+          </p>
+        </div>
+
+        <div className="bg-[#18181C] border border-amber-900/50 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6">
+          <div className="text-center pb-6 border-b border-stone-800">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-amber-400 mb-3">
+              {gaokaoDossier.title}
+            </h2>
+            <p className="text-stone-300 font-serif text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
+              {gaokaoDossier.verdict}
+            </p>
+          </div>
+
+          <div className="space-y-3 font-serif text-sm sm:text-base text-stone-300 leading-relaxed">
+            <div className="bg-[#141417] p-4.5 rounded-2xl border border-stone-800">
+              <span className="text-amber-400 font-semibold block mb-1">
+                文凭与社会资本：
+              </span>
+              <p className="text-stone-200">{gaokaoDossier.academicCapital}</p>
+            </div>
+
+            <div className="bg-[#141417] p-4.5 rounded-2xl border border-stone-800">
+              <span className="text-sky-400 font-semibold block mb-1">
+                心理盔甲与隐性烙印：
+              </span>
+              <p className="text-stone-200">{gaokaoDossier.psychologicalArmor}</p>
+            </div>
+          </div>
+
+          <div>
+            <span className="text-xs font-serif text-stone-500 block mb-2">
+              十八岁时你身上已结成的骨茧：
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((t) => (
+                <span
+                  key={t}
+                  className="px-2.5 py-1 rounded-lg bg-stone-800 text-stone-300 text-xs font-serif border border-stone-700"
+                >
+                  #{t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-stone-800">
+            <button
+              onClick={handleProceedFromGaokao}
+              className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 shadow-lg"
+            >
+              迈入象牙塔与现实绞杀场（走向20~27岁）
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 3: GROWTH PHASE (6 ~ 27 岁：关隘推进与持续手札)
   // =========================================================================
   if (gameState === 'growth' || gameState === 'growth_outcome') {
     const currentEvent = allGrowthEvents[currentEventIdx];
@@ -445,8 +551,10 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
                   onClick={handleNextGrowthNode}
                   className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2"
                 >
-                  {currentEventIdx < allGrowthEvents.length - 1
-                    ? '走向下一年'
+                  {currentEventIdx === K12_EVENTS.length - 1
+                    ? '高考放榜：查阅十八岁成人礼命运裁决'
+                    : currentEventIdx < allGrowthEvents.length - 1
+                    ? '走向下一个节点'
                     : '步入二十七岁：人生命运清算'}
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -732,7 +840,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   // VIEW 6: RETIREMENT VERDICT AT AGE 63 (六十三载终局与一生判词)
   // =========================================================================
   if (gameState === 'verdict') {
-    const verdict = generateFinalLifetimeVerdict(chosenPath, autonomy, kinshipTies);
+    const verdict = generateFinalLifetimeVerdict(chosenPath, autonomy, kinshipTies, tags);
 
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
