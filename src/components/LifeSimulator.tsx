@@ -113,7 +113,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Clean up spin timer on unmount
   useEffect(() => {
     return () => {
-      if (spinTimerRef.current) clearInterval(spinTimerRef.current);
+      if (spinTimerRef.current) clearTimeout(spinTimerRef.current);
     };
   }, []);
 
@@ -129,11 +129,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       iterations++;
 
       if (iterations < maxIterations) {
-        // Decelerate smoothly
         if (iterations > 12) speed += 35;
         spinTimerRef.current = setTimeout(runReel, speed);
       } else {
-        // Settle down on a final random life
         const fresh = generateRandomFamily();
         setCharData(fresh);
         setAttrs({
@@ -214,7 +212,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const handleNextGrowthNode = () => {
     // If just finished K-12 (index === K12_EVENTS.length - 1, which is Age 17 sprint)
     if (currentEventIdx === K12_EVENTS.length - 1) {
-      // Calculate Gaokao outcome from past choices!
       const outcome = calculateGaokaoOutcome(attrs, tags);
       setGaokaoCalc(outcome);
       setGameState('gaokao_calculated');
@@ -229,7 +226,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setGameState('growth');
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } else {
-      // Finished age 27! Calculate 27yo diagnosis
       const diag = evaluate27YearOldLife(attrs, tags);
       setDiagnosis(diag);
       setGameState('diagnosis');
@@ -258,7 +254,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     };
     setHistoryNotes((prev) => [...prev, note]);
 
-    // Proceed to college (event index for CAREER_EVENTS start)
     setCurrentEventIdx(K12_EVENTS.length);
     setCurrentPendingReaction(null);
     setGameState('growth');
@@ -316,215 +311,214 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Helpers for text descriptions of core attributes
+  // Helpers for text descriptions of core attributes (all upright, readable, no brackets clutter)
   const getInferiorityDesc = (val: number) => {
-    if (val >= 60) return "深刻自卑敏感（深恐被人轻视）";
-    if (val >= 35) return "自尊内敛（把贫瘠磨成硬壳）";
-    return "坦荡野性（野草不轻易弯腰）";
+    if (val >= 60) return "深刻自卑敏感 · 深恐受人轻视";
+    if (val >= 35) return "自尊内敛 · 习惯独自消化";
+    return "坦荡野性 · 野草不轻易弯腰";
   };
 
   const getAcademicDesc = (val: number) => {
-    if (val >= 60) return "应试做题机器（杀出名校金身）";
-    if (val >= 35) return "中规中矩（普高夹缝求生）";
-    return "看淡应试（转战具体手艺生计）";
+    if (val >= 60) return "顶尖做题机器 · 试卷杀出金身";
+    if (val >= 35) return "中规中矩 · 普高夹缝求生";
+    return "转战具体手艺 · 避开虚浮内卷";
   };
 
   const getGuiltDesc = (val: number) => {
-    if (val >= 60) return "宗族重负（全家的期望与无形锁链）";
-    if (val >= 35) return "隐性愧疚（挂念父母衰老）";
-    return "精神断脐（只为自己负责）";
+    if (val >= 60) return "宗族重负 · 父母期待是无形锁链";
+    if (val >= 35) return "隐性牵绊 · 始终挂念父母老去";
+    return "精神断脐 · 纯粹为自己负责";
   };
 
   const getRebellionDesc = (val: number) => {
-    if (val >= 60) return "逆鳞初成（随时准备掀桌）";
-    if (val >= 35) return "清醒游离（身体在工位灵魂在逃跑）";
-    return "顺从规则（信奉集体与秩序）";
+    if (val >= 60) return "逆鳞初成 · 随时准备掀桌";
+    if (val >= 35) return "清醒游离 · 身体在场灵魂在逃";
+    return "顺从规则 · 信奉集体与秩序";
   };
 
   const getResilienceDesc = (val: number) => {
-    if (val >= 60) return "百炼成钢（四海皆可摸爬滚打）";
-    if (val >= 35) return "粗糙经磨（能吃常人苦）";
-    return "温室幼苗（未见大风大浪）";
+    if (val >= 60) return "百炼成钢 · 四海皆可摸爬滚打";
+    if (val >= 35) return "粗糙经磨 · 能吃常人苦";
+    return "温室幼苗 · 尚未经历风浪";
   };
 
   // =========================================================================
-  // VIEW 1: CINEMATIC BIRTHPLACE REEL & DOSSIER CARD
+  // VIEW 1: CINEMATIC BIRTHPLACE REEL & DOSSIER CARD (CLEAN EDITORIAL AESTHETICS)
   // =========================================================================
   if (gameState === 'setup') {
     const activeSlide = BIRTHPLACE_SLIDES[slideIndex];
 
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        {/* Title & Atmosphere */}
+      <div className="max-w-3xl mx-auto px-4 py-12 font-serif">
+        {/* Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-stone-400 text-xs font-serif mb-3 tracking-widest uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            人生开局 · 天命降生投影
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-stone-900 border border-stone-800 text-stone-300 text-sm mb-3">
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            人生底牌 · 天命降生投影
           </div>
-          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-stone-100 tracking-tight mb-2.5">
+          <h1 className="text-3xl sm:text-5xl font-bold text-stone-100 tracking-tight mb-3">
             抽一张人生底牌
           </h1>
-          <p className="text-sm sm:text-base text-stone-400 font-serif max-w-lg mx-auto">
-            没有人能自主选择降生的家庭。按下命运之轮，看你这一世落入哪片泥土与屋檐。
+          <p className="text-base sm:text-lg text-stone-300 max-w-xl mx-auto leading-relaxed">
+            没有人能自主选择降生的家庭。按下命运齿轮，看你这一世落入哪片泥土与屋檐。
           </p>
         </div>
 
-        {/* Cinematic Birthplace Carousel Reel (投胎幻灯片/轮盘) */}
-        <div className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-b from-[#18181E] to-[#121216] border border-amber-900/30 p-6 sm:p-7 shadow-2xl">
-          <div className="flex items-center justify-between text-xs font-serif text-stone-500 mb-3 border-b border-stone-800 pb-2">
-            <span className="flex items-center gap-1.5 text-amber-400 font-semibold">
-              <span className="relative flex h-2 w-2">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 ${isSpinning ? 'block' : 'hidden'}`}></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-              </span>
+        {/* Birthplace Carousel Reel (投胎幻灯片/轮盘) */}
+        <div className="mb-8 rounded-3xl bg-[#14151B] border border-amber-900/40 p-6 sm:p-8 shadow-xl">
+          <div className="flex items-center justify-between text-sm text-stone-400 mb-4 border-b border-stone-800/80 pb-3">
+            <span className="flex items-center gap-2 text-amber-400 font-medium">
+              <span className={`inline-block w-2.5 h-2.5 rounded-full bg-amber-400 ${isSpinning ? 'animate-pulse' : ''}`} />
               {isSpinning ? "正在全中国疆域随机寻址中..." : "出生地已锁定落籍"}
             </span>
-            <span className="font-mono text-stone-400">坐标：{charData.family.region}</span>
+            <span className="text-stone-300">
+              {isSpinning ? "定位中..." : charData.family.region}
+            </span>
           </div>
 
           {/* Reel Display Card */}
-          <div className={`transition-all duration-150 transform ${isSpinning ? 'scale-95 opacity-80 blur-[0.5px]' : 'scale-100 opacity-100'}`}>
-            <div className="flex items-center gap-4 py-2">
-              <div className="text-4xl sm:text-5xl p-3 sm:p-4 rounded-2xl bg-[#0F0F12] border border-stone-800 shadow-inner">
+          <div className="py-3">
+            <div className="flex items-center gap-5">
+              <div className="text-4xl sm:text-5xl p-4 rounded-2xl bg-[#0B0C0E] border border-stone-800 shrink-0">
                 {isSpinning ? activeSlide.icon : "📍"}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xl sm:text-3xl font-serif font-bold text-stone-100 truncate mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-stone-100 truncate mb-1.5">
                   {isSpinning ? activeSlide.region : charData.family.region}
                 </div>
-                <div className="text-xs sm:text-sm font-serif text-amber-300/90 truncate mb-1">
+                <div className="text-base sm:text-lg text-amber-300/90 mb-1 leading-normal">
                   {isSpinning ? activeSlide.landscape : charData.family.regionDetail.split("。")[0]}
                 </div>
-                <div className="text-xs font-serif text-stone-400 line-clamp-1">
+                <div className="text-sm sm:text-base text-stone-400 leading-normal">
                   {isSpinning ? activeSlide.tagline : charData.family.regionDetail.split("。")[1] || charData.family.regionDetail}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Trigger Reel Button */}
-          <div className="mt-4 pt-3 border-t border-stone-800/80 flex items-center justify-between">
-            <span className="text-xs font-serif text-stone-500">
-              {isSpinning ? "命运正在飞速翻转..." : "对出身不满意？可以重新摇号"}
+          {/* Reel Control */}
+          <div className="mt-5 pt-4 border-t border-stone-800/80 flex items-center justify-between">
+            <span className="text-sm text-stone-400">
+              {isSpinning ? "命运正在飞速翻转..." : "对出生地不满意？可重新抽取"}
             </span>
             <button
               onClick={triggerBirthReel}
               disabled={isSpinning}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-stone-950 border border-stone-700 text-stone-200 text-xs sm:text-sm font-serif transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-stone-950 border border-stone-700 text-stone-200 text-sm sm:text-base transition-colors"
             >
-              <RotateCcw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin text-amber-400' : ''}`} />
+              <RotateCcw className={`w-4 h-4 ${isSpinning ? 'animate-spin text-amber-400' : ''}`} />
               重新摇号投胎
             </button>
           </div>
         </div>
 
-        {/* Detailed Dossier Card (等停下来的时候出现的完整户籍卡片) */}
+        {/* Detailed Dossier Card (端正、大方、清晰大字排版) */}
         {!isSpinning && (
-          <div className="bg-[#17171C] border border-stone-800 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6 transition-all duration-300 animate-in fade-in slide-in-from-bottom-3">
-            {/* Top Identity Row with Red Ink Stamp Effect */}
-            <div className="flex items-start justify-between pb-5 border-b border-stone-800">
+          <div className="bg-[#16171E] border border-stone-800 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-7 animate-in fade-in duration-200">
+            {/* Header: Name, gender, status stamp */}
+            <div className="flex items-start justify-between pb-6 border-b border-stone-800">
               <div>
-                <div className="flex items-baseline gap-3 mb-1.5">
-                  <span className="text-3xl sm:text-4xl font-serif font-bold text-stone-100">
+                <div className="flex flex-wrap items-baseline gap-3 mb-2">
+                  <span className="text-3xl sm:text-4xl font-bold text-stone-100">
                     {charData.name}
                   </span>
-                  <span className="text-base text-stone-400 font-serif">
+                  <span className="text-lg text-stone-300">
                     6 岁 · {charData.gender}
                   </span>
-                  <span className="text-xs font-serif px-2.5 py-0.5 rounded-full bg-amber-950/40 text-amber-200 border border-amber-800/40">
+                  <span className="text-sm px-3 py-1 rounded-full bg-amber-950/40 text-amber-200 border border-amber-800/40">
                     {charData.family.siblings}
                   </span>
                 </div>
-                <p className="text-sm text-stone-400 font-serif">
-                  籍贯：{charData.family.region}
+                <p className="text-base text-stone-400">
+                  原籍：{charData.family.region}
                 </p>
               </div>
 
-              {/* Red Archival Stamp */}
-              <div className="rotate-[-6deg] border-2 border-rose-700/80 text-rose-500 px-3 py-1 rounded-lg text-xs sm:text-sm font-serif font-black tracking-widest uppercase select-none opacity-90 shadow-sm shadow-rose-950">
+              {/* Upright, dignified seal */}
+              <div className="border border-rose-700/80 bg-rose-950/30 text-rose-300 px-3.5 py-1.5 rounded-xl text-sm font-bold tracking-wider">
                 已落籍 · 六岁
               </div>
             </div>
 
             {/* Section 1: 住房与居住环境 */}
-            <div className="bg-[#121215] p-4.5 rounded-2xl border border-stone-800 space-y-1.5">
-              <div className="flex items-center gap-2 text-amber-400 font-serif text-sm font-semibold">
-                <Home className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-amber-400 text-base font-bold">
+                <Home className="w-5 h-5 shrink-0" />
                 <span>家里的住房条件：</span>
               </div>
-              <p className="text-stone-200 font-serif text-sm sm:text-base leading-relaxed pl-6">
+              <p className="text-stone-200 text-base sm:text-lg leading-relaxed pl-7">
                 {charData.family.housing}
               </p>
             </div>
 
             {/* Section 2: 父母职业、年龄与性情 */}
-            <div className="bg-[#141419] p-4.5 rounded-2xl border border-stone-800 space-y-3">
-              <div className="flex items-center gap-2 text-stone-200 font-serif text-sm font-semibold">
-                <Users className="w-4 h-4 text-sky-400 shrink-0" />
+            <div className="space-y-3 pt-4 border-t border-stone-800/80">
+              <div className="flex items-center gap-2 text-stone-200 text-base font-bold">
+                <Users className="w-5 h-5 text-sky-400 shrink-0" />
                 <span>父母生计与性情档案：</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
-                <div className="bg-[#0F0F13] p-3 rounded-xl border border-stone-800/80">
-                  <div className="text-xs text-stone-500 font-serif mb-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pl-7">
+                <div className="bg-[#101116] p-4 rounded-2xl border border-stone-800">
+                  <div className="text-sm text-stone-400 mb-1">
                     父亲：{charData.family.fatherAge} 岁
                   </div>
-                  <div className="text-sm font-serif font-semibold text-stone-200 mb-1">
+                  <div className="text-base sm:text-lg font-bold text-stone-100 mb-1.5">
                     {charData.family.fatherJob}
                   </div>
-                  <div className="text-xs font-serif text-stone-400 leading-relaxed">
-                    “{charData.family.fatherTrait}”
+                  <div className="text-sm sm:text-base text-stone-300 leading-relaxed">
+                    「{charData.family.fatherTrait}」
                   </div>
                 </div>
 
-                <div className="bg-[#0F0F13] p-3 rounded-xl border border-stone-800/80">
-                  <div className="text-xs text-stone-500 font-serif mb-1">
+                <div className="bg-[#101116] p-4 rounded-2xl border border-stone-800">
+                  <div className="text-sm text-stone-400 mb-1">
                     母亲：{charData.family.motherAge} 岁
                   </div>
-                  <div className="text-sm font-serif font-semibold text-stone-200 mb-1">
+                  <div className="text-base sm:text-lg font-bold text-stone-100 mb-1.5">
                     {charData.family.motherJob}
                   </div>
-                  <div className="text-xs font-serif text-stone-400 leading-relaxed">
-                    “{charData.family.motherTrait}”
+                  <div className="text-sm sm:text-base text-stone-300 leading-relaxed">
+                    「{charData.family.motherTrait}」
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Section 3: 家境与经济水位 */}
-            <div className="bg-[#1C1715] p-4.5 rounded-2xl border border-amber-900/30 space-y-2">
+            <div className="space-y-2.5 pt-4 border-t border-stone-800/80">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-amber-400 font-serif text-sm font-semibold">
-                  <Coins className="w-4 h-4 text-amber-400 shrink-0" />
+                <div className="flex items-center gap-2 text-amber-400 text-base font-bold">
+                  <Coins className="w-5 h-5 shrink-0" />
                   <span>家境与生计水位：</span>
                 </div>
-                <span className="text-xs font-mono font-semibold text-emerald-400 bg-emerald-950/40 px-2.5 py-0.5 rounded border border-emerald-800/40">
-                  存折结余约 ¥{charData.family.initialSavings.toLocaleString()}
+                <span className="text-sm font-sans font-semibold text-emerald-400 bg-emerald-950/40 px-3 py-1 rounded-lg border border-emerald-800/40">
+                  存折结余约 ¥{charData.family.initialSavings.toLocaleString()} 元
                 </span>
               </div>
-              <p className="text-stone-300 font-serif text-sm leading-relaxed pl-6">
-                <span className="font-semibold text-amber-200">{charData.family.wealthTier}</span>。
+              <p className="text-stone-200 text-base sm:text-lg leading-relaxed pl-7">
+                <span className="font-bold text-amber-200">{charData.family.wealthTier}</span>。
                 {charData.family.wealthDetail}
               </p>
-              <div className="pt-2 border-t border-amber-950/60 pl-6 text-xs font-serif text-stone-400">
+              <div className="pl-7 text-sm sm:text-base text-stone-400 leading-relaxed">
                 家庭精神氛围：{charData.family.emotionalTone}。{charData.family.toneDetail}
               </div>
             </div>
 
-            {/* Section 4: 降生记忆切片 */}
-            <p className="text-sm sm:text-base text-stone-300 font-serif leading-relaxed italic bg-stone-900/40 p-4 rounded-xl border border-stone-800/40">
-              “{charData.family.backgroundStory}”
-            </p>
+            {/* Section 4: 降生记忆切片 (Upright, dignified quote) */}
+            <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800/80 text-base sm:text-lg text-stone-200 leading-relaxed">
+              「{charData.family.backgroundStory}」
+            </div>
 
             {/* Start CTA */}
-            <div className="pt-3 border-t border-stone-800">
+            <div className="pt-4 border-t border-stone-800">
               <button
                 onClick={handleStartLife}
-                className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-lg shadow-xl shadow-amber-950/20 transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-bold text-lg sm:text-xl shadow-xl shadow-amber-950/20 transition-all flex items-center justify-center gap-2.5"
               >
                 接受这张底牌，以六岁之躯启程
                 <ArrowRight className="w-5 h-5" />
               </button>
-              <p className="text-center text-xs text-stone-500 font-serif mt-2.5">
+              <p className="text-center text-sm text-stone-400 mt-3">
                 从小学一年级开始，你的每一个选择都将与这份家庭底色发生剧烈化学反应
               </p>
             </div>
@@ -539,45 +533,45 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   // =========================================================================
   if (gameState === 'gaokao_calculated' && gaokaoCalc) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-12 font-serif">
         <div className="text-center mb-8">
-          <span className="text-xs font-serif px-3 py-1 rounded-full bg-amber-950/50 text-amber-300 border border-amber-800/50 inline-flex items-center gap-1.5 mb-3">
-            <GraduationCap className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-950/50 text-amber-300 border border-amber-800/50 text-sm mb-3">
+            <GraduationCap className="w-4 h-4" />
             十八岁 · 高考放榜与成人命运审判
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight mb-2">
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-stone-100 tracking-tight mb-2.5">
             十二载因果终局出炉
           </h1>
-          <p className="text-base text-stone-400 font-serif">
+          <p className="text-base sm:text-lg text-stone-300">
             你无法自选高分，这一刻的成绩单由你过去的十二年亲手铸成
           </p>
         </div>
 
-        <div className="bg-[#18181C] border border-amber-900/60 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6">
+        <div className="bg-[#16171E] border border-amber-900/60 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-7">
           {/* Headline Result */}
           <div className="text-center pb-6 border-b border-stone-800">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-amber-400 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-amber-400 mb-2.5">
               {gaokaoCalc.title}
             </h2>
-            <div className="text-sm font-sans font-semibold text-emerald-400 mb-3 bg-emerald-950/30 inline-block px-3 py-1 rounded-full border border-emerald-800/40">
+            <div className="text-base font-sans font-semibold text-emerald-400 mb-4 bg-emerald-950/30 inline-block px-4 py-1.5 rounded-full border border-emerald-800/40">
               {gaokaoCalc.scoreText}
             </div>
-            <p className="text-stone-300 font-serif text-base sm:text-lg leading-relaxed max-w-xl mx-auto bg-[#131316] p-5 rounded-2xl border border-stone-800">
+            <p className="text-stone-200 text-base sm:text-lg leading-relaxed max-w-xl mx-auto bg-[#101116] p-5 rounded-2xl border border-stone-800">
               {gaokaoCalc.verdict}
             </p>
           </div>
 
           {/* Breakdown Dossier */}
-          <div className="space-y-3 font-serif text-sm sm:text-base text-stone-300 leading-relaxed">
-            <div className="bg-[#141417] p-4.5 rounded-2xl border border-stone-800">
-              <span className="text-amber-400 font-semibold block mb-1">
+          <div className="space-y-4 text-base sm:text-lg text-stone-200 leading-relaxed">
+            <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
+              <span className="text-amber-400 font-bold block mb-1.5">
                 学历资产与现实门槛：
               </span>
               <p className="text-stone-200">{gaokaoCalc.academicCapitalDesc}</p>
             </div>
 
-            <div className="bg-[#141417] p-4.5 rounded-2xl border border-stone-800">
-              <span className="text-sky-400 font-semibold block mb-1">
+            <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
+              <span className="text-sky-400 font-bold block mb-1.5">
                 心理剖面与代际重荷：
               </span>
               <p className="text-stone-200">{gaokaoCalc.psychologicalDossier}</p>
@@ -585,44 +579,44 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
           </div>
 
           {/* Core Latent Metrics Snapshot */}
-          <div className="bg-[#121215] p-4.5 rounded-2xl border border-stone-800 space-y-2 text-xs font-serif text-stone-400">
-            <div className="flex justify-between">
-              <span>【自卑与创伤】</span>
-              <span className="text-stone-200">{getInferiorityDesc(attrs.inferiority)}</span>
+          <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800 space-y-2.5 text-sm sm:text-base text-stone-300">
+            <div className="flex justify-between items-center py-1 border-b border-stone-800/60">
+              <span className="text-stone-400">【自卑与创伤】</span>
+              <span className="text-stone-100 font-medium">{getInferiorityDesc(attrs.inferiority)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>【做题应试资本】</span>
-              <span className="text-amber-300">{getAcademicDesc(attrs.academicCapital)}</span>
+            <div className="flex justify-between items-center py-1 border-b border-stone-800/60">
+              <span className="text-stone-400">【做题应试资本】</span>
+              <span className="text-amber-300 font-medium">{getAcademicDesc(attrs.academicCapital)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>【宗族愧疚重荷】</span>
-              <span className="text-stone-200">{getGuiltDesc(attrs.kinshipGuilt)}</span>
+            <div className="flex justify-between items-center py-1 border-b border-stone-800/60">
+              <span className="text-stone-400">【宗族愧疚重荷】</span>
+              <span className="text-stone-100 font-medium">{getGuiltDesc(attrs.kinshipGuilt)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>【反叛与逆鳞】</span>
-              <span className="text-rose-400">{getRebellionDesc(attrs.rebellion)}</span>
+            <div className="flex justify-between items-center py-1 border-b border-stone-800/60">
+              <span className="text-stone-400">【反叛与逆鳞】</span>
+              <span className="text-rose-400 font-medium">{getRebellionDesc(attrs.rebellion)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>【生存韧劲】</span>
-              <span className="text-emerald-400">{getResilienceDesc(attrs.resilience)}</span>
+            <div className="flex justify-between items-center py-1">
+              <span className="text-stone-400">【生存韧劲】</span>
+              <span className="text-emerald-400 font-medium">{getResilienceDesc(attrs.resilience)}</span>
             </div>
           </div>
 
           {/* Follow-up Choice based on this concrete outcome */}
-          <div className="pt-4 border-t border-stone-800 space-y-3">
-            <span className="text-sm font-serif font-semibold text-stone-200 block">
+          <div className="pt-4 border-t border-stone-800 space-y-3.5">
+            <span className="text-base sm:text-lg font-bold text-stone-100 block">
               {gaokaoCalc.firstStepChoice.prompt}
             </span>
             {gaokaoCalc.firstStepChoice.options.map((opt, optIdx) => (
               <button
                 key={optIdx}
                 onClick={() => handleGaokaoFollowup(opt)}
-                className="w-full text-left p-4 sm:p-5 rounded-2xl bg-[#1D1D22] hover:bg-[#25252C] border border-stone-700/80 hover:border-amber-500/60 transition-all group"
+                className="w-full text-left p-5 rounded-2xl bg-[#1C1D26] hover:bg-[#242532] border border-stone-700/80 hover:border-amber-500/60 transition-all group"
               >
-                <div className="text-base sm:text-lg font-serif font-semibold text-stone-100 group-hover:text-amber-300 transition-colors mb-1.5">
+                <div className="text-base sm:text-lg font-bold text-stone-100 group-hover:text-amber-300 transition-colors mb-1.5">
                   ➔ {opt.text}
                 </div>
-                <div className="text-xs sm:text-sm font-serif text-stone-400 leading-relaxed">
+                <div className="text-sm sm:text-base text-stone-300 leading-relaxed">
                   {opt.detail}
                 </div>
               </button>
@@ -644,56 +638,56 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
     const totalEvents = K12_EVENTS.length + CAREER_EVENTS.length;
 
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 py-8 font-serif">
         {/* Top Header Bar with Live Character Dossier */}
-        <div className="bg-[#151518] border border-stone-800 rounded-2xl p-4 mb-6 space-y-3">
-          <div className="flex items-center justify-between border-b border-stone-800/80 pb-2.5">
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-serif font-bold text-stone-100">
+        <div className="bg-[#14151B] border border-stone-800 rounded-2xl p-5 mb-6 space-y-3.5 shadow-lg">
+          <div className="flex items-center justify-between border-b border-stone-800 pb-3">
+            <div className="flex items-baseline gap-2.5">
+              <span className="text-2xl font-bold text-stone-100">
                 {charData.name}
               </span>
-              <span className="text-sm font-serif text-stone-400">
+              <span className="text-base text-stone-300">
                 {currentEvent ? `${currentEvent.age} 岁` : ''} · {charData.family.region}
               </span>
             </div>
             <div className="text-right">
-              <span className="text-xs text-stone-500 font-serif mr-1.5">现金储备</span>
-              <span className="text-emerald-400 font-sans font-semibold text-base">
+              <span className="text-sm text-stone-400 mr-2">现金储备</span>
+              <span className="text-emerald-400 font-sans font-bold text-lg">
                 ¥{attrs.savings.toLocaleString()}
               </span>
             </div>
           </div>
 
-          {/* Core Psychological State Bar (用户核心系统项可视化展示) */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-serif pt-1">
-            <div className="flex items-center gap-1.5 text-stone-300">
-              <HeartPulse className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-              <span className="truncate">自卑：{getInferiorityDesc(attrs.inferiority).split("（")[0]}</span>
+          {/* Core Psychological State Bar (Clear 14px text) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm pt-1">
+            <div className="flex items-center gap-2 text-stone-200">
+              <HeartPulse className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>自卑：{getInferiorityDesc(attrs.inferiority).split(" · ")[0]}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-stone-300">
-              <Brain className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span className="truncate">做题：{getAcademicDesc(attrs.academicCapital).split("（")[0]}</span>
+            <div className="flex items-center gap-2 text-stone-200">
+              <Brain className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>做题：{getAcademicDesc(attrs.academicCapital).split(" · ")[0]}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-stone-300">
-              <Shield className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-              <span className="truncate">宗族负荷：{getGuiltDesc(attrs.kinshipGuilt).split("（")[0]}</span>
+            <div className="flex items-center gap-2 text-stone-200">
+              <Shield className="w-4 h-4 text-orange-400 shrink-0" />
+              <span>宗族：{getGuiltDesc(attrs.kinshipGuilt).split(" · ")[0]}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-stone-300">
-              <Flame className="w-3.5 h-3.5 text-red-500 shrink-0" />
-              <span className="truncate">反叛逆鳞：{getRebellionDesc(attrs.rebellion).split("（")[0]}</span>
+            <div className="flex items-center gap-2 text-stone-200">
+              <Flame className="w-4 h-4 text-red-500 shrink-0" />
+              <span>反叛：{getRebellionDesc(attrs.rebellion).split(" · ")[0]}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-stone-300">
-              <Zap className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span className="truncate">生存韧劲：{getResilienceDesc(attrs.resilience).split("（")[0]}</span>
+            <div className="flex items-center gap-2 text-stone-200">
+              <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>韧劲：{getResilienceDesc(attrs.resilience).split(" · ")[0]}</span>
             </div>
           </div>
 
           {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1 border-t border-stone-800/60">
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-stone-800/80">
               {tags.map((t) => (
                 <span
                   key={t}
-                  className="text-xs font-serif px-2 py-0.5 rounded bg-stone-900 text-stone-400 border border-stone-800"
+                  className="text-sm px-2.5 py-0.5 rounded-lg bg-stone-900 text-stone-300 border border-stone-800"
                 >
                   #{t}
                 </span>
@@ -704,23 +698,23 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
 
         {/* Chronicle History (Scrollable Past Decisions) */}
         {historyNotes.length > 0 && (
-          <div className="space-y-3 mb-8">
-            <span className="text-xs font-serif text-stone-500 block tracking-wider uppercase">
-              岁月印记 ({historyNotes.length} 次命运转折)
+          <div className="space-y-3.5 mb-8">
+            <span className="text-sm text-stone-400 block tracking-wider uppercase font-medium">
+              岁月印记 · 过去的命运转折 ({historyNotes.length} 次)
             </span>
             {historyNotes.map((note, idx) => (
               <div
                 key={idx}
-                className="bg-[#141417] border border-stone-800/80 rounded-2xl p-4 text-stone-400 font-serif text-sm transition-all"
+                className="bg-[#141419] border border-stone-800 rounded-2xl p-4 text-sm sm:text-base text-stone-300 transition-all"
               >
-                <div className="flex items-center justify-between text-xs text-stone-500 mb-1">
-                  <span className="font-semibold text-stone-300">{note.stageName}</span>
+                <div className="flex items-center justify-between text-sm text-stone-400 mb-1.5">
+                  <span className="font-bold text-stone-200">{note.stageName}</span>
                   <span>{note.title}</span>
                 </div>
-                <p className="text-stone-200 font-medium mb-1.5">
+                <p className="text-stone-100 font-medium mb-1.5">
                   ➔ {note.choiceText}
                 </p>
-                <p className="text-stone-400 text-xs italic pl-2.5 border-l-2 border-stone-700">
+                <p className="text-stone-300 text-sm pl-3 border-l-2 border-stone-700 leading-relaxed">
                   {note.reaction}
                 </p>
               </div>
@@ -730,40 +724,40 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
 
         {/* Current Active Event Card */}
         {currentEvent && (
-          <div className="bg-[#18181C] border border-amber-900/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-stone-800 pb-3">
-              <span className="text-amber-400 font-serif font-bold text-sm sm:text-base">
+          <div className="bg-[#16171E] border border-amber-900/40 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-stone-800 pb-3.5">
+              <span className="text-amber-400 font-bold text-base sm:text-lg">
                 【{currentEvent.stageName}】
               </span>
-              <span className="text-xs font-serif text-stone-500">
+              <span className="text-sm text-stone-400">
                 人生关隘 {currentEventIdx + 1} / {totalEvents}
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-stone-100 leading-snug">
+            <h2 className="text-2xl sm:text-3xl font-bold text-stone-100 leading-snug">
               {currentEvent.title}
             </h2>
 
-            <div className="text-base sm:text-lg text-stone-200 font-serif leading-relaxed whitespace-pre-line bg-[#131316] p-5 rounded-2xl border border-stone-800">
+            <div className="text-base sm:text-lg text-stone-200 leading-relaxed whitespace-pre-line bg-[#101116] p-5 sm:p-6 rounded-2xl border border-stone-800">
               {currentEvent.scene}
             </div>
 
             {/* If user hasn't chosen yet */}
             {gameState === 'growth' && (
-              <div className="space-y-3 pt-2">
-                <span className="text-xs font-serif text-stone-400 block tracking-wider">
+              <div className="space-y-3.5 pt-2">
+                <span className="text-base font-bold text-stone-200 block tracking-wide">
                   做出你的抉择：
                 </span>
                 {currentEvent.choices.map((choice, cIdx) => (
                   <button
                     key={cIdx}
                     onClick={() => handleChooseGrowth(choice)}
-                    className="w-full text-left p-4 sm:p-5 rounded-2xl bg-[#1D1D22] hover:bg-[#25252C] border border-stone-700/80 hover:border-amber-500/60 transition-all group"
+                    className="w-full text-left p-5 rounded-2xl bg-[#1D1E28] hover:bg-[#252634] border border-stone-700/80 hover:border-amber-500/60 transition-all group"
                   >
-                    <div className="text-base sm:text-lg font-serif font-semibold text-stone-100 group-hover:text-amber-300 transition-colors mb-1.5">
+                    <div className="text-base sm:text-lg font-bold text-stone-100 group-hover:text-amber-300 transition-colors mb-1.5">
                       {choice.text}
                     </div>
-                    <div className="text-xs sm:text-sm font-serif text-stone-400 leading-relaxed">
+                    <div className="text-sm sm:text-base text-stone-300 leading-relaxed">
                       {choice.detail}
                     </div>
                   </button>
@@ -773,19 +767,19 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
 
             {/* If user just picked, show immediate emotional aftermath */}
             {gameState === 'growth_outcome' && currentPendingReaction && (
-              <div className="space-y-4 pt-2">
+              <div className="space-y-5 pt-2">
                 <div className="bg-amber-950/20 border border-amber-800/40 rounded-2xl p-5">
-                  <span className="text-amber-400 font-serif text-xs block mb-1.5">
+                  <span className="text-amber-400 text-sm font-bold block mb-2">
                     生活的回响：
                   </span>
-                  <p className="text-base sm:text-lg text-stone-100 font-serif leading-relaxed italic">
-                    “{currentPendingReaction.reaction}”
+                  <p className="text-base sm:text-lg text-stone-100 leading-relaxed">
+                    「{currentPendingReaction.reaction}」
                   </p>
                 </div>
 
                 <button
                   onClick={handleNextGrowthNode}
-                  className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-bold text-lg transition-all flex items-center justify-center gap-2"
                 >
                   {currentEventIdx === K12_EVENTS.length - 1
                     ? '高考放榜：查阅系统为你算出的考分与大学'
@@ -807,65 +801,65 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   // =========================================================================
   if (gameState === 'diagnosis' && diagnosis) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-12 font-serif">
         <div className="text-center mb-8">
-          <span className="text-xs font-serif px-3 py-1 rounded-full bg-amber-950/50 text-amber-300 border border-amber-800/50 inline-block mb-3">
+          <span className="text-sm px-3.5 py-1.5 rounded-full bg-amber-950/50 text-amber-300 border border-amber-800/50 inline-block mb-3">
             二十七岁 · 走向社会第五年
           </span>
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-stone-100 tracking-tight mb-2.5">
             人生命运解构书
           </h1>
-          <p className="text-base text-stone-400 font-serif">
+          <p className="text-base sm:text-lg text-stone-300">
             二十七年的多米诺骨牌在此收拢，你的骨骼成色已现
           </p>
         </div>
 
         {/* Diagnosis Parchment */}
-        <div className="bg-[#18181C] border border-amber-800/50 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6">
+        <div className="bg-[#16171E] border border-amber-800/50 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-7">
           {/* Headline Verdict */}
           <div className="text-center pb-6 border-b border-stone-800">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-amber-400 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-amber-400 mb-2.5">
               {diagnosis.title}
             </h2>
-            <p className="text-stone-300 font-serif text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
+            <p className="text-stone-200 text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
               {diagnosis.portrait}
             </p>
           </div>
 
           {/* Deep Narrative Breakdowns */}
-          <div className="space-y-3 font-serif text-sm sm:text-base text-stone-300 leading-relaxed">
-            <div className="bg-[#1C1715] p-4 rounded-xl border border-amber-950/80">
-              <span className="text-amber-400 font-semibold block mb-1">
+          <div className="space-y-4 text-base sm:text-lg text-stone-200 leading-relaxed">
+            <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
+              <span className="text-amber-400 font-bold block mb-1.5">
                 故土与血缘审判：
               </span>
               {diagnosis.kinshipEvaluation}
             </div>
 
-            <div className="bg-[#151719] p-4 rounded-xl border border-stone-800">
-              <span className="text-sky-400 font-semibold block mb-1">
+            <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
+              <span className="text-sky-400 font-bold block mb-1.5">
                 秩序与体制审查：
               </span>
               {diagnosis.systemEvaluation}
             </div>
 
-            <div className="bg-stone-900/60 p-4 rounded-xl border border-stone-800 italic">
-              <span className="text-stone-400 font-semibold block mb-1">
+            <div className="bg-[#101116] p-5 rounded-2xl border border-stone-800">
+              <span className="text-stone-300 font-bold block mb-1.5">
                 宿命判词：
               </span>
-              “{diagnosis.fateVerdict}”
+              「{diagnosis.fateVerdict}」
             </div>
           </div>
 
           {/* Accumulated Tags */}
           <div>
-            <span className="text-xs font-serif text-stone-500 block mb-2">
+            <span className="text-sm text-stone-400 block mb-2.5">
               前二十七年铭刻在你身上的烙印：
             </span>
             <div className="flex flex-wrap gap-2">
               {tags.map((t) => (
                 <span
                   key={t}
-                  className="px-2.5 py-1 rounded-lg bg-stone-800 text-stone-300 text-xs font-serif border border-stone-700"
+                  className="px-3 py-1 rounded-xl bg-stone-900 text-stone-200 text-sm border border-stone-800"
                 >
                   #{t}
                 </span>
@@ -875,31 +869,31 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
 
           {/* Target Country Selection if Emigrating */}
           <div className="pt-6 border-t border-stone-800">
-            <span className="text-sm font-serif text-stone-300 font-semibold block mb-3">
+            <span className="text-base sm:text-lg font-bold text-stone-100 block mb-3.5">
               若选择出海，你的第一站备选：
             </span>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {TARGET_COUNTRIES.map((country) => (
                 <button
                   key={country.id}
                   onClick={() => setSelectedCountry(country)}
-                  className={`p-3 rounded-xl border text-left font-serif transition-all ${
+                  className={`p-3.5 rounded-2xl border text-left transition-all ${
                     selectedCountry.id === country.id
                       ? 'bg-amber-950/40 border-amber-500 text-white'
                       : 'bg-stone-900/60 border-stone-800 text-stone-400 hover:text-stone-200'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-base font-bold mb-1">
+                  <div className="flex items-center gap-2 text-base sm:text-lg font-bold mb-1">
                     <span>{country.flag}</span>
                     <span>{country.name}</span>
                   </div>
-                  <span className="text-xs text-stone-500 block line-clamp-1">
+                  <span className="text-sm text-stone-400 block line-clamp-1">
                     {country.city}
                   </span>
                 </button>
               ))}
             </div>
-            <p className="text-xs font-serif text-stone-400 mt-2">
+            <p className="text-sm sm:text-base text-stone-300 mt-3 leading-relaxed">
               {selectedCountry.flag} {selectedCountry.name}（{selectedCountry.city}）：
               {selectedCountry.tagline}。{selectedCountry.costDesc}。
             </p>
@@ -909,20 +903,20 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
           <div className="pt-6 border-t border-stone-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
               onClick={() => handleDecide27Fork('stay')}
-              className="py-4 px-5 rounded-2xl bg-[#221C18] hover:bg-[#2C241F] border border-amber-900/50 hover:border-amber-700 text-stone-200 font-serif font-bold text-base transition-all text-center"
+              className="py-4 px-5 rounded-2xl bg-[#201B17] hover:bg-[#28221D] border border-amber-900/50 hover:border-amber-700 text-stone-200 font-bold text-base sm:text-lg transition-all text-center"
             >
               【留在此岸 · 扎根故土】
-              <span className="block text-xs font-normal text-stone-400 mt-1 font-sans">
+              <span className="block text-sm font-normal text-stone-400 mt-1 font-sans">
                 接纳熟人社会的秩序、房贷与生老病死
               </span>
             </button>
 
             <button
               onClick={() => handleDecide27Fork('emigrate')}
-              className="py-4 px-5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-bold text-base transition-all text-center shadow-lg shadow-amber-950/30"
+              className="py-4 px-5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-base sm:text-lg transition-all text-center shadow-lg shadow-amber-950/30"
             >
               【断脐出海 · 奔赴{selectedCountry.name}】
-              <span className="block text-xs font-normal text-stone-900/80 mt-1 font-sans">
+              <span className="block text-sm font-normal text-stone-900/80 mt-1 font-sans">
                 斩断宗族与内卷，用一生清冷换取个人主权
               </span>
             </button>
@@ -939,16 +933,16 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
     const stage = PARALLEL_LIVES_MILESTONES[parallelIdx];
 
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 font-serif">
         {/* Top Header */}
         <div className="text-center mb-8">
-          <span className="text-xs font-serif px-3 py-1 rounded-full bg-stone-800 text-stone-400 inline-block mb-2">
+          <span className="text-sm px-3.5 py-1.5 rounded-full bg-stone-800 text-stone-300 inline-block mb-2.5">
             平行时空对照记 · {parallelIdx + 1} / {PARALLEL_LIVES_MILESTONES.length}
           </span>
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-bold text-stone-100 tracking-tight">
             {stage.title}
           </h1>
-          <p className="text-sm sm:text-base text-stone-400 font-serif mt-1">
+          <p className="text-base text-stone-300 mt-1.5">
             命题：{stage.theme}
           </p>
         </div>
@@ -957,75 +951,75 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
           {/* Left Column: Emigrated You */}
           <div
-            className={`rounded-3xl p-6 border transition-all ${
+            className={`rounded-3xl p-6 sm:p-7 border transition-all ${
               chosenPath === 'emigrate'
-                ? 'bg-[#18181C] border-amber-600/60 shadow-xl ring-1 ring-amber-500/20'
-                : 'bg-[#131316] border-stone-800/80 opacity-80'
+                ? 'bg-[#16171E] border-amber-600/60 shadow-xl ring-1 ring-amber-500/20'
+                : 'bg-[#111216] border-stone-800/80 opacity-80'
             }`}
           >
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-stone-800">
-              <span className="font-serif font-bold text-stone-100 flex items-center gap-1.5 text-base sm:text-lg">
+            <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-stone-800">
+              <span className="font-bold text-stone-100 flex items-center gap-2 text-lg sm:text-xl">
                 <span>{selectedCountry.flag}</span>
                 <span>【在异邦的你】</span>
               </span>
               {chosenPath === 'emigrate' && (
-                <span className="text-xs font-serif px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="text-sm px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   你选择的现实
                 </span>
               )}
             </div>
 
-            <p className="text-stone-200 font-serif text-base sm:text-lg leading-relaxed whitespace-pre-line mb-4">
+            <p className="text-stone-200 text-base sm:text-lg leading-relaxed whitespace-pre-line mb-5">
               {stage.emigratedScene}
             </p>
 
-            <div className="bg-stone-900/60 p-4 rounded-xl border border-stone-800 text-xs sm:text-sm font-serif text-stone-400 italic">
-              {stage.emigratedReflection}
+            <div className="bg-[#0E0F13] p-4 rounded-xl border border-stone-800 text-sm sm:text-base text-stone-300 leading-relaxed">
+              「{stage.emigratedReflection}」
             </div>
           </div>
 
           {/* Right Column: Stayed in China You */}
           <div
-            className={`rounded-3xl p-6 border transition-all ${
+            className={`rounded-3xl p-6 sm:p-7 border transition-all ${
               chosenPath === 'stay'
-                ? 'bg-[#18181C] border-amber-600/60 shadow-xl ring-1 ring-amber-500/20'
-                : 'bg-[#131316] border-stone-800/80 opacity-80'
+                ? 'bg-[#16171E] border-amber-600/60 shadow-xl ring-1 ring-amber-500/20'
+                : 'bg-[#111216] border-stone-800/80 opacity-80'
             }`}
           >
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-stone-800">
-              <span className="font-serif font-bold text-stone-100 flex items-center gap-1.5 text-base sm:text-lg">
+            <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-stone-800">
+              <span className="font-bold text-stone-100 flex items-center gap-2 text-lg sm:text-xl">
                 <span>🇨🇳</span>
                 <span>【留在国内的你】</span>
               </span>
               {chosenPath === 'stay' && (
-                <span className="text-xs font-serif px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="text-sm px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   你选择的现实
                 </span>
               )}
             </div>
 
-            <p className="text-stone-200 font-serif text-base sm:text-lg leading-relaxed whitespace-pre-line mb-4">
+            <p className="text-stone-200 text-base sm:text-lg leading-relaxed whitespace-pre-line mb-5">
               {stage.stayedScene}
             </p>
 
-            <div className="bg-stone-900/60 p-4 rounded-xl border border-stone-800 text-xs sm:text-sm font-serif text-stone-400 italic">
-              {stage.stayedReflection}
+            <div className="bg-[#0E0F13] p-4 rounded-xl border border-stone-800 text-sm sm:text-base text-stone-300 leading-relaxed">
+              「{stage.stayedReflection}」
             </div>
           </div>
         </div>
 
         {/* Milestone Resolution & Advance */}
-        <div className="bg-[#17171A] border border-stone-800 rounded-3xl p-6 sm:p-8 mt-6">
-          <div className="text-stone-300 font-serif text-base sm:text-lg leading-relaxed mb-4">
+        <div className="bg-[#14151B] border border-stone-800 rounded-3xl p-6 sm:p-8 mt-6">
+          <div className="text-stone-200 text-base sm:text-lg font-bold leading-relaxed mb-3">
             ➔ {stage.choice.text}
           </div>
-          <p className="text-stone-400 font-serif text-xs sm:text-sm italic mb-6">
-            “{stage.choice.detail}”
+          <p className="text-stone-300 text-sm sm:text-base mb-6 leading-relaxed">
+            「{stage.choice.detail}」
           </p>
 
           <button
             onClick={handleNextParallelMilestone}
-            className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 shadow-lg"
+            className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 shadow-lg"
           >
             {parallelIdx < PARALLEL_LIVES_MILESTONES.length - 1
               ? '跨入下一个人生大坎'
@@ -1044,107 +1038,107 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
     const verdict = generateFinalLifetimeVerdict(chosenPath, attrs, tags);
 
     return (
-      <div className="max-w-3xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-12 font-serif">
         <div className="text-center mb-8">
-          <span className="text-xs font-serif px-3 py-1 rounded-full bg-stone-800 text-stone-400 inline-block mb-3">
+          <span className="text-sm px-3.5 py-1.5 rounded-full bg-stone-800 text-stone-300 inline-block mb-3">
             六十三岁 · 法定退休之年
           </span>
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-stone-100 tracking-tight mb-2.5">
             六十三载人生判词
           </h1>
-          <p className="text-base text-stone-400 font-serif">
+          <p className="text-base sm:text-lg text-stone-300">
             所有的奔赴与逃避，终归于一抔尘土
           </p>
         </div>
 
         {/* Lifetime Parchment */}
-        <div className="bg-[#18181C] border border-amber-900/60 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6">
+        <div className="bg-[#16171E] border border-amber-900/60 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-7">
           <div className="text-center pb-6 border-b border-stone-800">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-amber-400 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-amber-400 mb-2">
               {verdict.summaryTitle}
             </h2>
-            <p className="text-stone-400 font-serif italic text-base sm:text-lg mb-4">
+            <p className="text-stone-300 text-base sm:text-lg mb-4">
               {verdict.tagline}
             </p>
-            <p className="text-stone-200 font-serif text-base sm:text-lg leading-relaxed text-justify bg-[#131316] p-5 rounded-2xl border border-stone-800">
+            <p className="text-stone-200 text-base sm:text-lg leading-relaxed text-justify bg-[#101116] p-6 rounded-2xl border border-stone-800">
               {verdict.verdictText}
             </p>
           </div>
 
           {/* Profile Retrospective */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center font-serif py-2 border-b border-stone-800 text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center py-2 border-b border-stone-800 text-sm sm:text-base">
             <div>
-              <span className="text-stone-500 block text-xs mb-1">人物原籍</span>
-              <span className="text-stone-200">{charData.family.region}</span>
+              <span className="text-stone-400 block text-xs sm:text-sm mb-1">人物原籍</span>
+              <span className="text-stone-100 font-medium">{charData.family.region}</span>
             </div>
             <div>
-              <span className="text-stone-500 block text-xs mb-1">最终归宿</span>
-              <span className="text-stone-200">
+              <span className="text-stone-400 block text-xs sm:text-sm mb-1">最终归宿</span>
+              <span className="text-stone-100 font-medium">
                 {chosenPath === 'emigrate' ? `${selectedCountry.name} · ${selectedCountry.city}` : '国内故土'}
               </span>
             </div>
             <div>
-              <span className="text-stone-500 block text-xs mb-1">反叛逆鳞</span>
-              <span className="text-rose-400 font-sans font-semibold">{attrs.rebellion}%</span>
+              <span className="text-stone-400 block text-xs sm:text-sm mb-1">反叛逆鳞</span>
+              <span className="text-rose-400 font-sans font-bold">{attrs.rebellion}%</span>
             </div>
             <div>
-              <span className="text-stone-500 block text-xs mb-1">宗族愧疚</span>
-              <span className="text-amber-400 font-sans font-semibold">{attrs.kinshipGuilt}%</span>
+              <span className="text-stone-400 block text-xs sm:text-sm mb-1">宗族愧疚</span>
+              <span className="text-amber-400 font-sans font-bold">{attrs.kinshipGuilt}%</span>
             </div>
           </div>
 
           {/* Chronicle List */}
-          <div className="space-y-3 pt-2">
-            <span className="text-xs font-serif text-stone-500 block uppercase tracking-wider">
+          <div className="space-y-3.5 pt-2">
+            <span className="text-sm text-stone-400 block uppercase tracking-wider font-medium">
               此生完整轨迹手札
             </span>
-            <div className="max-h-72 overflow-y-auto space-y-2 pr-2">
+            <div className="max-h-72 overflow-y-auto space-y-2.5 pr-2">
               {historyNotes.map((note, idx) => (
                 <div
                   key={idx}
-                  className="bg-[#121215] p-3 rounded-xl border border-stone-800/80 text-xs font-serif"
+                  className="bg-[#101116] p-3.5 rounded-xl border border-stone-800/80 text-sm"
                 >
-                  <div className="flex justify-between text-stone-500 mb-1">
-                    <span className="text-stone-300 font-semibold">{note.stageName}</span>
+                  <div className="flex justify-between text-stone-400 mb-1">
+                    <span className="text-stone-200 font-bold">{note.stageName}</span>
                     <span>{note.title}</span>
                   </div>
-                  <p className="text-stone-200">➔ {note.choiceText}</p>
+                  <p className="text-stone-100">➔ {note.choiceText}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Action CTAs */}
-          <div className="pt-6 border-t border-stone-800 space-y-3">
+          <div className="pt-6 border-t border-stone-800 space-y-3.5">
             <button
               onClick={handleCopyChronicle}
-              className="w-full py-3.5 px-6 rounded-2xl bg-stone-800 hover:bg-stone-700 active:bg-stone-900 text-stone-200 font-serif font-medium text-base transition-all flex items-center justify-center gap-2 border border-stone-700"
+              className="w-full py-4 px-6 rounded-2xl bg-stone-800 hover:bg-stone-700 active:bg-stone-900 text-stone-200 font-medium text-base transition-all flex items-center justify-center gap-2 border border-stone-700"
             >
               {copied ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-400" />
+                  <Check className="w-5 h-5 text-emerald-400" />
                   已复制完整六十三载人生手札
                 </>
               ) : (
                 <>
-                  <Copy className="w-4 h-4" />
+                  <Copy className="w-5 h-5" />
                   复制一生手札，分享这一世
                 </>
               )}
             </button>
 
             {chosenPath === 'emigrate' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                 <button
                   onClick={() => onNavigateToSubclasses(selectedCountry.id)}
-                  className="py-3 px-4 rounded-xl bg-amber-950/40 hover:bg-amber-900/50 border border-amber-700/50 text-amber-200 font-serif text-sm flex items-center justify-center gap-1.5 transition-colors"
+                  className="py-3.5 px-4 rounded-xl bg-amber-950/40 hover:bg-amber-900/50 border border-amber-700/50 text-amber-200 text-sm sm:text-base flex items-center justify-center gap-2 transition-colors"
                 >
                   <Compass className="w-4 h-4" />
                   查阅{selectedCountry.name}真实签证与算分
                 </button>
                 <button
                   onClick={() => onNavigateToDIY(selectedCountry.id)}
-                  className="py-3 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 font-serif text-sm flex items-center justify-center gap-1.5 transition-colors"
+                  className="py-3.5 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 text-sm sm:text-base flex items-center justify-center gap-2 transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
                   查阅{selectedCountry.name}手搓落地清单
@@ -1154,9 +1148,9 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
 
             <button
               onClick={triggerBirthReel}
-              className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-bold text-base transition-all flex items-center justify-center gap-2 mt-2"
+              className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 mt-2"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-5 h-5" />
               换一张底牌，再活一次
             </button>
           </div>
