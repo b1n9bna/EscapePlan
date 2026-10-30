@@ -13,14 +13,10 @@ import {
   RotateCcw,
   BookOpen,
   RefreshCw,
-  MapPin,
-  GraduationCap,
   Wallet,
-  Calendar,
   CheckSquare,
   Copy,
-  Check,
-  Compass
+  Check
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -113,20 +109,20 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   };
 
   const handleCopySummary = () => {
-    const text = `【双城生存手记档案 · 离土者的五年】
-档案编号：#8B-${profile.id.toUpperCase()}-${profile.targetCountryId.toUpperCase()}
-人物档案：${profile.name} (${profile.age}岁 · ${profile.profession.name})
+    const text = `【双城生存手记 · 离土者的五年】
+人物档案：${profile.name} (${profile.age}岁 · ${profile.gender} · ${profile.profession.name})
 老家原籍：${profile.hometown} (${profile.familyRole})
 移居终点：${activeCountryObj.name} · ${activeCountryObj.city}
 
 双维坐标：
 - 现代个体独立度：${individualSovereignty}% (摆脱宗族凝视，建立自我边界)
 - 故土宗族羁绊度：${soilKinshipTies}% (血缘牵绊与远距离孝道)
-- 结余储蓄现金：¥${savings.toLocaleString()} RMB
+- 最终结余积蓄：¥${savings.toLocaleString()} RMB
 
-社会学手记评语：
-你终于成了一个“离土自洽”的现代人。你脱离了老家那张密不透风的熟人差序格局，获得了属于自己的辽阔与安宁；而故土的那抹炊烟，终于退成了一枚安静守候的文化胎记。
-——摘自 EscapePlan《双城生活模拟》`;
+社会学观察手记：
+五年过去了，没有发大财，银行卡里依然只有几万块钱。但你终于成了一个“离土自洽”的现代人。
+你脱离了老家那张密不透风、既温暖又窒息的熟人差序网，获得了属于自己的辽阔与安宁；而故土的那抹炊烟与父母眼角的白发，终于退成了一枚安静守候的文化胎记。
+——摘自 EscapePlan《双城生活手记》`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -134,131 +130,134 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   };
 
   // =========================================================================
-  // VIEW 1: IDENTITY CARD & SOIL BACKGROUND
+  // VIEW 1: IDENTITY CARD & LITERARY ORIGIN (WARM EDITORIAL PARCHMENT)
   // =========================================================================
   if (gameState === 'setup') {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/80 text-slate-300 text-xs mb-3 border border-slate-700/60 font-mono">
-            <Compass className="w-3.5 h-3.5 text-blue-400" />
-            <span>乡土中国与离土之人 · 双城对照手记</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight mb-2">
-            如果这就是你抽到的人生底牌
+        {/* Literary Header */}
+        <div className="text-center mb-10">
+          <p className="text-sm sm:text-base font-serif tracking-widest text-amber-500/90 uppercase mb-2">
+            从乡土中国走出的离土之人
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight mb-4">
+            抽一张普通人的底牌
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
-            生活从来没有自定义难度。每个离土远行的人，都有一片濡湿稠密的故土。翻开这本五年手记，看异邦的柴米油盐，如何与老家的人情差序隔洋呼应。
+          <p className="text-base sm:text-lg text-stone-400 max-w-xl mx-auto font-serif leading-relaxed">
+            生活从来没有自定义难度。每个离土远行的人，身后都系着一片濡湿稠密的故土。翻开这本五年手记，看异邦的柴米油盐，如何与老家的人情差序隔洋呼应。
           </p>
         </div>
 
-        {/* Profile Card */}
-        <div className={`bg-[#111722] border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl transition-all duration-200 ${isRolling ? 'opacity-50' : 'opacity-100'}`}>
+        {/* Paper-like Dossier Card */}
+        <div
+          className={`bg-[#17171A] border border-stone-800 rounded-3xl p-6 sm:p-10 shadow-2xl transition-all duration-200 ${
+            isRolling ? 'opacity-50' : 'opacity-100'
+          }`}
+        >
           {/* Header Row */}
-          <div className="flex items-start justify-between pb-5 border-b border-slate-800">
+          <div className="flex items-start justify-between pb-6 border-b border-stone-800">
             <div>
-              <div className="flex items-center space-x-2.5 mb-1.5">
-                <span className="text-xl font-bold text-white">{profile.name}</span>
-                <span className="text-xs text-slate-400 font-mono">
+              <div className="flex flex-wrap items-baseline gap-3 mb-2">
+                <span className="text-2xl sm:text-3xl font-serif font-bold text-stone-100">
+                  {profile.name}
+                </span>
+                <span className="text-base text-stone-400 font-serif">
                   {profile.age} 岁 · {profile.gender}
                 </span>
-                <span className="text-[11px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                <span className="text-xs sm:text-sm font-serif px-2.5 py-0.5 rounded-full bg-amber-950/40 text-amber-200 border border-amber-800/40">
                   {profile.familyRole}
                 </span>
               </div>
-              <p className="text-xs text-blue-400 font-medium">
+              <p className="text-base text-stone-300 font-medium">
                 {profile.profession.name}
               </p>
             </div>
-            <span className="text-3xl p-2 rounded-xl bg-slate-900 border border-slate-800">
+            <span className="text-4xl p-2.5 rounded-2xl bg-stone-900 border border-stone-800">
               {profile.profession.icon}
             </span>
           </div>
 
           {/* Mundane Profession Background */}
-          <p className="text-xs text-slate-400 my-4 leading-relaxed bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800/60 font-serif">
+          <p className="text-base sm:text-lg text-stone-300 my-5 font-serif leading-relaxed bg-[#121215] p-5 rounded-2xl border border-stone-800/70">
             {profile.profession.backgroundDesc}
           </p>
 
-          {/* Fei Xiaotong Soil Background Insight */}
-          <div className="bg-[#0B0F17] border border-slate-800 rounded-xl p-4 my-4 space-y-2 text-xs">
-            <span className="text-slate-400 font-medium block">
+          {/* Fei Xiaotong Kinship Context */}
+          <div className="bg-[#1C1715] border border-amber-900/30 rounded-2xl p-5 my-5 space-y-2">
+            <span className="text-amber-400 font-serif font-semibold text-sm sm:text-base block">
               🌾 原生乡土差序格局特征：
             </span>
-            <p className="text-slate-300 font-serif leading-relaxed text-[13px]">
+            <p className="text-stone-200 font-serif text-base sm:text-lg leading-relaxed">
               {profile.soilTiesDesc}
             </p>
           </div>
 
-          {/* Hard Attributes Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4 pt-3 border-t border-slate-800/60 text-xs text-slate-300">
-            <div className="flex items-center space-x-2">
-              <GraduationCap className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-              <span className="text-slate-500">学历背景：</span>
-              <span>{profile.education}</span>
+          {/* Hard Attributes Grid (Readable & Clean) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-5 pt-4 border-t border-stone-800 text-sm sm:text-base text-stone-300 font-serif">
+            <div>
+              <span className="text-stone-500 block text-xs sm:text-sm mb-1">学历背景</span>
+              <span className="text-stone-200 font-medium">{profile.education}</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-              <span className="text-slate-500">老家起点：</span>
-              <span className="truncate">{profile.hometown}</span>
+            <div>
+              <span className="text-stone-500 block text-xs sm:text-sm mb-1">老家起点</span>
+              <span className="text-stone-200 font-medium">{profile.hometown}</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Wallet className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-              <span className="text-slate-500">初始积蓄：</span>
-              <span className="font-mono text-emerald-400 font-semibold">
-                ¥{profile.initialSavingsRMB.toLocaleString()}
+            <div>
+              <span className="text-stone-500 block text-xs sm:text-sm mb-1">初始积蓄</span>
+              <span className="text-emerald-400 font-semibold font-sans text-base sm:text-lg">
+                ¥{profile.initialSavingsRMB.toLocaleString()} 元
               </span>
             </div>
           </div>
 
           {/* Destination Selector */}
-          <div className="pt-4 border-t border-slate-800 mt-2">
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs text-slate-400 font-medium">
+          <div className="pt-6 border-t border-stone-800 mt-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-1">
+              <span className="text-base text-stone-300 font-serif font-semibold">
                 目标移居地 (离土之后的落脚点)：
               </span>
-              <span className="text-[11px] text-slate-500 font-mono">
+              <span className="text-sm text-stone-400 font-serif">
                 {activeCountryObj.city}
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
               {SIM_COUNTRIES.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => setProfile((p) => ({ ...p, targetCountryId: c.id }))}
-                  className={`p-2.5 rounded-xl border text-xs text-left transition ${
+                  className={`p-3.5 rounded-2xl border text-sm sm:text-base text-left transition-all ${
                     c.id === profile.targetCountryId
-                      ? 'bg-blue-600/20 border-blue-500 text-white font-medium'
-                      : 'bg-[#0B0F17] border-slate-800 text-slate-400 hover:border-slate-700'
+                      ? 'bg-amber-950/30 border-amber-500 text-amber-100 font-medium shadow-md shadow-amber-950/20'
+                      : 'bg-[#121215] border-stone-800 text-stone-400 hover:border-stone-700 hover:text-stone-200'
                   }`}
                 >
-                  <span className="block text-base mb-0.5">{c.flag}</span>
-                  <span className="truncate block font-semibold">{c.name}</span>
+                  <span className="block text-xl mb-1">{c.flag}</span>
+                  <span className="font-serif block font-semibold">{c.name}</span>
                 </button>
               ))}
             </div>
 
-            <div className="bg-[#0B0F17] p-3 rounded-xl border border-slate-800/80 text-[11px] text-slate-400 font-serif leading-relaxed">
-              <strong className="text-slate-300 mr-1.5 font-sans">文化距离：</strong>
+            <div className="bg-[#121215] p-4 rounded-2xl border border-stone-800 text-sm sm:text-base text-stone-400 font-serif leading-relaxed">
+              <strong className="text-stone-200 mr-2 font-sans">文化距离：</strong>
               {activeCountryObj.culturalDistance}
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="mt-7 flex gap-3">
+          <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleRollNewLife}
               disabled={isRolling}
-              className="px-4 py-3 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs sm:text-sm font-medium transition flex items-center justify-center space-x-1.5"
+              className="px-6 py-4 rounded-2xl border border-stone-700 bg-stone-800 hover:bg-stone-700 text-stone-200 text-base font-medium transition flex items-center justify-center space-x-2"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-slate-400 ${isRolling ? 'animate-spin' : ''}`} />
-              <span>重新抽签 (换个人)</span>
+              <RefreshCw className={`w-4 h-4 text-stone-400 ${isRolling ? 'animate-spin' : ''}`} />
+              <span className="font-serif">重新抽签 (换个人)</span>
             </button>
 
             <button
               onClick={handleStartDiary}
-              className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 shadow-md shadow-blue-600/20"
+              className="flex-1 py-4 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white text-base sm:text-lg font-serif font-semibold transition flex items-center justify-center space-x-2 shadow-lg shadow-amber-700/20"
             >
               <span>翻开双城五年手记 ➜</span>
             </button>
@@ -269,119 +268,119 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   }
 
   // =========================================================================
-  // VIEW 2: DUAL-COLUMN SPLIT SCENE (HERE VS THERE)
+  // VIEW 2: DUAL-COLUMN SPLIT SCENE (READABLE & LITERARY ESSAY STYLE)
   // =========================================================================
   if (gameState === 'reading' && currentEntry) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-10">
-        {/* Top Minimal Status Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-800 mb-6 text-xs gap-2">
-          <div className="flex items-center space-x-2">
-            <span className="text-base">{activeCountryObj.flag}</span>
-            <span className="text-slate-200 font-semibold">{profile.name}</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">{profile.familyRole}</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-emerald-400 font-mono">结余: ¥{savings.toLocaleString()}</span>
+        {/* Clean Reading Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-stone-800 mb-6 gap-2 text-sm sm:text-base font-serif">
+          <div className="flex items-center space-x-2.5">
+            <span className="text-xl">{activeCountryObj.flag}</span>
+            <span className="text-stone-100 font-bold">{profile.name}</span>
+            <span className="text-stone-600">•</span>
+            <span className="text-stone-400">{profile.familyRole}</span>
+            <span className="text-stone-600">•</span>
+            <span className="text-emerald-400 font-sans font-medium">
+              结余 ¥{savings.toLocaleString()}
+            </span>
           </div>
 
-          {/* Timeline Label */}
-          <div className="flex items-center space-x-1 font-mono text-slate-400 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800">
-            <Calendar className="w-3.5 h-3.5 text-slate-500" />
-            <span>{currentEntry.timeLabel}</span>
+          <div className="text-stone-400 font-serif">
+            {currentEntry.timeLabel}
           </div>
         </div>
 
-        {/* Phase Title */}
+        {/* Phase Title (Big & Dignified) */}
         <div className="mb-6">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-100 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-stone-100 tracking-tight leading-snug">
             {currentEntry.phaseTitle}
           </h2>
         </div>
 
-        {/* Dual Split Columns: Left = HERE (异邦), Right = THERE (故土) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* Dual Split Columns: Left = HERE (此岸), Right = THERE (彼岸) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
           {/* LEFT: HERE (此岸 · 异邦生活) */}
-          <div className="bg-[#111722] border border-slate-800/90 rounded-2xl p-5 sm:p-6 shadow-md flex flex-col justify-between">
+          <div className="bg-[#17171B] border border-stone-800 rounded-3xl p-6 sm:p-7 shadow-md flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-2.5 border-b border-slate-800/80 mb-3">
-                <span className="text-xs font-semibold text-blue-400 flex items-center space-x-1.5">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-800 mb-4">
+                <span className="text-base sm:text-lg font-serif font-bold text-stone-100 flex items-center space-x-2">
                   <span>🌊</span>
                   <span>{currentEntry.hereTitle}</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-500 uppercase">
-                  HERE · {activeCountryObj.name}
+                <span className="text-xs font-serif text-stone-500">
+                  此岸 · {activeCountryObj.name}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 font-serif leading-relaxed whitespace-pre-line">
+              <p className="text-base sm:text-lg text-stone-200 font-serif leading-loose whitespace-pre-line">
                 {currentEntry.hereText}
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-slate-800/60 text-[11px] text-slate-500 font-mono">
-              生活细节：独立立足、柴米油盐、个人边界
+            <div className="mt-5 pt-3.5 border-t border-stone-800/80 text-xs sm:text-sm text-stone-500 font-serif">
+              独立生活：自力更生、柴米油盐、个人边界
             </div>
           </div>
 
           {/* RIGHT: THERE (彼岸 · 故土差序) */}
-          <div className="bg-[#121620] border border-amber-900/30 rounded-2xl p-5 sm:p-6 shadow-md flex flex-col justify-between">
+          <div className="bg-[#1D1714] border border-amber-900/30 rounded-3xl p-6 sm:p-7 shadow-md flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-2.5 border-b border-amber-900/30 mb-3">
-                <span className="text-xs font-semibold text-amber-300/90 flex items-center space-x-1.5">
+              <div className="flex items-center justify-between pb-3 border-b border-amber-900/30 mb-4">
+                <span className="text-base sm:text-lg font-serif font-bold text-amber-200 flex items-center space-x-2">
                   <span>🏮</span>
                   <span>{currentEntry.thereTitle}</span>
                 </span>
-                <span className="text-[10px] font-mono text-amber-500/70 uppercase">
-                  THERE · 老家故土
+                <span className="text-xs font-serif text-amber-500/70">
+                  彼岸 · 老家故土
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-300 font-serif leading-relaxed whitespace-pre-line">
+              <p className="text-base sm:text-lg text-stone-200 font-serif leading-loose whitespace-pre-line">
                 {currentEntry.thereText}
               </p>
             </div>
-            <div className="mt-4 pt-3 border-t border-amber-900/20 text-[11px] text-amber-500/80 font-mono">
+            <div className="mt-5 pt-3.5 border-t border-amber-900/20 text-xs sm:text-sm text-amber-500/80 font-serif">
               乡土回响：人情礼数、宗族血缘、亲情羁绊
             </div>
           </div>
         </div>
 
-        {/* Middle: Fei Xiaotong Sociological Footnote */}
-        <div className="bg-[#0B0F17] border border-slate-800 rounded-xl p-4 sm:p-4.5 mb-6 text-xs leading-relaxed font-serif text-slate-400">
-          <p className="italic text-slate-300">
+        {/* Middle: Fei Xiaotong Book Excerpt Blockquote */}
+        <div className="bg-[#151413] border-l-4 border-amber-600/70 border-r border-t border-b border-stone-800 rounded-r-2xl p-5 sm:p-6 mb-7">
+          <p className="text-base sm:text-lg font-serif italic text-stone-200 leading-relaxed">
             {currentEntry.sociologicalFootnote}
           </p>
         </div>
 
-        {/* Dual Choices */}
-        <div className="bg-[#111722] border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl">
-          <span className="text-xs text-slate-400 block mb-3 font-medium">
+        {/* Dual Choices (Comfortable, Large Reading Cards) */}
+        <div className="bg-[#17171A] border border-stone-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+          <p className="text-base sm:text-lg text-stone-200 font-serif font-semibold mb-4">
             面对此岸的现实与彼岸的牵引，你做出怎样的回应？
-          </span>
+          </p>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {currentEntry.choices.map((choice, idx) => (
               <div
                 key={idx}
                 onClick={() => handleChoose(choice)}
-                className="p-4 rounded-xl border border-slate-800 bg-[#0B0F17] hover:border-slate-600 hover:bg-slate-900/60 cursor-pointer transition text-left group"
+                className="p-5 rounded-2xl border border-stone-800 bg-[#121215] hover:border-amber-600/60 hover:bg-[#1A1816] cursor-pointer transition text-left group"
               >
-                <p className="text-xs sm:text-sm font-medium text-slate-200 group-hover:text-blue-300 leading-snug">
+                <p className="text-base sm:text-lg font-serif font-medium text-stone-100 group-hover:text-amber-200 leading-snug">
                   {choice.text}
                 </p>
-                <p className="text-[11px] text-slate-500 mt-1 font-serif">
+                <p className="text-sm sm:text-base text-stone-400 mt-1.5 font-serif leading-relaxed">
                   {choice.detail}
                 </p>
 
                 {/* Subtle Delta Hints */}
-                <div className="flex gap-3 mt-2 pt-2 border-t border-slate-800/40 text-[10px] font-mono text-slate-500">
+                <div className="flex flex-wrap gap-4 mt-3 pt-3 border-t border-stone-800/50 text-xs sm:text-sm font-serif text-stone-500">
                   {choice.fundsDelta !== 0 && (
-                    <span className={choice.fundsDelta > 0 ? 'text-emerald-400' : 'text-slate-400'}>
+                    <span className={choice.fundsDelta > 0 ? 'text-emerald-400 font-sans' : 'text-stone-400 font-sans'}>
                       结余 {choice.fundsDelta > 0 ? `+¥${choice.fundsDelta}` : `-¥${Math.abs(choice.fundsDelta)}`}
                     </span>
                   )}
-                  <span className={choice.individualSovereigntyDelta > 0 ? 'text-blue-400' : 'text-slate-400'}>
+                  <span className={choice.individualSovereigntyDelta > 0 ? 'text-stone-300' : 'text-stone-500'}>
                     个体独立度 {choice.individualSovereigntyDelta > 0 ? `+${choice.individualSovereigntyDelta}` : choice.individualSovereigntyDelta}%
                   </span>
-                  <span className={choice.soilKinshipTiesDelta > 0 ? 'text-amber-400' : 'text-slate-400'}>
+                  <span className={choice.soilKinshipTiesDelta > 0 ? 'text-amber-300' : 'text-stone-500'}>
                     故土羁绊 {choice.soilKinshipTiesDelta > 0 ? `+${choice.soilKinshipTiesDelta}` : choice.soilKinshipTiesDelta}%
                   </span>
                 </div>
@@ -394,25 +393,25 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   }
 
   // =========================================================================
-  // VIEW 3: OUTCOME TRANSITION
+  // VIEW 3: OUTCOME TRANSITION (BOOKISH ESSAY PAGE)
   // =========================================================================
   if (gameState === 'outcome' && selectedOutcome) {
     const isEnd = currentEntryIdx >= activeStories.length - 1;
 
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-[#111722] border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-          <span className="text-[11px] font-mono text-slate-500 uppercase block mb-2">
+      <div className="max-w-2xl mx-auto px-4 py-14">
+        <div className="bg-[#17171A] border border-stone-800 rounded-3xl p-7 sm:p-10 shadow-2xl">
+          <p className="text-xs sm:text-sm font-serif text-amber-500/90 tracking-widest uppercase mb-3">
             内心的回响 · 岁月注脚
-          </span>
+          </p>
 
-          <div className="p-5 rounded-xl bg-[#0B0F17] border border-slate-800 text-xs sm:text-sm text-slate-300 leading-relaxed font-serif mb-6 whitespace-pre-line">
+          <div className="p-6 sm:p-8 rounded-2xl bg-[#121215] border border-stone-800/80 text-base sm:text-lg text-stone-200 leading-loose font-serif mb-8 whitespace-pre-line">
             {selectedOutcome.reaction}
           </div>
 
           <button
             onClick={handleNextEntry}
-            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 shadow-md shadow-blue-600/20"
+            className="w-full py-4 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white text-base sm:text-lg font-serif font-semibold transition flex items-center justify-center space-x-2 shadow-lg shadow-amber-700/20"
           >
             <span>{isEnd ? '查看五年双城手记总结 ➜' : '时光继续向前流淌 ➜'}</span>
           </button>
@@ -422,102 +421,94 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   }
 
   // =========================================================================
-  // VIEW 4: FINAL MEMOIR & RECORD (双城生活手记档案)
+  // VIEW 4: FINAL MEMOIR (SERIOUS & RESPECTFUL RETROSPECTIVE)
   // =========================================================================
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <div className="bg-[#111722] border-2 border-slate-800 rounded-2xl p-6 sm:p-9 shadow-2xl relative">
-        {/* Subtle Archival Seal */}
-        <div className="absolute top-5 right-5 border border-slate-700/80 bg-slate-900/60 text-slate-400 px-2.5 py-1 rounded text-[10px] font-mono tracking-widest uppercase">
-          CHRONICLE · 5 YEARS
-        </div>
-
+      <div className="bg-[#17171A] border-2 border-stone-800 rounded-3xl p-7 sm:p-12 shadow-2xl relative">
         {/* Title & Metadata */}
-        <div className="text-center pb-6 border-b border-slate-800">
-          <span className="text-3xl mb-2 block">{activeCountryObj.flag}</span>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-1">
-            双城生存手记档案 · 离土者的五年
+        <div className="text-center pb-8 border-b border-stone-800">
+          <span className="text-4xl mb-3 block">{activeCountryObj.flag}</span>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-stone-100 tracking-tight mb-2">
+            双城生存手记 · 离土者的五年
           </h2>
-          <p className="text-xs text-slate-400 font-mono">
-            编号：#8B-{profile.id.toUpperCase()}-{profile.targetCountryId.toUpperCase()}-2026
-          </p>
-          <p className="text-xs text-slate-500 mt-1 font-serif">
+          <p className="text-base text-stone-400 font-serif">
             {profile.name} · {profile.age} 岁 · {profile.profession.name} · 原籍：{profile.hometown} ({profile.familyRole})
           </p>
         </div>
 
-        {/* Dual Dimension Balance */}
-        <div className="my-6">
-          <span className="text-[11px] font-mono text-slate-500 block mb-3 uppercase tracking-wider">
-            双维平衡定位 (Dual-World Position)
+        {/* Dual Dimension Balance Cards */}
+        <div className="my-8">
+          <span className="text-sm font-serif text-amber-500/90 block mb-3 uppercase tracking-wider">
+            双维平衡定位
           </span>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 text-xs">
-            <div className="bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800">
-              <div className="flex justify-between items-center mb-1.5">
-                <span className="text-slate-400">🌊 现代个体独立度</span>
-                <span className="font-mono text-blue-400 font-semibold">{individualSovereignty}%</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 text-base font-serif">
+            <div className="bg-[#121215] p-5 rounded-2xl border border-stone-800">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-stone-300 font-semibold">🌊 现代个体独立度</span>
+                <span className="font-sans text-stone-100 font-bold text-lg">{individualSovereignty}%</span>
               </div>
-              <p className="text-[11px] text-slate-500 font-serif">
+              <p className="text-sm text-stone-400 font-serif leading-relaxed">
                 脱离乡土熟人社会的凝视，在异邦建立属于自己的清爽边界与生活主权。
               </p>
             </div>
 
-            <div className="bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800">
-              <div className="flex justify-between items-center mb-1.5">
-                <span className="text-slate-400">🌾 故土差序羁绊度</span>
-                <span className="font-mono text-amber-400 font-semibold">{soilKinshipTies}%</span>
+            <div className="bg-[#121215] p-5 rounded-2xl border border-stone-800">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-amber-200 font-semibold">🌾 故土差序羁绊度</span>
+                <span className="font-sans text-amber-300 font-bold text-lg">{soilKinshipTies}%</span>
               </div>
-              <p className="text-[11px] text-slate-500 font-serif">
+              <p className="text-sm text-stone-400 font-serif leading-relaxed">
                 跨越半个地球的血缘牵绊，那些寄不出的腊肠、除夕夜的屏幕与隔洋转账。
               </p>
             </div>
           </div>
 
-          <div className="bg-[#0B0F17] p-3 rounded-xl border border-slate-800 text-xs flex justify-between items-center">
-            <span className="text-slate-400 flex items-center gap-1">
-              <Wallet className="w-3.5 h-3.5 text-emerald-400" /> 五年最终结余资产：
+          <div className="bg-[#121215] p-4.5 rounded-2xl border border-stone-800 text-base font-serif flex justify-between items-center">
+            <span className="text-stone-300 flex items-center gap-2">
+              <Wallet className="w-4 h-4 text-emerald-400" /> 五年最终结余资产：
             </span>
-            <span className="font-mono text-emerald-400 font-semibold text-sm">
+            <span className="font-sans text-emerald-400 font-bold text-lg">
               ¥{savings.toLocaleString()} RMB
             </span>
           </div>
         </div>
 
         {/* Timeline Footprints */}
-        <div className="my-6 space-y-3.5">
-          <span className="text-[11px] font-mono text-slate-500 block uppercase tracking-wider">
-            五年岁月双城印记 (Chronicle of Five Years)
+        <div className="my-8 space-y-5">
+          <span className="text-sm font-serif text-amber-500/90 block uppercase tracking-wider">
+            五年岁月双城印记
           </span>
           {historyNotes.map((note, idx) => (
-            <div key={idx} className="text-xs leading-relaxed border-l-2 border-slate-800 pl-4 py-1">
-              <span className="text-slate-500 font-mono block text-[11px] mb-0.5">
+            <div key={idx} className="text-base leading-relaxed border-l-2 border-stone-700 pl-5 py-1">
+              <span className="text-stone-500 font-serif block text-sm mb-1">
                 第 {note.year} 年 · {note.phaseTitle}
               </span>
-              <strong className="text-slate-300 block mb-1">{note.choiceText}</strong>
-              <p className="text-slate-400 font-serif">{note.reaction}</p>
+              <strong className="text-stone-200 font-serif block mb-1.5">{note.choiceText}</strong>
+              <p className="text-stone-400 font-serif leading-relaxed">{note.reaction}</p>
             </div>
           ))}
         </div>
 
         {/* Fei Xiaotong Sociological Closing Summary */}
-        <div className="p-4.5 rounded-xl bg-[#0B0F17] border border-slate-800 text-xs text-slate-300 font-serif leading-relaxed mb-6">
-          <p className="mb-2">
+        <div className="p-6 rounded-2xl bg-[#121215] border border-stone-800 text-base sm:text-lg text-stone-200 font-serif leading-loose mb-8">
+          <p className="mb-3">
             五年过去了，你没有发大财，银行卡里依然只有几万块钱。但你终于成了一个“离土自洽”的现代人。
           </p>
-          <p className="text-slate-400">
+          <p className="text-stone-400">
             你脱离了老家那张密不透风、既温暖又窒息的熟人差序网，在异邦获得了属于自己的辽阔与安宁；而故土的那抹炊烟与父母眼角的白发，终于退成了一枚安静守候的文化胎记。在此处生根，在记忆中止息。
           </p>
         </div>
 
-        {/* Buttons */}
-        <div className="space-y-2.5 pt-4 border-t border-slate-800 text-xs">
-          <div className="flex gap-2.5">
+        {/* Action Footers */}
+        <div className="space-y-3 pt-6 border-t border-stone-800 text-base font-serif">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleCopySummary}
-              className="flex-1 py-2.5 rounded-xl font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition flex items-center justify-center space-x-1.5 border border-slate-700"
+              className="flex-1 py-3.5 rounded-2xl font-medium bg-stone-800 hover:bg-stone-700 text-stone-200 transition flex items-center justify-center space-x-2 border border-stone-700"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-stone-400" />}
               <span>{copied ? '已复制双城手记' : '复制五年双城手记'}</span>
             </button>
 
@@ -527,27 +518,27 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
                 setGameState('setup');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="flex-1 py-2.5 rounded-xl font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center justify-center space-x-1.5"
+              className="flex-1 py-3.5 rounded-2xl font-medium bg-stone-800 hover:bg-stone-700 text-stone-300 transition flex items-center justify-center space-x-2"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
-              <span>重新抽签 (换个人体验)</span>
+              <RotateCcw className="w-4 h-4 text-stone-400" />
+              <span>重新抽签 (体验另一生)</span>
             </button>
           </div>
 
-          <div className="flex gap-2.5">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => onNavigateToSubclasses(profile.targetCountryId)}
-              className="flex-1 py-2.5 rounded-xl font-semibold bg-blue-600 hover:bg-blue-500 text-white transition flex items-center justify-center space-x-1.5 shadow-sm shadow-blue-600/20"
+              className="flex-1 py-3.5 rounded-2xl font-semibold bg-amber-600 hover:bg-amber-500 text-white transition flex items-center justify-center space-x-2 shadow-sm shadow-amber-600/20"
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <BookOpen className="w-4 h-4" />
               <span>查看该国真实签证政策</span>
             </button>
 
             <button
               onClick={() => onNavigateToDIY(profile.targetCountryId)}
-              className="flex-1 py-2.5 rounded-xl font-semibold bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 transition flex items-center justify-center space-x-1.5"
+              className="flex-1 py-3.5 rounded-2xl font-semibold bg-stone-800 text-emerald-400 border border-emerald-500/30 hover:bg-stone-700 transition flex items-center justify-center space-x-2"
             >
-              <CheckSquare className="w-3.5 h-3.5" />
+              <CheckSquare className="w-4 h-4" />
               <span>手搓避坑清单</span>
             </button>
           </div>
