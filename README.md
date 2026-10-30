@@ -1,5 +1,14 @@
 # EscapePlan
 
+<p align="center">
+  <a href="https://b1n9bna.github.io/EscapePlan/"><img src="https://img.shields.io/badge/Live_Demo-在线访问-indigo?style=flat-square&logo=githubpages&logoColor=white" alt="Live Demo"></a>
+  <img src="https://img.shields.io/badge/Server_Cost-¥0_(Pure_Static)-success?style=flat-square&logo=cloudflare" alt="Zero Server">
+  <img src="https://img.shields.io/badge/Privacy-100%25_Local_First-emerald?style=flat-square&logo=shield" alt="Local First">
+  <img src="https://img.shields.io/badge/Compute_Time-<10_ms-orange?style=flat-square&logo=lightning" alt="Compute Time">
+  <img src="https://img.shields.io/badge/Tech-React_|_Vite_|_Tailwind-blue?style=flat-square&logo=react" alt="Tech">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License"></a>
+</p>
+
 一个开源的海外移居参考与签证算分工具（纯前端实现，所有数据保存在浏览器本地）。
 
 在线页面：[https://b1n9bna.github.io/EscapePlan/](https://b1n9bna.github.io/EscapePlan/)
