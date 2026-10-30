@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import {
-  PROFESSIONS,
-  FUND_OPTIONS,
   SIM_COUNTRIES,
-  RANDOM_NAMES,
-  SIM_YEAR_EVENTS
+  SIM_YEAR_EVENTS,
+  generateRandomLife
 } from '../data/simulation';
 import type {
-  Profession,
   SimProfile,
   SimEventChoice,
   SimYearEvent
 } from '../data/simulation';
 import {
   Sparkles,
-  Dices,
   Heart,
   Wallet,
   Globe2,
@@ -24,7 +20,10 @@ import {
   RotateCcw,
   BookOpen,
   CheckCircle2,
-  Flame
+  Flame,
+  GraduationCap,
+  MapPin,
+  RefreshCw
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -39,19 +38,14 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Game states: 'setup' | 'simulating' | 'outcome_modal' | 'ending'
   const [gameState, setGameState] = useState<'setup' | 'simulating' | 'outcome_modal' | 'ending'>('setup');
 
-  // Character Profile
-  const [name, setName] = useState<string>('李想');
-  const [age, setAge] = useState<number>(27);
-  const [gender, setGender] = useState<'男' | '女' | '保密'>('男');
-  const [selectedProf, setSelectedProf] = useState<Profession>(PROFESSIONS[0]);
-  const [fundsRMB, setFundsRMB] = useState<number>(200000);
-  const [englishLevel, setEnglishLevel] = useState<SimProfile['englishLevel']>('四六级哑巴英语');
-  const [targetCountryId, setTargetCountryId] = useState<string>('japan');
+  // Pure Random Character Profile (Default rolled on load)
+  const [profile, setProfile] = useState<SimProfile>(() => generateRandomLife());
+  const [isRolling, setIsRolling] = useState<boolean>(false);
 
   // In-Game Live Metrics
   const [currentYearIdx, setCurrentYearIdx] = useState<number>(0);
   const [health, setHealth] = useState<number>(85);
-  const [currentFundsRMB, setCurrentFundsRMB] = useState<number>(200000);
+  const [currentFundsRMB, setCurrentFundsRMB] = useState<number>(profile.initialFundsRMB);
   const [languageSkill, setLanguageSkill] = useState<number>(30);
   const [prProgress, setPrProgress] = useState<number>(0);
   const [laozhongIndex, setLaozhongIndex] = useState<number>(60);
@@ -60,69 +54,58 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const [timelineLogs, setTimelineLogs] = useState<{ year: number; eventTitle: string; choiceText: string; narrative: string }[]>([]);
   const [currentOutcome, setCurrentOutcome] = useState<{ narrative: string; choice: SimEventChoice } | null>(null);
 
-  // Random Life generator (Inspired by 1in8b.life)
-  const handleRandomRoll = () => {
-    const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
-    const randomAge = Math.floor(Math.random() * 18) + 22; // 22 ~ 39
-    const randomGender: '男' | '女' = Math.random() > 0.5 ? '男' : '女';
-    const randomProf = PROFESSIONS[Math.floor(Math.random() * PROFESSIONS.length)];
-    const randomFund = FUND_OPTIONS[Math.floor(Math.random() * FUND_OPTIONS.length)].value;
-    const randomCountry = SIM_COUNTRIES[Math.floor(Math.random() * SIM_COUNTRIES.length)].id;
-    const engLevels: SimProfile['englishLevel'][] = [
-      '零基础纯靠比划',
-      '四六级哑巴英语',
-      '日常无障碍/雅思6分',
-      '精通/雅思7.5+'
-    ];
-    const randomEng = engLevels[Math.floor(Math.random() * engLevels.length)];
-
-    setName(randomName);
-    setAge(randomAge);
-    setGender(randomGender);
-    setSelectedProf(randomProf);
-    setFundsRMB(randomFund);
-    setTargetCountryId(randomCountry);
-    setEnglishLevel(randomEng);
-
-    try {
-      confetti({ particleCount: 30, spread: 60, origin: { y: 0.7 } });
-    } catch {
-      // ignore
-    }
+  // Re-roll random profile
+  const handleReRoll = () => {
+    setIsRolling(true);
+    setTimeout(() => {
+      const newLife = generateRandomLife();
+      setProfile(newLife);
+      setIsRolling(false);
+      try {
+        confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
+      } catch {
+        // ignore
+      }
+    }, 200);
   };
 
-  // Start the 5-year journey
+  // Start the 5-year journey with the rolled character
   const handleStartSim = () => {
-    setCurrentFundsRMB(fundsRMB);
+    setCurrentFundsRMB(profile.initialFundsRMB);
     setHealth(85);
     setPrProgress(0);
-    setLaozhongIndex(65);
     setCurrentYearIdx(0);
     setTimelineLogs([]);
 
-    // Language base based on initial English level
+    // Initial language skill calculation
     let initLang = 20;
-    if (englishLevel === '日常无障碍/雅思6分') initLang = 50;
-    if (englishLevel === '精通/雅思7.5+') initLang = 75;
+    if (profile.englishLevel === '日常无障碍/雅思6分') initLang = 50;
+    if (profile.englishLevel === '精通/雅思7.5+') initLang = 75;
+    if (profile.education === '重点大学本硕') initLang += 10;
     setLanguageSkill(initLang);
+
+    // Initial laozhong index based on trait
+    let initLaozhong = 60;
+    if (profile.trait.includes('老中胃')) initLaozhong = 90;
+    if (profile.trait.includes('社恐')) initLaozhong = 35;
+    if (profile.trait.includes('做题家')) initLaozhong = 70;
+    setLaozhongIndex(initLaozhong);
 
     setGameState('simulating');
   };
 
   // Get active country's events
-  const countryEvents: SimYearEvent[] = SIM_YEAR_EVENTS[targetCountryId] || SIM_YEAR_EVENTS['japan'];
+  const countryEvents: SimYearEvent[] = SIM_YEAR_EVENTS[profile.targetCountryId] || SIM_YEAR_EVENTS['japan'];
   const currentEvent: SimYearEvent | undefined = countryEvents[currentYearIdx];
 
   // Handle a choice
   const handleMakeChoice = (choice: SimEventChoice) => {
-    // Apply stat deltas
     setHealth((prev) => Math.min(100, Math.max(0, prev + (choice.effects.healthDelta || 0))));
     setCurrentFundsRMB((prev) => prev + (choice.effects.fundsDeltaRMB || 0));
     setLanguageSkill((prev) => Math.min(100, Math.max(0, prev + (choice.effects.languageDelta || 0))));
     setPrProgress((prev) => Math.min(100, Math.max(0, prev + (choice.effects.prProgressDelta || 0))));
     setLaozhongIndex((prev) => Math.min(100, Math.max(0, prev + (choice.effects.laozhongDelta || 0))));
 
-    // Record timeline log
     const newLogs = [
       ...timelineLogs,
       {
@@ -143,7 +126,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setCurrentYearIdx(currentYearIdx + 1);
       setGameState('simulating');
     } else {
-      // Game Over -> Ending
       setGameState('ending');
       try {
         confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
@@ -153,195 +135,177 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     }
   };
 
-  const currentCountryObj = SIM_COUNTRIES.find((c) => c.id === targetCountryId) || SIM_COUNTRIES[0];
+  const currentCountryObj = SIM_COUNTRIES.find((c) => c.id === profile.targetCountryId) || SIM_COUNTRIES[0];
 
   // =========================================================================
-  // VIEW 1: CHARACTER SETUP & DESTINY ROLL
+  // VIEW 1: PURE RANDOM BIRTH (GACHA LOTTERY CARD)
   // =========================================================================
   if (gameState === 'setup') {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Hero Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-3">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-3">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>灵感源自《80亿分之一》· 纯本地运算保护隐私</span>
+            <span>灵感源自《80亿分之一》· 出生与底牌无法选择</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
-            🎮 平行人生：全球移居与生存模拟器
+            🎲 移居命运轮盘：抽取你的初始底牌
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            不只是程序员！咖啡师、幼教、设计师、护士、电工技工、或是刚毕业的年轻人。
-            输入你的背景（或随机开局），开启一段充满现实抉择的 5 年移居推演。
+          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+            生活从来没有自定义难度。有人出生在大城市带上百万存款，有人只有大专学历和两三万积蓄。
+            在这个无法作弊的模拟器里，看看这副底牌能带你走多远！
           </p>
-
-          <button
-            onClick={handleRandomRoll}
-            className="mt-5 inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600/30 to-purple-600/30 hover:from-indigo-600/50 hover:to-purple-600/50 border border-indigo-500/40 text-indigo-200 text-xs sm:text-sm font-semibold transition-all shadow-lg shadow-indigo-500/10"
-          >
-            <Dices className="w-4 h-4 text-indigo-400" />
-            <span>🎲 随机抽取一个平行人生 (Random Life Roll)</span>
-          </button>
         </div>
 
-        {/* Character Creator Card */}
-        <div className="bg-[#121824] border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
-          <h3 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-4 pb-2 border-b border-slate-800">
-            第一步：设定你的角色画像
-          </h3>
+        {/* The Gacha Destiny Card */}
+        <div className={`bg-[#121824] border-2 border-indigo-500/40 rounded-3xl p-6 sm:p-9 shadow-2xl relative overflow-hidden transition-all duration-300 ${isRolling ? 'scale-[0.98] blur-[1px]' : 'scale-100'}`}>
+          {/* Ambient Glow */}
+          <div className="absolute -top-32 -right-32 w-72 h-72 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="text-xs font-medium text-slate-400 block mb-1.5">代号 / 姓名</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0F17] border border-slate-700 text-white text-sm focus:outline-none focus:border-blue-500"
-              />
+          {/* Top Stamp */}
+          <div className="flex items-center justify-between pb-5 border-b border-slate-800 text-xs">
+            <div className="flex items-center space-x-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="font-mono text-slate-400 tracking-wider">DESTINY LOTTERY CARD</span>
             </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono text-[11px] border border-slate-700">
+              抽卡结果 · 100% 随机生成
+            </span>
+          </div>
 
-            <div>
-              <label className="text-xs font-medium text-slate-400 block mb-1.5">年龄 ({age} 岁)</label>
-              <input
-                type="range"
-                min="20"
-                max="50"
-                value={age}
-                onChange={(e) => setAge(Number(e.target.value))}
-                className="w-full accent-blue-500 mt-2"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-medium text-slate-400 block mb-1.5">性别</label>
-              <div className="flex space-x-2">
-                {(['男', '女', '保密'] as const).map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => setGender(g)}
-                    className={`flex-1 py-2 rounded-xl text-xs font-medium border ${
-                      gender === g
-                        ? 'bg-blue-600 border-blue-500 text-white'
-                        : 'bg-[#0B0F17] border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    {g}
-                  </button>
-                ))}
+          {/* Main Character Identity Hero */}
+          <div className="my-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <span className="text-5xl sm:text-6xl p-3 bg-slate-900 rounded-2xl border border-slate-800 shadow-inner">
+                {profile.profession.icon}
+              </span>
+              <div>
+                <div className="flex items-center space-x-2 mb-1">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    {profile.name}
+                  </h2>
+                  <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    {profile.age} 岁 · {profile.gender}
+                  </span>
+                </div>
+                <p className="text-sm sm:text-base font-bold text-indigo-400">
+                  {profile.profession.name}
+                </p>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  {profile.profession.description}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Profession Selection */}
-          <div className="mb-6">
-            <label className="text-xs font-medium text-slate-400 block mb-2">
-              当前职业与专业背景 (点击选择)
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              {PROFESSIONS.map((prof) => {
-                const isSelected = prof.id === selectedProf.id;
-                return (
-                  <div
-                    key={prof.id}
-                    onClick={() => setSelectedProf(prof)}
-                    className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-blue-600/20 border-blue-500 text-white shadow-md shadow-blue-500/10'
-                        : 'bg-[#0B0F17] border-slate-800 text-slate-300 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-xl">{prof.icon}</span>
-                      <span className="text-xs font-bold truncate">{prof.name}</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-1">
-                      {prof.description}
-                    </p>
-                  </div>
-                );
-              })}
+          {/* 4 Attributes Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-6 text-xs">
+            <div className="bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800 flex items-start space-x-3">
+              <GraduationCap className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="text-slate-500 block mb-0.5">学历背景</span>
+                <span className="font-semibold text-slate-200">{profile.education}</span>
+              </div>
+            </div>
+
+            <div className="bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800 flex items-start space-x-3">
+              <MapPin className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="text-slate-500 block mb-0.5">出生与成长环境</span>
+                <span className="font-semibold text-slate-200">{profile.hometown}</span>
+              </div>
+            </div>
+
+            <div className="bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800 flex items-start space-x-3">
+              <Wallet className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="text-slate-500 block mb-0.5">初始可用启动金</span>
+                <span className="font-bold text-amber-300 font-mono text-sm">
+                  ¥{profile.initialFundsRMB.toLocaleString()} 元
+                </span>
+                <span className="text-[10px] text-slate-500 block mt-0.5">
+                  {profile.initialFundsRMB <= 50000 ? '⚠️ 极限破釜沉舟模式' : '拥有基础缓冲防守金'}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-[#0B0F17] p-3.5 rounded-xl border border-slate-800 flex items-start space-x-3">
+              <Globe2 className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="text-slate-500 block mb-0.5">外语初始掌握度</span>
+                <span className="font-semibold text-blue-300">{profile.englishLevel}</span>
+              </div>
             </div>
           </div>
 
-          {/* Funds & English */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          {/* Personality Trait Callout */}
+          <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center space-x-2.5 text-xs text-slate-300 mb-6">
+            <Flame className="w-4 h-4 text-amber-400 flex-shrink-0" />
             <div>
-              <label className="text-xs font-medium text-slate-400 block mb-1.5">
-                可支配启动金储备
-              </label>
-              <select
-                value={fundsRMB}
-                onChange={(e) => setFundsRMB(Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0F17] border border-slate-700 text-white text-xs sm:text-sm focus:outline-none focus:border-blue-500"
-              >
-                {FUND_OPTIONS.map((f, i) => (
-                  <option key={i} value={f.value}>
-                    {f.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs font-medium text-slate-400 block mb-1.5">
-                当前外语掌握水平
-              </label>
-              <select
-                value={englishLevel}
-                onChange={(e) => setEnglishLevel(e.target.value as SimProfile['englishLevel'])}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0F17] border border-slate-700 text-white text-xs sm:text-sm focus:outline-none focus:border-blue-500"
-              >
-                <option value="零基础纯靠比划">零基础纯靠比划 (手势交流)</option>
-                <option value="四六级哑巴英语">四六级哑巴英语 (能读懂，口语卡壳)</option>
-                <option value="日常无障碍/雅思6分">日常无障碍 / 雅思 6.0 分水平</option>
-                <option value="精通/雅思7.5+">母语级精通 / 雅思 7.5+ / 掌握二外</option>
-              </select>
+              <span className="text-slate-500">隐藏性格底色：</span>
+              <strong className="text-slate-200 ml-1">{profile.trait}</strong>
             </div>
           </div>
 
-          {/* Destination Selection */}
-          <div className="mb-8">
-            <h3 className="text-xs uppercase font-mono tracking-wider text-slate-400 mb-3 pb-2 border-b border-slate-800">
-              第二步：选择你想移居的目的地 (或平行时空对照组)
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {SIM_COUNTRIES.map((c) => {
-                const isSelected = c.id === targetCountryId;
-                return (
-                  <div
-                    key={c.id}
-                    onClick={() => setTargetCountryId(c.id)}
-                    className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-blue-600/15 border-blue-500 shadow-md shadow-blue-500/15'
-                        : 'bg-[#0B0F17] border-slate-800 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2.5 mb-1.5">
-                      <span className="text-2xl">{c.flag}</span>
-                      <div>
-                        <h4 className="text-xs sm:text-sm font-bold text-white">{c.name}</h4>
-                        <span className="text-[10px] text-blue-400 font-mono">门槛：{c.difficulty}</span>
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-snug">
-                      {c.desc}
-                    </p>
-                  </div>
-                );
-              })}
+          {/* Destination Box (Randomly drawn, but can switch) */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/20 to-indigo-950/20 border border-blue-500/30 mb-8">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div className="flex items-center space-x-2">
+                <span className="text-xs uppercase font-mono tracking-wider text-blue-400 font-semibold">
+                  🎯 命运将你抛向的目的地
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-400">
+                可切换下方目标国体验
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-3 my-2">
+              <span className="text-3xl">{currentCountryObj.flag}</span>
+              <div>
+                <h4 className="text-base font-bold text-white">{currentCountryObj.name}</h4>
+                <p className="text-xs text-slate-300">{currentCountryObj.desc}</p>
+              </div>
+            </div>
+
+            {/* Quick Country Switcher Chips */}
+            <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-800/80">
+              {SIM_COUNTRIES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setProfile((p) => ({ ...p, targetCountryId: c.id }))}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${
+                    c.id === profile.targetCountryId
+                      ? 'bg-blue-600 border-blue-500 text-white shadow-sm'
+                      : 'bg-[#0B0F17] border-slate-800 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span>{c.flag} {c.name.split(' ')[0]}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Launch Button */}
-          <button
-            onClick={handleStartSim}
-            className="w-full py-4 rounded-xl text-sm sm:text-base font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white shadow-xl shadow-blue-500/25 transition flex items-center justify-center space-x-2"
-          >
-            <span>🚀 踏上平行移居旅程 (开启第 1 年)</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          {/* Two Main Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={handleReRoll}
+              disabled={isRolling}
+              className="flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center justify-center space-x-2"
+            >
+              <RefreshCw className={`w-4 h-4 text-indigo-400 ${isRolling ? 'animate-spin' : ''}`} />
+              <span>🎲 不满意？洗牌重抽 (Re-roll)</span>
+            </button>
+
+            <button
+              onClick={handleStartSim}
+              className="flex-1 py-3.5 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white shadow-lg shadow-indigo-500/25 transition flex items-center justify-center space-x-2"
+            >
+              <span>🚀 接受这副底牌，开始 5 年推演！</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -356,12 +320,12 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         {/* Sticky Live Dashboard (Like 1in8b.life) */}
         <div className="bg-[#121824] border border-slate-800 rounded-2xl p-4 sm:p-5 mb-8 shadow-xl">
           <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800/80 mb-4 text-xs">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2.5">
               <span className="text-2xl">{currentCountryObj.flag}</span>
               <div>
-                <span className="font-bold text-white text-sm">{name}</span>
+                <span className="font-bold text-white text-sm">{profile.name}</span>
                 <span className="text-slate-400 text-xs ml-2">
-                  {age + currentYearIdx} 岁 · {selectedProf.name}
+                  {profile.age + currentYearIdx} 岁 · {profile.profession.name} · {profile.education}
                 </span>
               </div>
             </div>
@@ -412,7 +376,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
               <div className="flex items-center justify-between text-slate-400 mb-1">
                 <span className="flex items-center space-x-1">
                   <Globe2 className="w-3.5 h-3.5 text-blue-400" />
-                  <span>语言能力</span>
+                  <span>语言熟练</span>
                 </span>
                 <span className="font-bold text-blue-400 font-mono">{languageSkill}</span>
               </div>
@@ -599,10 +563,10 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
             {currentCountryObj.name} · 5年生存历练达成
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2 tracking-tight">
-            【{name} 的平行移居史诗】
+            【{profile.name} 的平行移居史诗】
           </h1>
           <p className="text-xs sm:text-sm text-slate-400">
-            原身份：{selectedProf.name} · 初始资金 ¥{(fundsRMB / 10000).toFixed(0)}万
+            原身份：{profile.profession.name} · {profile.education} · 初始底牌 ¥{(profile.initialFundsRMB / 10000).toFixed(0)}万
           </p>
         </div>
 
@@ -625,7 +589,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
           <div className="bg-[#0B0F17] p-3.5 rounded-2xl border border-slate-800 text-center">
             <span className="text-[11px] text-slate-500 block mb-1">身份终态</span>
             <span className="text-base sm:text-lg font-bold text-purple-400 font-mono">
-              {prProgress >= 80 ? '永久居留 (PR)' : prProgress >= 40 ? '长期工签' : '体验完毕'}
+              {prProgress >= 80 ? '永久居留 (PR)' : prProgress >= 40 ? '长期居留工签' : '体验完毕'}
             </span>
           </div>
         </div>
@@ -654,25 +618,26 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         <div className="pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4">
           <button
             onClick={() => {
+              handleReRoll();
               setGameState('setup');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>换个身份重新模拟</span>
+            <span>🎲 重新投胎再抽一把</span>
           </button>
 
           <div className="flex space-x-2">
             <button
-              onClick={() => onNavigateToSubclasses(targetCountryId)}
+              onClick={() => onNavigateToSubclasses(profile.targetCountryId)}
               className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 transition"
             >
               <BookOpen className="w-4 h-4" />
               <span>查看真实的 {currentCountryObj.name} 政策</span>
             </button>
             <button
-              onClick={() => onNavigateToDIY(targetCountryId)}
+              onClick={() => onNavigateToDIY(profile.targetCountryId)}
               className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 transition"
             >
               手搓路线图 ➜

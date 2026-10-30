@@ -10,8 +10,11 @@ export interface Profession {
 export interface SimProfile {
   name: string;
   age: number;
-  gender: "男" | "女" | "保密";
+  gender: "男" | "女";
   profession: Profession;
+  education: "高中 / 中专 / 技校" | "普通全日制大专" | "普通统招本科" | "重点大学本硕";
+  hometown: "一线大都市打工人" | "二三线省会城市" | "县城小镇青年";
+  trait: string; // 性格特质
   initialFundsRMB: number; // 启动资金
   englishLevel: "零基础纯靠比划" | "四六级哑巴英语" | "日常无障碍/雅思6分" | "精通/雅思7.5+";
   targetCountryId: string;
@@ -182,7 +185,78 @@ export const SIM_COUNTRIES = [
   }
 ];
 
-export const RANDOM_NAMES = ["李想", "王星", "林深", "张宁", "周舟", "陈默", "安娜", "赵云", "沈越", "姜来"];
+export const RANDOM_NAMES = [
+  "李想", "陈晓梅", "林深", "周若雨", "王大明", 
+  "张宁", "沈越", "赵雅婷", "刘晨", "姜来", 
+  "徐小伟", "高杨", "郭静", "孙一诺", "宋飞"
+];
+
+export const RANDOM_TRAITS = [
+  "老中胃重度依恋 · 离不开深夜外卖与人间烟火",
+  "天生孤癖社恐 · 讨厌聚会社交，自愈能力极强",
+  "乐天派大条 · 随遇而安，走到哪里都能活",
+  "做题家灵魂 · 信奉努力打卡，极度擅长应试考证",
+  "动手能力MAX · 蓝领糙汉体质，擅长修修补补",
+  "佛系生活家 · 物质欲望低，追求阳光与大自然"
+];
+
+export const RANDOM_EDUCATIONS: SimProfile['education'][] = [
+  "高中 / 中专 / 技校",
+  "普通全日制大专",
+  "普通统招本科",
+  "重点大学本硕"
+];
+
+export const RANDOM_HOMETOWNS: SimProfile['hometown'][] = [
+  "一线大都市打工人",
+  "二三线省会城市",
+  "县城小镇青年"
+];
+
+export const RANDOM_FUNDS = [
+  30000,   // 3万 (破釜沉舟)
+  50000,   // 5万
+  120000,  // 12万 (省吃俭用工薪)
+  250000,  // 25万
+  450000,  // 45万 (稳健中产)
+  850000   // 85万 (小富底气)
+];
+
+export function generateRandomLife(): SimProfile {
+  const name = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
+  const age = Math.floor(Math.random() * 18) + 22; // 22 ~ 39
+  const gender: "男" | "女" = Math.random() > 0.5 ? "男" : "女";
+  const profession = PROFESSIONS[Math.floor(Math.random() * PROFESSIONS.length)];
+  const education = RANDOM_EDUCATIONS[Math.floor(Math.random() * RANDOM_EDUCATIONS.length)];
+  const hometown = RANDOM_HOMETOWNS[Math.floor(Math.random() * RANDOM_HOMETOWNS.length)];
+  const trait = RANDOM_TRAITS[Math.floor(Math.random() * RANDOM_TRAITS.length)];
+  const initialFundsRMB = RANDOM_FUNDS[Math.floor(Math.random() * RANDOM_FUNDS.length)];
+  
+  const engLevels: SimProfile['englishLevel'][] = [
+    "零基础纯靠比划",
+    "四六级哑巴英语",
+    "日常无障碍/雅思6分",
+    "精通/雅思7.5+"
+  ];
+  const englishLevel = engLevels[Math.floor(Math.random() * engLevels.length)];
+
+  // Default target countries (excluding China stay for default roll, but user can pick it)
+  const availableCountries = SIM_COUNTRIES.filter(c => c.id !== "china_stay");
+  const targetCountryId = availableCountries[Math.floor(Math.random() * availableCountries.length)].id;
+
+  return {
+    name,
+    age,
+    gender,
+    profession,
+    education,
+    hometown,
+    trait,
+    initialFundsRMB,
+    englishLevel,
+    targetCountryId
+  };
+}
 
 export const SIM_YEAR_EVENTS: Record<string, SimYearEvent[]> = {
   japan: [
