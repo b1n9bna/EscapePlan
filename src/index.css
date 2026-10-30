@@ -83,8 +83,27 @@ body {
 }
 
 /* Light Mode Theme Customizations */
-[data-theme="light"], .light {
+:root[data-theme="light"],
+html.light,
+[data-theme="light"],
+.light {
   color-scheme: light;
+}
+
+:root[data-theme="light"] body,
+html.light body,
+[data-theme="light"] body,
+.light body {
+  background-color: #F8F7F3;
+  color: #1C1917;
+}
+
+/* Light Mode Prose Reading Text Contrast */
+:root[data-theme="light"] .prose-reading,
+html.light .prose-reading,
+[data-theme="light"] .prose-reading,
+.light .prose-reading {
+  color: #292524; /* Stone 800: clear, deep ink reading contrast */
 }
 
 [data-theme="light"] ::-webkit-scrollbar-track,

@@ -105,7 +105,8 @@ const RadarChart: React.FC<{
     autonomy: number;
     kinship: number;
   };
-}> = ({ radar }) => {
+  isLight?: boolean;
+}> = ({ radar, isLight }) => {
   const size = 200;
   const center = size / 2;
   const radius = 62;
@@ -148,16 +149,20 @@ const RadarChart: React.FC<{
   }).join(' ');
 
   return (
-    <div className="flex flex-col items-center justify-center p-3 bg-[#0B0C12] border border-stone-800/80 rounded-2xl">
-      <div className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+    <div className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-colors ${
+      isLight ? "bg-stone-50 border-stone-200" : "bg-[#0B0C12] border-stone-800/80"
+    }`}>
+      <div className={`text-[11px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1.5 ${
+        isLight ? "text-amber-800" : "text-amber-400"
+      }`}>
         <Sparkles className="w-3.5 h-3.5" />
         五维人生格局图
       </div>
       <svg width={size} height={size} className="overflow-visible">
         <defs>
           <radialGradient id="radarGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#b45309" stopOpacity="0.15" />
+            <stop offset="0%" stopColor="#f59e0b" stopOpacity={isLight ? "0.45" : "0.5"} />
+            <stop offset="100%" stopColor="#b45309" stopOpacity={isLight ? "0.2" : "0.15"} />
           </radialGradient>
         </defs>
 
@@ -166,7 +171,7 @@ const RadarChart: React.FC<{
             key={idx}
             points={pts}
             fill="none"
-            stroke="#292524"
+            stroke={isLight ? "#e7e5e4" : "#292524"}
             strokeWidth="1"
             strokeDasharray={idx < 2 ? '3,3' : undefined}
           />
@@ -181,7 +186,7 @@ const RadarChart: React.FC<{
               y1={center}
               x2={p.x}
               y2={p.y}
-              stroke="#292524"
+              stroke={isLight ? "#d6d3d1" : "#292524"}
               strokeWidth="1"
             />
           );
@@ -204,7 +209,7 @@ const RadarChart: React.FC<{
               cy={p.y}
               r="3.5"
               fill="#fbbf24"
-              stroke="#0C0E14"
+              stroke={isLight ? "#ffffff" : "#0C0E14"}
               strokeWidth="1.5"
             />
           );
@@ -219,10 +224,10 @@ const RadarChart: React.FC<{
               y={lp.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="text-[10px] fill-stone-300 font-sans"
+              className={`text-[10px] font-sans ${isLight ? "fill-stone-700 font-medium" : "fill-stone-300"}`}
             >
               {a.label}
-              <tspan className="fill-amber-400 font-mono font-semibold ml-0.5"> {a.val}</tspan>
+              <tspan className={`${isLight ? "fill-amber-700 font-bold" : "fill-amber-400"} font-mono font-semibold ml-0.5`}> {a.val}</tspan>
             </text>
           );
         })}
@@ -270,36 +275,51 @@ const EndingCodexModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   unlockedIds: string[];
-}> = ({ isOpen, onClose, unlockedIds }) => {
+  isLight?: boolean;
+}> = ({ isOpen, onClose, unlockedIds, isLight }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-year-enter">
-      <div className="bg-[#0E1017] border border-white/[0.08] rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl">
-        <div className="px-5 sm:px-6 py-4 border-b border-white/[0.07] flex items-center justify-between shrink-0 bg-[#13151F]">
+      <div className={`border rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl transition-colors ${
+        isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#0E1017] border-white/[0.08] text-stone-100"
+      }`}>
+        <div className={`px-5 sm:px-6 py-4 border-b flex items-center justify-between shrink-0 transition-colors ${
+          isLight ? "bg-stone-50 border-stone-200" : "bg-[#13151F] border-white/[0.07]"
+        }`}>
           <div className="flex items-center gap-2.5">
-            <BookOpen className="w-5 h-5 text-[#D4A359]" />
+            <BookOpen className={`w-5 h-5 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-stone-100 flex items-center gap-2 font-narrative-serif">
+              <h2 className={`text-base sm:text-lg font-bold flex items-center gap-2 font-narrative-serif ${
+                isLight ? "text-stone-900" : "text-stone-100"
+              }`}>
                 <span>一生结局图鉴</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#D4A359]/15 border border-[#D4A359]/30 text-[#D4A359] font-mono-num">
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono-num font-semibold ${
+                  isLight ? "bg-amber-100 text-amber-900 border border-amber-300" : "bg-[#D4A359]/15 border border-[#D4A359]/30 text-[#D4A359]"
+                }`}>
                   已收集 {unlockedIds.length} / 16
                 </span>
               </h2>
-              <p className="text-xs text-stone-400 font-reading-sans mt-0.5">
+              <p className={`text-xs font-reading-sans mt-0.5 ${
+                isLight ? "text-stone-600 font-medium" : "text-stone-400"
+              }`}>
                 探索不同阶层起点、求学分流与出海抉择，集齐全部 16 大宿命篇章
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-stone-400 hover:text-stone-100 hover:bg-[#1E2230] transition-colors"
+            className={`p-1.5 rounded-lg transition-colors ${
+              isLight ? "text-stone-500 hover:text-stone-900 hover:bg-stone-200" : "text-stone-400 hover:text-stone-100 hover:bg-[#1E2230]"
+            }`}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-4 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1 bg-[#0A0B0E]">
+        <div className={`p-4 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1 transition-colors ${
+          isLight ? "bg-[#FAF9F6]" : "bg-[#0A0B0E]"
+        }`}>
           {ENDING_CODEX_DEFS.map((ed) => {
             const isUnlocked = unlockedIds.includes(ed.id);
 
@@ -309,10 +329,18 @@ const EndingCodexModal: React.FC<{
                 className={`p-4 rounded-xl border transition-all ${
                   isUnlocked
                     ? ed.rarity === 'SSR'
-                      ? 'bg-[#191612] border-[#D4A359]/70 shadow-md shadow-amber-950/20'
+                      ? isLight
+                        ? 'bg-amber-50/70 border-amber-400 shadow-md shadow-amber-900/10'
+                        : 'bg-[#191612] border-[#D4A359]/70 shadow-md shadow-amber-950/20'
                       : ed.rarity === 'SR'
-                      ? 'bg-[#161324] border-purple-500/50'
+                      ? isLight
+                        ? 'bg-purple-50/70 border-purple-300'
+                        : 'bg-[#161324] border-purple-500/50'
+                      : isLight
+                      ? 'bg-white border-stone-200 shadow-2xs'
                       : 'bg-[#13151F] border-white/[0.08]'
+                    : isLight
+                    ? 'bg-stone-100/70 border-stone-200 opacity-60'
                     : 'bg-[#0E1016] border-white/[0.05] opacity-55'
                 }`}
               >
@@ -324,45 +352,65 @@ const EndingCodexModal: React.FC<{
                           ? 'bg-gradient-to-r from-[#D4A359] to-[#C29348] text-stone-950 font-bold'
                           : ed.rarity === 'SR'
                           ? 'bg-purple-600 text-stone-100 font-bold'
+                          : isLight
+                          ? 'bg-stone-200 text-stone-800'
                           : 'bg-stone-800 text-stone-300'
                       }`}
                     >
                       {ed.rarity}
                     </span>
-                    <span className="text-xs font-mono-num text-stone-400">
+                    <span className={`text-xs font-mono-num ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
                       No.{ed.number < 10 ? '0' : ''}{ed.number}
                     </span>
-                    <span className="text-[11px] text-stone-400 font-reading-sans">
+                    <span className={`text-[11px] font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
                       · {ed.trackHint}
                     </span>
                   </div>
                   {isUnlocked ? (
-                    <span className="text-[11px] text-emerald-300 font-medium flex items-center gap-1 bg-emerald-950/40 border border-emerald-800/50 px-2 py-0.5 rounded-full font-reading-sans">
-                      <Check className="w-3 h-3 text-emerald-300" />
+                    <span className={`text-[11px] font-medium flex items-center gap-1 px-2 py-0.5 rounded-full font-reading-sans ${
+                      isLight
+                        ? "text-emerald-800 bg-emerald-50 border border-emerald-300"
+                        : "text-emerald-300 bg-emerald-950/40 border border-emerald-800/50"
+                    }`}>
+                      <Check className="w-3 h-3" />
                       已解锁
                     </span>
                   ) : (
-                    <span className="text-[11px] text-stone-300 flex items-center gap-1 bg-white/[0.05] border border-white/[0.1] px-2 py-0.5 rounded-full font-reading-sans">
-                      <Lock className="w-3 h-3 text-stone-300" />
+                    <span className={`text-[11px] flex items-center gap-1 px-2 py-0.5 rounded-full font-reading-sans ${
+                      isLight
+                        ? "text-stone-500 bg-stone-200/80 border border-stone-300"
+                        : "text-stone-300 bg-white/[0.05] border border-white/[0.1]"
+                    }`}>
+                      <Lock className="w-3 h-3" />
                       未解锁
                     </span>
                   )}
                 </div>
 
-                <h3 className={`text-sm font-bold mb-1 font-narrative-serif ${isUnlocked ? 'text-stone-100' : 'text-stone-400'}`}>
+                <h3 className={`text-sm font-bold mb-1 font-narrative-serif ${
+                  isUnlocked
+                    ? isLight ? 'text-stone-900' : 'text-stone-100'
+                    : isLight ? 'text-stone-500' : 'text-stone-400'
+                }`}>
                   {ed.title}
                 </h3>
-                <div className="text-[11px] text-[#D4A359]/90 italic font-narrative-serif mb-2">
+                <div className={`text-[11px] italic font-narrative-serif mb-2 ${
+                  isLight ? "text-amber-800 font-medium" : "text-[#D4A359]/90"
+                }`}>
                   {ed.tagline}
                 </div>
 
                 {isUnlocked ? (
-                  <p className="text-xs text-stone-300 leading-relaxed font-reading-sans">
+                  <p className={`text-xs leading-relaxed font-reading-sans ${
+                    isLight ? "text-stone-700" : "text-stone-300"
+                  }`}>
                     {ed.description}
                   </p>
                 ) : (
-                  <div className="text-xs text-stone-400 bg-[#12141C] p-2.5 rounded-lg border border-white/[0.06] font-reading-sans">
-                    <span className="text-[#D4A359]/90 font-medium block mb-0.5">解锁线索：</span>
+                  <div className={`text-xs p-2.5 rounded-lg border font-reading-sans ${
+                    isLight ? "bg-stone-100 border-stone-200 text-stone-600" : "bg-[#12141C] border-white/[0.06] text-stone-400"
+                  }`}>
+                    <span className={`font-semibold block mb-0.5 ${isLight ? "text-amber-800" : "text-[#D4A359]/90"}`}>解锁线索：</span>
                     {ed.unlockCondition}
                   </div>
                 )}
@@ -371,7 +419,9 @@ const EndingCodexModal: React.FC<{
           })}
         </div>
 
-        <div className="px-6 py-3 border-t border-white/[0.07] bg-[#0E1017] flex items-center justify-between text-xs text-stone-400 shrink-0 font-reading-sans">
+        <div className={`px-6 py-3 border-t flex items-center justify-between text-xs shrink-0 font-reading-sans ${
+          isLight ? "bg-stone-50 border-stone-200 text-stone-600" : "bg-[#0E1017] border-white/[0.07] text-stone-400"
+        }`}>
           <span>图鉴记录已持久化保存在当前浏览器</span>
           <button
             onClick={onClose}
@@ -1241,11 +1291,11 @@ ${logEntries
               </h2>
             </div>
             <div className="text-right">
-              <span className="text-xs text-stone-400 block font-reading-sans">阶层水位 · 家庭底资</span>
-              <span className="text-xs sm:text-sm font-medium text-[#D4A359] font-narrative-serif">
+              <span className={`text-xs block font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>阶层水位 · 家庭底资</span>
+              <span className={`text-xs sm:text-sm font-semibold font-narrative-serif ${isLight ? "text-amber-900" : "text-[#D4A359]"}`}>
                 {charData.family.wealthTier}
               </span>
-              <span className="text-[11px] font-mono-num text-teal-400 block mt-0.5">
+              <span className={`text-[11px] font-mono-num block mt-0.5 font-medium ${isLight ? "text-teal-700" : "text-teal-400"}`}>
                 家庭初始存款：¥{charData.family.initialFamilySavings.toLocaleString()}
               </span>
             </div>
@@ -1253,70 +1303,94 @@ ${logEntries
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
             <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
-      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
-    }`}>
-              <div className="text-amber-300 font-semibold flex items-center gap-2.5 font-reading-sans">
+              isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+            }`}>
+              <div className={`font-semibold flex items-center gap-2.5 font-reading-sans ${
+                isLight ? "text-amber-900" : "text-amber-300"
+              }`}>
                 <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                  <User className="w-3.5 h-3.5 text-amber-300" />
+                  <User className="w-3.5 h-3.5 text-amber-500" />
                 </div>
                 <span>父亲：{charData.family.fatherAge}岁 · {charData.family.fatherJob}</span>
               </div>
-              <p className="text-stone-300 leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8">
+              <p className={`leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8 ${
+                isLight ? "text-stone-700" : "text-stone-300"
+              }`}>
                 {charData.family.fatherTrait}
               </p>
             </div>
 
             <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
-      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
-    }`}>
-              <div className="text-rose-300 font-semibold flex items-center gap-2.5 font-reading-sans">
+              isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+            }`}>
+              <div className={`font-semibold flex items-center gap-2.5 font-reading-sans ${
+                isLight ? "text-rose-800" : "text-rose-300"
+              }`}>
                 <div className="w-6 h-6 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center shrink-0">
-                  <User className="w-3.5 h-3.5 text-rose-300" />
+                  <User className="w-3.5 h-3.5 text-rose-500" />
                 </div>
                 <span>母亲：{charData.family.motherAge}岁 · {charData.family.motherJob}</span>
               </div>
-              <p className="text-stone-300 leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8">
+              <p className={`leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8 ${
+                isLight ? "text-stone-700" : "text-stone-300"
+              }`}>
                 {charData.family.motherTrait}
               </p>
             </div>
 
             <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
-      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
-    }`}>
-              <div className="text-teal-300 font-semibold flex items-center justify-between font-reading-sans">
+              isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+            }`}>
+              <div className={`font-semibold flex items-center justify-between font-reading-sans ${
+                isLight ? "text-teal-800" : "text-teal-300"
+              }`}>
                 <div className="flex items-center gap-2.5">
                   <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
-                    <Home className="w-3.5 h-3.5 text-teal-300" />
+                    <Home className="w-3.5 h-3.5 text-teal-600" />
                   </div>
                   <span>居住环境与家庭储备</span>
                 </div>
-                <span className="text-xs font-mono-num text-teal-300 font-semibold">
+                <span className={`text-xs font-mono-num font-semibold ${
+                  isLight ? "text-teal-800" : "text-teal-300"
+                }`}>
                   底蓄 ¥{charData.family.initialFamilySavings.toLocaleString()}
                 </span>
               </div>
-              <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8">
+              <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8 ${
+                isLight ? "text-stone-700" : "text-stone-300"
+              }`}>
                 {charData.family.housing}
               </p>
-              <p className="text-stone-400 text-xs mt-1 font-reading-sans pl-8">{charData.family.wealthDetail}</p>
+              <p className={`text-xs mt-1 font-reading-sans pl-8 ${
+                isLight ? "text-stone-600" : "text-stone-400"
+              }`}>{charData.family.wealthDetail}</p>
             </div>
 
             <div className={`p-4 rounded-xl border space-y-2 transition-colors ${
-      isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
-    }`}>
-              <div className="text-sky-300 font-semibold flex items-center gap-2.5 font-reading-sans">
+              isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+            }`}>
+              <div className={`font-semibold flex items-center gap-2.5 font-reading-sans ${
+                isLight ? "text-sky-800" : "text-sky-300"
+              }`}>
                 <div className="w-6 h-6 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
-                  <Shield className="w-3.5 h-3.5 text-sky-300" />
+                  <Shield className="w-3.5 h-3.5 text-sky-600" />
                 </div>
                 <span>同胞与情感底色</span>
               </div>
-              <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8">
+              <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8 ${
+                isLight ? "text-stone-700" : "text-stone-300"
+              }`}>
                 {charData.family.siblings} — {charData.family.siblingsDetail}
               </p>
-              <p className="text-[#D4A359]/90 text-xs mt-1 font-reading-sans pl-8">{charData.family.emotionalTone}</p>
+              <p className={`text-xs mt-1 font-reading-sans pl-8 ${
+                isLight ? "text-amber-800 font-medium" : "text-[#D4A359]/90"
+              }`}>{charData.family.emotionalTone}</p>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-white/[0.06] flex justify-end">
+          <div className={`pt-3 border-t flex justify-end ${
+            isLight ? "border-stone-200" : "border-white/[0.06]"
+          }`}>
             <button
               onClick={startSimulation}
               className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-950/40 active:scale-[0.99] font-narrative-serif tracking-wide"
@@ -1483,11 +1557,15 @@ ${logEntries
         </div>
 
         {/* Mobile Tab Switcher */}
-        <div className="flex lg:hidden bg-[#13151F] p-0.5 rounded-lg border border-white/[0.08] text-[11px]">
+        <div className={`flex lg:hidden p-0.5 rounded-lg border text-[11px] ${
+          isLight ? "bg-stone-100 border-stone-300" : "bg-[#13151F] border-white/[0.08]"
+        }`}>
           <button
             onClick={() => setMobileTab('profile')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              mobileTab === 'profile' ? 'bg-[#D4A359] text-stone-950 font-bold' : 'text-stone-400'
+              mobileTab === 'profile'
+                ? "bg-gradient-to-r from-[#D4A359] to-[#C29348] text-stone-950 font-bold shadow-xs"
+                : isLight ? "text-stone-600 font-medium" : "text-stone-400"
             }`}
           >
             档案
@@ -1495,7 +1573,9 @@ ${logEntries
           <button
             onClick={() => setMobileTab('log')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              mobileTab === 'log' ? 'bg-[#D4A359] text-stone-950 font-bold' : 'text-stone-400'
+              mobileTab === 'log'
+                ? "bg-gradient-to-r from-[#D4A359] to-[#C29348] text-stone-950 font-bold shadow-xs"
+                : isLight ? "text-stone-600 font-medium" : "text-stone-400"
             }`}
           >
             日志
@@ -1503,14 +1583,20 @@ ${logEntries
           <button
             onClick={() => setMobileTab('family')}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              mobileTab === 'family' ? 'bg-[#D4A359] text-stone-950 font-bold' : 'text-stone-400'
+              mobileTab === 'family'
+                ? "bg-gradient-to-r from-[#D4A359] to-[#C29348] text-stone-950 font-bold shadow-xs"
+                : isLight ? "text-stone-600 font-medium" : "text-stone-400"
             }`}
           >
             家庭
           </button>
           <button
             onClick={() => setShowCodexModal(true)}
-            className="px-2 py-1 rounded-md text-[#D4A359] hover:text-[#E0B26A] flex items-center gap-1 border-l border-white/[0.08] ml-0.5"
+            className={`px-2 py-1 rounded-md flex items-center gap-1 border-l ml-0.5 font-medium ${
+              isLight
+                ? "text-amber-900 hover:text-amber-950 border-stone-300"
+                : "text-[#D4A359] hover:text-[#E0B26A] border-white/[0.08]"
+            }`}
             title="结局图鉴"
           >
             <BookOpen className="w-3.5 h-3.5" />
@@ -1621,36 +1707,44 @@ ${logEntries
         >
           {/* Identity Card */}
           <div className={`border rounded-xl p-4 space-y-2.5 shadow-sm transition-colors ${
-      isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
-    }`}>
+            isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
+          }`}>
             <div className="flex items-center justify-between">
-              <span className="text-base font-bold text-stone-100 font-narrative-serif">{charData.name}</span>
-              <span className="text-xs px-2.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-300 font-reading-sans">
+              <span className={`text-base font-bold font-narrative-serif ${isLight ? "text-stone-900" : "text-stone-100"}`}>
+                {charData.name}
+              </span>
+              <span className={`text-xs px-2.5 py-0.5 rounded border font-reading-sans ${
+                isLight ? "bg-stone-100 border-stone-300 text-stone-800 font-medium" : "bg-[#181B26] border-white/[0.08] text-stone-300"
+              }`}>
                 {charData.gender} · {currentAge}岁
               </span>
             </div>
-            <div className="text-xs text-stone-400 space-y-1.5 font-reading-sans">
+            <div className={`text-xs space-y-1.5 font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
               <div>出生：{charData.family.region}</div>
               <div>阶层：{charData.family.wealthTier}</div>
-              <div className="pt-2 border-t border-white/[0.06] space-y-1.5">
+              <div className={`pt-2 border-t space-y-1.5 ${isLight ? "border-stone-200" : "border-white/[0.06]"}`}>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-stone-300">
+                  <span className={`flex items-center gap-2 ${isLight ? "text-stone-800 font-medium" : "text-stone-300"}`}>
                     <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                      <Coins className="w-3.5 h-3.5 text-amber-300" />
+                      <Coins className="w-3.5 h-3.5 text-amber-500" />
                     </div>
                     <span>{currentAge < 18 ? "个人零花现金：" : "个人可支配资产："}</span>
                   </span>
                   <span
                     className={`font-mono-num font-semibold text-sm ${
-                      attrs.savings >= 0 ? "text-amber-300" : "text-rose-400"
+                      attrs.savings >= 0
+                        ? isLight ? "text-amber-800 font-bold" : "text-amber-300"
+                        : "text-rose-500 font-bold"
                     }`}
                   >
                     ¥{attrs.savings.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-stone-400 pl-8">
+                <div className={`flex items-center justify-between text-[11px] pl-8 ${isLight ? "text-stone-500 font-medium" : "text-stone-400"}`}>
                   <span>{currentAge < 18 ? "平时零花与跑腿零钱" : "个人薪资与日常结余"}</span>
-                  <span className="text-stone-500 font-narrative-serif">{currentAge < 18 ? "学杂由家庭托底" : "独立自负盈亏"}</span>
+                  <span className={`${isLight ? "text-stone-600" : "text-stone-500"} font-narrative-serif`}>
+                    {currentAge < 18 ? "学杂由家庭托底" : "独立自负盈亏"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -1658,149 +1752,187 @@ ${logEntries
 
           {/* Active Crisis Alert Banner in Left Panel */}
           {crisisWarning && (
-            <div className="bg-rose-950/40 border border-rose-800/80 rounded-xl p-3 flex items-start gap-2.5 animate-pulse text-xs text-rose-200">
-              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className={`rounded-xl p-3 flex items-start gap-2.5 animate-pulse text-xs border ${
+              isLight
+                ? "bg-rose-50 border-rose-300 text-rose-900"
+                : "bg-rose-950/40 border-rose-800/80 text-rose-200"
+            }`}>
+              <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${isLight ? "text-rose-600" : "text-rose-400"}`} />
               <div>
-                <div className="font-semibold text-rose-300 text-[11px] font-narrative-serif">{crisisWarning.title}</div>
-                <div className="text-[10px] text-stone-300 mt-0.5 leading-snug font-reading-sans">{crisisWarning.desc}</div>
+                <div className={`font-semibold text-[11px] font-narrative-serif ${isLight ? "text-rose-900" : "text-rose-300"}`}>
+                  {crisisWarning.title}
+                </div>
+                <div className={`text-[10px] mt-0.5 leading-snug font-reading-sans ${isLight ? "text-rose-700" : "text-stone-300"}`}>
+                  {crisisWarning.desc}
+                </div>
               </div>
             </div>
           )}
 
           {/* 4 Core Attributes Meters */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-3 shadow-sm">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#D4A359] block pb-1 border-b border-white/[0.06] font-narrative-serif">
+          <div className={`border rounded-xl p-4 space-y-3 shadow-sm transition-colors ${
+            isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
+          }`}>
+            <span className={`text-xs font-semibold uppercase tracking-wider block pb-1 border-b font-narrative-serif ${
+              isLight ? "text-amber-900 border-stone-200" : "text-[#D4A359] border-white/[0.06]"
+            }`}>
               四维生命状态
             </span>
 
             {/* Health */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs font-reading-sans">
-                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                <span className={`flex items-center gap-2 font-medium ${isLight ? "text-stone-800" : "text-stone-200"}`}>
                   <div className="w-5 h-5 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                    <HeartPulse className="w-3 h-3 text-emerald-300" />
+                    <HeartPulse className="w-3 h-3 text-emerald-500" />
                   </div>
                   体魄
                 </span>
-                <span className="font-mono-num text-emerald-400 font-semibold">{attrs.health}%</span>
+                <span className={`font-mono-num font-semibold ${isLight ? "text-emerald-700 font-bold" : "text-emerald-400"}`}>
+                  {attrs.health}%
+                </span>
               </div>
-              <div className="h-1.5 rounded-full bg-[#1C1F2B] overflow-hidden">
+              <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-stone-200" : "bg-[#1C1F2B]"}`}>
                 <div
                   className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.max(0, attrs.health))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getHealthDesc(attrs.health)}</div>
+              <div className={`text-[11px] font-reading-sans pl-7 font-medium ${isLight ? "text-stone-600" : "text-stone-400"}`}>
+                {getHealthDesc(attrs.health)}
+              </div>
             </div>
 
             {/* Happiness */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs font-reading-sans">
-                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                <span className={`flex items-center gap-2 font-medium ${isLight ? "text-stone-800" : "text-stone-200"}`}>
                   <div className="w-5 h-5 rounded-md bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                    <Smile className="w-3 h-3 text-amber-300" />
+                    <Smile className="w-3 h-3 text-amber-500" />
                   </div>
                   心境
                 </span>
-                <span className="font-mono-num text-amber-400 font-semibold">{attrs.happiness}%</span>
+                <span className={`font-mono-num font-semibold ${isLight ? "text-amber-800 font-bold" : "text-amber-400"}`}>
+                  {attrs.happiness}%
+                </span>
               </div>
-              <div className="h-1.5 rounded-full bg-[#1C1F2B] overflow-hidden">
+              <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-stone-200" : "bg-[#1C1F2B]"}`}>
                 <div
                   className="h-full bg-amber-400 rounded-full transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.max(0, attrs.happiness))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getHappinessDesc(attrs.happiness)}</div>
+              <div className={`text-[11px] font-reading-sans pl-7 font-medium ${isLight ? "text-stone-600" : "text-stone-400"}`}>
+                {getHappinessDesc(attrs.happiness)}
+              </div>
             </div>
 
             {/* Cognition */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs font-reading-sans">
-                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                <span className={`flex items-center gap-2 font-medium ${isLight ? "text-stone-800" : "text-stone-200"}`}>
                   <div className="w-5 h-5 rounded-md bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
-                    <Brain className="w-3 h-3 text-sky-300" />
+                    <Brain className="w-3 h-3 text-sky-500" />
                   </div>
                   见识
                 </span>
-                <span className="font-mono-num text-sky-400 font-semibold">{attrs.cognition}%</span>
+                <span className={`font-mono-num font-semibold ${isLight ? "text-sky-700 font-bold" : "text-sky-400"}`}>
+                  {attrs.cognition}%
+                </span>
               </div>
-              <div className="h-1.5 rounded-full bg-[#1C1F2B] overflow-hidden">
+              <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-stone-200" : "bg-[#1C1F2B]"}`}>
                 <div
                   className="h-full bg-sky-400 rounded-full transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.max(0, attrs.cognition))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getCognitionDesc(attrs.cognition)}</div>
+              <div className={`text-[11px] font-reading-sans pl-7 font-medium ${isLight ? "text-stone-600" : "text-stone-400"}`}>
+                {getCognitionDesc(attrs.cognition)}
+              </div>
             </div>
 
             {/* Social */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs font-reading-sans">
-                <span className="text-stone-200 flex items-center gap-2 font-medium">
+                <span className={`flex items-center gap-2 font-medium ${isLight ? "text-stone-800" : "text-stone-200"}`}>
                   <div className="w-5 h-5 rounded-md bg-purple-500/15 border border-purple-500/30 flex items-center justify-center shrink-0">
-                    <Users className="w-3 h-3 text-purple-300" />
+                    <Users className="w-3 h-3 text-purple-500" />
                   </div>
                   人脉
                 </span>
-                <span className="font-mono-num text-purple-400 font-semibold">{attrs.social}%</span>
+                <span className={`font-mono-num font-semibold ${isLight ? "text-purple-700 font-bold" : "text-purple-400"}`}>
+                  {attrs.social}%
+                </span>
               </div>
-              <div className="h-1.5 rounded-full bg-[#1C1F2B] overflow-hidden">
+              <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-stone-200" : "bg-[#1C1F2B]"}`}>
                 <div
                   className="h-full bg-purple-400 rounded-full transition-all duration-300"
                   style={{ width: `${Math.min(100, Math.max(0, attrs.social))}%` }}
                 />
               </div>
-              <div className="text-[11px] text-stone-400 font-reading-sans pl-7">{getSocialDesc(attrs.social)}</div>
+              <div className={`text-[11px] font-reading-sans pl-7 font-medium ${isLight ? "text-stone-600" : "text-stone-400"}`}>
+                {getSocialDesc(attrs.social)}
+              </div>
             </div>
           </div>
 
           {/* 5 Distinct Qualitative Mental & Social States */}
           <div className={`border rounded-xl p-4 space-y-2 text-xs shadow-sm transition-colors ${
-      isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
-    }`}>
-            <span className="font-semibold uppercase tracking-wider text-[#D4A359] block pb-1 border-b border-white/[0.06] font-narrative-serif">
+            isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
+          }`}>
+            <span className={`font-semibold uppercase tracking-wider block pb-1 border-b font-narrative-serif ${
+              isLight ? "text-amber-900 border-stone-200" : "text-[#D4A359] border-white/[0.06]"
+            }`}>
               核心心智与特质
             </span>
             <div className="flex justify-between items-center py-0.5 font-reading-sans">
-              <span className="text-stone-400">自卑度：</span>
-              <span className="text-rose-400 font-medium font-reading-sans">
+              <span className={isLight ? "text-stone-700 font-medium" : "text-stone-400"}>自卑度：</span>
+              <span className={`font-medium font-reading-sans ${isLight ? "text-rose-700 font-semibold" : "text-rose-400"}`}>
                 {getInferiorityDesc(attrs.inferiority)}
               </span>
             </div>
             <div className="flex justify-between items-center py-0.5 font-reading-sans">
-              <span className="text-stone-400">做题本钱：</span>
-              <span className="text-sky-400 font-medium font-reading-sans">
+              <span className={isLight ? "text-stone-700 font-medium" : "text-stone-400"}>做题本钱：</span>
+              <span className={`font-medium font-reading-sans ${isLight ? "text-sky-700 font-semibold" : "text-sky-400"}`}>
                 {getAcademicDesc(attrs.academicCapital)}
               </span>
             </div>
             <div className="flex justify-between items-center py-0.5 font-reading-sans">
-              <span className="text-stone-400">宗族羁绊：</span>
-              <span className="text-[#D4A359] font-medium font-reading-sans">
+              <span className={isLight ? "text-stone-700 font-medium" : "text-stone-400"}>宗族羁绊：</span>
+              <span className={`font-medium font-reading-sans ${isLight ? "text-amber-800 font-semibold" : "text-[#D4A359]"}`}>
                 {getKinshipDesc(attrs.kinshipGuilt)}
               </span>
             </div>
             <div className="flex justify-between items-center py-0.5 font-reading-sans">
-              <span className="text-stone-400">反叛心气：</span>
-              <span className="text-violet-400 font-medium font-reading-sans">
+              <span className={isLight ? "text-stone-700 font-medium" : "text-stone-400"}>反叛心气：</span>
+              <span className={`font-medium font-reading-sans ${isLight ? "text-violet-700 font-semibold" : "text-violet-400"}`}>
                 {getIndependenceDesc(attrs.rebellion)}
               </span>
             </div>
             <div className="flex justify-between items-center py-0.5 font-reading-sans">
-              <span className="text-stone-400">抗压韧劲：</span>
-              <span className="text-emerald-400 font-medium font-reading-sans">
+              <span className={isLight ? "text-stone-700 font-medium" : "text-stone-400"}>抗压韧劲：</span>
+              <span className={`font-medium font-reading-sans ${isLight ? "text-emerald-700 font-semibold" : "text-emerald-400"}`}>
                 {getResilienceDesc(attrs.resilience)}
               </span>
             </div>
           </div>
 
           {/* Tags */}
-          <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-4 space-y-2 shadow-sm">
-            <span className="text-xs font-semibold text-[#D4A359] block font-narrative-serif">成长烙印印记</span>
+          <div className={`border rounded-xl p-4 space-y-2 shadow-sm transition-colors ${
+            isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#13151F] border-white/[0.07] text-stone-100"
+          }`}>
+            <span className={`text-xs font-semibold block font-narrative-serif ${
+              isLight ? "text-amber-900" : "text-[#D4A359]"
+            }`}>
+              成长烙印印记
+            </span>
             <div className="flex flex-wrap gap-1.5">
               {tags.map((t) => (
                 <span
                   key={t}
-                  className="px-2.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-300 text-[11px] font-reading-sans"
+                  className={`px-2.5 py-0.5 rounded border text-[11px] font-reading-sans ${
+                    isLight ? "bg-stone-100 border-stone-300 text-stone-800 font-medium" : "bg-[#181B26] border-white/[0.08] text-stone-300"
+                  }`}
                 >
                   {t}
                 </span>
@@ -1815,7 +1947,9 @@ ${logEntries
         <main
           className={`${
             mobileTab === 'log' ? 'flex' : 'hidden'
-          } lg:flex flex-1 bg-[#0A0B0E] flex-col h-full min-w-0 relative`}
+          } lg:flex flex-1 ${
+            isLight ? "bg-[#F8F7F4] text-stone-900" : "bg-[#0A0B0E] text-stone-100"
+          } flex-col h-full min-w-0 relative transition-colors`}
         >
           {/* Chronicle Feed Container */}
           <div
@@ -1826,34 +1960,52 @@ ${logEntries
             <div className="max-w-2xl mx-auto w-full space-y-4">
             {/* Crisis Toast Alert inside Chronicle Feed */}
             {crisisWarning && !logEntries.some((e) => e.age === 63) && (
-              <div className="bg-rose-950/40 border-2 border-rose-800/80 rounded-2xl p-4 sm:p-5 flex items-start gap-3 shadow-lg animate-pulse">
-                <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+              <div className={`rounded-2xl p-4 sm:p-5 flex items-start gap-3 shadow-lg animate-pulse border-2 ${
+                isLight
+                  ? "bg-rose-50 border-rose-300 text-rose-950"
+                  : "bg-rose-950/40 border-rose-800/80 text-rose-200"
+              }`}>
+                <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${isLight ? "text-rose-600" : "text-rose-400"}`} />
                 <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-rose-300 font-narrative-serif">{crisisWarning.title}</h4>
-                  <p className="text-xs text-rose-200/90 leading-relaxed font-reading-sans">{crisisWarning.desc}</p>
+                  <h4 className={`text-sm font-bold font-narrative-serif ${isLight ? "text-rose-900" : "text-rose-300"}`}>
+                    {crisisWarning.title}
+                  </h4>
+                  <p className={`text-xs leading-relaxed font-reading-sans ${isLight ? "text-rose-800" : "text-rose-200/90"}`}>
+                    {crisisWarning.desc}
+                  </p>
                 </div>
               </div>
             )}
             {logEntries.map((entry, idx) => (
               <div
                 key={entry.id + idx}
-                className="bg-[#12141C] border border-white/[0.07] rounded-2xl p-5 sm:p-6 shadow-sm space-y-3 transition-all hover:border-white/[0.12] animate-year-enter"
+                className={`border rounded-2xl p-5 sm:p-6 shadow-sm space-y-3 transition-all animate-year-enter ${
+                  isLight
+                    ? "bg-white border-stone-200/90 hover:border-stone-300 text-stone-900 shadow-stone-200/50"
+                    : "bg-[#12141C] border-white/[0.07] hover:border-white/[0.12] text-stone-100"
+                }`}
               >
                 {/* Entry Header */}
-                <div className="flex items-center justify-between text-xs text-stone-400 border-b border-white/[0.06] pb-2 font-mono-num">
-                  <span className="text-[#D4A359] font-semibold">
+                <div className={`flex items-center justify-between text-xs border-b pb-2 font-mono-num ${
+                  isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
+                }`}>
+                  <span className={`font-semibold ${isLight ? "text-amber-800 font-bold" : "text-[#D4A359]"}`}>
                     [{entry.age}岁 · {entry.year}年]
                   </span>
-                  <span className="text-stone-400 font-reading-sans">{entry.stageName}</span>
+                  <span className={`font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
+                    {entry.stageName}
+                  </span>
                 </div>
 
                 {/* Entry Title */}
-                <h3 className="text-base sm:text-lg font-bold text-stone-100 font-narrative-serif tracking-normal">
+                <h3 className={`text-base sm:text-lg font-bold font-narrative-serif tracking-normal ${
+                  isLight ? "text-stone-900" : "text-stone-100"
+                }`}>
                   {entry.title}
                 </h3>
 
                 {/* Narrative scene */}
-                <p className="prose-reading whitespace-pre-line">
+                <p className={`prose-reading whitespace-pre-line ${isLight ? "text-stone-800 font-normal" : "text-stone-200"}`}>
                   {entry.scene}
                 </p>
 
@@ -1862,10 +2014,14 @@ ${logEntries
                   <div className="flex flex-wrap gap-2 pt-1 text-xs">
                     {entry.statDelta.health !== undefined && entry.statDelta.health !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
                           entry.statDelta.health > 0
-                            ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40'
-                            : 'bg-rose-950/60 text-rose-400 border border-rose-800/40'
+                            ? isLight
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-medium'
+                              : 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40'
+                            : isLight
+                            ? 'bg-rose-50 text-rose-800 border-rose-300 font-medium'
+                            : 'bg-rose-950/60 text-rose-400 border-rose-800/40'
                         }`}
                       >
                         体魄 {entry.statDelta.health > 0 ? `+${entry.statDelta.health}` : entry.statDelta.health}
@@ -1873,10 +2029,14 @@ ${logEntries
                     )}
                     {entry.statDelta.cognition !== undefined && entry.statDelta.cognition !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
                           entry.statDelta.cognition > 0
-                            ? 'bg-sky-950/60 text-sky-400 border border-sky-800/40'
-                            : 'bg-rose-950/60 text-rose-400 border border-rose-800/40'
+                            ? isLight
+                              ? 'bg-sky-50 text-sky-800 border-sky-300 font-medium'
+                              : 'bg-sky-950/60 text-sky-400 border-sky-800/40'
+                            : isLight
+                            ? 'bg-rose-50 text-rose-800 border-rose-300 font-medium'
+                            : 'bg-rose-950/60 text-rose-400 border-rose-800/40'
                         }`}
                       >
                         见识 {entry.statDelta.cognition > 0 ? `+${entry.statDelta.cognition}` : entry.statDelta.cognition}
@@ -1884,10 +2044,14 @@ ${logEntries
                     )}
                     {entry.statDelta.social !== undefined && entry.statDelta.social !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
                           entry.statDelta.social > 0
-                            ? 'bg-purple-950/60 text-purple-400 border border-purple-800/40'
-                            : 'bg-rose-950/60 text-rose-400 border border-rose-800/40'
+                            ? isLight
+                              ? 'bg-purple-50 text-purple-800 border-purple-300 font-medium'
+                              : 'bg-purple-950/60 text-purple-400 border-purple-800/40'
+                            : isLight
+                            ? 'bg-rose-50 text-rose-800 border-rose-300 font-medium'
+                            : 'bg-rose-950/60 text-rose-400 border-rose-800/40'
                         }`}
                       >
                         人脉 {entry.statDelta.social > 0 ? `+${entry.statDelta.social}` : entry.statDelta.social}
@@ -1895,10 +2059,14 @@ ${logEntries
                     )}
                     {entry.statDelta.savings !== undefined && entry.statDelta.savings !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
                           entry.statDelta.savings > 0
-                            ? "bg-amber-950/60 text-amber-300 border border-amber-800/40"
-                            : "bg-rose-950/60 text-rose-400 border border-rose-800/40"
+                            ? isLight
+                              ? 'bg-amber-50 text-amber-900 border-amber-300 font-medium'
+                              : 'bg-amber-950/60 text-amber-300 border-amber-800/40'
+                            : isLight
+                            ? 'bg-rose-50 text-rose-800 border-rose-300 font-medium'
+                            : 'bg-rose-950/60 text-rose-400 border-rose-800/40'
                         }`}
                       >
                         {entry.age < 18 ? "个人零花" : "个人现金"} {entry.statDelta.savings > 0 ? `+¥${entry.statDelta.savings}` : `-¥${Math.abs(entry.statDelta.savings)}`}
@@ -1906,10 +2074,14 @@ ${logEntries
                     )}
                     {entry.statDelta.familySavings !== undefined && entry.statDelta.familySavings !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
                           entry.statDelta.familySavings > 0
-                            ? "bg-teal-950/60 text-teal-300 border border-teal-800/40"
-                            : "bg-orange-950/60 text-orange-400 border border-orange-800/40"
+                            ? isLight
+                              ? 'bg-teal-50 text-teal-900 border-teal-300 font-medium'
+                              : 'bg-teal-950/60 text-teal-300 border-teal-800/40'
+                            : isLight
+                            ? 'bg-orange-50 text-orange-900 border-orange-300 font-medium'
+                            : 'bg-orange-950/60 text-orange-400 border-orange-800/40'
                         }`}
                       >
                         家庭储蓄 {entry.statDelta.familySavings > 0 ? `+¥${entry.statDelta.familySavings}` : `-¥${Math.abs(entry.statDelta.familySavings)}`}
@@ -1920,13 +2092,21 @@ ${logEntries
 
                 {/* If a choice was made */}
                 {entry.chosenOptionText && (
-                  <div className="mt-3 pt-3 border-t border-white/[0.06] bg-[#161822] p-3.5 rounded-xl space-y-1.5">
-                    <div className="text-xs sm:text-[13px] text-[#D4A359] font-semibold flex items-center gap-1.5 font-reading-sans">
+                  <div className={`mt-3 pt-3 border-t p-3.5 rounded-xl space-y-1.5 ${
+                    isLight
+                      ? "bg-amber-50/70 border border-amber-200/80 text-stone-800"
+                      : "border-white/[0.06] bg-[#161822] text-stone-100"
+                  }`}>
+                    <div className={`text-xs sm:text-[13px] font-semibold flex items-center gap-1.5 font-reading-sans ${
+                      isLight ? "text-amber-900 font-bold" : "text-[#D4A359]"
+                    }`}>
                       <span>抉择印记：</span>
                       <span>{entry.chosenOptionText}</span>
                     </div>
                     {entry.chosenReaction && (
-                      <div className="text-xs sm:text-[13px] text-stone-300 leading-relaxed pl-3 border-l-2 border-[#D4A359]/40 italic font-reading-sans">
+                      <div className={`text-xs sm:text-[13px] leading-relaxed pl-3 border-l-2 italic font-reading-sans ${
+                        isLight ? "text-stone-700 border-amber-500/60 font-normal" : "text-stone-300 border-[#D4A359]/40"
+                      }`}>
                         {entry.chosenReaction}
                       </div>
                     )}
@@ -1935,8 +2115,12 @@ ${logEntries
 
                 {/* If milestone reflection present */}
                 {entry.reflection && (
-                  <div className="mt-2 text-xs sm:text-[13px] text-[#D4A359]/90 italic pt-2 border-t border-white/[0.06] flex items-start gap-1.5 bg-[#D4A359]/10 p-3 rounded-xl font-reading-sans">
-                    <Sparkles className="w-3.5 h-3.5 text-[#D4A359] shrink-0 mt-0.5" />
+                  <div className={`mt-2 text-xs sm:text-[13px] italic pt-2 border-t flex items-start gap-1.5 p-3 rounded-xl font-reading-sans ${
+                    isLight
+                      ? "bg-amber-100/70 text-amber-950 border border-amber-300 font-medium"
+                      : "text-[#D4A359]/90 border-white/[0.06] bg-[#D4A359]/10"
+                  }`}>
+                    <Sparkles className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
                     <span>体悟：{entry.reflection}</span>
                   </div>
                 )}
@@ -1949,9 +2133,13 @@ ${logEntries
               const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries);
 
               return (
-                <div className="bg-[#13151E] border-2 border-[#D4A359]/70 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 animate-year-enter">
+                <div className={`border-2 rounded-2xl p-6 sm:p-8 space-y-6 animate-year-enter transition-colors ${
+                  isLight
+                    ? "bg-white border-amber-600/40 text-stone-900 shadow-xl"
+                    : "bg-[#13151E] border-[#D4A359]/70 text-stone-100 shadow-2xl"
+                }`}>
                   {/* Badge & Title */}
-                  <div className="text-center pb-4 border-b border-white/[0.07] space-y-2.5">
+                  <div className={`text-center pb-4 border-b space-y-2.5 ${isLight ? "border-stone-200" : "border-white/[0.07]"}`}>
                     <div className="flex items-center justify-center gap-2">
                       <span
                         className={`text-xs font-bold px-2.5 py-0.5 rounded font-mono-num shadow-sm ${
@@ -1959,41 +2147,53 @@ ${logEntries
                             ? 'bg-gradient-to-r from-[#D4A359] to-[#C29348] text-stone-950 font-bold'
                             : finalVerdict.ending.rarity === 'SR'
                             ? 'bg-purple-600 text-stone-100 font-bold'
+                            : isLight
+                            ? 'bg-stone-200 text-stone-800'
                             : 'bg-stone-800 text-stone-300'
                         }`}
                       >
                         {finalVerdict.ending.rarity}
                       </span>
-                      <span className="text-xs font-mono-num text-[#D4A359]/90">
+                      <span className={`text-xs font-mono-num font-semibold ${isLight ? "text-amber-800" : "text-[#D4A359]/90"}`}>
                         终局 No.{finalVerdict.ending.number < 10 ? '0' : ''}{finalVerdict.ending.number} / 16
                       </span>
                     </div>
 
-                    <h2 className="text-2xl sm:text-3xl font-bold text-[#D4A359] tracking-normal font-narrative-serif">
+                    <h2 className={`text-2xl sm:text-3xl font-bold tracking-normal font-narrative-serif ${
+                      isLight ? "text-stone-900" : "text-[#D4A359]"
+                    }`}>
                       {finalVerdict.summaryTitle}
                     </h2>
-                    <div className="text-xs sm:text-sm text-stone-300 font-narrative-serif italic max-w-xl mx-auto">
+                    <div className={`text-xs sm:text-sm font-narrative-serif italic max-w-xl mx-auto ${
+                      isLight ? "text-stone-600 font-medium" : "text-stone-300"
+                    }`}>
                       {finalVerdict.tagline}
                     </div>
                   </div>
 
                   {/* 2-Column: Radar Chart + Key Stats */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    <RadarChart radar={finalVerdict.radar} />
+                    <RadarChart radar={finalVerdict.radar} isLight={isLight} />
 
                     <div className="space-y-2.5">
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="bg-[#161822] p-3 rounded-xl border border-white/[0.06]">
-                          <span className="text-stone-400 block text-[11px] font-reading-sans">姓名 / 性别</span>
-                          <span className="text-stone-100 font-medium font-narrative-serif">{charData.name} · {charData.gender}</span>
+                        <div className={`p-3 rounded-xl border ${
+                          isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+                        }`}>
+                          <span className={`block text-[11px] font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>姓名 / 性别</span>
+                          <span className={`font-medium font-narrative-serif ${isLight ? "text-stone-900" : "text-stone-100"}`}>{charData.name} · {charData.gender}</span>
                         </div>
-                        <div className="bg-[#161822] p-3 rounded-xl border border-white/[0.06]">
-                          <span className="text-stone-400 block text-[11px] font-reading-sans">出生地背景</span>
-                          <span className="text-stone-100 font-medium truncate block font-reading-sans">{charData.family.region}</span>
+                        <div className={`p-3 rounded-xl border ${
+                          isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+                        }`}>
+                          <span className={`block text-[11px] font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>出生地背景</span>
+                          <span className={`font-medium truncate block font-reading-sans ${isLight ? "text-stone-900" : "text-stone-100"}`}>{charData.family.region}</span>
                         </div>
-                        <div className="bg-[#161822] p-3 rounded-xl border border-white/[0.06]">
-                          <span className="text-stone-400 block text-[11px] font-reading-sans">求学分流</span>
-                          <span className="text-[#D4A359] font-medium truncate block font-reading-sans">
+                        <div className={`p-3 rounded-xl border ${
+                          isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+                        }`}>
+                          <span className={`block text-[11px] font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>求学分流</span>
+                          <span className={`font-semibold truncate block font-reading-sans ${isLight ? "text-amber-800" : "text-[#D4A359]"}`}>
                             {currentTrack === '985_211'
                               ? '985/211 核心精英'
                               : currentTrack === 'junior_college'
@@ -2001,25 +2201,39 @@ ${logEntries
                               : '普通双非 务实骨干'}
                           </span>
                         </div>
-                        <div className="bg-[#161822] p-3 rounded-xl border border-white/[0.06]">
-                          <span className="text-stone-400 block text-[11px] font-reading-sans">终局个人资产</span>
-                          <span className={`font-mono-num font-bold ${attrs.savings >= 0 ? "text-amber-300" : "text-rose-400"}`}>
+                        <div className={`p-3 rounded-xl border ${
+                          isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+                        }`}>
+                          <span className={`block text-[11px] font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>终局个人资产</span>
+                          <span className={`font-mono-num font-bold ${
+                            attrs.savings >= 0
+                              ? isLight ? "text-amber-800" : "text-amber-300"
+                              : "text-rose-500"
+                          }`}>
                             ¥{attrs.savings.toLocaleString()}
                           </span>
                         </div>
-                        <div className="bg-[#161822] p-3 rounded-xl border border-white/[0.06]">
-                          <span className="text-stone-400 block text-[11px] font-reading-sans">老家父母储备</span>
-                          <span className={`font-mono-num font-bold ${attrs.familySavings >= 0 ? "text-teal-300" : "text-rose-400"}`}>
+                        <div className={`p-3 rounded-xl border ${
+                          isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+                        }`}>
+                          <span className={`block text-[11px] font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>老家父母储备</span>
+                          <span className={`font-mono-num font-bold ${
+                            attrs.familySavings >= 0
+                              ? isLight ? "text-teal-800" : "text-teal-300"
+                              : "text-rose-500"
+                          }`}>
                             ¥{attrs.familySavings.toLocaleString()}
                           </span>
                         </div>
                       </div>
 
                       {/* Earned Achievements Shelf */}
-                      <div className="bg-[#161822] p-3.5 rounded-xl border border-white/[0.06] space-y-2">
-                        <div className="flex items-center justify-between text-xs font-semibold text-stone-300">
-                          <span className="flex items-center gap-1.5 text-[#D4A359] font-narrative-serif">
-                            <Award className="w-3.5 h-3.5 text-[#D4A359]" />
+                      <div className={`p-3.5 rounded-xl border space-y-2 ${
+                        isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+                      }`}>
+                        <div className="flex items-center justify-between text-xs font-semibold">
+                          <span className={`flex items-center gap-1.5 font-narrative-serif ${isLight ? "text-amber-900 font-bold" : "text-[#D4A359]"}`}>
+                            <Award className={`w-3.5 h-3.5 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
                             斩获人生成就 ({finalVerdict.achievements.length}/12)
                           </span>
                         </div>
@@ -2029,9 +2243,15 @@ ${logEntries
                               key={ach.id}
                               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] border font-reading-sans ${
                                 ach.rarity === 'gold'
-                                  ? 'bg-[#D4A359]/15 border-[#D4A359]/40 text-[#D4A359]'
+                                  ? isLight
+                                    ? 'bg-amber-100/70 border-amber-300 text-amber-950 font-semibold'
+                                    : 'bg-[#D4A359]/15 border-[#D4A359]/40 text-[#D4A359]'
                                   : ach.rarity === 'purple'
-                                  ? 'bg-purple-950/40 border-purple-600/50 text-purple-200'
+                                  ? isLight
+                                    ? 'bg-purple-100/70 border-purple-300 text-purple-950 font-semibold'
+                                    : 'bg-purple-950/40 border-purple-600/50 text-purple-200'
+                                  : isLight
+                                  ? 'bg-stone-100 border-stone-300 text-stone-800 font-medium'
                                   : 'bg-[#181B26] border-white/[0.08] text-stone-300'
                               }`}
                               title={ach.description}
@@ -2046,18 +2266,28 @@ ${logEntries
                   </div>
 
                   {/* Literary Verdict Prose */}
-                  <div className="bg-[#161822] p-5 sm:p-6 rounded-xl border border-white/[0.06] prose-reading whitespace-pre-line">
+                  <div className={`p-5 sm:p-6 rounded-xl border prose-reading whitespace-pre-line ${
+                    isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06]"
+                  }`}>
                     {finalVerdict.verdictText}
                   </div>
 
                   {/* Life Tags Badges */}
                   <div className="space-y-1.5">
-                    <span className="text-xs font-semibold text-stone-400 block font-narrative-serif">六十三载岁月烙印</span>
+                    <span className={`text-xs font-semibold block font-narrative-serif ${
+                      isLight ? "text-stone-700 font-bold" : "text-stone-400"
+                    }`}>
+                      六十三载岁月烙印
+                    </span>
                     <div className="flex flex-wrap gap-1.5">
                       {tags.map((t) => (
                         <span
                           key={t}
-                          className="px-2.5 py-0.5 rounded-full bg-[#181B26] text-stone-300 text-xs font-reading-sans border border-white/[0.08]"
+                          className={`px-2.5 py-0.5 rounded-full text-xs font-reading-sans border ${
+                            isLight
+                              ? "bg-stone-100 text-stone-800 border-stone-300 font-medium"
+                              : "bg-[#181B26] text-stone-300 border-white/[0.08]"
+                          }`}
                         >
                           {t}
                         </span>
@@ -2066,14 +2296,20 @@ ${logEntries
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-3 border-t border-white/[0.07] flex flex-col sm:flex-row gap-2.5 font-reading-sans">
+                  <div className={`pt-3 border-t flex flex-col sm:flex-row gap-2.5 font-reading-sans ${
+                    isLight ? "border-stone-200" : "border-white/[0.07]"
+                  }`}>
                     <button
                       onClick={handleCopyRecord}
-                      className="flex-1 py-3 px-4 rounded-xl border border-white/[0.08] bg-[#181B26] hover:bg-[#1E2230] text-stone-100 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                      className={`flex-1 py-3 px-4 rounded-xl border text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.99] ${
+                        isLight
+                          ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                          : "border-white/[0.08] bg-[#181B26] hover:bg-[#1E2230] text-stone-100"
+                      }`}
                     >
                       {copied ? (
                         <>
-                          <Check className="w-4 h-4 text-emerald-400" />
+                          <Check className="w-4 h-4 text-emerald-500" />
                           <span>已复制生平手记</span>
                         </>
                       ) : (
@@ -2086,16 +2322,24 @@ ${logEntries
 
                     <button
                       onClick={() => setShowCodexModal(true)}
-                      className="py-3 px-4 rounded-xl border border-[#D4A359]/30 bg-[#D4A359]/10 hover:bg-[#D4A359]/20 text-[#D4A359] text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
+                      className={`py-3 px-4 rounded-xl border text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all ${
+                        isLight
+                          ? "border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 font-semibold"
+                          : "border-[#D4A359]/30 bg-[#D4A359]/10 hover:bg-[#D4A359]/20 text-[#D4A359]"
+                      }`}
                     >
-                      <BookOpen className="w-4 h-4 text-[#D4A359]" />
+                      <BookOpen className={`w-4 h-4 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
                       <span>查看16大结局图鉴</span>
                     </button>
 
                     {chosenPath === 'emigrate' && (
                       <button
                         onClick={() => onNavigateToSubclasses()}
-                        className="py-3 px-4 rounded-xl border border-sky-800/60 bg-sky-950/40 hover:bg-sky-900/50 text-sky-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
+                        className={`py-3 px-4 rounded-xl border text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all ${
+                          isLight
+                            ? "border-sky-300 bg-sky-50 hover:bg-sky-100 text-sky-900 font-semibold"
+                            : "border-sky-800/60 bg-sky-950/40 hover:bg-sky-900/50 text-sky-200"
+                        }`}
                       >
                         <Compass className="w-4 h-4" />
                         <span>出海参考</span>
@@ -2105,7 +2349,11 @@ ${logEntries
 
                     <button
                       onClick={() => onNavigateToDIY()}
-                      className="py-3 px-4 rounded-xl border border-white/[0.08] bg-[#181B26] hover:bg-[#1E2230] text-stone-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
+                      className={`py-3 px-4 rounded-xl border text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all ${
+                        isLight
+                          ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
+                          : "border-white/[0.08] bg-[#181B26] hover:bg-[#1E2230] text-stone-300"
+                      }`}
                     >
                       <span>DIY指南</span>
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -2467,90 +2715,98 @@ ${logEntries
             isLight ? "border-stone-200 bg-[#FAF9F6] text-stone-800" : "border-white/[0.07] bg-[#0D0F15] text-stone-100"
           }`}
         >
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#D4A359] block pb-1 border-b border-white/[0.06] font-narrative-serif">
+          <span className={`text-xs font-semibold uppercase tracking-wider block pb-1 border-b font-narrative-serif ${
+            isLight ? "text-amber-900 border-stone-200" : "text-[#D4A359] border-white/[0.06]"
+          }`}>
             原生家庭与血缘生态
           </span>
 
           {/* Father Dynamic Card */}
           <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
-      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
-    }`}>
+            isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+          }`}>
             <div className="flex items-center justify-between font-reading-sans">
-              <span className="flex items-center gap-2 text-amber-300 font-semibold">
+              <span className={`flex items-center gap-2 font-semibold ${isLight ? "text-amber-900 font-bold" : "text-amber-300"}`}>
                 <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                  <User className="w-3.5 h-3.5 text-amber-300" />
+                  <User className={`w-3.5 h-3.5 ${isLight ? "text-amber-600" : "text-amber-300"}`} />
                 </div>
                 父亲：{fatherStatus.age}岁
               </span>
-              <span className="text-stone-400 font-normal">{charData.family.fatherJob}</span>
+              <span className={`font-normal ${isLight ? "text-stone-700 font-medium" : "text-stone-400"}`}>{charData.family.fatherJob}</span>
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
+            <div className={`text-[12px] leading-relaxed font-reading-sans pl-8 ${isLight ? "text-stone-800 font-normal" : "text-stone-300"}`}>
               {fatherStatus.status}
             </div>
-            <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans">
+            <div className={`text-[11px] pt-1.5 border-t font-reading-sans ${isLight ? "text-stone-600 border-stone-200 font-medium" : "text-stone-400 border-white/[0.06]"}`}>
               性格：{charData.family.fatherTrait}
             </div>
           </div>
 
           {/* Mother Dynamic Card */}
           <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
-      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
-    }`}>
+            isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+          }`}>
             <div className="flex items-center justify-between font-reading-sans">
-              <span className="flex items-center gap-2 text-rose-300 font-semibold">
+              <span className={`flex items-center gap-2 font-semibold ${isLight ? "text-rose-800 font-bold" : "text-rose-300"}`}>
                 <div className="w-6 h-6 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center shrink-0">
-                  <User className="w-3.5 h-3.5 text-rose-300" />
+                  <User className={`w-3.5 h-3.5 ${isLight ? "text-rose-600" : "text-rose-300"}`} />
                 </div>
                 母亲：{motherStatus.age}岁
               </span>
-              <span className="text-stone-400 font-normal">{charData.family.motherJob}</span>
+              <span className={`font-normal ${isLight ? "text-stone-700 font-medium" : "text-stone-400"}`}>{charData.family.motherJob}</span>
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
+            <div className={`text-[12px] leading-relaxed font-reading-sans pl-8 ${isLight ? "text-stone-800 font-normal" : "text-stone-300"}`}>
               {motherStatus.status}
             </div>
-            <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans">
+            <div className={`text-[11px] pt-1.5 border-t font-reading-sans ${isLight ? "text-stone-600 border-stone-200 font-medium" : "text-stone-400 border-white/[0.06]"}`}>
               性格：{charData.family.motherTrait}
             </div>
           </div>
 
           {/* Siblings */}
           <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
-      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
-    }`}>
-            <div className="text-sky-300 font-semibold flex items-center justify-between font-reading-sans">
+            isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+          }`}>
+            <div className={`font-semibold flex items-center justify-between font-reading-sans ${isLight ? "text-sky-800" : "text-sky-300"}`}>
               <span className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
-                  <Shield className="w-3.5 h-3.5 text-sky-300" />
+                  <Shield className={`w-3.5 h-3.5 ${isLight ? "text-sky-600" : "text-sky-300"}`} />
                 </div>
                 同胞：{siblingStatus.label}
               </span>
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
+            <div className={`text-[12px] leading-relaxed font-reading-sans pl-8 ${isLight ? "text-stone-800 font-normal" : "text-stone-300"}`}>
               {siblingStatus.status}
             </div>
           </div>
 
           {/* Housing & Family Assets */}
           <div className={`border rounded-xl p-3.5 space-y-2 text-xs shadow-sm transition-colors ${
-      isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
-    }`}>
-            <div className="text-teal-300 font-semibold flex items-center justify-between font-reading-sans">
+            isLight ? "bg-white border-stone-200 text-stone-800 hover:border-stone-300" : "bg-[#13151F] border-white/[0.07] text-stone-100 hover:border-white/[0.12]"
+          }`}>
+            <div className={`font-semibold flex items-center justify-between font-reading-sans ${isLight ? "text-teal-800" : "text-teal-300"}`}>
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
-                  <Home className="w-3.5 h-3.5 text-teal-300" />
+                  <Home className={`w-3.5 h-3.5 ${isLight ? "text-teal-600" : "text-teal-300"}`} />
                 </div>
                 <span>{currentAge < 23 ? "家庭居所与家庭储备" : "老家宅居与父母储备"}</span>
               </div>
-              <span className={`font-mono-num font-semibold text-sm ${attrs.familySavings >= 0 ? "text-teal-300" : "text-rose-400"}`}>
+              <span className={`font-mono-num font-semibold text-sm ${
+                attrs.familySavings >= 0
+                  ? isLight ? "text-teal-800 font-bold" : "text-teal-300"
+                  : "text-rose-500 font-bold"
+              }`}>
                 ¥{attrs.familySavings.toLocaleString()}
               </span>
             </div>
-            <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
+            <div className={`text-[12px] leading-relaxed font-reading-sans pl-8 ${isLight ? "text-stone-800 font-normal" : "text-stone-300"}`}>
               {charData.family.housing}
             </div>
-            <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans flex items-center justify-between">
+            <div className={`text-[11px] pt-1.5 border-t font-reading-sans flex items-center justify-between ${
+              isLight ? "text-stone-600 border-stone-200 font-medium" : "text-stone-400 border-white/[0.06]"
+            }`}>
               <span>{charData.family.wealthDetail}</span>
-              <span className={attrs.familySavings < 0 ? "text-rose-400 font-medium" : "text-stone-500"}>
+              <span className={attrs.familySavings < 0 ? (isLight ? "text-rose-600 font-semibold" : "text-rose-400 font-medium") : (isLight ? "text-stone-600 font-medium" : "text-stone-500")}>
                 {attrs.familySavings < 0 ? "⚠️ 原生家庭借债负数" : "原生家庭底资"}
               </span>
             </div>
@@ -2565,6 +2821,7 @@ ${logEntries
         isOpen={showCodexModal}
         onClose={() => setShowCodexModal(false)}
         unlockedIds={unlockedEndings}
+        isLight={isLight}
       />
 
       {/* ================================================================= */}
@@ -2572,37 +2829,61 @@ ${logEntries
       {/* ================================================================= */}
       {showGaokaoModal && gaokaoCalc && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0E1017] border border-[#D4A359]/60 rounded-2xl max-w-xl w-full p-5 sm:p-7 shadow-2xl space-y-5 animate-year-enter max-h-[90vh] overflow-y-auto">
-            <div className="text-center pb-4 border-b border-white/[0.07]">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4A359]/15 text-[#D4A359] border border-[#D4A359]/30 text-xs mb-2 font-narrative-serif">
+          <div className={`border rounded-2xl max-w-xl w-full p-5 sm:p-7 shadow-2xl space-y-5 animate-year-enter max-h-[90vh] overflow-y-auto transition-colors ${
+            isLight
+              ? "bg-white border-amber-600/40 text-stone-900 shadow-stone-900/15"
+              : "bg-[#0E1017] border-[#D4A359]/60 text-stone-100 shadow-2xl"
+          }`}>
+            <div className={`text-center pb-4 border-b ${isLight ? "border-stone-200" : "border-white/[0.07]"}`}>
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs mb-2 font-narrative-serif ${
+                isLight
+                  ? "bg-amber-100 text-amber-900 border border-amber-300"
+                  : "bg-[#D4A359]/15 text-[#D4A359] border border-[#D4A359]/30"
+              }`}>
                 <GraduationCap className="w-3.5 h-3.5" />
                 十八岁 · 高考放榜与学业结算
               </div>
               {isAutoPlaying && (
-                <div className="text-[11px] text-[#D4A359] font-reading-sans flex items-center justify-center gap-1.5 mb-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-pulse" />
+                <div className={`text-[11px] font-reading-sans flex items-center justify-center gap-1.5 mb-2 ${
+                  isLight ? "text-amber-800" : "text-[#D4A359]"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isLight ? "bg-amber-600" : "bg-[#D4A359]"}`} />
                   自动流转挂起中 · 选定去向后自动继续
                 </div>
               )}
-              <h2 className="text-xl sm:text-2xl font-bold text-[#D4A359] mb-2 font-narrative-serif">
+              <h2 className={`text-xl sm:text-2xl font-bold mb-2 font-narrative-serif ${
+                isLight ? "text-stone-900" : "text-[#D4A359]"
+              }`}>
                 {gaokaoCalc.title}
               </h2>
-              <div className="text-xs sm:text-sm font-semibold text-emerald-400 bg-emerald-950/40 inline-block px-3.5 py-1 rounded-full border border-emerald-800/40 font-mono-num">
+              <div className={`text-xs sm:text-sm font-semibold inline-block px-3.5 py-1 rounded-full border font-mono-num ${
+                isLight
+                  ? "text-emerald-900 bg-emerald-50 border-emerald-300 font-bold"
+                  : "text-emerald-400 bg-emerald-950/40 border-emerald-800/40"
+              }`}>
                 {gaokaoCalc.scoreText}
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed bg-[#13151F] p-4 rounded-xl border border-white/[0.06] font-reading-sans">
+            <p className={`text-xs sm:text-sm leading-relaxed p-4 rounded-xl border font-reading-sans ${
+              isLight
+                ? "bg-stone-50 border-stone-200 text-stone-800"
+                : "bg-[#13151F] border-white/[0.06] text-stone-300"
+            }`}>
               {gaokaoCalc.verdict}
             </p>
 
-            <div className="text-xs text-stone-400 space-y-1 font-reading-sans">
+            <div className={`text-xs space-y-1 font-reading-sans ${
+              isLight ? "text-stone-600 font-medium" : "text-stone-400"
+            }`}>
               <div>【学业资本】{gaokaoCalc.academicCapitalDesc}</div>
               <div>【心理画像】{gaokaoCalc.psychologicalDossier}</div>
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-white/[0.07]">
-              <span className="text-xs font-semibold text-[#D4A359] block font-narrative-serif">
+            <div className={`space-y-2 pt-2 border-t ${isLight ? "border-stone-200" : "border-white/[0.07]"}`}>
+              <span className={`text-xs font-semibold block font-narrative-serif ${
+                isLight ? "text-amber-900" : "text-[#D4A359]"
+              }`}>
                 {gaokaoCalc.firstStepChoice.prompt}
               </span>
               <div className="grid grid-cols-1 gap-2.5">
@@ -2610,20 +2891,34 @@ ${logEntries
                   <button
                     key={oIdx}
                     onClick={() => handleConfirmGaokaoStep(opt)}
-                    className="p-3.5 sm:p-4 rounded-xl border border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/70 hover:bg-[#1E2232] text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between"
+                    className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between ${
+                      isLight
+                        ? "border-stone-200 bg-stone-50 hover:border-amber-500/70 hover:bg-amber-50/50 text-stone-900"
+                        : "border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/70 hover:bg-[#1E2232] text-stone-100"
+                    }`}
                   >
                     <div className="flex items-start gap-2.5">
-                      <span className="w-5 h-5 rounded-md bg-[#13151F] border border-white/[0.1] text-[#D4A359] font-mono-num text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                      <span className={`w-5 h-5 rounded-md border font-mono-num text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
+                        isLight
+                          ? "bg-stone-200 border-stone-300 text-stone-800"
+                          : "bg-[#13151F] border-white/[0.1] text-[#D4A359]"
+                      }`}>
                         {oIdx + 1}
                       </span>
                       <div>
-                        <div className="text-xs sm:text-sm font-semibold text-stone-100 group-hover:text-[#D4A359] mb-1 font-reading-sans">
+                        <div className={`text-xs sm:text-sm font-semibold mb-1 font-reading-sans ${
+                          isLight ? "text-stone-900 group-hover:text-amber-900" : "text-stone-100 group-hover:text-[#D4A359]"
+                        }`}>
                           {opt.text}
                         </div>
-                        <div className="text-xs text-stone-400 leading-relaxed font-reading-sans">{opt.detail}</div>
+                        <div className={`text-xs leading-relaxed font-reading-sans ${
+                          isLight ? "text-stone-600" : "text-stone-400"
+                        }`}>{opt.detail}</div>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-300 transition-transform group-hover:translate-x-1 shrink-0 mt-1 ml-3" />
+                    <ChevronRight className={`w-4 h-4 shrink-0 mt-1 ml-3 transition-transform group-hover:translate-x-1 ${
+                      isLight ? "text-stone-400 group-hover:text-amber-700" : "text-stone-400 group-hover:text-amber-300"
+                    }`} />
                   </button>
                 ))}
               </div>
