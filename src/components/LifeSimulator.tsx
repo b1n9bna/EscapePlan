@@ -2473,7 +2473,7 @@ ${logEntries
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 pt-0.5">
+                <div className="grid grid-cols-1 gap-3.5 sm:gap-4 pt-1">
                   {currentNode.choices.map((choice, cIdx) => {
                     const p = getChoicePresentation(choice, cIdx);
 
@@ -2481,15 +2481,15 @@ ${logEntries
                       <button
                         key={cIdx}
                         onClick={() => handleSelectChoice(choice)}
-                        className={`p-4 sm:p-5 rounded-xl border text-left transition-all duration-150 active:scale-[0.99] group shadow-sm flex flex-col gap-2 relative ${
+                        className={`p-4 sm:p-5 rounded-xl border text-left transition-all duration-150 active:scale-[0.99] group shadow-sm flex flex-col gap-2.5 sm:gap-3 relative ${
                           isLight
                             ? "bg-white hover:bg-amber-50/40 border-stone-200 hover:border-amber-400 text-stone-900"
                             : "bg-[#161824] hover:bg-[#1D2030] border-stone-800 hover:border-amber-500/50 text-stone-100"
                         }`}
                       >
                         {/* Top row: Number + Stance Badge + TradeOff Pills */}
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2.5">
+                          <div className="flex items-center gap-2.5">
                             <span className={`w-6 h-6 rounded-md border font-mono text-xs sm:text-sm font-bold flex items-center justify-center shrink-0 ${
                               isLight
                                 ? "bg-stone-100 text-stone-800 border-stone-300"
@@ -2497,7 +2497,7 @@ ${logEntries
                             }`}>
                               {cIdx + 1}
                             </span>
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-semibold border ${
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-semibold border tracking-[0.06em] ${
                               isLight
                                 ? "bg-amber-50 text-amber-900 border-amber-200"
                                 : "bg-amber-500/15 text-amber-300 border-amber-500/30"
@@ -2524,7 +2524,7 @@ ${logEntries
                               return (
                                 <span
                                   key={toIdx}
-                                  className={`text-[11.5px] sm:text-xs font-medium px-2.5 py-0.5 rounded-full border ${pillColor}`}
+                                  className={`text-[11.5px] sm:text-xs font-medium px-2.5 py-0.5 rounded-full border tracking-[0.04em] ${pillColor}`}
                                 >
                                   {to.label}
                                 </span>
@@ -2539,21 +2539,29 @@ ${logEntries
                           </div>
                         </div>
 
-                        {/* Main Action Text - clear, upright, prominent font size */}
+                        {/* Main Action Text - clear, upright, prominent font size, generous letter-spacing & line-height */}
                         <div
-                          style={{ fontSize: 'var(--choice-title-size, 17px)' }}
-                          className={`font-semibold leading-relaxed tracking-[0.055em] ${
+                          style={{
+                            fontSize: 'var(--choice-title-size, 17px)',
+                            letterSpacing: 'var(--choice-letter-spacing, 0.09em)',
+                            lineHeight: '1.76'
+                          }}
+                          className={`font-semibold ${
                             isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
                           }`}
                         >
                           {p.cleanText}
                         </div>
 
-                        {/* Detail text - clean, upright, legible font size */}
+                        {/* Detail text - clean, upright, generous letter-spacing & line-height */}
                         {p.detail && (
                           <div
-                            style={{ fontSize: 'var(--choice-desc-size, 14px)' }}
-                            className={`leading-relaxed line-clamp-3 pt-0.5 tracking-[0.05em] ${
+                            style={{
+                              fontSize: 'var(--choice-desc-size, 14px)',
+                              letterSpacing: 'var(--choice-desc-letter-spacing, 0.08em)',
+                              lineHeight: '1.82'
+                            }}
+                            className={`line-clamp-3 pt-0.5 ${
                               isLight ? "text-stone-600" : "text-stone-400"
                             }`}
                           >
@@ -2913,40 +2921,48 @@ ${logEntries
               <div>【心理画像】{gaokaoCalc.psychologicalDossier}</div>
             </div>
 
-            <div className={`space-y-2 pt-2 border-t ${isLight ? "border-stone-200" : "border-white/[0.07]"}`}>
-              <span className={`text-xs font-semibold block font-narrative-serif ${
+            <div className={`space-y-3 pt-3 border-t ${isLight ? "border-stone-200" : "border-white/[0.07]"}`}>
+              <span className={`text-sm sm:text-base font-bold block font-narrative-serif tracking-[0.06em] ${
                 isLight ? "text-amber-900" : "text-[#D4A359]"
               }`}>
                 {gaokaoCalc.firstStepChoice.prompt}
               </span>
-              <div className="grid grid-cols-1 gap-2.5">
+              <div className="grid grid-cols-1 gap-3 sm:gap-3.5">
                 {gaokaoCalc.firstStepChoice.options.map((opt, oIdx) => (
                   <button
                     key={oIdx}
                     onClick={() => handleConfirmGaokaoStep(opt)}
-                    className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between ${
+                    className={`p-4 sm:p-5 rounded-xl border text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between ${
                       isLight
                         ? "border-stone-200 bg-stone-50 hover:border-amber-500/70 hover:bg-amber-50/50 text-stone-900"
                         : "border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/70 hover:bg-[#1E2232] text-stone-100"
                     }`}
                   >
-                    <div className="flex items-start gap-2.5">
-                      <span className={`w-5 h-5 rounded-md border font-mono-num text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
+                    <div className="flex items-start gap-3">
+                      <span className={`w-6 h-6 rounded-md border font-mono-num text-xs sm:text-sm font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                         isLight
                           ? "bg-stone-200 border-stone-300 text-stone-800"
                           : "bg-[#13151F] border-white/[0.1] text-[#D4A359]"
                       }`}>
                         {oIdx + 1}
                       </span>
-                      <div>
-                        <div className={`text-xs sm:text-sm font-semibold mb-1 font-reading-sans ${
-                          isLight ? "text-stone-900 group-hover:text-amber-900" : "text-stone-100 group-hover:text-[#D4A359]"
-                        }`}>
+                      <div className="space-y-1.5">
+                        <div
+                          style={{ letterSpacing: '0.085em', lineHeight: '1.75' }}
+                          className={`text-sm sm:text-[16px] font-semibold font-reading-sans ${
+                            isLight ? "text-stone-900 group-hover:text-amber-900" : "text-stone-100 group-hover:text-[#D4A359]"
+                          }`}
+                        >
                           {opt.text}
                         </div>
-                        <div className={`text-xs leading-relaxed font-reading-sans ${
-                          isLight ? "text-stone-600" : "text-stone-400"
-                        }`}>{opt.detail}</div>
+                        <div
+                          style={{ letterSpacing: '0.075em', lineHeight: '1.8' }}
+                          className={`text-xs sm:text-[13.5px] font-reading-sans ${
+                            isLight ? "text-stone-600" : "text-stone-400"
+                          }`}
+                        >
+                          {opt.detail}
+                        </div>
                       </div>
                     </div>
                     <ChevronRight className={`w-4 h-4 shrink-0 mt-1 ml-3 transition-transform group-hover:translate-x-1 ${

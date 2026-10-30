@@ -70,6 +70,8 @@ body {
   --choice-title-size-sm: 16px;
   --choice-desc-size: 13px;
   --choice-desc-size-sm: 13.5px;
+  --choice-letter-spacing: 0.075em;
+  --choice-desc-letter-spacing: 0.065em;
 }
 
 .font-scale-large {
@@ -83,6 +85,8 @@ body {
   --choice-title-size-sm: 18px;
   --choice-desc-size: 14px;
   --choice-desc-size-sm: 15px;
+  --choice-letter-spacing: 0.09em;
+  --choice-desc-letter-spacing: 0.08em;
 }
 
 .font-scale-huge {
@@ -96,6 +100,8 @@ body {
   --choice-title-size-sm: 20.5px;
   --choice-desc-size: 15.5px;
   --choice-desc-size-sm: 17px;
+  --choice-letter-spacing: 0.11em;
+  --choice-desc-letter-spacing: 0.095em;
 }
 
 /* 新生岁月静雅淡入过渡（取消纵向位移突变，避免震颤与视觉眩晕） */
