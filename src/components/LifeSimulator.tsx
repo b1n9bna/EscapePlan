@@ -48,6 +48,10 @@ import {
   ChevronRight,
   Calendar,
   Compass,
+  Play,
+  Pause,
+  FastForward,
+  Gauge,
   BookOpen,
   Award,
   AlertTriangle,
@@ -452,6 +456,10 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   });
   const [showCodexModal, setShowCodexModal] = useState(false);
 
+  // Auto-play state & Speed control (in seconds per year, volume-slider style)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [autoPlaySpeed, setAutoPlaySpeed] = useState(1.2);
+
   // Confetti trigger once at Age 63
   const confettiFiredRef = useRef(false);
   useEffect(() => {
@@ -466,6 +474,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       } catch {}
     }
   }, [logEntries]);
+
 
   // Register newly unlocked ending into LocalStorage
   useEffect(() => {
@@ -680,6 +689,81 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   };
 
   // =========================================================================
+  // SKIP DIRECTLY TO NEXT INTERACTIVE DECISION / MAJOR MILESTONE
+  // =========================================================================
+  const handleSkipToNextDecision = () => {
+    if (waitingForChoice) return;
+    if (logEntries.some((e) => e.age === 63)) return;
+    if (isAutoPlaying) setIsAutoPlaying(false);
+
+    // If currently at 17yo or gaokao not resolved, trigger Gaokao directly
+    if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17 || (!timeline[timelineIndex + 1] && currentAge <= 18))) {
+      const calc = calculateGaokaoOutcome(attrs, tags);
+      setGaokaoCalc(calc);
+      setShowGaokaoModal(true);
+      return;
+    }
+
+    let targetIdx = timelineIndex + 1;
+    const accumulatedLogs: ChronicleLogEntry[] = [];
+    let accumulatedDelta: Partial<CharacterAttributes> = {};
+    const accumulatedTags: string[] = [];
+
+    while (targetIdx < timeline.length) {
+      const node = timeline[targetIdx];
+
+      // Stop if reaching gaokao threshold
+      if (!gaokaoCalc && (node.age >= 18 || currentNode.age === 17)) {
+        break;
+      }
+
+      const isChoice = node.type === 'choice' && node.choices && node.choices.length > 0;
+      const isMilestone = node.type === 'milestone' || node.age === 63;
+
+      if (node.naturalDelta) {
+        Object.entries(node.naturalDelta).forEach(([k, v]) => {
+          accumulatedDelta[k as keyof CharacterAttributes] =
+            (accumulatedDelta[k as keyof CharacterAttributes] || 0) + (v || 0);
+        });
+      }
+      if (node.naturalTags) {
+        accumulatedTags.push(...node.naturalTags);
+      }
+
+      accumulatedLogs.push({
+        id: node.id,
+        age: node.age,
+        year: birthYear + node.age,
+        stageName: node.stageName,
+        title: node.title,
+        scene: node.scene,
+        type: node.type || 'natural',
+        statDelta: node.naturalDelta,
+        tagsAdded: node.naturalTags,
+        reflection: node.reflection
+      });
+
+      if (isChoice || isMilestone) {
+        break;
+      }
+
+      targetIdx++;
+    }
+
+    if (accumulatedLogs.length > 0) {
+      if (Object.keys(accumulatedDelta).length > 0) applyDelta(accumulatedDelta);
+      if (accumulatedTags.length > 0) setTags((prev) => Array.from(new Set([...prev, ...accumulatedTags])));
+      setLogEntries((prev) => [...prev, ...accumulatedLogs]);
+      setTimelineIndex(targetIdx);
+      scrollToFeedBottom();
+    } else if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)) {
+      const calc = calculateGaokaoOutcome(attrs, tags);
+      setGaokaoCalc(calc);
+      setShowGaokaoModal(true);
+    }
+  };
+
+  // =========================================================================
   // SUBMIT PLAYER CHOICE
   // =========================================================================
   const handleSelectChoice = (choice: LifeChoice) => {
@@ -816,6 +900,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   const handleRestart = () => {
     confettiFiredRef.current = false;
+    setIsAutoPlaying(false);
     const fresh = generateRandomFamily();
     setCharData(fresh);
     setTimeline(generateTimelineForCharacter(fresh.family, fresh.gender));
@@ -828,6 +913,87 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setLogEntries([]);
     setTags([]);
   };
+
+  // =========================================================================
+  // AUTO-PLAY ENGINE (WITH SMART AUTO-PAUSE ON DECISION / CRISIS / RETIREMENT)
+  // =========================================================================
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    if (gamePhase !== 'cockpit') {
+      setIsAutoPlaying(false);
+      return;
+    }
+    // Smart auto-pause guards
+    if (waitingForChoice || showGaokaoModal || logEntries.some((e) => e.age === 63)) {
+      setIsAutoPlaying(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      handleNextNaturalYear();
+    }, autoPlaySpeed * 1000);
+
+    return () => clearTimeout(timer);
+  }, [isAutoPlaying, autoPlaySpeed, timelineIndex, waitingForChoice, showGaokaoModal, gamePhase, logEntries.length]);
+
+  // =========================================================================
+  // GLOBAL KEYBOARD SHORTCUTS (Space: Next / 1-4: Choice / A: Auto-play)
+  // =========================================================================
+  useEffect(() => {
+    if (gamePhase !== 'cockpit') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is inside an input/textarea
+      if (
+        document.activeElement &&
+        (document.activeElement.tagName === 'INPUT' ||
+          document.activeElement.tagName === 'TEXTAREA')
+      ) {
+        return;
+      }
+
+      // Space / Enter: Advance year or stop auto-play
+      if (e.code === 'Space' || e.key === 'Enter') {
+        e.preventDefault();
+        if (isAutoPlaying) {
+          setIsAutoPlaying(false);
+          return;
+        }
+        if (!waitingForChoice && !showGaokaoModal && !logEntries.some((entry) => entry.age === 63)) {
+          handleNextNaturalYear();
+        }
+        return;
+      }
+
+      // Key 'a' or 'A': Toggle Auto Play
+      if (e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        if (!waitingForChoice && !showGaokaoModal && !logEntries.some((entry) => entry.age === 63)) {
+          setIsAutoPlaying((prev) => !prev);
+        }
+        return;
+      }
+
+      // Number keys 1, 2, 3, 4: Directly pick active choice
+      if (['1', '2', '3', '4'].includes(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        if (waitingForChoice && currentNode.choices && currentNode.choices[idx]) {
+          e.preventDefault();
+          handleSelectChoice(currentNode.choices[idx]);
+          return;
+        }
+        if (showGaokaoModal && gaokaoCalc?.firstStepChoice?.options && gaokaoCalc.firstStepChoice.options[idx]) {
+          e.preventDefault();
+          handleConfirmGaokaoStep(gaokaoCalc.firstStepChoice.options[idx]);
+          return;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gamePhase, waitingForChoice, showGaokaoModal, isAutoPlaying, timelineIndex, currentNode, gaokaoCalc, logEntries.length]);
+
 
   const handleCopyRecord = () => {
     const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
@@ -1605,9 +1771,14 @@ ${logEntries
                       onClick={() => handleSelectChoice(choice)}
                       className="p-3.5 sm:p-4 rounded-xl border border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/80 hover:bg-[#1E2232] hover:-translate-y-0.5 text-left transition-all duration-200 active:scale-[0.99] group flex items-center justify-between shadow-sm"
                     >
-                      <span className="text-xs sm:text-[13.5px] font-medium text-stone-200 group-hover:text-white leading-relaxed font-reading-sans">
-                        {choice.text}
-                      </span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-5 h-5 rounded-md bg-[#13151F] border border-white/[0.1] text-[#D4A359] font-mono-num text-xs font-bold flex items-center justify-center shrink-0 group-hover:border-[#D4A359]/60">
+                          {cIdx + 1}
+                        </span>
+                        <span className="text-xs sm:text-[13.5px] font-medium text-stone-200 group-hover:text-white leading-relaxed font-reading-sans">
+                          {choice.text}
+                        </span>
+                      </div>
                       <ChevronRight className="w-4 h-4 text-stone-500 group-hover:text-[#D4A359] transition-transform group-hover:translate-x-1 shrink-0 ml-3" />
                     </button>
                   ))}
@@ -1622,7 +1793,7 @@ ${logEntries
 
           {/* Action Bar at Bottom of Middle Column */}
           {!waitingForChoice && (
-            <div className="py-3 px-6 border-t border-white/[0.07] bg-[#0E1017] flex items-center justify-between shrink-0 font-reading-sans">
+            <div className="py-2.5 px-4 sm:px-6 border-t border-white/[0.07] bg-[#0E1017] flex flex-wrap items-center justify-between gap-3 shrink-0 font-reading-sans">
               {logEntries.some((e) => e.age === 63) ? (
                 <>
                   <span className="text-xs text-[#D4A359] font-medium flex items-center gap-1.5 font-narrative-serif">
@@ -1647,27 +1818,106 @@ ${logEntries
                   </div>
                 </>
               ) : (
-                <div className="w-full flex items-center justify-end">
-                  <button
-                    onClick={handleNextNaturalYear}
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-950/40 active:scale-[0.98]"
-                  >
-                    <span>
-                      {!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)
-                        ? '十八岁 · 高考放榜与成人分流'
-                        : timeline[timelineIndex + 1]
-                        ? timeline[timelineIndex + 1].age === 18
-                          ? '十八岁 · 高考放榜与成人分流'
-                          : timeline[timelineIndex + 1].age > currentAge + 1
-                          ? `迈向${timeline[timelineIndex + 1].age}岁（${timeline[timelineIndex + 1].title}）`
-                          : `迈入下一岁（${currentAge + 1}岁）`
-                        : currentNode.age === 27 && !logEntries.some((e) => e.age === 63)
-                        ? '迈向三十岁（而立之年）'
-                        : '继续前行'}
+                <>
+                  {/* Left Controls: Auto-Play Toggle, Volume-style Speed Slider & Skip to Choice */}
+                  <div className="flex items-center gap-2 sm:gap-2.5">
+                    {/* Auto-Play Toggle */}
+                    <button
+                      onClick={() => setIsAutoPlaying((prev) => !prev)}
+                      className={`px-3 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-1.5 transition-all active:scale-[0.98] ${
+                        isAutoPlaying
+                          ? 'bg-[#D4A359]/20 border-[#D4A359] text-[#D4A359] shadow-sm shadow-amber-950/40'
+                          : 'bg-[#181B26] border-white/[0.08] hover:border-white/[0.16] text-stone-300'
+                      }`}
+                      title="自动推进时光流转 (快捷键: A)"
+                    >
+                      {isAutoPlaying ? (
+                        <>
+                          <Pause className="w-3.5 h-3.5 fill-[#D4A359]" />
+                          <span>暂停</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#D4A359] animate-ping ml-0.5" />
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-3.5 h-3.5" />
+                          <span>自动流转</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Speed Slider (Volume-Slider Style) */}
+                    <div className="flex items-center gap-2 bg-[#13151F] px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/[0.08]">
+                      <Gauge className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] text-stone-400 whitespace-nowrap hidden sm:inline">流速</span>
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="3.0"
+                          step="0.1"
+                          value={autoPlaySpeed}
+                          onChange={(e) => setAutoPlaySpeed(parseFloat(e.target.value))}
+                          className="w-14 sm:w-20 h-1 bg-[#1C1F2B] rounded-lg appearance-none cursor-pointer accent-[#D4A359]"
+                          title={`流转间隔：${autoPlaySpeed} 秒/岁（拖动左右调节快慢）`}
+                        />
+                        <span className="text-[11px] font-mono-num text-[#D4A359] w-8 text-right font-medium">
+                          {autoPlaySpeed.toFixed(1)}s
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Skip Directly to Next Choice */}
+                    <button
+                      onClick={handleSkipToNextDecision}
+                      className="px-2.5 py-1.5 rounded-xl bg-[#181B26] hover:bg-[#1E2230] border border-white/[0.08] hover:border-white/[0.16] text-stone-300 text-xs font-medium flex items-center gap-1 transition-all active:scale-[0.98]"
+                      title="跳过平稳过渡年，一键直达下一个人生关键抉择或高考分流"
+                    >
+                      <FastForward className="w-3.5 h-3.5 text-[#D4A359]" />
+                      <span className="hidden sm:inline">直达抉择</span>
+                    </button>
+                  </div>
+
+                  {/* Middle: Minimal Keyboard Shortcut Pills */}
+                  <div className="hidden xl:flex items-center gap-2 text-[11px] text-stone-500 font-reading-sans">
+                    <span className="flex items-center gap-1">
+                      <kbd className="px-1.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-400 font-mono-num text-[10px]">Space</kbd>
+                      推进
                     </span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
+                    <span>·</span>
+                    <span className="flex items-center gap-1">
+                      <kbd className="px-1.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-400 font-mono-num text-[10px]">1~4</kbd>
+                      选支
+                    </span>
+                    <span>·</span>
+                    <span className="flex items-center gap-1">
+                      <kbd className="px-1.5 py-0.5 rounded bg-[#181B26] border border-white/[0.08] text-stone-400 font-mono-num text-[10px]">A</kbd>
+                      自动
+                    </span>
+                  </div>
+
+                  {/* Right: Primary Step Button */}
+                  <div>
+                    <button
+                      onClick={handleNextNaturalYear}
+                      className="px-5 sm:px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-950/40 active:scale-[0.98]"
+                    >
+                      <span>
+                        {!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)
+                          ? '十八岁 · 高考放榜与成人分流'
+                          : timeline[timelineIndex + 1]
+                          ? timeline[timelineIndex + 1].age === 18
+                            ? '十八岁 · 高考放榜与成人分流'
+                            : timeline[timelineIndex + 1].age > currentAge + 1
+                            ? `迈向${timeline[timelineIndex + 1].age}岁（${timeline[timelineIndex + 1].title}）`
+                            : `迈入下一岁（${currentAge + 1}岁）`
+                          : currentNode.age === 27 && !logEntries.some((e) => e.age === 63)
+                          ? '迈向三十岁（而立之年）'
+                          : '继续前行'}
+                      </span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -1794,12 +2044,20 @@ ${logEntries
                   <button
                     key={oIdx}
                     onClick={() => handleConfirmGaokaoStep(opt)}
-                    className="p-3.5 sm:p-4 rounded-xl border border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/70 hover:bg-[#1E2232] text-left transition-all active:scale-[0.99] group shadow-sm"
+                    className="p-3.5 sm:p-4 rounded-xl border border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/70 hover:bg-[#1E2232] text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between"
                   >
-                    <div className="text-xs sm:text-sm font-semibold text-stone-100 group-hover:text-[#D4A359] mb-1 font-reading-sans">
-                      {opt.text}
+                    <div className="flex items-start gap-2.5">
+                      <span className="w-5 h-5 rounded-md bg-[#13151F] border border-white/[0.1] text-[#D4A359] font-mono-num text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        {oIdx + 1}
+                      </span>
+                      <div>
+                        <div className="text-xs sm:text-sm font-semibold text-stone-100 group-hover:text-[#D4A359] mb-1 font-reading-sans">
+                          {opt.text}
+                        </div>
+                        <div className="text-xs text-stone-400 leading-relaxed font-reading-sans">{opt.detail}</div>
+                      </div>
                     </div>
-                    <div className="text-xs text-stone-400 leading-relaxed font-reading-sans">{opt.detail}</div>
+                    <ChevronRight className="w-4 h-4 text-stone-500 group-hover:text-[#D4A359] transition-transform group-hover:translate-x-1 shrink-0 mt-1 ml-3" />
                   </button>
                 ))}
               </div>
