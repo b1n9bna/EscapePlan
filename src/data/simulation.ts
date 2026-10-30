@@ -1,878 +1,971 @@
-export interface Profession {
-  id: string;
-  name: string;
-  icon: string;
-  backgroundDesc: string;
+// ============================================================================
+// ESCAPEPLAN LIFE SIMULATION ENGINE
+// 逃跑计划 · 中国式命运交互电影数据模型
+// ============================================================================
+
+export interface FamilyOrigin {
+  region: string;
+  regionDetail: string;
+  parents: string;
+  parentsDetail: string;
+  siblings: string;
+  siblingsDetail: string;
+  emotionalTone: string;
+  toneDetail: string;
+  backgroundStory: string;
+  initialSavings: number;
 }
 
-export interface SimProfile {
-  id: string;
-  name: string;
-  age: number;
-  gender: "男" | "女";
-  profession: Profession;
-  education: string;
-  hometown: string;
-  initialSavingsRMB: number;
-  englishLevel: string;
-  targetCountryId: string;
-  familyRole: string; // 宗族/家庭生态角色
-  soilTiesDesc: string; // 原生家庭与人情生态
-}
-
-export interface DualChoice {
+export interface LifeChoice {
   text: string;
   detail: string;
-  reaction: string; // 做出选择后的即时心境与生活回响
-  fundsDelta: number;
-  individualSovereigntyDelta: number; // 独立自主度
-  soilKinshipTiesDelta: number; // 故土羁绊度
+  reaction: string;
+  savingsDelta: number;
+  autonomyDelta: number; // 个体主权
+  kinshipDelta: number; // 宗族重力
+  institutionalDelta: number; // 体制依附
+  resilienceDelta: number; // 生存韧劲
+  addTags?: string[];
 }
 
-export interface DualDiaryEntry {
-  year: number;
-  timeLabel: string;
-  phaseTitle: string;
-  hereTitle: string;
-  hereText: string;
-  thereTitle: string;
-  thereText: string;
-  choices: DualChoice[];
+export interface LifeEventNode {
+  id: string;
+  age: number;
+  stageName: string;
+  title: string;
+  scene: string;
+  choices: LifeChoice[];
 }
 
-export interface SimCountry {
+export interface DualTrackStage {
+  age: number;
+  title: string;
+  theme: string;
+  emigratedScene: string;
+  stayedScene: string;
+  emigratedReflection: string;
+  stayedReflection: string;
+  choice: {
+    text: string;
+    detail: string;
+    reaction: string;
+  };
+}
+
+export interface CountryOption {
   id: string;
   name: string;
   flag: string;
   city: string;
-  livingCostDesc: string;
-  culturalDistance: string;
+  tagline: string;
+  costDesc: string;
+  cultureDistance: string;
 }
 
-export const PROFESSIONS: Profession[] = [
-  {
-    id: "technician",
-    name: "中专汽修师傅 / 机械维修",
-    icon: "🔧",
-    backgroundDesc: "初中毕业读了三年职校汽修，手上常有洗不净的黑机油，懂机械电路，能吃大苦，不怕脏累。"
-  },
-  {
-    id: "nurse",
-    name: "大专护理 / 公立医院合同制护士",
-    icon: "🏥",
-    backgroundDesc: "公立医院三班倒四年，看惯了生老病死，熟练打针换药，脾气耐磨，但编制遥遥无期。"
-  },
-  {
-    id: "barista",
-    name: "大专连锁店咖啡师 / 烘焙学徒",
-    icon: "☕",
-    backgroundDesc: "站立打奶泡拉花三年，熟悉西式简餐服务，手臂常有小烫痕，渴望换个不那么压抑的环境。"
-  },
-  {
-    id: "clerk",
-    name: "双非文科普通本科 / 综合文员·运营",
-    icon: "📄",
-    backgroundDesc: "二本汉语言文学毕业，在私企做表格和杂活，月薪四千五，没有硬核壁垒，最迷茫的大多数。"
-  },
-  {
-    id: "dev_ordinary",
-    name: "双非理工本科 / 外包运维工程师",
-    icon: "💻",
-    backgroundDesc: "二本软件工程，在二线城市做外包运维值夜班，腰椎不太好，靠看英文文档自学敲代码。"
-  },
-  {
-    id: "dev_elite",
-    name: "985/211 重点本硕 / 互联网大厂后端开发",
-    icon: "🚀",
-    backgroundDesc: "一路考学上来的标准做题家，年薪四十万但面临 35 岁优化危机，深陷阶层滑落与内卷焦虑。"
-  },
-  {
-    id: "finance_master",
-    name: "重点财经大学商科硕士 / 审计·财务",
-    icon: "📊",
-    backgroundDesc: "四大会计所熬夜加班三年，精通财务报表，受够了无休止的抽凭盘点与酒局应酬。"
-  },
-  {
-    id: "phd_researcher",
-    name: "生物医药在读博士 / 学术科研候鸟",
-    icon: "🔬",
-    backgroundDesc: "三十岁依然在实验室养细胞杀小鼠，靠微薄助学金度日，国内高校教职卷飞，进退维谷。"
-  }
-];
-
-export const SIM_COUNTRIES: SimCountry[] = [
+export const TARGET_COUNTRIES: CountryOption[] = [
   {
     id: "japan",
     name: "日本",
     flag: "🇯🇵",
-    city: "东京郊区 / 大阪",
-    livingCostDesc: "生活成本适中，物价精细，满街便利店与自行车道。",
-    culturalDistance: "近邻社会 · 汉字圈但人际边界极度清晰冰冷"
+    city: "东京 · 荒川区",
+    tagline: "治安极佳、极度原子化、少子老龄化缺工、语言门槛明确",
+    costDesc: "初始启动金约 6~10 万 RMB",
+    cultureDistance: "东亚文化同源，表面冷漠客气，适合不喜社交的个体"
   },
   {
     id: "australia",
     name: "澳大利亚",
     flag: "🇦🇺",
-    city: "悉尼郊区 / 维州农场小镇",
-    livingCostDesc: "阳光充沛，草坪宽阔，人工极贵，靠体力劳动能自给自足。",
-    culturalDistance: "大洋洲移民国 · 彻底告别宗族凝视的广袤大陆"
+    city: "墨尔本 · 西区",
+    tagline: "蓝领收入极高、阳光海洋、严格打分制与WHV青年跳板",
+    costDesc: "初始启动金约 10~15 万 RMB",
+    cultureDistance: "多元移民社会，工会强劲，体力劳动受尊重"
   },
   {
     id: "germany",
     name: "德国",
     flag: "🇩🇪",
-    city: "柏林郊区 / 杜伊斯堡",
-    livingCostDesc: "生活节奏严谨，严格八小时下班，周日全城闭店安宁。",
-    culturalDistance: "中欧法理社会 · 严苛契约与绝对个人隐私保护"
+    city: "杜塞尔多夫 · 北威州",
+    tagline: "工匠双元制、免学费、劳动法严苛、重视规则与秩序",
+    costDesc: "自保金约 8~12 万 RMB",
+    cultureDistance: "生活节奏严谨，德语要求硬核，社会福利托底坚实"
   },
   {
     id: "spain",
     name: "西班牙",
     flag: "🇪🇸",
-    city: "瓦伦西亚 / 阿利坎特",
-    livingCostDesc: "气候温暖日照长，物价宜人，漫步地中海海滩与街巷。",
-    culturalDistance: "南欧熟人天性 · 热烈松弛，家庭聚会却无东亚攀比焦虑"
+    city: "瓦伦西亚",
+    tagline: "生活成本欧洲最低梯队、阳光地中海、非盈利/数字游民友好",
+    costDesc: "初始启动金约 8~15 万 RMB",
+    cultureDistance: "热情松弛，午休文化浓厚，适合低欲望慢节奏生活"
   },
   {
     id: "canada",
     name: "加拿大",
     flag: "🇨🇦",
-    city: "卡尔加里 / 温哥华郊区",
-    livingCostDesc: "雪山广阔，多元包容，冬日炉火与暖咖啡的漫长岁月。",
-    culturalDistance: "北美枫叶之国 · 多元族裔并存，漫长冬日带来深刻内省"
+    city: "卡尔加里 / 温尼伯",
+    tagline: "地广人稀、医疗教育托底、省提名红利与漫长严冬",
+    costDesc: "初始启动金约 12~18 万 RMB",
+    cultureDistance: "老牌移民国，包容度高，耐得住寂寞与暴雪"
   },
   {
     id: "thailand",
     name: "泰国",
     flag: "🇹🇭",
-    city: "清迈宁曼路旁的小巷",
-    livingCostDesc: "物价低廉，空气里有香茅草味道，生活节奏慢得像停滞了。",
-    culturalDistance: "热带佛国 · 慢调与包容，老中胃与乡愁最温柔的海外平替"
-  },
-  {
-    id: "china_stay",
-    name: "留在原来的城市 (平行对照)",
-    flag: "🇨🇳",
-    city: "老家省会 / 现住地",
-    livingCostDesc: "熟悉的路口，熟悉的外卖，家人在身边，平淡而琐碎的生活。",
-    culturalDistance: "原生母体 · 浸泡在差序格局与人间烟火的深厚土壤中"
+    city: "清迈 · 宁曼路周边",
+    tagline: "低成本避风港、慢节奏疗愈、长期签证需技巧、适合自由职业",
+    costDesc: "初始启动金约 3~5 万 RMB",
+    cultureDistance: "佛教包容文化，物价低廉，不能直接打普通工"
   }
 ];
 
-export const PROFILES_POOL: Omit<SimProfile, 'targetCountryId'>[] = [
+// ============================================================================
+// 原生家庭多轴矩阵数据库
+// ============================================================================
+
+const REGIONS = [
   {
-    id: "p1",
-    name: "陈浩",
-    age: 28,
-    gender: "男",
-    profession: PROFESSIONS[0], // 中专汽修
-    education: "职业中专汽修专业",
-    hometown: "山东潍坊农村",
-    initialSavingsRMB: 36000,
-    englishLevel: "只会看仪表盘简单故障码，听不懂整句",
-    familyRole: "宗族观念极重的农村长子，下有一个正在读高中的弟弟",
-    soilTiesDesc: "村里婚丧嫁娶规矩森严，父母一生好面子，指望他挣钱回家盖两层小楼给弟弟张罗彩礼。"
+    region: "豫东平原农耕大县",
+    detail: "麦浪翻滚、宗族红白喜事密集、留守儿童与外出打工潮交织，全县升学全靠县一中题海。",
+    savingsRange: [15000, 45000]
   },
   {
-    id: "p2",
-    name: "王婷",
-    age: 26,
-    gender: "女",
-    profession: PROFESSIONS[1], // 大专护理
-    education: "医学院全日制大专护理",
-    hometown: "江苏徐州矿区",
-    initialSavingsRMB: 42000,
-    englishLevel: "考过医护英语三级，专业词汇认识，口语结巴",
-    familyRole: "多子女工薪家庭二姐，习惯为家里默默兜底",
-    soilTiesDesc: "从小懂事谦让，亲戚家里谁生病都要找她去医院找关系托熟人，是全家族的免费勤务员。"
+    region: "浙东民营制造百强县",
+    detail: "满街小作坊与五金注塑厂，崇尚宗族抱团经商发财，读书若考不上重点不如早早接单做生意。",
+    savingsRange: [40000, 120000]
   },
   {
-    id: "p3",
-    name: "林小满",
-    age: 24,
-    gender: "女",
-    profession: PROFESSIONS[2], // 大专咖啡师
-    education: "民办大专旅游管理",
-    hometown: "湖南株洲老工业区",
-    initialSavingsRMB: 28000,
-    englishLevel: "日常单词还行，语速稍快就完全发懵",
-    familyRole: "老厂矿下岗职工独女",
-    soilTiesDesc: "家住老机械厂宿舍，街坊邻里熟络得毫无秘密，谁家孩子考上编制、谁家相亲被拒全院皆知。"
+    region: "东北资源枯竭型收缩矿城",
+    detail: "老国企烟囱已熄灭多年，年轻人外流，整座小城靠老人退休金维系，体制内工作是唯一体面。",
+    savingsRange: [20000, 60000]
   },
   {
-    id: "p4",
-    name: "周若雨",
-    age: 27,
-    gender: "女",
-    profession: PROFESSIONS[3], // 双非文科
-    education: "二本普通统招中文系",
-    hometown: "江西某县城，在杭州打工四年",
-    initialSavingsRMB: 51000,
-    englishLevel: "普通高中英语底子，能看懂简单生活邮件",
-    familyRole: "县城体制内边缘家庭长女",
-    soilTiesDesc: "七大姑八大姨全在本地体制或学校，每次过年回家都被围攻催婚催考公，被视作‘不听话的叛逆者’。"
+    region: "湘西丘陵丘壑农业镇",
+    detail: "柑橘林与陡峭梯田，父母常年在珠三角制鞋厂打工，老屋里只有老人做饭的柴火青烟。",
+    savingsRange: [12000, 35000]
   },
   {
-    id: "p5",
-    name: "李明",
-    age: 30,
-    gender: "男",
-    profession: PROFESSIONS[4], // 双非理工
-    education: "普通双非统招计算机本科",
-    hometown: "河北保定农村",
-    initialSavingsRMB: 75000,
-    englishLevel: "能流畅阅读英文技术文档，完全开不了口",
-    familyRole: "父母做小生意破产负债家庭的独子",
-    soilTiesDesc: "家里背着三十万外债，亲戚逢年过节避之不及，极度渴望通过自己的双手在外挣钱帮父母脱困。"
+    region: "华北重工业地级市生活区",
+    detail: "钢厂子弟校与筒子楼记忆，空气里总有微尘，人情网密不透风，办事看病全靠高中同学群。",
+    savingsRange: [30000, 80000]
   },
   {
-    id: "p6",
-    name: "张建国",
-    age: 33,
-    gender: "男",
-    profession: PROFESSIONS[5], // 985做题家
-    education: "华中重点 985 软件工程本硕",
-    hometown: "河南洛阳农村",
-    initialSavingsRMB: 180000,
-    englishLevel: "大学六级 580，能进行工作技术口语沟通",
-    familyRole: "背负全村乃至全家族最高学历光环的长孙",
-    soilTiesDesc: "当年考上 985 村头放了三千响鞭炮，父辈引以为傲，如今大厂面临年龄瓶颈，阶层滑落恐惧深入骨髓。"
+    region: "闽南沿海侨乡商贸镇",
+    detail: "宗祠香火极旺，亲戚多在东南亚或欧美打拼，乡邻聚会总在暗中攀比洋房与谁家寄回的外汇。",
+    savingsRange: [35000, 90000]
   },
   {
-    id: "p7",
-    name: "赵雅婷",
-    age: 29,
-    gender: "女",
-    profession: PROFESSIONS[6], // 重点商科
-    education: "211 重点财经大学金融硕士",
-    hometown: "四川绵阳工薪家庭",
-    initialSavingsRMB: 120000,
-    englishLevel: "雅思 6.5，商务英语熟练",
-    familyRole: "普通城市工薪家庭独女",
-    soilTiesDesc: "父母掏空公积金供她读完研，一心盼她在国内金融机构体面升职、嫁人生子，对出国极度不解与恐惧。"
+    region: "中西部省会边缘工薪区",
+    detail: "两代人按揭一套老破小，父母拼命加班供房贷，极其害怕子女阶层跌落，校外补习班寸步不让。",
+    savingsRange: [25000, 70000]
   },
   {
-    id: "p8",
-    name: "孙一诺",
-    age: 31,
-    gender: "男",
-    profession: PROFESSIONS[7], // 博士科研候鸟
-    education: "国内知名医科大学生物学博士在读/博后",
-    hometown: "辽宁锦州重组单亲家庭",
-    initialSavingsRMB: 48000,
-    englishLevel: "专业论文写作极强，日常口语偏学术书面语",
-    familyRole: "与老家亲戚关系疏离的单亲学术子弟",
-    soilTiesDesc: "多年沉浸在实验室里，与老家世俗的人情来往严重脱节，同龄人早已买房生娃，他依然拿着微薄津贴。"
+    region: "超一线城市城中村夹缝",
+    detail: "抬头是一线CBD的摩天反光玻璃，脚下是握手楼潮湿的窄巷，看尽了繁华却无一寸属于自己。",
+    savingsRange: [18000, 50000]
   }
 ];
 
-export function getRandomProfile(): SimProfile {
-  const base = PROFILES_POOL[Math.floor(Math.random() * PROFILES_POOL.length)];
-  const countries = SIM_COUNTRIES.filter(c => c.id !== "china_stay");
-  const randomCountry = countries[Math.floor(Math.random() * countries.length)].id;
+const PARENT_PROFILES = [
+  {
+    parents: "县自然资源局科员 + 公立小学高级教师",
+    detail: "标准体制内中层，恪守本分，信奉“稳定压倒一切”，对你的人生有极强规划与控制欲。",
+    institutionalBase: 35,
+    kinshipBase: 25
+  },
+  {
+    parents: "农贸市场活禽/生肉摊档夫妻",
+    detail: "起早贪黑双手生冻疮，用零钞毛票供你上学，说话门门大嗓门，信奉实利与真金白银。",
+    institutionalBase: -15,
+    kinshipBase: 20
+  },
+  {
+    parents: "珠三角五金模具厂两栖打工族",
+    detail: "长年住工厂铁架床宿舍，逢年过节才拎着年货回老家，总带着未能陪伴你的愧疚与自责。",
+    institutionalBase: -10,
+    kinshipBase: 30
+  },
+  {
+    parents: "下岗开黑车/跑滴滴 + 早市面点摊",
+    detail: "经历过90年代企业买断的创伤，早早白了头发，把所有未能实现的阶层跨越死死寄托在你身上。",
+    institutionalBase: 15,
+    kinshipBase: 25
+  },
+  {
+    parents: "乡镇卫生院大夫 + 初中教导员",
+    detail: "地方上体面受敬重的人家，清贫但讲规矩，最害怕子女“做出格的事”让家族蒙羞。",
+    institutionalBase: 30,
+    kinshipBase: 20
+  },
+  {
+    parents: "小服装厂破产转型开菜鸟驿站 + 社区团购",
+    detail: "曾见过小老板的体面，后来背了债务缩回仓库理快递，每天在货架间疲于奔命。",
+    institutionalBase: -5,
+    kinshipBase: 15
+  },
+  {
+    parents: "建筑工地铁瓦工师傅 + 守家务农母亲",
+    detail: "父亲一身风湿与老茧，每年年底最怕包工头卷款跑路，母亲在老家守着几分责任田。",
+    institutionalBase: -20,
+    kinshipBase: 35
+  },
+  {
+    parents: "省城高校后勤管理员 + 市立医院护士长",
+    detail: "每天见识教授和专家的光鲜，深知文凭是唯一翻盘阶梯，从小对你推行军事化作息。",
+    institutionalBase: 25,
+    kinshipBase: 15
+  }
+];
+
+const SIBLINGS_PROFILES = [
+  {
+    siblings: "独生子女（独享亦独扛）",
+    detail: "父母将所有关注与资源倾注在你身上，但未来老人的照护、医疗和养老没有任何同胞替你分担。",
+    kinshipBase: 25
+  },
+  {
+    siblings: "重男轻女家庭的长姐（下有小5岁的弟弟）",
+    detail: "从小被灌输“做姐姐要有担当”，过年新衣服永远优先弟弟，心里常年扎着一根不被看见的刺。",
+    kinshipBase: 40
+  },
+  {
+    siblings: "夹心层的二儿子/二女儿",
+    detail: "老大备受器重，老幺备受娇宠，你夹在中间如同隐形人，最早就学会了察言观色与独自消化委屈。",
+    kinshipBase: 10
+  },
+  {
+    siblings: "长兄为父（下有正读中学的妹妹）",
+    detail: "母亲常年病弱，父亲在外打工，你早早就学会了做饭和照看妹妹，习惯了压抑自己的欲望。",
+    kinshipBase: 35
+  },
+  {
+    siblings: "重组家庭（父母离异各自再婚，由祖父母抚养）",
+    detail: "过年不知该去哪个家，在爷爷奶奶漏风的老平房里长大，骨子里极度渴望拥有属于自己的固定锚点。",
+    kinshipBase: -10
+  }
+];
+
+const EMOTIONAL_TONES = [
+  {
+    tone: "窒息控制型（“我们这辈子受苦全是为了你”）",
+    detail: "每一次关怀都伴随着情感勒索，让你一旦产生独立念头就背负沉重的道德负罪感。"
+  },
+  {
+    tone: "严苛攀比型（“你看大舅家表哥今年又考上编制了”）",
+    detail: "家里的餐桌就是公开处刑台，你的价值只取决于你带回的分数、文凭和工资数字。"
+  },
+  {
+    tone: "温厚匮乏型（“家里没本事，全靠你自己争气了”）",
+    detail: "父母朴讷善良，给不了你任何关系与财富，只能把唯一的土鸡蛋剥好默默放在你碗里。"
+  },
+  {
+    tone: "务实铜臭型（“读死书有什么用，能换几个钱？”）",
+    detail: "家里凡事以现实利益衡量，鄙夷一切虚浮的风花雪月，早早逼你面对生活的账本。"
+  },
+  {
+    tone: "疲惫放养型（“能吃饱穿暖就行，我们管不了那么多”）",
+    detail: "父母忙于生计无暇过问你的精神世界，你在野草般的自由中早熟，但也早早体会孤立无援。"
+  }
+];
+
+const FIRST_NAMES = ["陈", "李", "王", "张", "刘", "黄", "周", "徐", "林", "吴"];
+const GIVEN_NAMES_MALE = ["浩然", "宇航", "家辉", "志伟", "建国", "子轩", "博文", "俊杰", "天明"];
+const GIVEN_NAMES_FEMALE = ["晓芸", "婷婷", "佳欣", "若涵", "思敏", "燕妮", "梦洁", "雅琴", "静波"];
+
+export function generateRandomFamily(): {
+  name: string;
+  gender: "男" | "女";
+  family: FamilyOrigin;
+} {
+  const gender: "男" | "女" = Math.random() > 0.5 ? "男" : "女";
+  const sur = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+  const given =
+    gender === "男"
+      ? GIVEN_NAMES_MALE[Math.floor(Math.random() * GIVEN_NAMES_MALE.length)]
+      : GIVEN_NAMES_FEMALE[Math.floor(Math.random() * GIVEN_NAMES_FEMALE.length)];
+  const name = `${sur}${given}`;
+
+  const reg = REGIONS[Math.floor(Math.random() * REGIONS.length)];
+  const par = PARENT_PROFILES[Math.floor(Math.random() * PARENT_PROFILES.length)];
+  const sib = SIBLINGS_PROFILES[Math.floor(Math.random() * SIBLINGS_PROFILES.length)];
+  const tone = EMOTIONAL_TONES[Math.floor(Math.random() * EMOTIONAL_TONES.length)];
+
+  const initialSavings = Math.floor(
+    reg.savingsRange[0] + Math.random() * (reg.savingsRange[1] - reg.savingsRange[0])
+  );
+
+  const backgroundStory = `你出生在${reg.region}。${par.detail}家里${sib.detail}在这个家里，${tone.detail}`;
+
   return {
-    ...base,
-    targetCountryId: randomCountry
+    name,
+    gender,
+    family: {
+      region: reg.region,
+      regionDetail: reg.detail,
+      parents: par.parents,
+      parentsDetail: par.detail,
+      siblings: sib.siblings,
+      siblingsDetail: sib.detail,
+      emotionalTone: tone.tone,
+      toneDetail: tone.detail,
+      backgroundStory,
+      initialSavings
+    }
   };
 }
 
-export const DUAL_STORIES: Record<string, DualDiaryEntry[]> = {
-  japan: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      phaseTitle: "破土与喜礼：半价便当与三十桌流水席",
-      hereTitle: "此岸 · 东京单身公寓的羽绒服窗帘",
-      hereText: "搬进单身公寓第一天，房间空得回音刺耳。没有床，窗帘太贵舍不得买，你拿两件厚羽绒服夹在窗框上挡光。晚上 7 点 50 分，你站在超市熟食区假装看酸奶，等店员掏出红色‘半额（半价）’贴纸贴在炸猪排便当上。心算了一下才 260 日元（合 13 块钱），你抓起一盒，就着倒扣的塑料收纳箱当桌子吃完。",
-      thereTitle: "彼岸 · 堂哥在老家镇上的大婚流水席",
-      thereText: "老家堂哥在镇上礼堂办婚宴，摆了整整三十桌流水席，锣鼓喧天。大伯在敬酒时大着嗓门问你妈：“二妹，孩子怎么没回来？大城市这么忙啊，亲堂哥结婚都不露面？”你妈赔着笑脸说国外请假难。家族微信群里发满了一桌桌大鱼大肉和敬酒视频，长辈们都在问你一个月能往回寄多少钱。",
-      choices: [
-        {
-          text: "在家族群里包了个 600 块微信红包，并附言祝新婚大吉；看着账户余额，下周少吃两顿外食。",
-          detail: "隔着大洋，用所剩无几的积蓄在宗族里维持体面。",
-          reaction: "大伯在群里领了红包回了个大拇指，妈妈私聊问你‘在外够不够花’。关上手机，屋子里只有旧冰箱的嗡鸣声。",
-          fundsDelta: -600,
-          individualSovereigntyDelta: -5,
-          soilKinshipTiesDelta: 10
-        },
-        {
-          text: "私聊堂哥发了一条长长的新婚祝词，把原本准备随礼的钱留给自己添置了一台二手电饭煲。",
-          detail: "把有限的生存资源留给异国的立足之地，接受在老家亲戚口中‘这孩子变生分了’的评价。",
-          reaction: "第一锅米饭煮好的时候，米香飘满了十几平米的小房间。虽然没随大礼，但你觉得自己终于踩在了实地上。",
-          fundsDelta: -180,
-          individualSovereigntyDelta: 12,
-          soilKinshipTiesDelta: -8
-        }
-      ]
-    },
-    {
-      year: 2,
-      timeLabel: "立足 · 第 2 年",
-      phaseTitle: "裂痕与缺席：1200日元快剪与老街拆迁",
-      hereTitle: "此岸 · 1200日元快剪店与塞在枕头下的药盒",
-      hereText: "头发长了，你硬着头皮走进车站旁 1200 日元的快剪店，听不懂日语，只能掏出老照片比划。入冬发烧到 38 度 5 不敢叫救护车怕贵，裹着被子发汗。晚上妈妈突然打微信视频过来，你慌慌张张把床头的药盒塞到枕头底下，用手抹了抹脸笑着说‘妈，这边暖和着呢’。",
-      thereTitle: "彼岸 · 老街拆迁，当年发小考编晒车",
-      thereText: "老家县城的那条老街拆迁了，小时候捉迷藏的石桥被推平改建成了宽阔的景观大道。当年和你一起在网吧包夜的高中发小考上了自然资源局编制，朋友圈发了提新车和订婚的喜帖，评论区全是老同学的起哄祝贺。那张你曾熟悉的人情大网，在没有你的情况下，按部就班地热闹繁衍着。",
-      choices: [
-        {
-          text: "给发小的朋友圈点了个赞，关掉手机，去二手店淘了一辆 300 块钱掉漆的旧自行车。",
-          detail: "认清自己已经是一个‘局外人’，把精力转回到眼下骑车去廉价菜场的坡道上。",
-          reaction: "推着那辆旧车走下坡道的时候，天边有一大片粉红色的晚霞。冷风吹在脸上，你觉得老家的一切离你越来越远了。",
-          fundsDelta: -300,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: -5
-        },
-        {
-          text: "趁着视频跟妈妈多聊了半个小时老街邻居的变迁，听着熟悉的乡音，眼眶几次泛酸。",
-          detail: "哪怕隔着屏幕，依然贪恋那份来自熟人社会的温暖温存。",
-          reaction: "妈妈絮絮叨叨说着张家长李家短，挂断电话时天已经彻底黑透了。你摸了摸额头，烧好像退了一点点。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: -3,
-          soilKinshipTiesDelta: 12
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "日常 · 第 3 年",
-      phaseTitle: "远水与近渴：水槽里的污垢与县医院的陪护床",
-      hereTitle: "此岸 · 通水槽的周六下午与吉野家温泉蛋",
-      hereText: "周六下午水槽突然堵了，冒出一股发酸的脏水。查了一下请疏通师傅上门要花两万多日元心疼肉跳。一个人在网上搜教程，去百元店买了根简易塑料管道条，跪在厨房冰凉的瓷砖地上捅了半个小时。头发和污垢哗啦一声排走的那一刻，你两手黑油瘫坐在地上，苦笑出声。随后去吉野家吃了碗大份牛肉饭，多要了个温泉蛋奖励自己。",
-      thereTitle: "彼岸 · 母亲胆结石住院，走廊里的折叠床",
-      thereText: "也就是这一周，母亲胆结石急性发作在县医院动手术。病房紧张，大姐在走廊租了张 20 块钱一晚的折叠陪护床，白天上班晚上在床前倒尿倒水送骨头汤。微信群里发来一张母亲打着吊瓶睡着的背影照片，亲戚们在群里排班送饭。大舅在语音里叹气：“家里有事，还是身边的人管用，远在天边也是远水救不了近火。”",
-      choices: [
-        {
-          text: "二话没说往大姐卡里转了 6000 块钱，让给母亲用最好的药，并给大姐订了补品。",
-          detail: "用异国省吃俭用攒下的真金白银，弥补自己无法床前侍奉的内疚与亏欠。",
-          reaction: "大姐发来语音带着哽咽：‘老弟/妹子，钱收到了，大姐知道你在外面不容易，你放心，家里有我。’那一夜你坐在窗前看了很久的电车灯光。",
-          fundsDelta: -6000,
-          individualSovereigntyDelta: -5,
-          soilKinshipTiesDelta: 18
-        },
-        {
-          text: "每天定闹钟在早晚交接班时给母亲打视频，转了 2000 元分担开销，并在网上帮大姐查清医保流程。",
-          detail: "在自身微薄的抗风险能力与家庭责任之间寻找平衡，不透支异国的生存底线。",
-          reaction: "母亲在屏幕那头虚弱地笑着说‘好多了，别老花钱’。你合上笔记本，明白很多遗憾从你拖着箱子过海关那一刻就注定了。",
-          fundsDelta: -2000,
-          individualSovereigntyDelta: 8,
-          soilKinshipTiesDelta: 6
-        }
-      ]
-    },
-    {
-      year: 4,
-      timeLabel: "习惯 · 第 4 年",
-      phaseTitle: "缺席与凝固：区役所印章与除夕夜的手机屏幕",
-      hereTitle: "此岸 · 不再看导航的回家路，与寄回家的洗脚盆",
-      hereText: "你已经能熟练在周二早上把可燃垃圾绑好放进收集网，去区役所办事拿出印章和在留卡一件件办妥，手心不再冒冷汗。下楼倒垃圾碰见邻居牵柴犬的老太太，能自然躬身道早安。你用攒下的钱给老家父母在网上买了台自动洗脚盆和两件厚羽绒服，周末去河边二手书店淘了两本散文，坐在草坪上看电车驶过。",
-      thereTitle: "彼岸 · 除夕夜的大年三十，架在可乐瓶上的手机",
-      thereText: "老家除夕夜，大圆桌摆满了卤牛肉、炸丸子和红烧鱼，电视里春晚闹哄哄的。爸爸把手机架在雪碧可乐瓶上跟你视频通话，表弟喝得满面红光冲着镜头喊：“哥/姐！啥时候带个对象回村给我们看看啊？！”满桌亲戚都在大笑起哄。网络卡顿了一下，画面突然凝固在父母眼角深深的笑意与眼底那一抹掩饰不住的落寞里。",
-      choices: [
-        {
-          text: "笑着在视频里给全桌亲戚拜年，顺从地听着他们七嘴八舌的催促与盘问，把酸楚咽在肚子里。",
-          detail: "哪怕观念早已脱钩，依然愿意配合完成这场属于老家宗族的大团圆戏码。",
-          reaction: "挂断电话，房间里死一般的寂静。窗外是清冷整洁的马路，远处偶有救护车呼啸而过。你把洗好的衣服挂在椅背上，心里空荡荡的。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: -4,
-          soilKinshipTiesDelta: 15
-        },
-        {
-          text: "认真跟父母单独聊了十分钟日常身体状况，在亲戚们大声起哄前，礼貌借口‘这边工作要开会’提前挂断。",
-          detail: "学会为自己的精神生活设立清晰的人际边界，不再为不相干亲戚的面子表演。",
-          reaction: "屏幕黑了下来，你长舒了一口气。去厨房倒了一杯温水，坐在桌前安安静静翻开新买的书，第一次享受除夕夜属于自己的绝对安宁。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 14,
-          soilKinshipTiesDelta: -10
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "回望 · 第 5 年",
-      phaseTitle: "自洽与归处：五年在留卡与不再催促的母亲",
-      hereTitle: "此岸 · 品川入管局窗口递出的五年在留卡",
-      hereText: "塑料卡片上印着‘5年’。走出入管局大楼，电车开往熟悉的品川站。你没有发财，银行卡里依然只有几万块钱；你依然习惯在晚上八点去超市看一眼打折贴纸；你依然想念老家的牛肉面。但你已经不用靠翻译软件生活，你有了自己熟悉的理发师，你在这个陌生的异国角落，踏踏实实地活了下来。",
-      thereTitle: "彼岸 · 母亲寄不出的腊肠，与当年同窗的焦虑",
-      thereText: "母亲打来电话，语气变了。她不再催你考公，不再催你结婚回国，只是在电话里絮絮叨叨：“老家的腊肠快递说海关查得严寄不过去，你自己在那边多买点好肉吃。家里都挺好，不用老惦记。”当年的高中同学已经在朋友圈为小升初学区房焦虑失眠，而你在这个安静的黄昏，坐在河堤的长椅上看着波光粼粼的河面。",
-      choices: [
-        {
-          text: "在回程的电车上发了条仅自己可见的朋友圈：‘今天第五年，下班回家。’",
-          detail: "既不宣扬，也不炫耀，只有属于自己的平静与坦然。",
-          reaction: "列车缓缓驶过荒川大桥，夕阳把河面染得金黄。你收起手机插进大衣口袋，准备下车去站前的小面包房买明天的早餐，脚步格外踏实。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 5
-        }
-      ]
+// ============================================================================
+// 前半链：K-12 应试铁笼（6 ~ 18 岁）
+// ============================================================================
+
+export const K12_EVENTS: LifeEventNode[] = [
+  // 6岁 小学入学
+  {
+    id: "k12_age_6",
+    age: 6,
+    stageName: "小学启蒙 · 6岁",
+    title: "校门口的午餐盒与方言",
+    scene:
+      "开学第一周，周围城里的同桌掏出印着卡通图案的双层不锈钢保温饭盒，里面是切好的苹果和煎肉饼。你书包里是用旧油漆塑料桶改装的饭罐，装着母亲早起炒好的咸菜土豆丝。老师在讲台上用普通话点名，你一张嘴带出的浓重乡音引来全班一阵窃笑。",
+    choices: [
+      {
+        text: "低头不语，午饭时悄悄躲到操场乒乓球台底下吃完",
+        detail: "你早早学会了用自尊裹紧自己的贫瘠，把自卑磨成了内敛的硬壳。",
+        reaction: "你开始学着城里同学的语调一字一句纠正发音，夜里在被窝里练普通话咬字。",
+        savingsDelta: 0,
+        autonomyDelta: 10,
+        kinshipDelta: 5,
+        institutionalDelta: 5,
+        resilienceDelta: 15,
+        addTags: ["自卑敏感", "早熟自尊"]
+      },
+      {
+        text: "大方把咸菜分给同桌：‘我家自己腌的，尝尝很香’",
+        detail: "你身上带着野草般的坦荡，贫穷没有第一时间压弯你的腰。",
+        reaction: "同桌吃了一口被辣得直吸气，反倒和你成了下课一起拍卡片的朋友。",
+        savingsDelta: 0,
+        autonomyDelta: 15,
+        kinshipDelta: -5,
+        institutionalDelta: -5,
+        resilienceDelta: 20,
+        addTags: ["草莽韧劲", "社交直觉"]
+      },
+      {
+        text: "回家赌气摔饭盒，逼母亲一定要给你买商场里那个45块钱的保温桶",
+        detail: "母亲叹着气数出抽屉里带折痕的零钱，父亲在院子里重重抽了一口旱烟。",
+        reaction: "第二天你如愿拿到了新饭盒，但母亲接下来整整两周每顿饭只就着白菜汤咽冷馍。",
+        savingsDelta: -45,
+        autonomyDelta: 5,
+        kinshipDelta: 20,
+        institutionalDelta: 10,
+        resilienceDelta: -10,
+        addTags: ["愧疚阴影", "面子执念"]
+      }
+    ]
+  },
+
+  // 10岁 补习与特长
+  {
+    id: "k12_age_10",
+    age: 10,
+    stageName: "小学高年级 · 10岁",
+    title: "奥数班与少年宫的门票",
+    scene:
+      "四年级期末家长会，班主任在黑板上画出全区小升初划片指标，语气严厉：‘考不上重点初中实验班，后面高中基本没戏。’走廊里，别的家长都在排队抢报周末的奥数与英语精品小班，一学期学费相当于家里小半年的买菜钱。",
+    choices: [
+      {
+        text: "主动拉着母亲衣角：‘妈我不喜欢数学，不用给我报班’",
+        detail: "你懂事地为家里省下了这笔钱，把借来的二手旧习题集一题题抄在草稿纸上。",
+        reaction: "母亲摸了摸你的头，眼里满是心疼。你只能靠自己的死磕把课本后所有思考题刷了三遍。",
+        savingsDelta: 0,
+        autonomyDelta: 15,
+        kinshipDelta: 15,
+        institutionalDelta: -5,
+        resilienceDelta: 20,
+        addTags: ["自力更生", "懂事压抑"]
+      },
+      {
+        text: "父母四处找亲戚借钱交了学费，周末你骑破自行车横穿半座城去上课",
+        detail: "坐在开着冷气的阶梯教室里，你连笔都不敢掉，唯恐漏听老师讲的任何一个速解口诀。",
+        reaction: "你的成绩冲到了全班前五名，父母逢人就说‘我家乐意吃苦，将来是要考大城市的’。",
+        savingsDelta: -1200,
+        autonomyDelta: -10,
+        kinshipDelta: 25,
+        institutionalDelta: 25,
+        resilienceDelta: 10,
+        addTags: ["做题机器", "宗族期待"]
+      },
+      {
+        text: "逃掉自习，跟着街角游戏厅和网吧的职校大孩子混在一起看打拳皇",
+        detail: "屏幕上的霓虹闪烁和街机的轰鸣声，比黑板上的分数更让你感到鲜活真实。",
+        reaction: "被父亲提着鸡毛掸子追打过两条街，你跪在堂屋地上，心里却第一次萌生了对所谓‘正道’的蔑视。",
+        savingsDelta: -50,
+        autonomyDelta: 25,
+        kinshipDelta: -15,
+        institutionalDelta: -30,
+        resilienceDelta: 15,
+        addTags: ["反叛胚子", "游离体外"]
+      }
+    ]
+  },
+
+  // 14岁 初三 普职分流（50%生死分水岭）
+  {
+    id: "k12_age_14",
+    age: 14,
+    stageName: "初三中考分流 · 14岁",
+    title: "50%分流刀下的协议书",
+    scene:
+      "中考模拟考放榜，全校只有前48%的学生能上普通高中，剩下的面临被‘普职分流’。晚自习班主任把你叫到办公室，桌上摊着一份《中职技术学校直升保底协议》：免收前两年学费，直升汽修/护理/电子商务，附赠定向就业推荐。如果不签，一旦中考落榜连职校的好专业都挑不上。",
+    choices: [
+      {
+        text: "咬死不签：‘我要考普高，哪怕只能去最烂的普高’",
+        detail: "你拒绝了提前认命。接下来的三个月，你每天嚼风油精提神，草稿纸写满了整整两大编织袋。",
+        reaction: "中考放榜那天，你的分数刚好压过县三中普高录取线3分，你攥着准考证在洗手间狠狠哭了一场。",
+        savingsDelta: 0,
+        autonomyDelta: 20,
+        kinshipDelta: 10,
+        institutionalDelta: 10,
+        resilienceDelta: 25,
+        addTags: ["拼命做题家", "守住普高"]
+      },
+      {
+        text: "在协议书上签字：选了免学费的公办中专技术方向（汽修/护理/机械）",
+        detail: "家里实在经不起继续供书的折腾，你决定提早三年学一门能果腹的硬核手艺。",
+        reaction: "父母松了一口气。邻里七嘴八舌议论你‘没出息’，但你看着手上的扳手与实训室，心里异常踏实。",
+        savingsDelta: 1000,
+        autonomyDelta: 10,
+        kinshipDelta: -10,
+        institutionalDelta: -25,
+        resilienceDelta: 30,
+        addTags: ["职教蓝领", "手艺人底色"]
+      },
+      {
+        text: "父母掏出养老钱走关系托人，交了两万八赞助费进私立高价高中",
+        detail: "这笔巨款让家里接下来一年连肉都不敢买，老旧冰箱空空荡荡。",
+        reaction: "走入私立高中的第一天，你背上的书包如同装满了铅块，你知道自己没有资格考砸一次。",
+        savingsDelta: -28000,
+        autonomyDelta: -20,
+        kinshipDelta: 35,
+        institutionalDelta: 15,
+        resilienceDelta: 5,
+        addTags: ["巨额学债", "心理重负"]
+      }
+    ]
+  },
+
+  // 17岁 高考志愿与命运终选
+  {
+    id: "k12_age_17",
+    age: 17,
+    stageName: "高三高考志愿 · 17岁",
+    title: "出分之夜的志愿博弈",
+    scene:
+      "凌晨查分网站卡顿了半小时终于刷新出来。全家人围在老旧台式电脑前。分数处于一个极其微妙的梯队：可以留在省内保底读一个包分配的师范/警校/铁道专科，或者冒险冲出省外读一个毫无背景的普通综合院校文理科。",
+    choices: [
+      {
+        text: "顺从父亲：填报省内定向/师范类/公费体制苗子专业",
+        detail: "‘听爸的，安稳过一辈子，将来考个编制离家近，咱们家经不起任何风浪折腾。’",
+        reaction: "录取通知书到了，全家人在县城饭馆摆了一桌，你在亲戚的敬酒声中感到一种平静而温和的窒息。",
+        savingsDelta: 0,
+        autonomyDelta: -25,
+        kinshipDelta: 30,
+        institutionalDelta: 35,
+        resilienceDelta: -5,
+        addTags: ["体制预备役", "安稳宿命"]
+      },
+      {
+        text: "瞒着家里偷偷修改第一志愿：填报沿海城市双非大学工科/软件",
+        detail: "你想去离家一千多公里的大海边，哪怕学费更贵、哪怕未来一切都要靠自己去闯。",
+        reaction: "父亲得知后把茶杯砸得粉碎，整整一个月没和你说一句话。但你收拾行李箱的双手在兴奋地发抖。",
+        savingsDelta: -3000,
+        autonomyDelta: 35,
+        kinshipDelta: -20,
+        institutionalDelta: -15,
+        resilienceDelta: 25,
+        addTags: ["破门出走", "代码与工具"]
+      },
+      {
+        text: "分数够高，稳稳拿下 211/985 重点院校硬核专业",
+        detail: "十几年县中苦读的汗水终于在这一刻兑现，全县红榜上印着你的名字。",
+        reaction: "村支书和校长亲自送来五千块奖学金。你成了全族人的荣光，但这枚勋章从此成了你脱不下来的盔甲。",
+        savingsDelta: 5000,
+        autonomyDelta: 10,
+        kinshipDelta: 20,
+        institutionalDelta: 20,
+        resilienceDelta: 15,
+        addTags: ["重点大学光环", "家族脸面"]
+      }
+    ]
+  }
+];
+
+// ============================================================================
+// 后半链：象牙塔与现实绞杀（18 ~ 27 岁）
+// ============================================================================
+
+export const CAREER_EVENTS: LifeEventNode[] = [
+  // 20岁 大二/大三 象牙塔里的阶层见闻
+  {
+    id: "career_age_20",
+    age: 20,
+    stageName: "大学阶段 · 20岁",
+    title: "宿舍夜谈与苹果全家桶",
+    scene:
+      "大二这年，同寝室本地家庭的同学换了最新款的苹果笔记本，正讨论暑假去欧洲交流或去券商大厂实习；而你刚用做家教兼职攒下的钱，换了一部屏幕有划痕的二手红米手机。晚上熄灯后，大家谈起未来的出路，有人打算靠家里在二线全款买房，有人已经联系好了海外留学的导师。",
+    choices: [
+      {
+        text: "周末兼职打三份工（发传单、奶茶店、周末家教），拼命存下每一个铜板",
+        detail: "你用肉身的疲惫置换金钱的安全感，两年来没有参加过任何一次超过人均50块的聚餐。",
+        reaction: "银行卡上的数字终于破了五位数。虽然在寝室聚会里你是最沉默的那一个，但你有底气不再向家里要一分钱。",
+        savingsDelta: 8000,
+        autonomyDelta: 20,
+        kinshipDelta: -10,
+        institutionalDelta: -10,
+        resilienceDelta: 25,
+        addTags: ["拼命攒钱", "边缘独行"]
+      },
+      {
+        text: "泡在图书馆和自习室：拼国家奖学金、考雅思/专业硬核证书",
+        detail: "你相信只要把专业实力磨到极致，社会的规则就不会轻易将你埋没。",
+        reaction: "你的专业绩点冲到年级前三，拿下了八千块国奖，但体检时发现腰椎已经开始出现生理曲度变直。",
+        savingsDelta: 8000,
+        autonomyDelta: 15,
+        kinshipDelta: 10,
+        institutionalDelta: 10,
+        resilienceDelta: 15,
+        addTags: ["硬核做题", "自律苦修"]
+      },
+      {
+        text: "参与社团学生会，学习酒桌应酬与组织材料，积极争取入党推优",
+        detail: "你敏锐察觉到了规则的运行逻辑，开始学着把棱角磨平，学着讲得体的套话与场面话。",
+        reaction: "辅导员对你越来越赞许，甚至在年底的留校与推优指标上留了你的名字。你感到自己正在成为机器的一部分。",
+        savingsDelta: 1000,
+        autonomyDelta: -20,
+        kinshipDelta: 15,
+        institutionalDelta: 35,
+        resilienceDelta: 10,
+        addTags: ["体制圆滑", "熟稔规则"]
+      }
+    ]
+  },
+
+  // 22岁 毕业大十字路口
+  {
+    id: "career_age_22",
+    age: 22,
+    stageName: "毕业十字路口 · 22岁",
+    title: "六月毕业季的离校大迁徙",
+    scene:
+      "毕业答辩结束，室友的行李箱在走廊滚出嘈杂的声响。招聘会的大厅挤满了穿廉价西装的应届生，上万份简历在地上被踩得满是泥印。你必须选择毕业后的第一块落脚点：",
+    choices: [
+      {
+        text: "回老家备战考编/三支一扶/县城事业单位，全职脱产啃老二战",
+        detail: "回到熟悉的县城房间，每天在母亲做饭的油烟味中刷行测与申论，不敢出门见高中同学。",
+        reaction: "父母对外宣布你在‘备战国家大事’，但你感到自己的青春正像一盆放置在背阴处的冷水，一天天蒸发。",
+        savingsDelta: -5000,
+        autonomyDelta: -25,
+        kinshipDelta: 30,
+        institutionalDelta: 35,
+        resilienceDelta: -10,
+        addTags: ["脱产考编", "深陷故土"]
+      },
+      {
+        text: "拎着编织袋直奔一线城市城中村（深圳城中村/北京回龙观/上海松江），进入私企/大厂外包996",
+        detail: "住在隔断出来的单间，窗外对着邻居家的空调外机，每天通勤三个小时挤在窒息的地铁早高峰。",
+        reaction: "第一个月拿到转正工资七千五，扣除房租和杂费只剩一半。你第一次真正感知到什么是被城市榨取。",
+        savingsDelta: 3500,
+        autonomyDelta: 25,
+        kinshipDelta: -15,
+        institutionalDelta: -15,
+        resilienceDelta: 20,
+        addTags: ["大城市漂流", "996螺丝钉"]
+      },
+      {
+        text: "靠一门硬技术/专业执照入行（汽修技师、医疗护工、咖啡连锁管培、独立手艺）",
+        detail: "不图虚名，用体力与具体的专业技能换取现钱，每天下班手上都带着机油或消毒水味道。",
+        reaction: "没有白领的光鲜，但你几乎没有失业焦虑。看着手里一点点积攒起来的硬通货，你感到一种粗粝的安全感。",
+        savingsDelta: 6000,
+        autonomyDelta: 20,
+        kinshipDelta: -10,
+        institutionalDelta: -25,
+        resilienceDelta: 30,
+        addTags: ["蓝领实干", "硬核技能"]
+      }
+    ]
+  },
+
+  // 23岁 职场第1年
+  {
+    id: "career_age_23",
+    age: 23,
+    stageName: "走向社会 · 第1年",
+    title: "试用期最后一周的裁撤谈话",
+    scene:
+      "年底经济形势下行，公司突击宣布裁减30%新人指标。在试用期的第5个月零20天，HR在玻璃隔间约谈你，桌上放着一份主动辞职协议，理由是‘业务结构调整，人岗匹配度不足’，暗示如果不签不仅没有证明还会影响档案背调。",
+    choices: [
+      {
+        text: "录音取证，据理力争：‘不给N+1合法补偿，我明天就去劳动仲裁大厅立案’",
+        detail: "你没有像同批同事那样哭着签字走人。你在冷风里骑车去劳动局打印材料，连打了三天热线。",
+        reaction: "HR最终妥协，多赔了一个月工资把你打发走。虽然丢了工作，但你第一次发现规则并非不可撼动。",
+        savingsDelta: 8500,
+        autonomyDelta: 25,
+        kinshipDelta: -5,
+        institutionalDelta: -20,
+        resilienceDelta: 25,
+        addTags: ["硬骨头仲裁", "识破职场"]
+      },
+      {
+        text: "忍气吞声签字走人，并在当晚电话里对父母报喜不报忧：‘公司很好，年终还有奖金’",
+        detail: "挂断电话，你在零下五度的天桥上把冷掉的煎饼果子一口口咽下去，眼泪掉在塑料袋里。",
+        reaction: "你把所有苦难咽进胃里化作慢性浅表性胃炎。为了省钱，你把出租屋退掉，搬进了不见天日的地下室隔间。",
+        savingsDelta: -2000,
+        autonomyDelta: -10,
+        kinshipDelta: 20,
+        institutionalDelta: 10,
+        resilienceDelta: 10,
+        addTags: ["报喜不报忧", "隐忍硬扛"]
+      }
+    ]
+  },
+
+  // 24岁 职场第2年
+  {
+    id: "career_age_24",
+    age: 24,
+    stageName: "走向社会 · 第2年",
+    title: "高中死党结婚与老家人情索命",
+    scene:
+      "十月国庆，老家高中同桌要在县城最大酒店办婚礼。微信群里大家都在起哄随礼，体制内的同学起步就是1000块红包，还晒出单位发的过节粮油。而你刚交完下个季度的押一付三房租，卡里只剩可怜的1350元。",
+    choices: [
+      {
+        text: "刷信用卡套现随礼1000元，并坐夜班绿皮车回老家参加婚礼",
+        detail: "酒席上，二叔和七姑八大姨拉着你的手盘问：‘在大城市一个月挣多少？买房没有？有没有编制？’",
+        reaction: "你在敬酒的假笑中耗尽了所有的社交能量。回程火车上，你看着下个月账单，发誓三年内绝不再回老家过节。",
+        savingsDelta: -2500,
+        autonomyDelta: -15,
+        kinshipDelta: 25,
+        institutionalDelta: 15,
+        resilienceDelta: -5,
+        addTags: ["人情透支", "宗族审判"]
+      },
+      {
+        text: "装作工作脱不开身，微信私发200元红包与祝福，拒绝回乡",
+        detail: "同桌收了红包回了客套的表情，但高中群里关于你的讨论悄悄冷落下来，母亲打电话骂你‘不知人情冷暖’。",
+        reaction: "你彻底被老家的核心熟人圈除名了。但那个长假，你在出租屋里安安静静看完了两本外语原版书，感到从未有过的清静。",
+        savingsDelta: -200,
+        autonomyDelta: 30,
+        kinshipDelta: -30,
+        institutionalDelta: -10,
+        resilienceDelta: 20,
+        addTags: ["斩断故交", "精神离土"]
+      }
+    ]
+  },
+
+  // 25岁 职场第3年
+  {
+    id: "career_age_25",
+    age: 25,
+    stageName: "走向社会 · 第3年",
+    title: "体检报告的4A红字与无休加班",
+    scene:
+      "年终体检中心寄来密封报告单：甲状腺结节TI-RADS 4A类（建议穿刺穿检）、轻度脂肪肝、窦性心动过缓。同周，部门总监召集开会宣布：‘全行业都在降本增效，下季度全面取消周末双休，拥抱战时状态。’",
+    choices: [
+      {
+        text: "去医院做穿刺检查，请假一周，开始把作息硬性切回11点前睡觉，拒绝无意义摸鱼加班",
+        detail: "总监在周会上当众点名批评你‘缺乏创业狼性，对待团队没有奉献精神’，并将你从核心项目踢出。",
+        reaction: "虽然绩效被打了C，但结节复查为良性。你站在深夜空无一人的天桥上，看着满城霓虹，心里嘲笑他们的狂热。",
+        savingsDelta: -1500,
+        autonomyDelta: 25,
+        kinshipDelta: -5,
+        institutionalDelta: -25,
+        resilienceDelta: 20,
+        addTags: ["保命哲学", "看破内卷"]
+      },
+      {
+        text: "把报告塞进抽屉最深处假装没看见，吞两颗止痛片继续在深夜两点写PPT",
+        detail: "‘大家都这么熬，我如果停下来，下个月的房租和老家父母的降压药钱谁来出？’",
+        reaction: "年底你拿到了‘卓越奋斗者’奖杯和一万二奖金，但你发现自己晨起时心慌手抖的次数越来越频繁。",
+        savingsDelta: 12000,
+        autonomyDelta: -20,
+        kinshipDelta: 15,
+        institutionalDelta: 20,
+        resilienceDelta: 5,
+        addTags: ["肉体燃料", "自毁型奋斗"]
+      }
+    ]
+  },
+
+  // 26岁 职场第4年
+  {
+    id: "career_age_26",
+    age: 26,
+    stageName: "走向社会 · 第4年",
+    title: "二线城市的六个钱包与三十年绞索",
+    scene:
+      "春节回家，父母突然关上房门，把一张存折拍在桌上：‘我和你爸把老平房抵押，加上半辈子养老金，一共凑了60万。你在合肥/武汉/郑州看好了一套期房，首付我们包了，每月房贷8200元你自己供，不买房哪个姑娘肯跟你结婚？’",
+    choices: [
+      {
+        text: "接过存折按揭签字，背上30年房贷，完成全家族的阶层跨越执念",
+        detail: "签完字那一刻，你看着红色的购房合同，感到这辈子的人生路径已经被打上了水泥钢筋。",
+        reaction: "从此你不敢离职、不敢生病、不敢轻易换工作。每个月工资一到账就自动划扣8200元，你彻底被锁死在城市机器上。",
+        savingsDelta: -20000,
+        autonomyDelta: -35,
+        kinshipDelta: 35,
+        institutionalDelta: 30,
+        resilienceDelta: -15,
+        addTags: ["三十年房奴", "全家锁死"]
+      },
+      {
+        text: "坚决推开存折：‘你们把老房抵押了，万一生大病住哪？我绝不为了所谓面子买高位期房’",
+        detail: "父亲气得浑身发抖，拍桌子怒吼‘你这是大逆不道！我们在亲戚面前头都抬不起来！’",
+        reaction: "母亲抹着眼泪叹气。你背上背包连夜坐车返回出租屋，两代人的鸿沟在这一晚彻底裂成无法弥合的东非大裂谷。",
+        savingsDelta: 0,
+        autonomyDelta: 40,
+        kinshipDelta: -35,
+        institutionalDelta: -20,
+        resilienceDelta: 25,
+        addTags: ["割席决绝", "不当接盘侠"]
+      }
+    ]
+  },
+
+  // 27岁 职场第5年（宿命之年）
+  {
+    id: "career_age_27",
+    age: 27,
+    stageName: "走向社会 · 第5年",
+    title: "母亲的病危通知与跨洋签证通知",
+    scene:
+      "五月中旬，老家县医院打来电话：母亲突发急性胆管炎并发心衰，医生语气凝重：‘我们县里设备不行，你必须尽快想办法弄到省协和医院的急诊床位，最好找熟人托关系……’\n\n就在同一天的同一小时，你手机邮箱里弹出了一封通知：你一年前悄悄递交的海外打工签证/留工资格获得了初步批准，要求在30天内核验资金与登机时间。",
+    choices: [
+      {
+        text: "托尽所有高中同学和关系，带着全部存款赶回省城医院陪护病床",
+        detail: "你用尽了所有的脸面托到了一张加床。你在充满来苏水味道的走廊里陪护了两周，给母亲端屎端尿，放弃了海外出走的机会。",
+        reaction: "母亲的手在输液管下枯瘦泛黄。看着窗外的灰蒙天空，你清楚自己这辈子注定要死死绑在这片泥土里了。",
+        savingsDelta: -35000,
+        autonomyDelta: -30,
+        kinshipDelta: 40,
+        institutionalDelta: 25,
+        resilienceDelta: 10,
+        addTags: ["孝道羁绊", "肉身归巢"]
+      },
+      {
+        text: "把手里攒下的积蓄大半汇回老家托亲友照看，自己咬牙办理出国公证与离境手续",
+        detail: "‘如果我也留在这里，全家最终不过是一起沉入泥潭。我必须在外面踩出一块浮木。’",
+        reaction: "在去往机场的大巴上，看着后视镜里越来越小的故乡地平线，眼泪止不住地涌出，你成为了家族名义上的逃兵。",
+        savingsDelta: -25000,
+        autonomyDelta: 45,
+        kinshipDelta: -20,
+        institutionalDelta: -35,
+        resilienceDelta: 35,
+        addTags: ["断脐出海", "背负骂名"]
+      }
+    ]
+  }
+];
+
+// ============================================================================
+// 27 岁命运解构与诊断引擎
+// ============================================================================
+
+export interface LifeDiagnosis {
+  type: "stay" | "emigrate" | "migrant_bird";
+  title: string;
+  portrait: string;
+  kinshipEvaluation: string;
+  systemEvaluation: string;
+  fateVerdict: string;
+  recommendation: string;
+}
+
+export function evaluate27YearOldLife(
+  autonomy: number,
+  kinship: number,
+  institutional: number,
+  savings: number,
+  tags: string[]
+): LifeDiagnosis {
+  const savingsNote = savings > 20000 ? `你手握约 ${savings.toLocaleString()} 元结余，这是你唯一的盘缠底牌。` : `你手中几乎没有流动现金积蓄，只能靠纯粹的体力或决绝走险。`;
+  // If kinship and institutional are high, naturally suited for staying
+  if (kinship >= 50 && institutional >= 20) {
+    return {
+      type: "stay",
+      title: "【宿命之木 · 扎根故土型】",
+      portrait: `你在熟人网络与体制安全感中长成。虽然你多次抱怨过它的逼仄与人情盘剥，但你骨子里最离不开的，恰恰是这种稠密的烟火温度。${savingsNote}`,
+      kinshipEvaluation: `宗族重力指数：${kinship}/100（极高）。亲人的病痛与期盼会随时拽动你的心脏，离开故土会让你在异国雪夜被内疚彻底风干。`,
+      systemEvaluation: `体制依附度：${institutional}/100（高）。你更适应确定的轨道，对异域无依无靠的野蛮丛林缺乏天然免疫力。`,
+      fateVerdict: `你的一亩三分地就在这里。认认真真接纳人情社会的人情与责任，在熟悉的熟人圈里建立防线，是你的宿命。`,
+      recommendation: `留在国内体制或熟人圈深耕，善用家庭网抵抗风浪。`
+    };
+  }
+
+  // If autonomy is very high and kinship is low or broken
+  if (autonomy >= 55 || tags.includes("断脐出海") || tags.includes("割席决绝")) {
+    return {
+      type: "emigrate",
+      title: "【断脐孤舟 · 肉身出海型】",
+      portrait: `你生来长着一副反叛的骨骼。那些被常人视作避风港的亲缘、面子与编制，对你而言是窒息的绞索。`,
+      kinshipEvaluation: `宗族重力指数：${kinship}/100（脱敏）。你早已在精神上断脐，能够冷酷地切除毫无边界的情感勒索。`,
+      systemEvaluation: `体制依附度：${institutional}/100（极低）。你拒绝成为任何宏大叙事的燃料，宁可在陌生文明做局外人，也不愿在故土被按头审判。`,
+      fateVerdict: `你天生适合出海。异国很冷、语言很硬、终生为客，但只要头顶没有宗族的审判与35岁的断头台，你就能在甲板上睡得无比安稳。`,
+      recommendation: `果断割舍沉没成本，带上你的技能与存款，奔赴异邦。`
+    };
+  }
+
+  // Otherwise: Migrant bird (出去淘金/换技能，再回来)
+  return {
+    type: "migrant_bird",
+    title: "【飞渡候鸟 · 渡海借风型】",
+    portrait: `你既不是传统的孝道殉道者，也不是决绝的文化背叛者。你是一只极度务实的候鸟，看清了国内的拥挤，但也舍不下熟悉的饭局与根须。`,
+    kinshipEvaluation: `宗族重力指数：${kinship}/100（平衡）。你在意亲人，但不愿为无底洞埋葬自己；你需要靠外部的距离维系体面。`,
+    systemEvaluation: `体制依附度：${institutional}/100（审慎）。你懂得体制的残酷，因此渴望去海外赚取外币、拿到技能杠杆与免死金牌。`,
+    fateVerdict: `去异邦闯荡三到八年，赚回你在国内十年都攒不下的现金与技能壁垒。当你羽翼丰满，带着一身盐霜归来时，你将握有支配人生的主动权。`,
+    recommendation: `出境打工或进修，设定明确的撤退或跳板时间表。`
+  };
+}
+
+// ============================================================================
+// 28 ~ 63 岁：双轨平行对映（Parallel Trajectories to Retirement）
+// ============================================================================
+
+export const PARALLEL_LIVES_MILESTONES: DualTrackStage[] = [
+  // 30岁
+  {
+    age: 30,
+    title: "30岁 · 立与不立",
+    theme: "异邦立足 vs 房贷围城",
+    emigratedScene:
+      "在异邦（以当地打工或小企业为例），你通过了初级语言考试，换了正式的工作签证，租下离市中心电车40分钟的一居室。除夕这天晚上，你下班后在华人超市买了一包冷冻水饺，房东老太太敲门送了你一块自家烤的苹果派，祝你新年好。虽然没有鞭炮和红白人情，但你卡里的外币存款第一次折合超过了15万人民币。",
+    stayedScene:
+      "在省会城市，你在父母资助下咬牙上车了郊区期房，每月还贷7800元。周五晚上你在饭局上给分管领导敬酒，喝到急性胃痉挛，吐在地下商场的洗手池里。周末高中同学聚会，大家一边吹嘘谁换了奔驰，一边心照不宣地打听谁能弄到重点小学的学位房指标。",
+    emigratedReflection:
+      "你尝到了无菌的自由，但也第一次体会到大年三十异国街道落雪时的绝对孤寂。",
+    stayedReflection:
+      "你在人情世故里八面玲珑，但深夜看着手机银行自动扣划房贷的短信，感到自己像被钉死在十字架上。",
+    choice: {
+      text: "这一年，你给国内的家里寄了第一笔外汇 / 咬牙还了第一笔大额本金",
+      detail: "不管是哪种人生，你都在为三十岁的生活缴足了昂贵的入场券。",
+      reaction: "两边的天空都在变暗，但你选择的路已经没有回头草可吃。"
     }
-  ],
-  australia: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      phaseTitle: "破土与喜礼：铁皮屋宿舍与表妹的编制酒席",
-      hereTitle: "此岸 · 维州农场宿舍，站了八个半小时的双手指泡",
-      hereText: "下了飞机一路转车到了维州果园小镇。合租铁皮屋里住了四个不同国家的年轻人，第一天站了八个半小时给橘子分类装箱，腰酸得翻身倒吸凉气，手掌磨出水泡。去 Kmart 买了 25 刀厚袜子。晚上坐在门前台阶上，天黑得透彻，南半球的银河横在头顶，偶尔能听到远处袋鼠跳过的沙沙声。",
-      thereTitle: "彼岸 · 表妹考上县税务局，家族群里的亲戚私信",
-      thereText: "同在这个月，老家表妹考上了县税务局编制，大伯在老家最高档的酒楼摆了四桌宴席。家族群里都在夸表妹‘光宗耀祖、一辈子旱涝保收’。一个平日不联系的堂叔突然私信你：“听说你去澳洲农村摘橘子了？好好的文凭跑去洋人乡下当苦力，传出去老家人听着像什么话啊？”",
-      choices: [
-        {
-          text: "不回复堂叔的私信，把水泡挑破缠上胶布，看着银行卡里刚收到的 950 澳币周薪支票笑了笑。",
-          detail: "用真切的劳动所得与内心的秩序，回击世俗的眼光。",
-          reaction: "第二天在流水线上，机器轰鸣，汗水滴在木箱上。领工的大叔冲你竖起大拇指说‘Good job mate!’，你觉得靠双手吃饭没什么丢人的。",
-          fundsDelta: 4500,
-          individualSovereigntyDelta: 15,
-          soilKinshipTiesDelta: -10
-        },
-        {
-          text: "礼貌回复堂叔‘出来体验生活练练英语，过两年就回’，并在家族群里给表妹发了 200 块红包道贺。",
-          detail: "咽下委屈，用乡土社会最习惯的客套话敷衍过去，维持表面的人情和平。",
-          reaction: "堂叔回了句‘早点回国考个编制才是正道’。你关掉微信，坐在门前抬头看银河，南十字星在夜空里亮得惊人。",
-          fundsDelta: -200,
-          individualSovereigntyDelta: -5,
-          soilKinshipTiesDelta: 8
-        }
-      ]
-    },
-    {
-      year: 2,
-      timeLabel: "立足 · 第 2 年",
-      phaseTitle: "裂痕与缺席：二手丰田与父亲被刮蹭的电动车",
-      hereTitle: "此岸 · 2200刀的旧凯美瑞与街角 Flat White",
-      hereText: "攒了 8000 澳币，花了 2200 刀买了辆开了 19 万公里的旧丰田凯美瑞。搬到墨尔本郊区，在当地咖啡馆找了份服务生的活。每天早上 6 点开门，满屋子都是浓郁深烘咖啡香气。常客是个点 Flat White 的退休老头，看你英语卡壳会慢吞吞开玩笑纠正你的发音。你报名了周末的 First Aid 急救证书，准备转做养老护理员。",
-      thereTitle: "彼岸 · 父亲骑车摔伤骨折，老舅找交警熟人调解",
-      thereText: "老家父亲下雨天骑电动车被刮蹭摔倒，右腿骨折。母亲在电话里哭，你在大洋彼岸急得满头大汗却连挂号软件都用不了。最后是老舅托了交警大队的一个老同学出面，查监控找到了肇事车主并调解赔了医药费。老舅在电话里语重心长叹气：“你跑那么远能顶什么事？真遇到坎坷，还不是老家这帮亲戚出面跑前跑后？”",
-      choices: [
-        {
-          text: "立刻给老舅寄了澳洲的绵羊油和蜂胶，并给父亲转了 5000 块营养费，电话里诚恳道谢。",
-          detail: "承认宗族熟人网络的现实价值，用物质回馈亲人的托底之情。",
-          reaction: "老舅收了礼物在亲戚群里夸你懂事。你下班坐在旧车里，握着方向盘沉默了很久。你知道有些亏欠，永远填不平。",
-          fundsDelta: -5600,
-          individualSovereigntyDelta: -6,
-          soilKinshipTiesDelta: 16
-        },
-        {
-          text: "给家里转了 3000 元，同时坚决催促家里通过正规交警保险法务理赔，不欠不必要的人情债。",
-          detail: "试图用现代法治观念重塑老家的行事风格，虽然常常招来长辈的不解。",
-          reaction: "母亲在电话里念叨‘找熟人省事嘛’。你叹了口气，明白两代人生活在完全不同的规则宇宙里。",
-          fundsDelta: -3000,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: -2
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "沉淀 · 第 3 年",
-      phaseTitle: "远水与近渴：海滩折叠椅与弟弟买房差的八万彩礼",
-      hereTitle: "此岸 · 傍晚一个人看日落的海滩与两块钱气泡水",
-      hereText: "周日傍晚开着旧丰田去海边，澳洲的海滩永远空旷干净。把折叠椅撑在沙子里，手里拿着一罐两块钱的超市气泡水看夕阳落进海面。空气里带着咸味与湿润，整周在护理院给老人翻身换药的疲劳，在这一刻被海浪声慢慢抚平。你深吸一口气，很久没有偏头痛了。",
-      thereTitle: "彼岸 · 亲弟弟订婚买房，母亲欲言又止的微信语音",
-      thereText: "手机震动，母亲发来几段长长的微信语音。先是问了天气，绕了半天弯子，最后吞吞吐吐地说：“……你弟弟今年订婚，女方那边非要全款买个小三居，还差八万块钱彩礼和首付。你在国外赚的是澳币，汇率高，能不能先支援家里一把？”",
-      choices: [
-        {
-          text: "拿出自己辛苦攒下的一半积蓄（约合 4 万 RMB）汇回去，并明确表态‘这是我能支持的极限’。",
-          detail: "兼顾骨肉亲情，但设立刚性底线，保护自己在异国的生存安全垫。",
-          reaction: "母亲收了钱长舒一口气，连声夸你顾家。你看着银行卡里缩水的数字，站起身合上折叠椅，在海风里慢慢走回车里。",
-          fundsDelta: -40000,
-          individualSovereigntyDelta: 5,
-          soilKinshipTiesDelta: 14
-        },
-        {
-          text: "如实向母亲说明自己正在做护理员、存钱办永居的艰难处境，转了 1 万元作为心意，拒绝全额托底。",
-          detail: "狠下心打碎‘海外发大财’的虚幻滤镜，坚守个体独立的尊严边界。",
-          reaction: "母亲在电话那头沉默了半晌，叹息着说‘知道了，你在外面也难’。挂断电话后，你一个人在海边坐到了天黑。",
-          fundsDelta: -10000,
-          individualSovereigntyDelta: 16,
-          soilKinshipTiesDelta: -12
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "扎根 · 第 5 年",
-      phaseTitle: "自洽与归处：后院柠檬树下的准签信与平静的炊烟",
-      hereTitle: "此岸 · 泥土手套、准签信与热腾腾的水饺",
-      hereText: "手机震动，移民局发来自动邮件，永居签证获批。你戴着沾满泥土的花园手套，站在小出租屋后院的柠檬树下，把那封信看了三遍。没有激动喊叫，也没有开香槟。摘下手套进屋喝了一大杯水，去超市买了平时舍不得买的草莓和速冻水饺，煮了一大碗就着老干妈吃完。阳光在窗台上慢慢移动，你终于不用担心下个月去哪了。",
-      thereTitle: "彼岸 · 家族重修宗族族谱，你那一栏后面的‘迁居海外’",
-      thereText: "老家村头祠堂重修族谱，老舅在微信群里发了排版照片。在密密麻麻的同辈姓名后面，你的名字旁印着一行小字：‘迁居大洋洲’。母亲发来一张老家傍晚烟囱冒青烟的照片，语音里带着平静：“老家挺好的，你自己在外面把日子过好，不用老往回跑，人平平安安就行。”",
-      choices: [
-        {
-          text: "把老家傍晚的照片保存下来设为手机壁纸，把准签信夹在护照里，换上鞋去附近的草坪散步。",
-          detail: "接纳自己的双重身份：既是那片厚重土地走出来的孩子，也是这片辽阔大陆上的独立旅人。",
-          reaction: "晚风吹在身上暖洋洋的，邻居家的金毛犬欢快地在草坪上追着飞盘。你踩在松软的草地上，心里满当当都是踏实。",
-          fundsDelta: -80,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 5
-        }
-      ]
+  },
+
+  // 35岁
+  {
+    age: 35,
+    title: "35岁 · 职场枯荣线",
+    theme: "工会与钓鱼 vs 大厂优化大潮",
+    emigratedScene:
+      "当地法律没有‘35岁红线’这种说法。你所在的蓝领车间或当地小公司下午4点准时锁门下班。你买了一辆二手皮卡，后备箱放着渔具，周末带着保温杯去海边钓鱼。但你依然听不懂本地同事在茶歇时聊起的橄榄球笑话，在他们眼里，你是一个勤勉、安静、从不找事的‘黄皮肤局外人’。",
+    stayedScene:
+      "国内大厂迎来第三轮‘优化降本’。你所在的业务线整批裁撤，HR拿着N+1赔偿协议找你谈话。你投出去两百份简历，只要年龄填了35岁，系统全部自动拦截未读。家里二胎刚满两岁，奶粉与早教班账单叠在茶几上，你在车库里坐了整整四十分钟，抽了三根烟才敢上楼。",
+    emigratedReflection:
+      "你避开了35岁的断头台，但你深知自己这辈子永远无法融入主流文化的核心。",
+    stayedReflection:
+      "你在黄金年龄被市场当成耗材吐了出来，你不得不去注册滴滴和同城闪送账号补贴家用。",
+    choice: {
+      text: "面对中年危机的重击，你硬生生用肩膀扛了下来",
+      detail: "人在三十五岁，所有浪漫主义的幻想都被生活剥得干干净净。",
+      reaction: "你不再和任何人争辩对错，因为生存本身就是唯一的正义。"
     }
-  ],
-  china_stay: [
-    {
-      year: 1,
-      timeLabel: "原地 · 第 1 年",
-      phaseTitle: "浸润与依附：加班晚上的热汤面与堂妹的喜糖",
-      hereTitle: "此岸 · 挤着二号线的打工人，与老板多给的一勺牛肉",
-      hereText: "周五晚上加班到快九点，浑身发沉走下天桥。路过常去的清真拉面馆，点了一碗细面，老板认出你是熟客，往你碗里多舀了一大勺带筋的牛肉块。热汤下肚，浑身的寒气一下子散开了。吃完顺路去超市买了两袋打折的大米和一卷垃圾袋，提着走回出租屋看地方新闻。",
-      thereTitle: "彼岸（宗族现场） · 参加堂妹婚礼，七大姑八大姨拉着你的手",
-      thereText: "周末坐两个小时高铁回老家参加堂妹的婚礼。随了 500 块礼金，大姨抓了一大把喜糖塞你口袋里，三姑拉着你的手问：“现在一个月到手多少？单位给交五险一金不？我单位有个小伙子条件不错，要不要加个微信？”虽然问得你头皮发麻，但桌上热气腾腾的大肘子和满屋子欢笑声，让你切切实实感受到了宗族的体温。",
-      choices: [
-        {
-          text: "乖乖加上大姨推荐的相亲对象微信，中午陪大伯喝了两小杯老白干，一家人其乐融融。",
-          detail: "顺从并享受乡土人情的庇护，在这个熟人社会里当一个被妥善安顿的普通后辈。",
-          reaction: "大伯喝得满脸红光，拍着你肩膀说‘好孩子，有孝心’。晚上坐高铁回出租屋，包里塞满了妈妈硬塞的土鸡蛋和腊肉。",
-          fundsDelta: -500,
-          individualSovereigntyDelta: -8,
-          soilKinshipTiesDelta: 20
-        },
-        {
-          text: "礼貌微笑着婉拒相亲，吃完酒席下午就借口‘单位要赶方案’坐高铁回程。",
-          detail: "在体制与宗族的稠密网罗中，努力为自己保留一小块现代独立的生活飞地。",
-          reaction: "大姨在背后跟妈妈咕哝了句‘这孩子心气高’。回到出租屋拉上窗帘，虽然安静，但心里莫名多了一丝说不清的空落。",
-          fundsDelta: -500,
-          individualSovereigntyDelta: 12,
-          soilKinshipTiesDelta: 5
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "原地 · 第 3 年",
-      phaseTitle: "近渴与回响：母亲住院动手术与床前的端茶喂药",
-      hereTitle: "此岸 · 请了整周陪护假，在县医院走廊奔波拿化验单",
-      hereText: "母亲胆结石发作在县医院动腹腔镜手术，你向公司请了整整一周年假回老家陪护。早上 6 点去医院水房打热水，楼上楼下跑着拿抽血化验单，中午跑回老家熬了黑鱼汤用保温桶装好送来。晚上蜷缩在床边的折叠椅上，母亲翻身轻轻哼了一声，你立刻惊醒替她掖好被角。母亲拉着你的手，眼眶发红说‘还是你在身边好’。",
-      thereTitle: "彼岸（宗族呼应） · 大舅拎着老母鸡，发小帮忙联系主刀医生",
-      thereText: "住院第二天，大舅从乡下拎了两只刚宰好的老母鸡和土鸡蛋赶来；当年在县中医院当药剂师的高中发小，私下帮你跟主刀主任打了招呼，手术排在了第一台。病房里的邻床阿姨羡慕地看着母亲：“你家这孩子真懂事孝顺，天天在床前守着，比那些跑外省、跑国外的强一百倍啊！”",
-      choices: [
-        {
-          text: "给发小发了感谢红包（发小退了回来，只让你下次喝酒请吃烧烤），全心全意把母亲照料到出院。",
-          detail: "深刻体会到熟人社会互相托底的温情，彻底接受生活在身边的意义。",
-          reaction: "母亲出院那天阳光很好，挽着你的胳膊慢慢走下台阶。你看着她头上日渐增多的白发，心想留在原地陪伴家人，本身就是一种极大的圆满。",
-          fundsDelta: -3000,
-          individualSovereigntyDelta: -5,
-          soilKinshipTiesDelta: 25
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "原地 · 第 5 年",
-      phaseTitle: "自洽与圆满：给朋友圈点了个赞，继续阳台晾衣炖汤",
-      hereTitle: "此岸 · 盛了一碗热气腾腾的排骨汤，阳台上的夕阳金边",
-      hereText: "周末睡到自然醒，坐公交车回父母家。早上陪妈妈去露天早市买白菜，帮爸爸一起包韭菜猪肉馅饺子。偶尔在朋友圈里看到当年高中同学发在澳洲海滩冲浪或加拿大雪山滑雪的照片，你停下手指看了两秒，随手点了个赞，然后放下手机，转身把洗好的衣服挂在阳台晾衣绳上。水珠顺着裤脚滴在瓷砖上，楼下传来小孩子放学嬉闹的声音，厨房里小火炖着的排骨汤咕嘟咕嘟冒着热气。",
-      thereTitle: "彼岸（内心自洽） · 认清生活的真相后，安于脚下的方寸之地",
-      thereText: "你没有跨越大洋去追寻异国的自由，你留在熟悉的街道，熟悉每一个拐角的早点铺，熟悉父母每一个咳嗽的声调。你承受了职场的内卷和人情的繁重，但你也获得了病床前的踏实与每一个周末全家人围坐小方桌的温度。生活像流水一样静静向前流淌，平平淡淡，也是一种真正的圆满。",
-      choices: [
-        {
-          text: "盛了一碗排骨汤放在茶几上，陪爸爸坐在沙发上看地方新闻，夕阳把客厅镀上一层金色。",
-          detail: "心无波澜，安于方寸，踏踏实实安顿好了整颗心。",
-          reaction: "爸爸从碗里夹了一块肉放进你碗里：“多吃点，今天炖得烂。”窗外夜幕降临，万家灯火亮起，你知道这就是属于你的归宿。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 5,
-          soilKinshipTiesDelta: 15
-        }
-      ]
+  },
+
+  // 42岁
+  {
+    age: 42,
+    title: "42岁 · 四海一家的生老病死",
+    theme: "跨洋转机来不及送终 vs 走廊陪护床前的最后尽孝",
+    emigratedScene:
+      "凌晨两点手机疯狂震动，是老家亲戚打来的微信语音：‘你爸不行了，在ICU抢救，医生让家属准备后事，你快回来看最后一眼！’你发疯一样查机票，转机加签证核酸最快也要32个小时。三天后当你提着沾满雨水的行李箱跪在老家县城灵堂前时，看到的只有一张黑白照片和一盒冰冷的骨灰。你母亲哭晕在你怀里，骂你是个没良心的逃兵。",
+    stayedScene:
+      "父亲确诊肺部恶性肿瘤。整整两个月，你托了高中当副院长的老同学才弄到一张加床。你白天上班，夜里在充满消毒水和呼噜声的走廊折叠床上陪护，翻身、吸痰、擦拭身体。在父亲闭上眼睛的那一刻，他的手紧紧握着你的手掌。你身心俱疲，但你问心无愧地陪他走完了人间的最后一程。",
+    emigratedReflection:
+      "那一晚你跪在故乡的祠堂前，知道那根连通故土的血缘脐带彻底断了，你成了名副其实的孤魂野鬼。",
+    stayedReflection:
+      "你为父亲办了一场体面的白事，收回了当年送出去的七万多份子钱。你在疲惫中感到一种宿命的完满。",
+    choice: {
+      text: "在生离死别的坟茔前，你给这一代父母磕了三个头",
+      detail: "所有的恩怨、孝顺与逃避，都在黄土掩埋棺木的那一刻化作了青烟。",
+      reaction: "你终于意识到：人到中年，故土不再是那个温暖的窝，而是父母的一座坟。"
     }
-  ],
-  germany: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      phaseTitle: "破土与喜礼：周日全城闭店与大学室友的三亚婚礼",
-      hereTitle: "此岸 · 柏林空无一人的冷风街角与加油站干面包",
-      hereText: "在柏林郊区租到一个 14 平米小单间，为了办户籍登记 (Anmeldung)，每天早上 6 点定闹钟刷新退号网页，刷了三周才抢到号。周日全城商店超市依法强制关门，街上安静得听见落叶声，你在冷风里裹紧大衣，在加油站花 4 欧买了块干硬面包。周末在厨房炖了一大锅土豆牛肉汤，窗玻璃上挂满水珠。",
-      thereTitle: "彼岸 · 大学上下铺兄弟在三亚大婚，合照里唯独缺了你",
-      thereText: "同在这个周末，大学睡在你上铺的同窗在三亚办海岛婚礼，同班同学几乎全飞过去当伴郎伴娘。班级微信群里发了上百张合照，大家穿着统一的西装礼服在沙滩上大笑。班长在群里艾特你：“就差你一个人了啊，德国那边就这么走不开？全班就你不合群啦！”",
-      choices: [
-        {
-          text: "给室友发了 888 块的大额微信红包，并在群里发了一小段真诚自嘲的祝福视频。",
-          detail: "用自嘲和金钱化解‘不合群’的道德审判，尽量保留当年的同窗旧谊。",
-          reaction: "群里起哄发表情包，室友私聊你‘兄弟懂你，在欧洲注意身体，回国聚’。你把干面包泡进热汤里，心里微酸但释怀了。",
-          fundsDelta: -888,
-          individualSovereigntyDelta: -4,
-          soilKinshipTiesDelta: 12
-        },
-        {
-          text: "给室友私聊道喜并寄了一套德国制造的高级指甲刀套装当结婚礼物，群里保持沉默。",
-          detail: "把深厚的个人私交与吵闹的群体起哄分开，拒绝接受道德绑架。",
-          reaction: "室友收到礼物发来照片连夸精致。你关上电脑，安静喝着土豆汤，窗外是柏林安详的冬夜。",
-          fundsDelta: -350,
-          individualSovereigntyDelta: 14,
-          soilKinshipTiesDelta: 2
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "日常 · 第 3 年",
-      phaseTitle: "远水与近渴：黑森林的松果与爷爷病榻前的呢喃",
-      hereTitle: "此岸 · 五点熄灯的办公室与徒步捡到的两颗松果",
-      hereText: "在一家当地物流公司做操作文员，下午 4 点 55 分同事互相道‘Schönen Feierabend’（下班愉快），5 点一到办公室灯光全熄，周末手机从没有过工作群消息。周六去附近的黑森林徒步，松软泥土，大衣口袋里揣两颗松果，与牵金毛的德国老爷爷互道‘Hallo’，整周的疲劳被高大的冷杉林吸收殆尽。",
-      thereTitle: "彼岸 · 老家爷爷病重卧床，迷糊中念着你的小名",
-      thereText: "老家 86 岁的爷爷因肺部感染病重卧床，堂兄弟们在床前轮流伺候。大姐发来微信视频，爷爷消瘦干枯的手摸着手机屏幕，声音微弱地念叨着你的乳名，问：“怎么还不放寒假回来啊？”大伯在视频旁叹气：“老人可能撑不过这个冬天，你能请假回来看一眼不？”你查了查往返机票和外管局签证续签预约，心急如焚。",
-      choices: [
-        {
-          text: "咬咬牙花光积蓄买了高价的紧急回国机票，向德企请了三周探亲假飞回爷爷床前守候。",
-          detail: "在个人前途与传统祖荫伦理的碰撞中，选择不给人生留下永恒的遗憾。",
-          reaction: "握住爷爷那只冰凉苍老的手时，爷爷眼角滑下了一滴泪。那一刻你明白，世上有些东西比存款和居留权更沉重。",
-          fundsDelta: -16000,
-          individualSovereigntyDelta: -8,
-          soilKinshipTiesDelta: 25
-        },
-        {
-          text: "每天定点开视频跟爷爷说话唱歌，让大姐用最好的药，给家里转了 8000 元医疗补贴。",
-          detail: "承受内心的剧痛与亲戚的侧目，理智地保住刚刚在德国立足的签证与工作根基。",
-          reaction: "爷爷在两个月后安详离世。你在黑森林里挑了一棵最高大的冷杉树，坐在树下哭了一整个下午。你长大了，但灵魂缺了一角。",
-          fundsDelta: -8000,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 5
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "回望 · 第 5 年",
-      phaseTitle: "自洽与归处：施普雷河边的啤酒与故乡渐行渐远的背影",
-      hereTitle: "此岸 · 拿到欧盟永居卡，施普雷河边喝了杯淡啤酒",
-      hereText: "外管局窗口递出来蓝色的欧盟长居卡。走出红砖老建筑，微风吹拂着河面。在河边的木长椅上坐下，看一艘货船慢悠悠划开水波。你依然常常嫌弃德铁晚点，但你已经习惯了这里的界限感，习惯了不被打扰的周末，习惯了把一双徒步鞋穿上好几年。生活很平淡，但也足够安宁。",
-      thereTitle: "彼岸 · 父母退休后的平和，以及不再有交集的同窗生活",
-      thereText: "母亲在微信上发来她和父亲在老年大学跳广场舞、打门球的照片。当年老家那些热烈盘问你的亲戚们，如今各自为儿女结婚、带孙子焦头烂额，不再有精力过问你在海外的生活。你与故土的那张大网，在五年的时空拉扯中，渐渐松弛了下来。",
-      choices: [
-        {
-          text: "把河水与落日的照片发给母亲，附言‘今天拿到了长期居留，你们夏天来德国避暑吧’。",
-          detail: "以一个独立自主个体的姿态，重新与故土长辈建立平视而温柔的情感链接。",
-          reaction: "母亲回了一串笑脸：‘好啊，去看看我大儿/闺女生活的城市！’你喝完最后一口啤酒，夕阳把一切镀成了金黄。",
-          fundsDelta: -30,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 8
-        }
-      ]
+  },
+
+  // 52岁
+  {
+    age: 52,
+    title: "52岁 · 下一代的归属与裂痕",
+    theme: "香蕉人的代沟 vs 高考陪读军备竞赛",
+    emigratedScene:
+      "你的孩子在当地公立学校长大，讲一口纯正无口音的流利外语，中文只能结结巴巴说几句日常词汇。晚餐桌上，他直呼你的名字，反驳你的中式道德观念，甚至抗拒跟你去唐人街。你看着眼前这个完全西化的下一代，突然意识到：你用一生的流散换来了他的自由，但他对你来自何方毫不关心。",
+    stayedScene:
+      "孩子高三，你在县城一中对面租了一套阴暗的陪读房。每天早晨5点半起床熬骨头汤，夜里11点半等孩子自习归来。为了让孩子能通过高考或者考编政审，你甚至不敢和拖欠物业费的邻居大声吵架。你把自己未能实现的阶层跃迁，沉重地压在这个十七岁少年的双肩上。",
+    emigratedReflection:
+      "你成功切断了家族的贫困循环，但也亲手斩断了文化与代际的香火相传。",
+    stayedReflection:
+      "中国式父母的宿命在你身上完美闭环：你变成了当年那个逼你读书、让你窒息的父亲。",
+    choice: {
+      text: "你默默收回了伸向下一代命运的手，学着尊重他们的生长",
+      detail: "一代人有一代人的沼泽，你无法替他们排干所有的水。",
+      reaction: "白发爬上了你的鬓角，你开始习惯在黄昏的余晖里独自坐上很久。"
     }
-  ],
-  spain: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      phaseTitle: "破土与喜礼：一欧元的橙汁与表姐的体制内庆功酒",
-      hereTitle: "此岸 · 瓦伦西亚的“Mañana”与盛开的紫薇花",
-      hereText: "在瓦伦西亚办居留绿卡，早上七点在移民局排长队，工作人员看了看材料耸耸肩说系统坏了：“Mañana, por favor（明天再来吧）”。走出大厅，在街角小店花 1 欧元买了一大杯鲜榨橙汁，酸甜冰凉。海风吹过来，满街都是盛开的紫薇花，你坐在长凳上晒太阳打盹，第一次体会到松弛。",
-      thereTitle: "彼岸 · 表姐提拔科级干部，亲戚们在群里指点江山",
-      thereText: "同在这个星期，老家表姐在县发改局升了副科长，大姑在家族群里发满了一桌桌庆功宴的照片，亲戚们纷纷在群里献殷勤。一个远房大伯艾特你：“你看看你表姐，女孩子在体制内多体面！你跑到欧洲荒废青春，没编制以后连养老金都领不全，赶紧买机票回来考个编吧！”",
-      choices: [
-        {
-          text: "在群里发了一句‘恭喜表姐’，然后默默关闭了群消息免打扰，转头去海滩慢跑看夕阳。",
-          detail: "不再试图向乡土传统自证，学会温和地把喧嚣隔绝在视线之外。",
-          reaction: "夕阳把地中海染成金红色，海浪一层层涌上来拍打着细软的沙滩。你甩开双腿慢跑，出了一身透汗，心里轻快得像一片羽毛。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 15,
-          soilKinshipTiesDelta: -5
-        },
-        {
-          text: "给表姐寄了一瓶西班牙特级初榨橄榄油当贺礼，客客气气维持长辈眼里的体面礼数。",
-          detail: "用不卑不亢的物质回馈，表明自己有体面的生活能力，堵住亲戚的闲话。",
-          reaction: "表姐收到油发朋友圈夸你懂生活，大姑也不再多嘴。你在阳台泡了一杯红茶，觉得多花这几十欧挺值得。",
-          fundsDelta: -300,
-          individualSovereigntyDelta: 5,
-          soilKinshipTiesDelta: 10
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "日常 · 第 3 年",
-      phaseTitle: "远水与近渴：地中海海鲜饭与老家发小的借钱语音",
-      hereTitle: "此岸 · 小铁锅慢炖海鲜饭与无花果树的清香",
-      hereText: "你彻底适应了西班牙的生活节奏。在菜市场用流利西语跟大妈砍价买海鲈鱼和番茄。学着用当地土法在小铁锅里煮了一盘海鲜饭，藏红花香气飘满小巷。阳台上的盆栽无花果结了果子，下午两点到五点全城闭店午休，阳光把你的皮肤晒成了健康的小麦色，国内长年的慢性鼻炎不药而愈。",
-      thereTitle: "彼岸 · 当年一起考研的挚友创业失败，深夜发来借钱语音",
-      thereText: "深夜两点，当年在大学和你一起通宵考研的挚友突然发来一段长长的语音。声音哽咽嘶哑，他在老家开教培工作室和朋友合伙被骗，欠了十几万外债，信用卡马上要逾期上征信。他吞吞吐吐地说：“兄弟……我知道你出国也不容易，但凡有别的办法我绝不开口，能不能先借我两万块钱周转一个月？”",
-      choices: [
-        {
-          text: "二话没说把刚刚攒下的 2 万元 RMB 转了过去，并附言‘不用急着还，先挺过这一关’。",
-          detail: "珍惜年少时纯粹的同窗义气，宁愿承担坏账风险也不愿看着故友沉沦。",
-          reaction: "朋友发来一张在马路边大哭的照片，连发了七八句‘下辈子做牛做马报答你’。你合上手机，心里沉甸甸的，但觉得问心无愧。",
-          fundsDelta: -20000,
-          individualSovereigntyDelta: 5,
-          soilKinshipTiesDelta: 18
-        },
-        {
-          text: "如实跟朋友说明自己在欧洲租房与居留的紧绷开销，转了 3000 元作为无偿赠予，温和表示借不出两万大额。",
-          detail: "严格设立个人财务安全红线，以赠代借，守护现代成年人理智的财务边界。",
-          reaction: "朋友收了钱真诚道谢。虽然关系微微多了一层客气，但你没有透支自己在异国的生存底盘。",
-          fundsDelta: -3000,
-          individualSovereigntyDelta: 12,
-          soilKinshipTiesDelta: 2
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "回望 · 第 5 年",
-      phaseTitle: "自洽与归处：三百天的晴天与父母叹息的‘乡土难移’",
-      hereTitle: "此岸 · 换到欧盟长居，表哥问发财没你笑了笑",
-      hereText: "第五年换到了长期居留。老家表哥发微信问你：“在那边赚大钱了吧？买大奔了吗？”你低头看了看自己穿了两年的人字拖，和刚刚在菜市场花 5 欧买的一大袋新鲜无花果，笑着回了句：“没发财，打工糊口。就是这里一年有三百天是大晴天，心情挺好。”",
-      thereTitle: "彼岸 · 父母来西班牙探亲一个月，最终还是想回老家打麻将",
-      thereText: "办了探亲签证，把父母接来西班牙住了一个月。爸爸每天在阳台上剥橙子，看着碧蓝的大海赞叹：“这天真蓝，空气是真好！”但住了三周后，老两口开始坐立不安。爸爸叹气：“街上一个人都不认识，连个下棋打麻将的老哥们都没有，饭馆除了面包就是火腿……还是得回老家舒坦啊。”",
-      choices: [
-        {
-          text: "给父母买了回国的直飞头等舱票，笑着送他们进安检，约定以后每年夏天接他们来住一个月。",
-          detail: "彻底接纳两代人不同的精神归宿：尊重父母的乡土羁绊，也笃定自己的异国人生。",
-          reaction: "父母在安检口回头挥手，笑得合不拢嘴。走出机场，瓦伦西亚的微风吹拂着你的衣角，你已经安顿好了整颗心。",
-          fundsDelta: -12000,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 10
-        }
-      ]
+  },
+
+  // 63岁
+  {
+    age: 63,
+    title: "63岁 · 法定退休终局",
+    theme: "海外养老金与草坪看日落 vs 熟人社会含饴弄孙",
+    emigratedScene:
+      "你按期办理了当地政府的法定养老金，住在市郊带有一小片草坪的砖木平房里。每周二有社区护工按时上门测量血压与血糖。你偶尔去当地华人超市买一袋临期的榨菜。回望这一生：你没有大富大贵，但你逃脱了35岁危机、房贷死结、酒局人情与无尽的内卷。你在无菌的平静中老去，身边是广袤的异域暮色。",
+    stayedScene:
+      "全国延迟退休改革落地，你终于在63岁这年领到了第一笔退休社保金。早晨6点去人民公园练太极剑，下午踩着老旧电动车穿过喧闹的菜市场接送孙子放学。周末老同事聚餐，依然在津津乐道当年谁当了处长、谁退居二线。你这一生从未脱轨，被人群簇拥着走过生老病死，你疲惫不堪，但你死在自己的泥土里。",
+    emigratedReflection:
+      "你用一生的孤独换回了最昂贵的奢侈品——在任何人的注视与评价之外，支配属于自己的每一秒。",
+    stayedReflection:
+      "你用一生的顺从融入了这片庞大稠密的熟人网络。你没有飞远，但你拥抱了泥土里最真实的炊烟。",
+    choice: {
+      text: "这一生走到终点，你合上了这本六十余载的命运手记",
+      detail: "世上本无完美的选择，所有被你舍弃的风景，都在另一个平行时空盛开。",
+      reaction: "风停了，日光照在泛黄的纸页上，一切归于尘埃。"
     }
-  ],
-  canada: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      phaseTitle: "破土与喜礼：暴雪除雪与二胎弟弟的满月酒席",
-      hereTitle: "此岸 · 零下十五度铲雪与 Tim Hortons 热咖啡",
-      hereText: "十一月的加拿大，推开门积雪没过小腿肚。零下十五度，拿着红色塑料大雪铲在门前吭哧除雪，睫毛结了一层细霜。手脚冻得发麻时去 Tim Hortons 买了两块加币的 Double-Double 热咖啡和一个热乎乎的蜂蜜甜甜圈，双手捧着纸杯，热气扑在脸上。去二手超市买了一件厚实二手羊毛大衣，脚下咯吱咯吱作响。",
-      thereTitle: "彼岸 · 哥哥在老家办二胎满月酒，催促你在老家买房",
-      thereText: "同在这个月，老家哥哥二胎办满月酒，老家亲戚二十几口人聚在包厢里大摆宴席。母亲打来电话抱怨带孙子腰酸背痛，话锋一转又开始念叨：“……你哥两个孩子房子不够住了，你在加拿大租房子住算个什么事？赶紧把钱存够回省城买套大房子，老了也有个落脚的地方。”",
-      choices: [
-        {
-          text: "给侄子包了 2000 块微信满月红包，在电话里温和安抚母亲，但绝口不提买房的事。",
-          detail: "用晚辈礼金尽到姑姑/叔叔的亲情礼节，但守住自己财务不被老家房产套牢的底线。",
-          reaction: "哥哥在群里发了宝宝握着红包的小手照片。你喝了一口热咖啡，看着窗外漫天纷飞的大雪，心里非常清楚自己的未来在哪里。",
-          fundsDelta: -2000,
-          individualSovereigntyDelta: 12,
-          soilKinshipTiesDelta: 10
-        },
-        {
-          text: "跟母亲据理力争说明自己在加拿大的规划，并指出国内房产市场风险，结果电话不欢而散。",
-          detail: "试图用理性击碎传统观念，往往只会换来长辈的委屈与不解。",
-          reaction: "母亲挂断了电话，你在雪地里站了很久。大雪落在肩头很沉，你叹了一口气，继续弯腰铲雪。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: -8
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "日常 · 第 3 年",
-      phaseTitle: "远水与近渴：落基山繁星与父亲深夜急救车警笛",
-      hereTitle: "此岸 · 落基山脚下湖边露营与壁炉暖火",
-      hereText: "开着换了雪胎的旧斯巴鲁去落基山脚下的湖面露营。湖水蓝得像宝石，松脂清香弥漫。支起帐篷生起营火，躺在折叠椅上看漫天繁星，感觉整个人被大自然温柔地包裹着。在大统华买了老干妈和挂面，雪夜在小电炉上热热地煮了一锅热汤面，壁炉的火苗在玻璃后轻轻跳动。",
-      thereTitle: "彼岸 · 父亲突发轻度脑梗，深夜救护车呼啸而过",
-      thereText: "就在这个露营的周末，手机弹出老家大姐的疯狂未接来电。父亲深夜突发轻度脑梗被 120 急救车送进市医院。大姐在电话里哭得不成样子：“爸突然倒下了，嘴都歪了，医生让签病危通知书，我手都在抖啊……你能不能回来？！”你在落基山的星空下，浑身血液瞬间凝固，整夜合不上眼。",
-      choices: [
-        {
-          text: "连夜退掉营地开回温哥华，买下三天内最贵的一班直飞回国机票，飞回国内在病床前守了整整三周。",
-          detail: "放下一整年所有的假期与积蓄，遵循肉身侍奉的原生伦理，不给自己留遗憾。",
-          reaction: "守在病床前给父亲喂水擦身，父亲的病情慢慢稳定。走出医院病房看着熟悉嘈杂的街道，你累得快要虚脱，但心里的一块石头落了地。",
-          fundsDelta: -25000,
-          individualSovereigntyDelta: -5,
-          soilKinshipTiesDelta: 30
-        },
-        {
-          text: "立刻汇款两万元用于垫付抢救押金，托老家当医生的同学全程盯紧专家会诊，每天保持视频连线。",
-          detail: "由于工作处于移民审核关键期无法离境，用最高效的现代远程资源调度分担危机。",
-          reaction: "父亲手术很成功，脱离了危险期。你在加拿大的窗前看着细雨连绵，这一周你瘦了整整六斤。",
-          fundsDelta: -20000,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 8
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "回望 · 第 5 年",
-      phaseTitle: "自洽与归处：信箱里的枫叶卡与母亲电话里的‘想通了’",
-      hereTitle: "此岸 · 枫叶卡寄到信箱，给炖牛肉加了一把黑胡椒",
-      hereText: "信箱里躺着印着枫叶水印的坚硬塑料卡片。五年了，度过了五个漫长寒冷的冬天，也见证了五个惊心动魄的明艳夏天。你没有像社交网络上的网红一样住上海景豪宅，但你有一份踏实的手艺，一台能在暴风雪里平稳前行的老车，和一个属于自己的温暖壁炉。去厨房给小火慢炖的牛肉汤加了一小把黑胡椒，香气四溢。",
-      thereTitle: "彼岸 · 母亲在电话里轻声说：“你想通了，我们也想通了”",
-      thereText: "母亲打来视频，父亲恢复得很好，正在旁边乐呵呵地逗小孙子。母亲在电话里看着你红润安稳的脸色，叹了口气轻声说：“……当年老觉得你一个人跑那么远不安心。现在看你在那边过得踏实自洽，不用像国内这样天天熬夜应酬求人办事，我们也想通了。自己过得好，比啥面子都强。”",
-      choices: [
-        {
-          text: "把炖好的热牛肉汤盛进保温盒，准备给邻居除雪的华人大叔送一碗，窗外是漫天飘落的白雪。",
-          detail: "在异国的雪地里，长出了属于自己的新根须与新温情。",
-          reaction: "大叔开门接过汤笑开了花。你走回自己的屋檐下，壁炉里柴火毕剥作响。生活平淡而长久地向前延展，你找到了属于自己的家。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 10
-        }
-      ]
-    }
-  ],
-  thailand: [
-    {
-      year: 1,
-      timeLabel: "初抵 · 第 1 年",
-      phaseTitle: "破土与喜礼：40泰铢的鸡肉饭与家族群里的‘混日子’",
-      hereTitle: "此岸 · 清迈宁曼路小巷与傍晚古城兜风的晚风",
-      hereText: "走出清迈机场，热带潮湿而温暖的香茅草气息扑面而来。在宁曼路背后的小巷租下带阳台的公寓，月租 9000 泰铢（不到两千人民币）。楼下海南鸡肉饭摊的老奶奶总是多给你舀一勺热腾腾的冬瓜鸡汤。买了一辆二手机车，傍晚慢悠悠绕着古城护城河兜风，风吹在身上，治愈了国内常年的偏头痛。",
-      thereTitle: "彼岸 · 大姑在家族群发语音：“去东南亚能混出什么名堂？”",
-      thereText: "得知你辞去国内工作去了泰国清迈，大姑在家族群里大惊小怪：“那不是去穷乡僻壤旅游的地方吗？年纪轻轻跑去东南亚混日子，既不买房也不生娃，以后老了没保障怎么办？趁早回国找个正经班上！”父母在群里沉默没有说话，发微信私下问你到底带了多少钱去。",
-      choices: [
-        {
-          text: "在群里不辩解，私下给父母发去自己干净明亮的公寓和菜市场物价视频，转了 1000 元让他们买好吃的。",
-          detail: "用真实的生活画面安抚父母的焦虑，对远房亲戚的评价一概免打扰。",
-          reaction: "父母看完视频放心不少，说‘看着挺干净，你过得开心就行’。你骑着机车去夜市买了份芒果糯米饭，晚风吹过，无比惬意。",
-          fundsDelta: -1000,
-          individualSovereigntyDelta: 15,
-          soilKinshipTiesDelta: 5
-        },
-        {
-          text: "在群里认真发了长文解释数字游民与低成本远程生活的逻辑，试图说服亲戚。",
-          detail: "年轻一代试图在宗族微信群里启蒙长辈，往往只是徒劳耗费口舌。",
-          reaction: "大姑回了一大串大红大绿的老年养生表情包，继续说‘还是体制内好’。你合上手机苦笑，明白认知隔着一个银河系。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 5,
-          soilKinshipTiesDelta: -5
-        }
-      ]
-    },
-    {
-      year: 3,
-      timeLabel: "日常 · 第 3 年",
-      phaseTitle: "远水与近渴：木檐下的四十分钟暴雨与外婆离世的白花",
-      hereTitle: "此岸 · 咖啡馆屋檐下听雨与徹底治好的失眠",
-      hereText: "清迈的雨季，暴雨总是毫无预兆倾盆而下。被困在一间木头搭建的小咖啡馆屋檐下，雨水从瓦片边缘像瀑布一样挂下来。街上的摩托车全停在骑楼下避雨，没有人按喇叭催促，大家都在安静看雨。你点了一杯 50 泰铢的手冲咖啡，敲完今天最后一部分给远程客户的活。你很久没有失眠过了。",
-      thereTitle: "彼岸 · 89 岁外婆离世，因为签证与机票错过出殡",
-      thereText: "也就是这个雨季，老家 89 岁的外婆在老屋平静离世。因签证更新期护照扣在移民局，加上最快航班也赶不上第二天清晨的出殡，你未能赶回老家给从小最疼你的外婆磕头送终。母亲发来灵堂的照片，黑白相框前白菊花静静绽放，表兄弟们披麻戴孝跪在灵前，而你成了远在大洋另一端的缺席者。",
-      choices: [
-        {
-          text: "冒着暴雨去清迈素贴山下的寺庙，为外婆点了一盏祈福酥油灯，跪在佛前失声痛哭。",
-          detail: "在异国的佛寺里，用自己最赤诚的悲痛，完成对故土亲人最后一次灵魂告别。",
-          reaction: "香火袅袅升起，雨打芭蕉。你跪在蒲团上，想起小时候外婆塞在手心里那颗融化的白糖。你站起身，擦干眼泪，走出寺庙。",
-          fundsDelta: -200,
-          individualSovereigntyDelta: 5,
-          soilKinshipTiesDelta: 20
-        },
-        {
-          text: "给老家寄了 5000 元作为香烛帛金，并请大姐把手机放在灵前，对着视频给外婆磕了三个响头。",
-          detail: "借现代通讯媒介勉强完成跨越国界的孝道仪式，咽下无法挽回的遗憾。",
-          reaction: "大姐在电话里哭着说外婆临走前还念着你的名字。雨停了，空气里带着泥土的清香，生活依然在推着你向前走。",
-          fundsDelta: -5000,
-          individualSovereigntyDelta: -2,
-          soilKinshipTiesDelta: 15
-        }
-      ]
-    },
-    {
-      year: 5,
-      timeLabel: "回望 · 第 5 年",
-      phaseTitle: "自洽与归处：松弛的生活与当年长辈打听‘清迈养老’",
-      hereTitle: "此岸 · 家当依然只有一个行李箱，但身心彻底自洽",
-      hereText: "五年过去，没有成为身家千万的老板，也没有买下豪宅。家当依然只有一个大行李箱和一台旧笔记本。但你学会了泰语买菜砍价，你的体检指标全恢复了正常。你明白人生也许不需要那么多宏大的目标，简简单单地活在一个阳光充沛的地方，本身就是一种莫大的福气。在夜市买了两盒芒果糯米饭送给看门大爷，大爷双手合十冲你道谢。",
-      thereTitle: "彼岸 · 当年指责你的大姑，私信打听‘清迈租房一个月多少钱’",
-      thereText: "老家当年大声指责你‘胡闹混日子’的大姑，突然发来微信私聊。大姑退休了，冬天老家湿冷关节炎发作苦不堪言，她试探着问你：“浩子/小满啊……清迈那边冬天真有那么暖和吗？像大姑这种退休老人，在那边租个带电梯的小公寓一个月两千块够不够啊？”",
-      choices: [
-        {
-          text: "温和客观地给大姑列了一份清迈旅居租房的实际开销与医疗注意事项，没有一丝冷嘲热讽。",
-          detail: "历经岁月沉淀后的宽容与释怀，以平等的成年人姿态对待曾经羁绊自己的乡土亲戚。",
-          reaction: "大姑连道感谢夸你有出息。你踩着人字拖慢吞吞走上楼梯，清迈的晚风穿堂而过，吹得窗台风铃叮当作响，心里一片澄澈。",
-          fundsDelta: 0,
-          individualSovereigntyDelta: 10,
-          soilKinshipTiesDelta: 8
-        }
-      ]
-    }
-  ]
-};
+  }
+];
+
+// ============================================================================
+// 63 岁终局一生判词（Final Lifetime Verdict）
+// ============================================================================
+
+export interface LifetimeVerdict {
+  summaryTitle: string;
+  verdictText: string;
+  tagline: string;
+}
+
+export function generateFinalLifetimeVerdict(
+  path: "emigrate" | "stay",
+  autonomy: number,
+  kinship: number
+): LifetimeVerdict {
+  if (path === "emigrate") {
+    const detail = autonomy >= 60 
+      ? "你骨子里生来就拥有极高的个体自主渴望，在异国三十余载的清冷与自由中，你终于完完全全活成了自己。"
+      : "虽在异邦漂泊，但每逢深夜，老家院子里的那棵枣树仍会偶尔入梦。你以巨大的坚忍平衡了两端。";
+    return {
+      summaryTitle: "【西行孤舟 · 断脐成神】",
+      tagline: "“生为客，死为客，天地之间一微尘。”",
+      verdictText:
+        `你在二十七岁那年做出了此生最惊心动魄的决断：斩断两代人的伦理脐带，将身家性命押在一张单程机票上。${detail}在异邦的漫长岁月里，你忍受了语言隔阂、无休止的身份排期与文化隔裂，但你赢回了一样这片故土最难赐予的奇迹——你不再是谁的燃料，不再是谁的面子，你完整地成为了你自己。你在异邦的草坪前看着落日，你知道，你无愧于这趟人间的冒险。`
+    };
+  } else {
+    const detail = kinship >= 50
+      ? "你对血缘和故土有着天然的深沉依恋，那些烟火气和亲友的絮叨，是你一生最踏实的解药。"
+      : "你曾数次想过远走高飞，但终究被现实的引力留在了这片泥土，你在琐碎的生活中修成了另一种豁达。";
+    return {
+      summaryTitle: "【归巢之木 · 守土安魂】",
+      tagline: "“生于斯，长于斯，死于斯，泥土才是最后的归宿。”",
+      verdictText:
+        `你在二十七岁那年收起了出海的佩剑，选择向你脚下的泥土低头。${detail}随后的岁月里，你被三十年房贷勒过脖子，在35岁危机里咽过苦酒，在医院走廊陪护过老人的生离死别，也把下一代送上了同样的应试天梯。你的一生平凡、琐碎甚至沉重，但你从未真正孤单过。每逢除夕万家灯火，满桌的饭菜和亲人的唠叨是你抵御虚无的唯一铠甲。你以一种古老而庄重的方式，完成了作为一个中国人的生命轮回。`
+    };
+  }
+}
