@@ -3,6 +3,7 @@ import {
   generateRandomFamily,
   BIRTHPLACE_SLIDES,
   generateTimelineForCharacter,
+  generateCareerTimeline,
   calculateGaokaoOutcome,
   evaluate27YearOldLife,
   PARALLEL_LIVES_MILESTONES,
@@ -94,7 +95,10 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // Cinematic Birthplace Reel Animator
   const [isSpinning, setIsSpinning] = useState(false);
-  const [slideIndex, setSlideIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(() => {
+    const idx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === charData.family.region);
+    return idx !== -1 ? idx : Math.floor(Math.random() * BIRTHPLACE_SLIDES.length);
+  });
   const spinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 4 Core Attributes + Latent Traits
@@ -428,10 +432,21 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setLogEntries((prev) => [...prev, gaokaoLog]);
     setShowGaokaoModal(false);
 
-    // Proceed to Age 19
-    const age19Idx = timeline.findIndex((n) => n.age === 19);
-    if (age19Idx !== -1) {
-      const node19 = timeline[age19Idx];
+    // ★★★ 动态因果分轨：根据高考结果(985/双非/大专)重构后续19~27岁人生时间线 ★★★
+    const careerNodes = generateCareerTimeline(
+      charData.family,
+      gaokaoCalc.degreeTrack,
+      option.addTags || []
+    );
+
+    // 保留0~18岁已走过的历史，把19~27岁换为完全契合学历阶层的专属人生
+    const upTo18 = timeline.filter((n) => n.age <= 18);
+    const updatedTimeline = [...upTo18, ...careerNodes];
+    setTimeline(updatedTimeline);
+
+    // 迈入19岁
+    const node19 = careerNodes[0];
+    if (node19) {
       if (node19.naturalDelta) applyDelta(node19.naturalDelta);
       if (node19.naturalTags) {
         setTags((prev) => Array.from(new Set([...prev, ...(node19.naturalTags || [])])));
@@ -443,12 +458,13 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         stageName: node19.stageName,
         title: node19.title,
         scene: node19.scene,
-        type: 'natural',
+        type: node19.type || 'natural',
         statDelta: node19.naturalDelta,
         tagsAdded: node19.naturalTags
       };
       setLogEntries((prev) => [...prev, log19]);
-      setTimelineIndex(age19Idx);
+      const age19Idx = updatedTimeline.findIndex((n) => n.id === node19.id);
+      setTimelineIndex(age19Idx !== -1 ? age19Idx : upTo18.length);
     }
     scrollToFeedBottom();
   };
@@ -539,7 +555,11 @@ ${parallelNotes.join('\n')}
   // VIEW 1: BIRTHPLACE REEL SETUP SCREEN
   // =========================================================================
   if (gamePhase === 'setup') {
-    const currentSlide = BIRTHPLACE_SLIDES[slideIndex] || BIRTHPLACE_SLIDES[0];
+    const currentSlide = isSpinning
+      ? BIRTHPLACE_SLIDES[slideIndex] || BIRTHPLACE_SLIDES[0]
+      : BIRTHPLACE_SLIDES.find((s) => s.region === charData.family.region) ||
+        BIRTHPLACE_SLIDES[slideIndex] ||
+        BIRTHPLACE_SLIDES[0];
 
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
