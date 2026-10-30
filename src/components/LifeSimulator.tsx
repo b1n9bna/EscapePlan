@@ -5,10 +5,8 @@ import {
   generateTimelineForCharacter,
   generateCareerTimeline,
   calculateGaokaoOutcome,
-  evaluate27YearOldLife,
-  PARALLEL_LIVES_MILESTONES,
+  generateAdultMilestones,
   generateFinalLifetimeVerdict,
-  TARGET_COUNTRIES,
   getHealthDesc,
   getHappinessDesc,
   getCognitionDesc,
@@ -26,9 +24,7 @@ import type {
   CharacterAttributes,
   LifeEventNode,
   LifeChoice,
-  GaokaoCalculation,
-  LifeDiagnosis,
-  CountryOption
+  GaokaoCalculation
 } from '../data/simulation';
 import {
   RotateCcw,
@@ -42,13 +38,10 @@ import {
   Shield,
   Home,
   GraduationCap,
-  Plane,
-  Building,
   Check,
   Copy,
   ExternalLink,
   ChevronRight,
-  BookOpen,
   Calendar,
   Compass
 } from 'lucide-react';
@@ -70,6 +63,7 @@ interface ChronicleLogEntry {
   chosenReaction?: string;
   statDelta?: Partial<CharacterAttributes>;
   tagsAdded?: string[];
+  reflection?: string;
 }
 
 export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
@@ -78,13 +72,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 }) => {
   // Gameplay View Modes:
   // 'setup' -> Birthplace Reel & Family Card
-  // 'cockpit' -> 3-column interactive simulation (Ages 0 to 27)
-  // 'diagnosis_27' -> 27yo Life Evaluation Dossier
-  // 'parallel' -> Ages 28 to 63 Dual-track parallel comparison
-  // 'verdict' -> Age 63 Retirement dossier
-  const [gamePhase, setGamePhase] = useState<
-    'setup' | 'cockpit' | 'diagnosis_27' | 'parallel' | 'verdict'
-  >('setup');
+  // 'cockpit' -> Unified 3-column interactive simulation (Ages 0 to 63!)
+  const [gamePhase, setGamePhase] = useState<'setup' | 'cockpit'>('setup');
 
   // Mobile layout switcher for 3 columns: 'profile' | 'log' | 'family'
   const [mobileTab, setMobileTab] = useState<'profile' | 'log' | 'family'>('log');
@@ -140,27 +129,17 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const [gaokaoCalc, setGaokaoCalc] = useState<GaokaoCalculation | null>(null);
   const [showGaokaoModal, setShowGaokaoModal] = useState(false);
 
-  // Age 27 Diagnosis & Decision state
-  const [diagnosis, setDiagnosis] = useState<LifeDiagnosis | null>(null);
+  // Adult Path Selection state ('stay' | 'emigrate')
   const [chosenPath, setChosenPath] = useState<'stay' | 'emigrate'>('stay');
-  const [chosenCountry, setChosenCountry] = useState<CountryOption>(TARGET_COUNTRIES[0]);
-
-  // Parallel Lives State (Ages 28~63)
-  const [parallelStageIdx, setParallelStageIdx] = useState(0);
-  const [parallelNotes, setParallelNotes] = useState<string[]>([]);
 
   // Copy success state
   const [copied, setCopied] = useState(false);
 
-  // Derived current age
+  // Derived current age strictly driven by active timeline node
   const currentAge =
     gamePhase === 'setup'
       ? 0
-      : gamePhase === 'parallel'
-      ? PARALLEL_LIVES_MILESTONES[parallelStageIdx]?.age || 28
-      : gamePhase === 'verdict'
-      ? 63
-      : timeline[timelineIndex]?.age ?? 27;
+      : timeline[timelineIndex]?.age ?? (logEntries[logEntries.length - 1]?.age || 0);
 
   // Dynamic Family Statuses
   const fatherStatus = getFatherDynamicStatus(
@@ -294,8 +273,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const handleNextNaturalYear = () => {
     const nextIdx = timelineIndex + 1;
     if (nextIdx >= timeline.length) {
-      // Reached Age 27 final milestone
-      triggerAge27Diagnosis();
+      // Reached end of simulation (Age 63)
       return;
     }
 
@@ -326,7 +304,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       scene: nextNode.scene,
       type: nextNode.type || 'natural',
       statDelta: nextNode.naturalDelta,
-      tagsAdded: nextNode.naturalTags
+      tagsAdded: nextNode.naturalTags,
+      reflection: nextNode.reflection
     };
 
     setLogEntries((prev) => [...prev, newLog]);
@@ -367,9 +346,31 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       return;
     }
 
-    // If reached end of timeline (Age 27)
+    // ★★★ 二十七岁关键岔路口抉择：因果无缝延展至 30~63 岁成年篇章 ★★★
+    if (currentNode.age === 27) {
+      const isEmigrate =
+        choice.text.includes('出海') ||
+        choice.text.includes('异邦') ||
+        choice.text.includes('跨国') ||
+        choice.text.includes('异国') ||
+        (choice.addTags &&
+          choice.addTags.some(
+            (t) => t.includes('出海') || t.includes('异邦') || t.includes('大工匠')
+          ));
+      const path: 'emigrate' | 'stay' = isEmigrate ? 'emigrate' : 'stay';
+      setChosenPath(path);
+
+      const track = gaokaoCalc?.degreeTrack || 'double_non';
+      const adultMilestones = generateAdultMilestones(track, path, charData.family);
+
+      // 将后续30, 35, 42, 52, 63岁里程碑直接串接进时间线，三栏交互彻底统一！
+      const currentNodes = timeline.slice(0, timelineIndex + 1);
+      setTimeline([...currentNodes, ...adultMilestones]);
+      scrollToFeedBottom();
+      return;
+    }
+
     if (nextIdx >= timeline.length) {
-      triggerAge27Diagnosis();
       return;
     }
 
@@ -391,7 +392,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       scene: nextNode.scene,
       type: nextNode.type || 'natural',
       statDelta: nextNode.naturalDelta,
-      tagsAdded: nextNode.naturalTags
+      tagsAdded: nextNode.naturalTags,
+      reflection: nextNode.reflection
     };
 
     setLogEntries((prev) => [...prev, nextLog]);
@@ -469,40 +471,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     scrollToFeedBottom();
   };
 
-  // =========================================================================
-  // AGE 27 DIAGNOSIS & BRANCH SELECTION
-  // =========================================================================
-  const triggerAge27Diagnosis = () => {
-    const diag = evaluate27YearOldLife(attrs, tags);
-    setDiagnosis(diag);
-    setGamePhase('diagnosis_27');
-  };
-
-  const handleConfirmAge27Path = (path: 'stay' | 'emigrate', country?: CountryOption) => {
-    setChosenPath(path);
-    if (country) setChosenCountry(country);
-    setParallelStageIdx(0);
-    setParallelNotes([]);
-    setGamePhase('parallel');
-  };
-
-  // Advance parallel life stages (30, 35, 42, 52, 63)
-  const handleNextParallelStage = () => {
-    const currentStage = PARALLEL_LIVES_MILESTONES[parallelStageIdx];
-    const note =
-      chosenPath === 'emigrate'
-        ? `【${currentStage.age}岁】${currentStage.title} ➔ 出海历练：${currentStage.emigratedReflection}`
-        : `【${currentStage.age}岁】${currentStage.title} ➔ 扎根故土：${currentStage.stayedReflection}`;
-
-    setParallelNotes((prev) => [...prev, note]);
-
-    if (parallelStageIdx < PARALLEL_LIVES_MILESTONES.length - 1) {
-      setParallelStageIdx((prev) => prev + 1);
-    } else {
-      setGamePhase('verdict');
-    }
-  };
-
   const handleRestart = () => {
     const fresh = generateRandomFamily();
     setCharData(fresh);
@@ -512,39 +480,43 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setGamePhase('setup');
     setGaokaoCalc(null);
     setShowGaokaoModal(false);
-    setDiagnosis(null);
-    setParallelStageIdx(0);
-    setParallelNotes([]);
+    setChosenPath('stay');
     setLogEntries([]);
     setTags([]);
   };
 
   const handleCopyRecord = () => {
-    const finalVerdict = generateFinalLifetimeVerdict(chosenPath, attrs, tags);
+    const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
+    const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags);
     const text = `【逃跑计划 · 一生因果纪要档案】
 代号/姓名：${charData.name}（${charData.gender}）
 出生地：${charData.family.region}（${birthYear}年）
 阶层背景：${charData.family.wealthTier}
 住房条件：${charData.family.housing}
-家庭期待：${charData.family.emotionalTone}
+求学与职业轨道：${
+      currentTrack === '985_211'
+        ? '985/211 核心技术与学术精英'
+        : currentTrack === 'junior_college'
+        ? '公办职教 实用蓝领工匠'
+        : '普通双非 务实业务骨干'
+    }
+人生航道：${chosenPath === 'emigrate' ? '奔赴异邦开拓' : '扎根故土深耕'}
+终局个人储蓄：¥${attrs.savings.toLocaleString()}
 
 【六十三岁终局判词】
 ${finalVerdict.summaryTitle}
 ${finalVerdict.tagline}
 ${finalVerdict.verdictText}
 
-【成长轨迹与重大抉择】
+【生平关键年轮与抉择轨迹】
 ${logEntries
   .map(
     (e) =>
       `[${e.age}岁·${e.year}年] ${e.title}${
         e.chosenOptionText ? ` ➔ 抉择：${e.chosenOptionText}` : ''
-      }`
+      }${e.reflection ? ` ➔ 体悟：${e.reflection}` : ''}`
   )
   .join('\n')}
-
-【平行时空晚年体悟】
-${parallelNotes.join('\n')}
 `;
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -1042,8 +1014,135 @@ ${parallelNotes.join('\n')}
                     )}
                   </div>
                 )}
+
+                {/* If milestone reflection present */}
+                {entry.reflection && (
+                  <div className="mt-2 text-xs sm:text-[13px] text-amber-300/85 italic pt-2 border-t border-stone-800/60 flex items-start gap-1.5 bg-amber-950/10 p-2.5 rounded-lg">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                    <span>体悟：{entry.reflection}</span>
+                  </div>
+                )}
               </div>
             ))}
+
+            {/* ★★★ 六十三岁法定退休：在三栏中流直接展开一生因果纪要档案 ★★★ */}
+            {logEntries.some((e) => e.age === 63) && (() => {
+              const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
+              const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags);
+
+              return (
+                <div className="bg-[#141622] border-2 border-amber-600/80 rounded-2xl p-6 sm:p-7 shadow-2xl space-y-5 animate-fadeIn">
+                  {/* Badge & Title */}
+                  <div className="text-center pb-4 border-b border-stone-800/80 space-y-2">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-700/60 text-amber-300 text-xs">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      公历 {birthYear + 63} 年 · 六十三岁 · 法定退休一生手记
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-amber-400">
+                      {finalVerdict.summaryTitle}
+                    </h2>
+                    <div className="text-xs sm:text-sm text-stone-300 font-serif italic">
+                      {finalVerdict.tagline}
+                    </div>
+                  </div>
+
+                  {/* Key Profile Summary */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                      <span className="text-stone-400 block text-[11px]">姓名 / 性别</span>
+                      <span className="text-stone-100 font-medium">{charData.name} · {charData.gender}</span>
+                    </div>
+                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                      <span className="text-stone-400 block text-[11px]">出生地背景</span>
+                      <span className="text-stone-100 font-medium truncate block">{charData.family.region}</span>
+                    </div>
+                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                      <span className="text-stone-400 block text-[11px]">求学与职业轨道</span>
+                      <span className="text-amber-400 font-medium truncate block">
+                        {currentTrack === '985_211'
+                          ? '985/211 核心精英'
+                          : currentTrack === 'junior_college'
+                          ? '公办职教 实用工匠'
+                          : '普通双非 务实骨干'}
+                      </span>
+                    </div>
+                    <div className="bg-[#0E0F14] p-2.5 rounded-xl border border-stone-800">
+                      <span className="text-stone-400 block text-[11px]">终局个人储蓄</span>
+                      <span className={`font-mono font-bold ${attrs.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        ¥{attrs.savings.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Literary Verdict Prose */}
+                  <div className="bg-[#0E0F14] p-4 sm:p-5 rounded-xl border border-stone-800/80 text-xs sm:text-sm text-stone-200 leading-relaxed font-sans">
+                    {finalVerdict.verdictText}
+                  </div>
+
+                  {/* Life Tags Badges */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-semibold text-stone-400 block">六十三载岁月烙印</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {tags.map((t) => (
+                        <span
+                          key={t}
+                          className="px-2.5 py-0.5 rounded-full bg-stone-800/90 text-stone-300 text-xs font-mono border border-stone-700/60"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-3 border-t border-stone-800/80 flex flex-col sm:flex-row gap-2.5">
+                    <button
+                      onClick={handleCopyRecord}
+                      className="flex-1 py-3 px-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 text-stone-100 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-400" />
+                          <span>已复制生平手记</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>一键复制一生档案</span>
+                        </>
+                      )}
+                    </button>
+
+                    {chosenPath === 'emigrate' && (
+                      <button
+                        onClick={() => onNavigateToSubclasses()}
+                        className="py-3 px-4 rounded-xl border border-sky-800/80 bg-sky-950/40 hover:bg-sky-900/50 text-sky-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
+                      >
+                        <Compass className="w-4 h-4" />
+                        <span>查看现实出海路径参考</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => onNavigateToDIY()}
+                      className="py-3 px-4 rounded-xl border border-stone-800 bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
+                    >
+                      <span>DIY落地指南</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={handleRestart}
+                      className="py-3 px-5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      <span>重新投胎</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Active Choice Card (if waiting for choice) */}
             {waitingForChoice && currentNode.choices && (
@@ -1075,18 +1174,47 @@ ${parallelNotes.join('\n')}
 
           {/* Action Bar at Bottom of Middle Column */}
           {!waitingForChoice && (
-            <div className="py-2.5 px-4 border-t border-stone-800/80 bg-[#10121A] flex items-center justify-end shrink-0">
-              <button
-                onClick={handleNextNaturalYear}
-                className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-900/20 active:scale-[0.99]"
-              >
-                <span>
-                  {timelineIndex >= timeline.length - 1
-                    ? '展开27岁人生命运解构书'
-                    : `迈入下一岁（${currentAge + 1}岁）`}
-                </span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+            <div className="py-2.5 px-4 border-t border-stone-800/80 bg-[#10121A] flex items-center justify-between shrink-0">
+              {logEntries.some((e) => e.age === 63) ? (
+                <>
+                  <span className="text-xs text-amber-400 font-medium flex items-center gap-1.5">
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    一生沧桑已成卷 · 六十三岁功德圆满
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleCopyRecord}
+                      className="px-3 py-1.5 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-medium flex items-center gap-1.5 transition-all"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>{copied ? '已复制生平' : '一键复制一生档案'}</span>
+                    </button>
+                    <button
+                      onClick={handleRestart}
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs flex items-center gap-1.5 transition-all active:scale-[0.99]"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>开启下一世</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full flex items-center justify-end">
+                  <button
+                    onClick={handleNextNaturalYear}
+                    className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-900/20 active:scale-[0.99]"
+                  >
+                    <span>
+                      {timeline[timelineIndex + 1]
+                        ? timeline[timelineIndex + 1].age > currentAge + 1
+                          ? `迈向${timeline[timelineIndex + 1].age}岁（${timeline[timelineIndex + 1].title}）`
+                          : `迈入下一岁（${currentAge + 1}岁）`
+                        : '继续前行'}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </main>
@@ -1217,268 +1345,6 @@ ${parallelNotes.join('\n')}
         </div>
       )}
 
-      {/* ================================================================= */}
-      {/* MODAL: 27yo LIFE EVALUATION DOSSIER (Stay vs Emigrate)            */}
-      {/* ================================================================= */}
-      {gamePhase === 'diagnosis_27' && diagnosis && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#14151F] border border-stone-700 rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl space-y-5 my-8">
-            <div className="text-center pb-4 border-b border-stone-800">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-stone-300 text-xs mb-2">
-                <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-                走向社会第五年 · 二十七岁人生命运解构书
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-amber-400 mb-1">
-                {diagnosis.title}
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-300 max-w-lg mx-auto leading-relaxed mt-2">
-                {diagnosis.portrait}
-              </p>
-            </div>
-
-            {/* Analysis details */}
-            <div className="space-y-3 text-xs sm:text-sm">
-              <div className="bg-[#0E0F14] p-3.5 rounded-xl border border-stone-800">
-                <span className="text-amber-400 font-semibold block mb-1">
-                  家庭顾念与情感牵绊：
-                </span>
-                <span className="text-stone-300 leading-relaxed">
-                  {diagnosis.kinshipEvaluation}
-                </span>
-              </div>
-
-              <div className="bg-[#0E0F14] p-3.5 rounded-xl border border-stone-800">
-                <span className="text-sky-400 font-semibold block mb-1">
-                  体制依附与现实权衡：
-                </span>
-                <span className="text-stone-300 leading-relaxed">
-                  {diagnosis.systemEvaluation}
-                </span>
-              </div>
-
-              <div className="bg-[#0E0F14] p-3.5 rounded-xl border border-stone-800">
-                <span className="text-stone-200 font-semibold block mb-1">
-                  人生研判与核心结论：
-                </span>
-                <span className="text-stone-300 leading-relaxed">
-                  「{diagnosis.fateVerdict}」
-                </span>
-              </div>
-            </div>
-
-            {/* The Big Fork Decision */}
-            <div className="pt-3 border-t border-stone-800 space-y-3">
-              <span className="text-xs font-semibold text-stone-200 block text-center">
-                站在二十七岁的分水岭，你的关键决断：
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  onClick={() => handleConfirmAge27Path('stay')}
-                  className="p-4 rounded-xl border border-stone-800 bg-[#0E0F14] hover:border-amber-500/70 hover:bg-amber-950/20 text-left transition-all active:scale-[0.99] flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center gap-1.5 text-sm font-bold text-amber-400 mb-1">
-                      <Building className="w-4 h-4" />
-                      留在国内深耕发展
-                    </div>
-                    <div className="text-xs text-stone-400 leading-relaxed">
-                      接受本土熟人网络与安稳秩序，在体制内外按部就班扎根，陪伴父母老去。
-                    </div>
-                  </div>
-                  <span className="text-xs text-amber-400 font-medium mt-3 flex items-center gap-1">
-                    选择此生路 ➔
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => handleConfirmAge27Path('emigrate', TARGET_COUNTRIES[0])}
-                  className="p-4 rounded-xl border border-stone-800 bg-[#0E0F14] hover:border-sky-500/70 hover:bg-sky-950/20 text-left transition-all active:scale-[0.99] flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center gap-1.5 text-sm font-bold text-sky-400 mb-1">
-                      <Plane className="w-4 h-4" />
-                      启程出海，开拓异邦
-                    </div>
-                    <div className="text-xs text-stone-400 leading-relaxed">
-                      放下沉没成本与熟人目光，带着技能与积蓄跨洋远行，追求更宽广的个人空间。
-                    </div>
-                  </div>
-                  <span className="text-xs text-sky-400 font-medium mt-3 flex items-center gap-1">
-                    选择出海路 ➔
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================================================================= */}
-      {/* VIEW 3: PARALLEL TRAJECTORIES TO RETIREMENT (Ages 28~63)          */}
-      {/* ================================================================= */}
-      {gamePhase === 'parallel' && (
-        <div className="fixed inset-0 z-50 bg-[#0B0F17] overflow-y-auto flex flex-col p-4 sm:p-8">
-          <div className="max-w-4xl mx-auto w-full my-auto space-y-6">
-            {/* Header */}
-            <div className="text-center pb-4 border-b border-stone-800">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-stone-300 text-xs mb-2">
-                <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                双轨平行对映 · {PARALLEL_LIVES_MILESTONES[parallelStageIdx].title}
-              </div>
-              <h2 className="text-xl sm:text-3xl font-bold text-stone-100">
-                {PARALLEL_LIVES_MILESTONES[parallelStageIdx].theme}
-              </h2>
-            </div>
-
-            {/* Side-by-side Trajectory Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Emigrated Path */}
-              <div
-                className={`p-5 rounded-2xl border transition-all ${
-                  chosenPath === 'emigrate'
-                    ? 'border-sky-600/80 bg-sky-950/15 ring-1 ring-sky-500/30'
-                    : 'border-stone-800/80 bg-[#12131C] opacity-75'
-                }`}
-              >
-                <div className="flex items-center gap-2 text-sm font-bold text-sky-400 mb-2">
-                  <Plane className="w-4 h-4" />
-                  海外轨迹 · {chosenCountry.name}
-                  {chosenPath === 'emigrate' && (
-                    <span className="ml-auto text-[11px] px-2 py-0.5 rounded bg-sky-900/60 text-sky-300">
-                      你当前选择
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs sm:text-sm text-stone-300 leading-relaxed mb-3">
-                  {PARALLEL_LIVES_MILESTONES[parallelStageIdx].emigratedScene}
-                </p>
-                <div className="text-xs text-sky-300/80 pt-2 border-t border-stone-800/80">
-                  体悟：{PARALLEL_LIVES_MILESTONES[parallelStageIdx].emigratedReflection}
-                </div>
-              </div>
-
-              {/* Stayed Path */}
-              <div
-                className={`p-5 rounded-2xl border transition-all ${
-                  chosenPath === 'stay'
-                    ? 'border-amber-600/80 bg-amber-950/15 ring-1 ring-amber-500/30'
-                    : 'border-stone-800/80 bg-[#12131C] opacity-75'
-                }`}
-              >
-                <div className="flex items-center gap-2 text-sm font-bold text-amber-400 mb-2">
-                  <Building className="w-4 h-4" />
-                  留土轨迹 · 故土深耕
-                  {chosenPath === 'stay' && (
-                    <span className="ml-auto text-[11px] px-2 py-0.5 rounded bg-amber-900/60 text-amber-300">
-                      你当前选择
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs sm:text-sm text-stone-300 leading-relaxed mb-3">
-                  {PARALLEL_LIVES_MILESTONES[parallelStageIdx].stayedScene}
-                </p>
-                <div className="text-xs text-amber-300/80 pt-2 border-t border-stone-800/80">
-                  体悟：{PARALLEL_LIVES_MILESTONES[parallelStageIdx].stayedReflection}
-                </div>
-              </div>
-            </div>
-
-            {/* Advance Button */}
-            <div className="flex justify-end pt-4 border-t border-stone-800">
-              <button
-                onClick={handleNextParallelStage}
-                className="px-6 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-900/20 active:scale-[0.99]"
-              >
-                <span>
-                  {parallelStageIdx < PARALLEL_LIVES_MILESTONES.length - 1
-                    ? `迈入下一阶段（${PARALLEL_LIVES_MILESTONES[parallelStageIdx + 1].age}岁）`
-                    : '查看六十三岁法定退休终局'}
-                </span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================================================================= */}
-      {/* VIEW 4: AGE 63 RETIREMENT LIFETIME VERDICT                        */}
-      {/* ================================================================= */}
-      {gamePhase === 'verdict' && (
-        <div className="fixed inset-0 z-50 bg-[#0B0F17] overflow-y-auto flex flex-col p-4 sm:p-8">
-          <div className="max-w-2xl mx-auto w-full my-auto space-y-6">
-            {(() => {
-              const finalVerdict = generateFinalLifetimeVerdict(chosenPath, attrs, tags);
-
-              return (
-                <div className="bg-[#12131C] border border-stone-700 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 text-center">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-stone-300 text-xs">
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    六十三岁 · 法定退休一生手记
-                  </div>
-
-                  <h2 className="text-2xl sm:text-3xl font-bold text-amber-400">
-                    {finalVerdict.summaryTitle}
-                  </h2>
-                  <div className="text-xs sm:text-sm text-stone-400 font-serif">
-                    {finalVerdict.tagline}
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-stone-300 leading-relaxed bg-[#0E0F14] p-5 rounded-xl border border-stone-800 text-left">
-                    {finalVerdict.verdictText}
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <button
-                      onClick={handleCopyRecord}
-                      className="flex-1 py-3 px-4 rounded-xl border border-stone-700 bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-4 h-4 text-emerald-400" />
-                          <span>已复制生平手记</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          <span>一键复制一生档案</span>
-                        </>
-                      )}
-                    </button>
-
-                    {chosenPath === 'emigrate' && (
-                      <button
-                        onClick={() => onNavigateToSubclasses(chosenCountry.id)}
-                        className="py-3 px-4 rounded-xl border border-sky-800 bg-sky-950/40 hover:bg-sky-900/50 text-sky-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
-                      >
-                        <Compass className="w-4 h-4" />
-                        <span>查看{chosenCountry.name}职业矩阵</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => onNavigateToDIY(chosenCountry.id)}
-                      className="py-3 px-4 rounded-xl border border-stone-800 bg-stone-900 hover:bg-stone-800 text-stone-300 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
-                    >
-                      <span>DIY落地指南</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      onClick={handleRestart}
-                      className="py-3 px-5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                      <span>开启下一世</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
