@@ -27,6 +27,7 @@ export interface FamilyOrigin {
   toneDetail: string;
   backgroundStory: string;
   initialSavings: number;
+  initialFamilySavings: number;
 }
 
 export interface CharacterAttributes {
@@ -35,7 +36,8 @@ export interface CharacterAttributes {
   happiness: number; // 幸福与心态 (0: 极度抑郁, 100: 积极豁达)
   cognition: number; // 认知与学习手腕 (0: 混沌蒙昧, 100: 见解独到/应试顶尖)
   social: number; // 社交与人情圈层 (0: 孤立内敛, 100: 八面玲珑)
-  savings: number; // 现金储蓄 (RMB)
+  savings: number; // 个人现金储蓄/可支配资金 (RMB)
+  familySavings: number; // 原生家庭存款储备池 (RMB)
 
   // 潜意识心理特质
   inferiority: number; // 自卑与敏感 (0: 坦荡从容, 100: 极度敏感)
@@ -523,8 +525,17 @@ export function generateRandomFamily(): {
   const sibConfig = SIBLINGS_OPTIONS[Math.floor(Math.random() * SIBLINGS_OPTIONS.length)];
   const tone = EMOTIONAL_TONES[Math.floor(Math.random() * EMOTIONAL_TONES.length)];
 
-  const initialSavingsMap = [0, 200, 800, 1500];
-  const initialSavings = initialSavingsMap[parent.wealthIndex] || 200;
+  // 原生家庭总存款池：严格契合阶层叙事设定
+  // 0: 入不敷出（民间借条周转负债） -> -15,000元
+  // 1: 紧绷温饱（家庭总存款不足三万） -> 28,000元
+  // 2: 小康微有结余（存折上有十万定期） -> 105,000元
+  // 3: 留守匮乏（靠微薄汇款苦熬） -> 8,000元
+  const initialFamilySavingsMap = [-15000, 28000, 105000, 8000];
+  const initialFamilySavings = initialFamilySavingsMap[parent.wealthIndex] ?? 28000;
+
+  // 个人初始零花钱（未成年期孩子手头的真实零散现金与压岁钱）
+  const initialPersonalSavingsMap = [0, 10, 50, 5];
+  const initialSavings = initialPersonalSavingsMap[parent.wealthIndex] ?? 10;
 
   return {
     name,
@@ -552,7 +563,8 @@ export function generateRandomFamily(): {
       emotionalTone: tone.tone,
       toneDetail: tone.detail,
       backgroundStory: `你出生于${eco.region}。父亲当时${parent.fatherAge}岁，是一名${parent.fatherJob}；母亲${parent.motherAge}岁，从事${parent.motherJob}。一家人挤在${housing}。`,
-      initialSavings
+      initialSavings,
+      initialFamilySavings
     }
   };
 }
@@ -1273,7 +1285,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
           text: "吵着要买商场45元保温盒，母亲叹气数零钱",
           detail: "母亲叹着气数出抽屉里带折痕的零钱，父亲在院子里重重抽了一口旱烟。",
           reaction: "第二天你如愿拿到了新饭盒，但母亲接下来整整两周每顿饭只就着白菜汤咽冷馍。",
-          delta: { kinshipGuilt: 20, happiness: -10, savings: -45 },
+          delta: { kinshipGuilt: 20, happiness: -10, familySavings: -45 },
           addTags: ["内疚阴影", "好面子"]
         }
       ]
@@ -1508,7 +1520,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
           text: "默默哭着跑回家，让母亲去邻居家借钱凑齐",
           detail: "母亲在抽屉翻找无果，叹着气去隔壁借了钱，领着你回学校交齐。",
           reaction: "你回到了座位，但母亲低头给老师赔笑脸的模样，成了你心中沉重的一道烙印。",
-          delta: { kinshipGuilt: 15, happiness: -15, savings: -80 },
+          delta: { kinshipGuilt: 15, happiness: -15, familySavings: -80 },
           addTags: ["愧疚沉重"]
         }
       ]
@@ -1752,7 +1764,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
           text: "去公用电话亭给老家打电话，听到母亲声音那一刻哭了出来",
           detail: "依然是那个依恋家庭的孩子，无法完全独自消化贫困。",
           reaction: "母亲连夜向邻居借了钱汇给你，电话里满是自责与叹息。",
-          delta: { kinshipGuilt: 20, happiness: -10, savings: 100 },
+          delta: { kinshipGuilt: 20, happiness: -10, familySavings: -100, savings: 100 },
           addTags: ["家庭牵挂"]
         }
       ]
@@ -1914,7 +1926,7 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
           text: "求家里支持走美术艺考，发誓考不上全额退学退还学费",
           detail: "父母拿出压箱底的养老积蓄为你报名。你每天在画室画石膏像到手指抽筋。",
           reaction: "你以名列前茅的专业成绩拿到降分指标考入{highSchool}艺术班。",
-          delta: { academicCapital: 15, kinshipGuilt: 25, savings: -12000, resilience: 15 },
+          delta: { academicCapital: 15, kinshipGuilt: 25, familySavings: -12000, resilience: 15 },
           trackTrigger: "academic",
           addTags: ["艺术曲折", "举家豪赌"]
         },
@@ -4736,7 +4748,8 @@ export const LIFE_SIMULATION_TIMELINE: LifeEventNode[] = generateTimelineForChar
     emotionalTone: "务实生计型",
     toneDetail: "家里凡事以现实利益与风险为先",
     backgroundStory: "",
-    initialSavings: 200
+    initialSavings: 10,
+    initialFamilySavings: 28000
   },
   "男"
 );
@@ -4878,7 +4891,7 @@ export function calculateGaokaoOutcome(
         {
           text: "全家凑出三万块复读费，去隔壁市高考补习学校复读一年，背水一战",
           detail: "你承受不起同辈和亲友异样的眼光，你决定再拿一年的青春在题海里拼一把。",
-          delta: { academicCapital: 25, kinshipGuilt: 30, savings: -30000 },
+          delta: { academicCapital: 25, kinshipGuilt: 30, familySavings: -30000 },
           addTags: ["复读背水", "巨额学债"]
         }
       ]
@@ -5568,7 +5581,7 @@ export function generateAdultMilestones(
           text: "【改善老家全套养老设施】出资为老屋加装全屋适老扶手、地暖、制氧与大额医疗备用金",
           detail: "用自己的双手创造真金白银，让父母晚年生活舒适体面，无后顾之忧。",
           reaction: "父母安享舒适晚年，你用实实在在的手艺饭兑现了对家庭的全部承诺。",
-          delta: { savings: -40000, kinshipGuilt: -30, happiness: 25 },
+          delta: { savings: -40000, familySavings: 40000, kinshipGuilt: -30, happiness: 25 },
           addTags: ["家业厚实", "至孝担当"]
         }
       ]
@@ -5610,7 +5623,8 @@ export interface CrisisWarning {
 
 export function detectCrisisWarning(
   attrs: CharacterAttributes,
-  tags: string[] = []
+  tags: string[] = [],
+  currentAge: number = 18
 ): CrisisWarning | null {
   if (attrs.health < 35 && !tags.includes("已化解健康危机")) {
     return {
@@ -5619,11 +5633,20 @@ export function detectCrisisWarning(
       desc: "长期高压劳碌使你的抵抗力跌破警戒线，频现偏头痛与关节劳损。若继续透支，恐在重要关隘引发连锁反应！"
     };
   }
-  if (attrs.savings < 0 && !tags.includes("已化解债务危机")) {
+  // 个人财务赤字危机（仅在成年独立后，个人现金告负才触发个人透支）
+  if (currentAge >= 18 && attrs.savings < 0 && !tags.includes("已化解债务危机")) {
     return {
       type: "poverty",
-      title: "【财务赤字警报】现金告急，生活拮据",
-      desc: "账面现金结余跌入负数，柴米油盐与生活开销步步紧逼，需要尽快稳住财务阵脚！"
+      title: "【个人财务赤字警报】现金告急，生活拮据",
+      desc: "个人账面资金跌入负数，房租日常与债务开销步步紧逼，需要尽快稳住个人现金流阵脚！"
+    };
+  }
+  // 原生家庭借贷危机（家庭总存款池告负，显示父母借贷压力）
+  if (attrs.familySavings < 0 && !tags.includes("已化解家庭债务")) {
+    return {
+      type: "poverty",
+      title: "【原生家庭借贷危机】家徒四壁，靠借贷度日",
+      desc: "家庭总存款池已见底转负，父母欠下民间借条周转。家中任何风吹草动都可能引发连锁生存危机！"
     };
   }
   if (attrs.inferiority > 75 && !tags.includes("已打破自卑枷锁")) {
@@ -6040,8 +6063,9 @@ export function evaluateLifetimeAchievements(
 }
 
 export function calculateLifetimeRadar(attrs: CharacterAttributes) {
+  const combinedWealth = attrs.savings + Math.max(0, attrs.familySavings * 0.4);
   return {
-    wealth: Math.min(98, Math.max(18, Math.round((attrs.savings + 50000) / 7000))),
+    wealth: Math.min(98, Math.max(18, Math.round((combinedWealth + 50000) / 7000))),
     health: Math.min(98, Math.max(18, attrs.health)),
     cognition: Math.min(98, Math.max(18, attrs.cognition)),
     autonomy: Math.min(98, Math.max(18, Math.round((attrs.rebellion * 0.6) + ((100 - attrs.inferiority) * 0.4)))),

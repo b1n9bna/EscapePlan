@@ -401,13 +401,14 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   });
   const spinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 4 Core Attributes + Latent Traits
+  // 4 Core Attributes + Latent Traits + Dual Financial Accounts
   const [attrs, setAttrs] = useState<CharacterAttributes>(() => ({
     health: 85,
     happiness: 80,
     cognition: 25,
     social: 25,
     savings: charData.family.initialSavings,
+    familySavings: charData.family.initialFamilySavings,
     inferiority: 20,
     academicCapital: 20,
     kinshipGuilt: 25,
@@ -581,6 +582,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       cognition: 25,
       social: 25,
       savings: charData.family.initialSavings,
+      familySavings: charData.family.initialFamilySavings,
       inferiority: 20,
       academicCapital: 20,
       kinshipGuilt: 25,
@@ -619,6 +621,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       cognition: Math.min(100, Math.max(0, prev.cognition + (delta.cognition || 0))),
       social: Math.min(100, Math.max(0, prev.social + (delta.social || 0))),
       savings: prev.savings + (delta.savings || 0),
+      familySavings: prev.familySavings + (delta.familySavings || 0),
       inferiority: Math.min(100, Math.max(0, prev.inferiority + (delta.inferiority || 0))),
       academicCapital: Math.min(100, Math.max(0, prev.academicCapital + (delta.academicCapital || 0))),
       kinshipGuilt: Math.min(100, Math.max(0, prev.kinshipGuilt + (delta.kinshipGuilt || 0))),
@@ -663,9 +666,16 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       return;
     }
 
-    // Apply natural deltas if present
-    if (nextNode.naturalDelta) {
-      applyDelta(nextNode.naturalDelta);
+    // Apply natural deltas & parental annual labor savings
+    const combinedDelta: Partial<CharacterAttributes> = { ...(nextNode.naturalDelta || {}) };
+    // 未成年期（0~17岁），父母在工农岗位持续劳动，每年有微薄家庭节余沉淀（扣除日常柴米油盐学费后）
+    if (currentAge < 18 && combinedDelta.familySavings === undefined) {
+      const tier = charData.family.wealthTier;
+      const annualLaborSavings = tier.includes('小康') ? 5000 : tier.includes('入不敷出') ? -300 : tier.includes('留守') ? 800 : 1800;
+      combinedDelta.familySavings = annualLaborSavings;
+    }
+    if (Object.keys(combinedDelta).length > 0) {
+      applyDelta(combinedDelta);
     }
     if (nextNode.naturalTags) {
       setTags((prev) => Array.from(new Set([...prev, ...(nextNode.naturalTags || [])])));
@@ -907,6 +917,19 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setTimeline(generateTimelineForCharacter(fresh.family, fresh.gender));
     const matchIdx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === fresh.family.region);
     if (matchIdx !== -1) setSlideIndex(matchIdx);
+    setAttrs({
+      health: 85,
+      happiness: 80,
+      cognition: 25,
+      social: 25,
+      savings: fresh.family.initialSavings,
+      familySavings: fresh.family.initialFamilySavings,
+      inferiority: 20,
+      academicCapital: 20,
+      kinshipGuilt: 25,
+      rebellion: 25,
+      resilience: 25
+    });
     setGamePhase('setup');
     setGaokaoCalc(null);
     setShowGaokaoModal(false);
@@ -1015,7 +1038,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         : '普通双非 务实业务骨干'
     }
 人生航道：${chosenPath === 'emigrate' ? '奔赴异邦开拓' : '扎根故土深耕'}
-终局个人储蓄：¥${attrs.savings.toLocaleString()}
+终局个人资产：¥${attrs.savings.toLocaleString()}\n老家父母储备：¥${attrs.familySavings.toLocaleString()}
 
 🏆 达成终局：No.${finalVerdict.ending.number < 10 ? '0' : ''}${finalVerdict.ending.number} ${finalVerdict.ending.title} [${finalVerdict.ending.rarity}]
 ${finalVerdict.ending.tagline}
@@ -1133,9 +1156,12 @@ ${logEntries
               </h2>
             </div>
             <div className="text-right">
-              <span className="text-xs text-stone-400 block font-reading-sans">阶层水位</span>
+              <span className="text-xs text-stone-400 block font-reading-sans">阶层水位 · 家庭底资</span>
               <span className="text-xs sm:text-sm font-medium text-[#D4A359] font-narrative-serif">
                 {charData.family.wealthTier}
+              </span>
+              <span className="text-[11px] font-mono-num text-teal-400 block mt-0.5">
+                家庭初始存款：¥{charData.family.initialFamilySavings.toLocaleString()}
               </span>
             </div>
           </div>
@@ -1166,11 +1192,16 @@ ${logEntries
             </div>
 
             <div className="bg-[#161822] p-4 rounded-xl border border-white/[0.06] space-y-2 hover:border-white/[0.12] transition-colors">
-              <div className="text-teal-300 font-semibold flex items-center gap-2.5 font-reading-sans">
-                <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
-                  <Home className="w-3.5 h-3.5 text-teal-300" />
+              <div className="text-teal-300 font-semibold flex items-center justify-between font-reading-sans">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
+                    <Home className="w-3.5 h-3.5 text-teal-300" />
+                  </div>
+                  <span>居住环境与家庭储备</span>
                 </div>
-                <span>居住环境与家庭资产</span>
+                <span className="text-xs font-mono-num text-teal-300 font-semibold">
+                  底蓄 ¥{charData.family.initialFamilySavings.toLocaleString()}
+                </span>
               </div>
               <p className="text-stone-300 text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8">
                 {charData.family.housing}
@@ -1318,18 +1349,26 @@ ${logEntries
             <div className="text-xs text-stone-400 space-y-1.5 font-reading-sans">
               <div>出生：{charData.family.region}</div>
               <div>阶层：{charData.family.wealthTier}</div>
-              <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
-                <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                  <Coins className="w-3.5 h-3.5 text-amber-300" />
+              <div className="pt-2 border-t border-white/[0.06] space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-stone-300">
+                    <div className="w-6 h-6 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
+                      <Coins className="w-3.5 h-3.5 text-amber-300" />
+                    </div>
+                    <span>{currentAge < 18 ? "个人零花现金：" : "个人可支配资产："}</span>
+                  </span>
+                  <span
+                    className={`font-mono-num font-semibold text-sm ${
+                      attrs.savings >= 0 ? "text-amber-300" : "text-rose-400"
+                    }`}
+                  >
+                    ¥{attrs.savings.toLocaleString()}
+                  </span>
                 </div>
-                <span className="text-stone-300">个人现金：</span>
-                <span
-                  className={`font-mono-num font-semibold text-sm ${
-                    attrs.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'
-                  }`}
-                >
-                  ¥{attrs.savings.toLocaleString()}
-                </span>
+                <div className="flex items-center justify-between text-[11px] text-stone-400 pl-8">
+                  <span>{currentAge < 18 ? "平时零花与跑腿零钱" : "个人薪资与日常结余"}</span>
+                  <span className="text-stone-500 font-narrative-serif">{currentAge < 18 ? "学杂由家庭托底" : "独立自负盈亏"}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1573,11 +1612,22 @@ ${logEntries
                       <span
                         className={`font-mono-num px-2.5 py-0.5 rounded-md ${
                           entry.statDelta.savings > 0
-                            ? 'bg-amber-950/60 text-[#D4A359] border border-amber-800/40'
-                            : 'bg-rose-950/60 text-rose-400 border border-rose-800/40'
+                            ? "bg-amber-950/60 text-amber-300 border border-amber-800/40"
+                            : "bg-rose-950/60 text-rose-400 border border-rose-800/40"
                         }`}
                       >
-                        现金 {entry.statDelta.savings > 0 ? `+¥${entry.statDelta.savings}` : `-¥${Math.abs(entry.statDelta.savings)}`}
+                        {entry.age < 18 ? "个人零花" : "个人现金"} {entry.statDelta.savings > 0 ? `+¥${entry.statDelta.savings}` : `-¥${Math.abs(entry.statDelta.savings)}`}
+                      </span>
+                    )}
+                    {entry.statDelta.familySavings !== undefined && entry.statDelta.familySavings !== 0 && (
+                      <span
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md ${
+                          entry.statDelta.familySavings > 0
+                            ? "bg-teal-950/60 text-teal-300 border border-teal-800/40"
+                            : "bg-orange-950/60 text-orange-400 border border-orange-800/40"
+                        }`}
+                      >
+                        家庭储蓄 {entry.statDelta.familySavings > 0 ? `+¥${entry.statDelta.familySavings}` : `-¥${Math.abs(entry.statDelta.familySavings)}`}
                       </span>
                     )}
                   </div>
@@ -1667,9 +1717,15 @@ ${logEntries
                           </span>
                         </div>
                         <div className="bg-[#161822] p-3 rounded-xl border border-white/[0.06]">
-                          <span className="text-stone-400 block text-[11px] font-reading-sans">终局个人储蓄</span>
-                          <span className={`font-mono-num font-bold ${attrs.savings >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          <span className="text-stone-400 block text-[11px] font-reading-sans">终局个人资产</span>
+                          <span className={`font-mono-num font-bold ${attrs.savings >= 0 ? "text-amber-300" : "text-rose-400"}`}>
                             ¥{attrs.savings.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="bg-[#161822] p-3 rounded-xl border border-white/[0.06]">
+                          <span className="text-stone-400 block text-[11px] font-reading-sans">老家父母储备</span>
+                          <span className={`font-mono-num font-bold ${attrs.familySavings >= 0 ? "text-teal-300" : "text-rose-400"}`}>
+                            ¥{attrs.familySavings.toLocaleString()}
                           </span>
                         </div>
                       </div>
@@ -2025,17 +2081,25 @@ ${logEntries
 
           {/* Housing & Family Assets */}
           <div className="bg-[#13151F] border border-white/[0.07] rounded-xl p-3.5 space-y-2 text-xs shadow-sm hover:border-white/[0.12] transition-colors">
-            <div className="text-teal-300 font-semibold flex items-center gap-2 font-reading-sans">
-              <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
-                <Home className="w-3.5 h-3.5 text-teal-300" />
+            <div className="text-teal-300 font-semibold flex items-center justify-between font-reading-sans">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center shrink-0">
+                  <Home className="w-3.5 h-3.5 text-teal-300" />
+                </div>
+                <span>{currentAge < 23 ? "家庭居所与家庭储备" : "老家宅居与父母储备"}</span>
               </div>
-              家庭居所与月度压力
+              <span className={`font-mono-num font-semibold text-sm ${attrs.familySavings >= 0 ? "text-teal-300" : "text-rose-400"}`}>
+                ¥{attrs.familySavings.toLocaleString()}
+              </span>
             </div>
             <div className="text-stone-300 text-[12px] leading-relaxed font-reading-sans pl-8">
               {charData.family.housing}
             </div>
-            <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans">
-              {charData.family.wealthDetail}
+            <div className="text-stone-400 text-[11px] pt-1.5 border-t border-white/[0.06] font-reading-sans flex items-center justify-between">
+              <span>{charData.family.wealthDetail}</span>
+              <span className={attrs.familySavings < 0 ? "text-rose-400 font-medium" : "text-stone-500"}>
+                {attrs.familySavings < 0 ? "⚠️ 原生家庭借债负数" : "原生家庭底资"}
+              </span>
             </div>
           </div>
         </aside>
