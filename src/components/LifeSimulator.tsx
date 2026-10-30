@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   generateRandomFamily,
   BIRTHPLACE_SLIDES,
-  LIFE_SIMULATION_TIMELINE,
+  generateTimelineForCharacter,
   calculateGaokaoOutcome,
   evaluate27YearOldLife,
   PARALLEL_LIVES_MILESTONES,
@@ -12,6 +12,8 @@ import {
   getHappinessDesc,
   getCognitionDesc,
   getSocialDesc,
+  getInferiorityDesc,
+  getAcademicDesc,
   getIndependenceDesc,
   getKinshipDesc,
   getResilienceDesc,
@@ -21,6 +23,7 @@ import {
 } from '../data/simulation';
 import type {
   CharacterAttributes,
+  LifeEventNode,
   LifeChoice,
   GaokaoCalculation,
   LifeDiagnosis,
@@ -110,6 +113,11 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   const [tags, setTags] = useState<string[]>([]);
 
+  // Dynamic Timeline for the current character
+  const [timeline, setTimeline] = useState<LifeEventNode[]>(() =>
+    generateTimelineForCharacter(charData.family, charData.gender)
+  );
+
   // Chronicle Log Feed
   const [logEntries, setLogEntries] = useState<ChronicleLogEntry[]>([]);
   const [timelineIndex, setTimelineIndex] = useState(0);
@@ -148,7 +156,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       ? PARALLEL_LIVES_MILESTONES[parallelStageIdx]?.age || 28
       : gamePhase === 'verdict'
       ? 63
-      : LIFE_SIMULATION_TIMELINE[timelineIndex]?.age ?? 27;
+      : timeline[timelineIndex]?.age ?? 27;
 
   // Dynamic Family Statuses
   const fatherStatus = getFatherDynamicStatus(
@@ -163,7 +171,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   );
   const siblingStatus = getSiblingDynamicStatus(charData.family.siblings, currentAge);
 
-  const currentNode = LIFE_SIMULATION_TIMELINE[timelineIndex] || LIFE_SIMULATION_TIMELINE[0];
+  const currentNode = timeline[timelineIndex] || timeline[0];
   const isChoiceNode = currentNode.type === 'choice' && currentNode.choices && currentNode.choices.length > 0;
   const lastLogEntry = logEntries[logEntries.length - 1];
   const waitingForChoice = isChoiceNode && lastLogEntry && !lastLogEntry.chosenOptionText;
@@ -191,6 +199,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       } else {
         const fresh = generateRandomFamily();
         setCharData(fresh);
+        setTimeline(generateTimelineForCharacter(fresh.family, fresh.gender));
         const matchIdx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === fresh.family.region);
         if (matchIdx !== -1) setSlideIndex(matchIdx);
         setIsSpinning(false);
@@ -217,6 +226,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // START SIMULATION FROM 0 YEARS OLD
   // =========================================================================
   const startSimulation = () => {
+    const dynamicTimeline = generateTimelineForCharacter(charData.family, charData.gender);
+    setTimeline(dynamicTimeline);
+
     const initialAttrs: CharacterAttributes = {
       health: 85,
       happiness: 80,
@@ -233,7 +245,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setTags(['初临人间']);
 
     // Age 0 initial log
-    const age0Node = LIFE_SIMULATION_TIMELINE[0];
+    const age0Node = dynamicTimeline[0];
     const initialLog: ChronicleLogEntry = {
       id: age0Node.id,
       age: 0,
@@ -274,13 +286,13 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // =========================================================================
   const handleNextNaturalYear = () => {
     const nextIdx = timelineIndex + 1;
-    if (nextIdx >= LIFE_SIMULATION_TIMELINE.length) {
+    if (nextIdx >= timeline.length) {
       // Reached Age 27 final milestone
       triggerAge27Diagnosis();
       return;
     }
 
-    const nextNode = LIFE_SIMULATION_TIMELINE[nextIdx];
+    const nextNode = timeline[nextIdx];
 
     // Check if Age 18 milestone trigger
     if ((nextNode.age >= 18 || currentNode.age === 17) && !gaokaoCalc) {
@@ -319,7 +331,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // SUBMIT PLAYER CHOICE
   // =========================================================================
   const handleSelectChoice = (choice: LifeChoice) => {
-    const currentNode = LIFE_SIMULATION_TIMELINE[timelineIndex];
+    const currentNode = timeline[timelineIndex];
 
     applyDelta(choice.delta);
     if (choice.addTags) {
@@ -349,13 +361,13 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     }
 
     // If reached end of timeline (Age 27)
-    if (nextIdx >= LIFE_SIMULATION_TIMELINE.length) {
+    if (nextIdx >= timeline.length) {
       triggerAge27Diagnosis();
       return;
     }
 
     // Automatically load next natural event or choice
-    const nextNode = LIFE_SIMULATION_TIMELINE[nextIdx];
+    const nextNode = timeline[nextIdx];
     if (nextNode.naturalDelta) {
       applyDelta(nextNode.naturalDelta);
     }
@@ -414,9 +426,9 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setShowGaokaoModal(false);
 
     // Proceed to Age 19
-    const age19Idx = LIFE_SIMULATION_TIMELINE.findIndex((n) => n.age === 19);
+    const age19Idx = timeline.findIndex((n) => n.age === 19);
     if (age19Idx !== -1) {
-      const node19 = LIFE_SIMULATION_TIMELINE[age19Idx];
+      const node19 = timeline[age19Idx];
       if (node19.naturalDelta) applyDelta(node19.naturalDelta);
       if (node19.naturalTags) {
         setTags((prev) => Array.from(new Set([...prev, ...(node19.naturalTags || [])])));
@@ -475,6 +487,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const handleRestart = () => {
     const fresh = generateRandomFamily();
     setCharData(fresh);
+    setTimeline(generateTimelineForCharacter(fresh.family, fresh.gender));
     const matchIdx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === fresh.family.region);
     if (matchIdx !== -1) setSlideIndex(matchIdx);
     setGamePhase('setup');
@@ -574,7 +587,7 @@ ${parallelNotes.join('\n')}
 
           <div className="mt-4 pt-3 border-t border-stone-800/80 flex items-center justify-between">
             <span className="text-xs sm:text-sm text-stone-400">
-              {isSpinning ? '齿轮飞速运转中...' : '不满意当前出身，可再次摇号投胎'}
+              {isSpinning ? '齿轮飞速运转中...' : '不满意当前出身，可随时重新投胎'}
             </span>
             <button
               onClick={spinReel}
@@ -582,7 +595,7 @@ ${parallelNotes.join('\n')}
               className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs sm:text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50"
             >
               <RotateCcw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin' : ''}`} />
-              重新投胎摇号
+              重新投胎
             </button>
           </div>
         </div>
@@ -658,7 +671,7 @@ ${parallelNotes.join('\n')}
               onClick={startSimulation}
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-900/20 active:scale-[0.99]"
             >
-              <span>接受这个出身，从0岁开始探索人生</span>
+              <span>开启人生</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -854,26 +867,38 @@ ${parallelNotes.join('\n')}
             </div>
           </div>
 
-          {/* Latent Traits */}
+          {/* 5 Distinct Qualitative Mental & Social States */}
           <div className="bg-[#0E0F14] border border-stone-800/90 rounded-xl p-3.5 space-y-2 text-xs">
             <span className="font-semibold uppercase tracking-wider text-stone-400 block pb-1 border-b border-stone-800/80">
-              潜意识心理特质
+              核心心智与特质
             </span>
-            <div className="flex justify-between py-0.5">
-              <span className="text-stone-400">独立与叛逆：</span>
-              <span className="text-rose-400 font-medium">
-                {getIndependenceDesc(attrs.rebellion)}
+            <div className="flex justify-between items-center py-0.5">
+              <span className="text-stone-400">自卑：</span>
+              <span className="text-rose-400 font-medium font-mono">
+                {getInferiorityDesc(attrs.inferiority)}
               </span>
             </div>
-            <div className="flex justify-between py-0.5">
-              <span className="text-stone-400">家庭牵绊感：</span>
-              <span className="text-amber-400 font-medium">
+            <div className="flex justify-between items-center py-0.5">
+              <span className="text-stone-400">做题：</span>
+              <span className="text-sky-400 font-medium font-mono">
+                {getAcademicDesc(attrs.academicCapital)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center py-0.5">
+              <span className="text-stone-400">宗族：</span>
+              <span className="text-amber-400 font-medium font-mono">
                 {getKinshipDesc(attrs.kinshipGuilt)}
               </span>
             </div>
-            <div className="flex justify-between py-0.5">
-              <span className="text-stone-400">生存抗压韧劲：</span>
-              <span className="text-emerald-400 font-medium">
+            <div className="flex justify-between items-center py-0.5">
+              <span className="text-stone-400">反叛：</span>
+              <span className="text-violet-400 font-medium font-mono">
+                {getIndependenceDesc(attrs.rebellion)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center py-0.5">
+              <span className="text-stone-400">韧劲：</span>
+              <span className="text-emerald-400 font-medium font-mono">
                 {getResilienceDesc(attrs.resilience)}
               </span>
             </div>
@@ -1029,25 +1054,21 @@ ${parallelNotes.join('\n')}
           </div>
 
           {/* Action Bar at Bottom of Middle Column */}
-          <div className="p-3 sm:p-4 border-t border-stone-800/90 bg-[#10121A] flex items-center justify-between shrink-0">
-            <span className="text-xs text-stone-400">
-              {waitingForChoice ? '请在上方卡片做出你的选择' : '当前年份纪实已沉淀'}
-            </span>
-
-            {!waitingForChoice && (
+          {!waitingForChoice && (
+            <div className="py-2.5 px-4 border-t border-stone-800/80 bg-[#10121A] flex items-center justify-end shrink-0">
               <button
                 onClick={handleNextNaturalYear}
-                className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-900/20 active:scale-[0.99]"
+                className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md shadow-amber-900/20 active:scale-[0.99]"
               >
                 <span>
-                  {timelineIndex >= LIFE_SIMULATION_TIMELINE.length - 1
+                  {timelineIndex >= timeline.length - 1
                     ? '展开27岁人生命运解构书'
                     : `迈入下一岁（${currentAge + 1}岁）`}
                 </span>
                 <ArrowRight className="w-4 h-4" />
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </main>
 
         {/* ================================================================= */}

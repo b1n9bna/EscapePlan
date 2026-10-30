@@ -56,7 +56,7 @@ export function App() {
       </main>
 
       {/* Global Footer */}
-      <Footer />
+      {activeTab !== 'sim' && <Footer />}
     </div>
   );
 }
