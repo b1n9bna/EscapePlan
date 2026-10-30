@@ -1,9 +1,9 @@
 import React from 'react';
-import { Gamepad2, Compass, BookOpen, Calculator, CheckSquare, ShieldCheck } from 'lucide-react';
+import { Gamepad2, BookOpen, Calculator, CheckSquare, ShieldCheck } from 'lucide-react';
 
 interface HeaderProps {
-  activeTab: 'sim' | 'quiz' | 'subclasses' | 'reality' | 'diy';
-  setActiveTab: (tab: 'sim' | 'quiz' | 'subclasses' | 'reality' | 'diy') => void;
+  activeTab: 'sim' | 'subclasses' | 'reality' | 'diy';
+  setActiveTab: (tab: 'sim' | 'subclasses' | 'reality' | 'diy') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
@@ -13,12 +13,12 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         <div className="flex items-center justify-between h-16">
           {/* Logo & Slogan */}
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('sim')}>
-            <span className="text-2xl p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 shadow-sm">
+            <span className="text-2xl p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 shadow-sm">
               🧭
             </span>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
+                <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-amber-400 via-orange-300 to-emerald-400 bg-clip-text text-transparent">
                   EscapePlan
                 </span>
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                面向大众的全球移居平行人生模拟器与手搓 DIY 路线图
+                面向大众的全球移居双城生活手记与手搓 DIY 路线图
               </p>
             </div>
           </div>
@@ -37,24 +37,12 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
               onClick={() => setActiveTab('sim')}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'sim'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                  ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
-              <Gamepad2 className="w-4 h-4 text-indigo-300" />
+              <Gamepad2 className="w-4 h-4 text-amber-200" />
               <span>人生模拟</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('quiz')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === 'quiz'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-              }`}
-            >
-              <Compass className="w-4 h-4" />
-              <span>精神体检</span>
             </button>
 
             <button
