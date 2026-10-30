@@ -6,8 +6,15 @@
 export interface FamilyOrigin {
   region: string;
   regionDetail: string;
-  parents: string;
-  parentsDetail: string;
+  fatherAge: number;
+  fatherJob: string;
+  fatherTrait: string;
+  motherAge: number;
+  motherJob: string;
+  motherTrait: string;
+  housing: string;
+  wealthTier: string;
+  wealthDetail: string;
   siblings: string;
   siblingsDetail: string;
   emotionalTone: string;
@@ -129,81 +136,177 @@ export const TARGET_COUNTRIES: CountryOption[] = [
 // 原生家庭多轴矩阵数据库
 // ============================================================================
 
-const REGIONS = [
+// ============================================================================
+// 原生家庭多轴矩阵数据库
+// ============================================================================
+
+export interface BirthplaceSlide {
+  region: string;
+  landscape: string;
+  tagline: string;
+  icon: string;
+}
+
+export const BIRTHPLACE_SLIDES: BirthplaceSlide[] = [
   {
     region: "豫东平原农耕大县",
-    detail: "麦浪翻滚、宗族红白喜事密集、留守儿童与外出打工潮交织，全县升学全靠县一中题海。",
-    savingsRange: [15000, 45000]
+    landscape: "平原麦浪 · 窑厂红砖 · 宗祠香火",
+    tagline: "全县七十万人，全靠县一中题海杀向省城",
+    icon: "🌾"
   },
   {
     region: "浙东民营制造百强县",
-    detail: "满街小作坊与五金注塑厂，崇尚宗族抱团经商发财，读书若考不上重点不如早早接单做生意。",
-    savingsRange: [40000, 120000]
+    landscape: "轰鸣注塑作坊 · 模具五金 · 货运卡车",
+    tagline: "崇尚宗族抱团经商发财，不读书就早早进厂接单",
+    icon: "⚙️"
   },
   {
-    region: "东北资源枯竭型收缩矿城",
-    detail: "老国企烟囱已熄灭多年，年轻人外流，整座小城靠老人退休金维系，体制内工作是唯一体面。",
-    savingsRange: [20000, 60000]
+    region: "东北老重工业收缩矿城",
+    landscape: "熄灭的红砖大烟囱 · 铁道扳道房 · 筒子楼",
+    tagline: "年轻人跑光，整座小城靠老人的买断退休金维持体面",
+    icon: "🏭"
   },
   {
     region: "湘西丘陵丘壑农业镇",
-    detail: "柑橘林与陡峭梯田，父母常年在珠三角制鞋厂打工，老屋里只有老人做饭的柴火青烟。",
-    savingsRange: [12000, 35000]
+    landscape: "梯田柑橘树 · 吊脚旧楼 · 泥泞机耕路",
+    tagline: "父母常年留守珠三角制鞋厂，留给家里的是老屋柴火烟",
+    icon: "🍊"
   },
   {
     region: "华北重工业地级市生活区",
-    detail: "钢厂子弟校与筒子楼记忆，空气里总有微尘，人情网密不透风，办事看病全靠高中同学群。",
-    savingsRange: [30000, 80000]
+    landscape: "钢厂子弟校 · 泛灰白杨树 · 家属大院",
+    tagline: "空气里常年有微尘，看病求职全靠几十年的高中同学网",
+    icon: "🏗️"
   },
   {
     region: "闽南沿海侨乡商贸镇",
-    detail: "宗祠香火极旺，亲戚多在东南亚或欧美打拼，乡邻聚会总在暗中攀比洋房与谁家寄回的外汇。",
-    savingsRange: [35000, 90000]
+    landscape: "金碧辉煌祖祠 · 渔港码头 · 走私旧闻",
+    tagline: "满街小洋楼，暗地里比拼谁家寄回来的外汇存折多",
+    icon: "⚓"
   },
   {
     region: "中西部省会边缘工薪区",
-    detail: "两代人按揭一套老破小，父母拼命加班供房贷，极其害怕子女阶层跌落，校外补习班寸步不让。",
-    savingsRange: [25000, 70000]
+    landscape: "老破小步梯顶楼 · 补习班招牌 · 菜市场喧闹",
+    tagline: "两代人按揭一套老房子，极其害怕孩子阶层跌落",
+    icon: "🏢"
   },
   {
-    region: "超一线城市城中村夹缝",
-    detail: "抬头是一线CBD的摩天反光玻璃，脚下是握手楼潮湿的窄巷，看尽了繁华却无一寸属于自己。",
-    savingsRange: [18000, 50000]
+    region: "超一线城市城中村窄巷",
+    landscape: "握手楼潮湿隔断 · 空调外机滴水 · 霓虹倒影",
+    tagline: "抬头是CBD摩天玻璃，脚下是见不到阳光的潮湿握手楼",
+    icon: "🌆"
+  }
+];
+
+const HOUSING_TEMPLATES = [
+  "县农机局家属院步梯5楼顶层，68㎡老两居，下雨天楼道泛潮渗水，窗外正对着街道喧闹的粮油小卖部。",
+  "村头自建两层红砖半毛坯平房，院里堆着麦秸秆与农用三轮车，冬日无暖气全靠堂屋生蜂窝煤炉子。",
+  "重工业老厂区建于1986年的筒子楼单间，32㎡公用卫生间与水房，楼道里常年弥漫着各家炸花椒油的刺鼻烟气。",
+  "浙东工业强镇自建带底商的三层小楼，底层堆满注塑塑料粒子和包装纸箱，二层是油腻逼仄的家庭起居室。",
+  "中西部省城郊区按揭购入的步梯顶楼老破小，54㎡两室一厅，墙皮局部剥落，父母长年舍不得开空调。",
+  "超一线城中村握手楼夹层单间，不见阳光，窗户推开距离隔壁邻居墙壁不足一米，整夜听着水管噪音。",
+  "沿海渔村依山而建的老石屋，海风带着咸湿腐蚀着老旧木窗，逢台风天全家人必须拿沙袋堵门。"
+];
+
+const WEALTH_TIERS = [
+  {
+    tier: "紧绷脆弱（经不起老人一场大病）",
+    detail: "家里平时能勉强吃饱穿暖，但活期存折上常年不足两万元，全靠父母手停口停的零工按月维持。"
+  },
+  {
+    tier: "体制微薄稳定（安稳但无大钱）",
+    detail: "双亲每月有固定薪水与医保托底，过年能分到粮油米面，但供完柴米油盐与人情走动后所剩无几。"
+  },
+  {
+    tier: "现金流尚可（但极易被风浪吞噬）",
+    detail: "家里做着微薄小生意或开摊档，手头有几万块周转现金，但一旦遭遇拆迁、行情下跌或三角债便面临破产。"
+  },
+  {
+    tier: "留守匮乏（靠微薄汇款苦熬）",
+    detail: "父母在外打工长年按月汇回八百一千块，全家老小精打细算，一分钱掰成两半花。"
   }
 ];
 
 const PARENT_PROFILES = [
   {
-    parents: "县自然资源局科员 + 公立小学高级教师",
-    detail: "标准体制内中层，恪守本分，信奉“稳定压倒一切”，对你的人生有极强规划与控制欲。"
+    fatherJob: "县自然资源局普通科员",
+    fatherAge: 42,
+    fatherTrait: "老烟枪，性格木讷，信奉仕途与编制，最恨子女做出格出格的事",
+    motherJob: "公立小学语文高级教师",
+    motherAge: 39,
+    motherTrait: "掌管家里账本，精打细算，习惯推行高压军事化背诵与作息",
+    housingIndex: 0,
+    wealthIndex: 1
   },
   {
-    parents: "农贸市场活禽/生肉摊档夫妻",
-    detail: "起早贪黑双手生冻疮，用零钞毛票供你上学，说话门门大嗓门，信奉实利与真金白银。"
+    fatherJob: "农贸市场生肉摊档主",
+    fatherAge: 45,
+    fatherTrait: "满手刀茧与冻疮，说话大嗓门，信奉真金白银与实利，鄙夷读死书",
+    motherJob: "农贸市场活禽摊打理人",
+    motherAge: 43,
+    motherTrait: "腰椎长年劳损，起早贪黑理零钞，一分钱都想留给孩子念书",
+    housingIndex: 1,
+    wealthIndex: 2
   },
   {
-    parents: "珠三角五金模具厂两栖打工族",
-    detail: "长年住工厂铁架床宿舍，逢年过节才拎着年货回老家，总带着未能陪伴你的愧疚与自责。"
+    fatherJob: "东莞五金模具厂冲压工",
+    fatherAge: 40,
+    fatherTrait: "手指缺了半截指甲，长年住工厂铁架床，每次打电话只懂问‘钱够不够’",
+    motherJob: "同厂流水线质检员",
+    motherAge: 38,
+    motherTrait: "逢年过节才拎着特产回乡，满怀无法陪伴你的愧疚与小心翼翼",
+    housingIndex: 1,
+    wealthIndex: 3
   },
   {
-    parents: "下岗开黑车/跑滴滴 + 早市面点摊",
-    detail: "经历过90年代企业买断的创伤，早早白了头发，把所有未能实现的阶层跨越死死寄托在你身上。"
+    fatherJob: "下岗自谋职业开黑车/跑网约车",
+    fatherAge: 46,
+    fatherTrait: "头发花白，经历了老国企破产的阵痛，一身烟酒气与未竟翻盘的执念",
+    motherJob: "清晨早市油炸面点摊摊主",
+    motherAge: 44,
+    motherTrait: "凌晨三点揉面炸油条，双手满是烫痕，逢人便夸你‘脑子好使一定能翻身’",
+    housingIndex: 2,
+    wealthIndex: 0
   },
   {
-    parents: "乡镇卫生院大夫 + 初中教导员",
-    detail: "地方上体面受敬重的人家，清贫但讲规矩，最害怕子女“做出格的事”让家族蒙羞。"
+    fatherJob: "乡镇卫生院全科内科大夫",
+    fatherAge: 44,
+    fatherTrait: "一身洗得发白的白大褂，性情清贫高傲，把名声和家族体面看得比命还大",
+    motherJob: "乡初中初二英语教导员",
+    motherAge: 42,
+    motherTrait: "极度严格，容不得试卷上出现任何一处粗心红叉，同辈压力极大",
+    housingIndex: 0,
+    wealthIndex: 1
   },
   {
-    parents: "小服装厂破产转型开菜鸟驿站 + 社区团购",
-    detail: "曾见过小老板的体面，后来背了债务缩回仓库理快递，每天在货架间疲于奔命。"
+    fatherJob: "破产服装厂前老板（现开菜鸟驿站）",
+    fatherAge: 47,
+    fatherTrait: "见过上百万的现金体面，后来背了债务缩在库房理件，总爱吹嘘当年人脉",
+    motherJob: "社区团购团长兼杂货店店主",
+    motherAge: 43,
+    motherTrait: "疲于奔命对账，整天被缺货催单电话逼得焦头烂额，脾气极度急躁",
+    housingIndex: 4,
+    wealthIndex: 0
   },
   {
-    parents: "建筑工地铁瓦工师傅 + 守家务农母亲",
-    detail: "父亲一身风湿与老茧，每年年底最怕包工头卷款跑路，母亲在老家守着几分责任田。"
+    fatherJob: "建筑工地铁架泥瓦工师傅",
+    fatherAge: 43,
+    fatherTrait: "风湿骨痛，年底最怕包工头卷款跑路，逢年过节坐在门槛上闷头抽烟袋",
+    motherJob: "老家留守务农母亲",
+    motherAge: 41,
+    motherTrait: "一人操持四亩麦田与几头猪，省吃俭用把全家鸡蛋全塞给你带去学校",
+    housingIndex: 1,
+    wealthIndex: 3
   },
   {
-    parents: "省城高校后勤管理员 + 市立医院护士长",
-    detail: "每天见识教授和专家的光鲜，深知文凭是唯一翻盘阶梯，从小对你推行军事化作息。"
+    fatherJob: "省城高校后勤水电维修班长",
+    fatherAge: 42,
+    fatherTrait: "见惯了象牙塔教授名流的优渥，深知阶层落差，逼你必须考进重点高校",
+    motherJob: "市立三甲医院合同制护士长",
+    motherAge: 40,
+    motherTrait: "三班倒常年缺觉，说话干脆利落但带着神经性焦虑，催你‘争气点’",
+    housingIndex: 4,
+    wealthIndex: 1
   }
 ];
 
@@ -270,25 +373,33 @@ export function generateRandomFamily(): {
       : GIVEN_NAMES_FEMALE[Math.floor(Math.random() * GIVEN_NAMES_FEMALE.length)];
   const name = `${sur}${given}`;
 
-  const reg = REGIONS[Math.floor(Math.random() * REGIONS.length)];
+  const slide = BIRTHPLACE_SLIDES[Math.floor(Math.random() * BIRTHPLACE_SLIDES.length)];
   const par = PARENT_PROFILES[Math.floor(Math.random() * PARENT_PROFILES.length)];
   const sib = SIBLINGS_PROFILES[Math.floor(Math.random() * SIBLINGS_PROFILES.length)];
   const tone = EMOTIONAL_TONES[Math.floor(Math.random() * EMOTIONAL_TONES.length)];
 
-  const initialSavings = Math.floor(
-    reg.savingsRange[0] + Math.random() * (reg.savingsRange[1] - reg.savingsRange[0])
-  );
+  const housing = HOUSING_TEMPLATES[par.housingIndex % HOUSING_TEMPLATES.length];
+  const wealth = WEALTH_TIERS[par.wealthIndex % WEALTH_TIERS.length];
 
-  const backgroundStory = `你出生在${reg.region}。${par.detail}家里${sib.detail}在这个家里，${tone.detail}`;
+  const initialSavings = Math.floor(18000 + Math.random() * 45000);
+
+  const backgroundStory = `你出生在${slide.region}。父亲${par.fatherAge}岁做${par.fatherJob}，母亲${par.motherAge}岁做${par.motherJob}。全家挤在${housing}家中${sib.detail}在这个屋檐下，${tone.detail}`;
 
   return {
     name,
     gender,
     family: {
-      region: reg.region,
-      regionDetail: reg.detail,
-      parents: par.parents,
-      parentsDetail: par.detail,
+      region: slide.region,
+      regionDetail: `${slide.landscape}。${slide.tagline}`,
+      fatherAge: par.fatherAge,
+      fatherJob: par.fatherJob,
+      fatherTrait: par.fatherTrait,
+      motherAge: par.motherAge,
+      motherJob: par.motherJob,
+      motherTrait: par.motherTrait,
+      housing,
+      wealthTier: wealth.tier,
+      wealthDetail: wealth.detail,
       siblings: sib.siblings,
       siblingsDetail: sib.detail,
       emotionalTone: tone.tone,

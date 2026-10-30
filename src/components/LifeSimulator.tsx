@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   generateRandomFamily,
+  BIRTHPLACE_SLIDES,
   K12_EVENTS,
   CAREER_EVENTS,
   calculateGaokaoOutcome,
@@ -29,7 +30,11 @@ import {
   Brain,
   Shield,
   Zap,
-  Flame
+  Flame,
+  Home,
+  Users,
+  Coins,
+  Sparkles
 } from 'lucide-react';
 
 interface LifeSimulatorProps {
@@ -64,7 +69,11 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   // Player Character & Dynamic Attributes
   const [charData, setCharData] = useState(() => generateRandomFamily());
-  const [isRolling, setIsRolling] = useState(false);
+  
+  // Cinematic Birthplace Reel Animator
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const spinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [attrs, setAttrs] = useState<CharacterAttributes>(() => ({
     inferiority: 35, // 自卑创伤
@@ -101,24 +110,46 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // Copy state
   const [copied, setCopied] = useState(false);
 
-  // Re-roll character
-  const handleRollNewLife = () => {
-    setIsRolling(true);
-    setTimeout(() => {
-      const fresh = generateRandomFamily();
-      setCharData(fresh);
-      setAttrs({
-        inferiority: 35,
-        academicCapital: 30,
-        kinshipGuilt: 40,
-        rebellion: 30,
-        resilience: 30,
-        savings: fresh.family.initialSavings
-      });
-      setTags([]);
-      setIsRolling(false);
-      setGameState('setup');
-    }, 150);
+  // Clean up spin timer on unmount
+  useEffect(() => {
+    return () => {
+      if (spinTimerRef.current) clearInterval(spinTimerRef.current);
+    };
+  }, []);
+
+  // Trigger Cinematic Birthplace Carousel / Reel
+  const triggerBirthReel = () => {
+    setIsSpinning(true);
+    let speed = 60;
+    let iterations = 0;
+    const maxIterations = 20;
+
+    const runReel = () => {
+      setSlideIndex((prev) => (prev + 1) % BIRTHPLACE_SLIDES.length);
+      iterations++;
+
+      if (iterations < maxIterations) {
+        // Decelerate smoothly
+        if (iterations > 12) speed += 35;
+        spinTimerRef.current = setTimeout(runReel, speed);
+      } else {
+        // Settle down on a final random life
+        const fresh = generateRandomFamily();
+        setCharData(fresh);
+        setAttrs({
+          inferiority: 35,
+          academicCapital: 30,
+          kinshipGuilt: 40,
+          rebellion: 30,
+          resilience: 30,
+          savings: fresh.family.initialSavings
+        });
+        setTags([]);
+        setIsSpinning(false);
+      }
+    };
+
+    spinTimerRef.current = setTimeout(runReel, speed);
   };
 
   // Begin Life at Age 6
@@ -270,7 +301,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     const text = `【逃跑计划 · 六十三载人生手札】
 人物：${charData.name}（${charData.gender}）
 籍贯：${charData.family.region}
-家庭底色：${charData.family.parents} · ${charData.family.siblings}
+住房：${charData.family.housing}
+父母：父亲(${charData.family.fatherAge}岁 · ${charData.family.fatherJob}) / 母亲(${charData.family.motherAge}岁 · ${charData.family.motherJob})
 终生判词：${verdict.summaryTitle}
 ${verdict.tagline}
 
@@ -316,117 +348,188 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
   };
 
   // =========================================================================
-  // VIEW 1: SETUP SCREEN (原生家庭底牌)
+  // VIEW 1: CINEMATIC BIRTHPLACE REEL & DOSSIER CARD
   // =========================================================================
   if (gameState === 'setup') {
+    const activeSlide = BIRTHPLACE_SLIDES[slideIndex];
+
     return (
-      <div className="max-w-3xl mx-auto px-4 py-12">
+      <div className="max-w-3xl mx-auto px-4 py-10">
+        {/* Title & Atmosphere */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-stone-100 tracking-tight mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-900 border border-stone-800 text-stone-400 text-xs font-serif mb-3 tracking-widest uppercase">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            人生开局 · 天命降生投影
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-stone-100 tracking-tight mb-2.5">
             抽一张人生底牌
           </h1>
-          <p className="text-base text-stone-400 font-serif">
-            从六岁开始，体验你无法自选的原生家庭与一生的连锁抉择
+          <p className="text-sm sm:text-base text-stone-400 font-serif max-w-lg mx-auto">
+            没有人能自主选择降生的家庭。按下命运之轮，看你这一世落入哪片泥土与屋檐。
           </p>
         </div>
 
-        {/* Character Card */}
-        <div
-          className={`bg-[#17171A] border border-stone-800 rounded-3xl p-6 sm:p-9 shadow-2xl transition-all duration-200 ${
-            isRolling ? 'opacity-50' : 'opacity-100'
-          }`}
-        >
-          {/* Header */}
-          <div className="flex items-start justify-between pb-6 border-b border-stone-800">
-            <div>
-              <div className="flex flex-wrap items-baseline gap-3 mb-2">
-                <span className="text-2xl sm:text-3xl font-serif font-bold text-stone-100">
-                  {charData.name}
-                </span>
-                <span className="text-base text-stone-400 font-serif">
-                  6 岁 · {charData.gender}
-                </span>
-                <span className="text-xs sm:text-sm font-serif px-2.5 py-0.5 rounded-full bg-amber-950/40 text-amber-200 border border-amber-800/40">
-                  {charData.family.siblings}
+        {/* Cinematic Birthplace Carousel Reel (投胎幻灯片/轮盘) */}
+        <div className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-b from-[#18181E] to-[#121216] border border-amber-900/30 p-6 sm:p-7 shadow-2xl">
+          <div className="flex items-center justify-between text-xs font-serif text-stone-500 mb-3 border-b border-stone-800 pb-2">
+            <span className="flex items-center gap-1.5 text-amber-400 font-semibold">
+              <span className="relative flex h-2 w-2">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 ${isSpinning ? 'block' : 'hidden'}`}></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              {isSpinning ? "正在全中国疆域随机寻址中..." : "出生地已锁定落籍"}
+            </span>
+            <span className="font-mono text-stone-400">坐标：{charData.family.region}</span>
+          </div>
+
+          {/* Reel Display Card */}
+          <div className={`transition-all duration-150 transform ${isSpinning ? 'scale-95 opacity-80 blur-[0.5px]' : 'scale-100 opacity-100'}`}>
+            <div className="flex items-center gap-4 py-2">
+              <div className="text-4xl sm:text-5xl p-3 sm:p-4 rounded-2xl bg-[#0F0F12] border border-stone-800 shadow-inner">
+                {isSpinning ? activeSlide.icon : "📍"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xl sm:text-3xl font-serif font-bold text-stone-100 truncate mb-1">
+                  {isSpinning ? activeSlide.region : charData.family.region}
+                </div>
+                <div className="text-xs sm:text-sm font-serif text-amber-300/90 truncate mb-1">
+                  {isSpinning ? activeSlide.landscape : charData.family.regionDetail.split("。")[0]}
+                </div>
+                <div className="text-xs font-serif text-stone-400 line-clamp-1">
+                  {isSpinning ? activeSlide.tagline : charData.family.regionDetail.split("。")[1] || charData.family.regionDetail}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Trigger Reel Button */}
+          <div className="mt-4 pt-3 border-t border-stone-800/80 flex items-center justify-between">
+            <span className="text-xs font-serif text-stone-500">
+              {isSpinning ? "命运正在飞速翻转..." : "对出身不满意？可以重新摇号"}
+            </span>
+            <button
+              onClick={triggerBirthReel}
+              disabled={isSpinning}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-stone-950 border border-stone-700 text-stone-200 text-xs sm:text-sm font-serif transition-colors"
+            >
+              <RotateCcw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin text-amber-400' : ''}`} />
+              重新摇号投胎
+            </button>
+          </div>
+        </div>
+
+        {/* Detailed Dossier Card (等停下来的时候出现的完整户籍卡片) */}
+        {!isSpinning && (
+          <div className="bg-[#17171C] border border-stone-800 rounded-3xl p-6 sm:p-9 shadow-2xl space-y-6 transition-all duration-300 animate-in fade-in slide-in-from-bottom-3">
+            {/* Top Identity Row with Red Ink Stamp Effect */}
+            <div className="flex items-start justify-between pb-5 border-b border-stone-800">
+              <div>
+                <div className="flex items-baseline gap-3 mb-1.5">
+                  <span className="text-3xl sm:text-4xl font-serif font-bold text-stone-100">
+                    {charData.name}
+                  </span>
+                  <span className="text-base text-stone-400 font-serif">
+                    6 岁 · {charData.gender}
+                  </span>
+                  <span className="text-xs font-serif px-2.5 py-0.5 rounded-full bg-amber-950/40 text-amber-200 border border-amber-800/40">
+                    {charData.family.siblings}
+                  </span>
+                </div>
+                <p className="text-sm text-stone-400 font-serif">
+                  籍贯：{charData.family.region}
+                </p>
+              </div>
+
+              {/* Red Archival Stamp */}
+              <div className="rotate-[-6deg] border-2 border-rose-700/80 text-rose-500 px-3 py-1 rounded-lg text-xs sm:text-sm font-serif font-black tracking-widest uppercase select-none opacity-90 shadow-sm shadow-rose-950">
+                已落籍 · 六岁
+              </div>
+            </div>
+
+            {/* Section 1: 住房与居住环境 */}
+            <div className="bg-[#121215] p-4.5 rounded-2xl border border-stone-800 space-y-1.5">
+              <div className="flex items-center gap-2 text-amber-400 font-serif text-sm font-semibold">
+                <Home className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>家里的住房条件：</span>
+              </div>
+              <p className="text-stone-200 font-serif text-sm sm:text-base leading-relaxed pl-6">
+                {charData.family.housing}
+              </p>
+            </div>
+
+            {/* Section 2: 父母职业、年龄与性情 */}
+            <div className="bg-[#141419] p-4.5 rounded-2xl border border-stone-800 space-y-3">
+              <div className="flex items-center gap-2 text-stone-200 font-serif text-sm font-semibold">
+                <Users className="w-4 h-4 text-sky-400 shrink-0" />
+                <span>父母生计与性情档案：</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
+                <div className="bg-[#0F0F13] p-3 rounded-xl border border-stone-800/80">
+                  <div className="text-xs text-stone-500 font-serif mb-1">
+                    父亲：{charData.family.fatherAge} 岁
+                  </div>
+                  <div className="text-sm font-serif font-semibold text-stone-200 mb-1">
+                    {charData.family.fatherJob}
+                  </div>
+                  <div className="text-xs font-serif text-stone-400 leading-relaxed">
+                    “{charData.family.fatherTrait}”
+                  </div>
+                </div>
+
+                <div className="bg-[#0F0F13] p-3 rounded-xl border border-stone-800/80">
+                  <div className="text-xs text-stone-500 font-serif mb-1">
+                    母亲：{charData.family.motherAge} 岁
+                  </div>
+                  <div className="text-sm font-serif font-semibold text-stone-200 mb-1">
+                    {charData.family.motherJob}
+                  </div>
+                  <div className="text-xs font-serif text-stone-400 leading-relaxed">
+                    “{charData.family.motherTrait}”
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: 家境与经济水位 */}
+            <div className="bg-[#1C1715] p-4.5 rounded-2xl border border-amber-900/30 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-amber-400 font-serif text-sm font-semibold">
+                  <Coins className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>家境与生计水位：</span>
+                </div>
+                <span className="text-xs font-mono font-semibold text-emerald-400 bg-emerald-950/40 px-2.5 py-0.5 rounded border border-emerald-800/40">
+                  存折结余约 ¥{charData.family.initialSavings.toLocaleString()}
                 </span>
               </div>
-              <p className="text-base text-stone-300 font-medium">
-                {charData.family.region}
+              <p className="text-stone-300 font-serif text-sm leading-relaxed pl-6">
+                <span className="font-semibold text-amber-200">{charData.family.wealthTier}</span>。
+                {charData.family.wealthDetail}
               </p>
+              <div className="pt-2 border-t border-amber-950/60 pl-6 text-xs font-serif text-stone-400">
+                家庭精神氛围：{charData.family.emotionalTone}。{charData.family.toneDetail}
+              </div>
             </div>
-            <button
-              onClick={handleRollNewLife}
-              disabled={isRolling}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-900 border border-stone-700 text-stone-300 hover:text-white hover:border-stone-500 text-xs sm:text-sm font-serif transition-colors"
-            >
-              <RotateCcw className={`w-3.5 h-3.5 ${isRolling ? 'animate-spin' : ''}`} />
-              重新投胎
-            </button>
-          </div>
 
-          {/* Regional Reality */}
-          <div className="my-4 bg-[#121215] p-4.5 rounded-2xl border border-stone-800/70">
-            <span className="text-stone-500 text-xs font-serif block mb-1">
-              地缘与生计土壤
-            </span>
-            <p className="text-base text-stone-200 font-serif leading-relaxed">
-              {charData.family.regionDetail}
+            {/* Section 4: 降生记忆切片 */}
+            <p className="text-sm sm:text-base text-stone-300 font-serif leading-relaxed italic bg-stone-900/40 p-4 rounded-xl border border-stone-800/40">
+              “{charData.family.backgroundStory}”
             </p>
-          </div>
 
-          {/* Parents & Kinship */}
-          <div className="bg-[#1C1715] border border-amber-900/30 rounded-2xl p-4.5 my-4 space-y-2">
-            <div>
-              <span className="text-amber-400 font-serif font-semibold text-sm block">
-                父母与生计：{charData.family.parents}
-              </span>
-              <p className="text-stone-300 font-serif text-sm leading-relaxed mt-1">
-                {charData.family.parentsDetail}
-              </p>
-            </div>
-            <div className="pt-2 border-t border-amber-950/60">
-              <span className="text-stone-400 font-serif text-xs block">
-                家庭精神氛围：{charData.family.emotionalTone}
-              </span>
-              <p className="text-stone-300 font-serif text-sm leading-relaxed mt-0.5">
-                {charData.family.toneDetail}
+            {/* Start CTA */}
+            <div className="pt-3 border-t border-stone-800">
+              <button
+                onClick={handleStartLife}
+                className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-lg shadow-xl shadow-amber-950/20 transition-all flex items-center justify-center gap-2"
+              >
+                接受这张底牌，以六岁之躯启程
+                <ArrowRight className="w-5 h-5" />
+              </button>
+              <p className="text-center text-xs text-stone-500 font-serif mt-2.5">
+                从小学一年级开始，你的每一个选择都将与这份家庭底色发生剧烈化学反应
               </p>
             </div>
           </div>
-
-          {/* Opening Narrative */}
-          <p className="text-base text-stone-300 my-4 font-serif leading-relaxed italic bg-stone-900/40 p-4 rounded-xl border border-stone-800/40">
-            “{charData.family.backgroundStory}”
-          </p>
-
-          {/* Initial Baseline */}
-          <div className="grid grid-cols-2 gap-4 my-4 pt-4 border-t border-stone-800 text-sm font-serif">
-            <div>
-              <span className="text-stone-500 block text-xs mb-1">初始家庭存款底子</span>
-              <span className="text-emerald-400 font-semibold text-base font-sans">
-                ¥{charData.family.initialSavings.toLocaleString()} 元
-              </span>
-            </div>
-            <div>
-              <span className="text-stone-500 block text-xs mb-1">同胞格局</span>
-              <span className="text-stone-200">{charData.family.siblings}</span>
-            </div>
-          </div>
-
-          {/* Start CTA */}
-          <div className="pt-6 border-t border-stone-800 mt-2">
-            <button
-              onClick={handleStartLife}
-              className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-stone-950 font-serif font-bold text-lg shadow-xl shadow-amber-950/20 transition-all flex items-center justify-center gap-2"
-            >
-              以六岁之躯，走入这一生
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <p className="text-center text-xs text-stone-500 font-serif mt-2.5">
-              从小学、中考分流到高考出分，过去的每一步因果都将自动算定你的大学与出路
-            </p>
-          </div>
-        </div>
+        )}
       </div>
     );
   }
@@ -1050,7 +1153,7 @@ ${historyNotes.map((n) => `[${n.stageName}] ${n.title} ➔ ${n.choiceText}`).joi
             )}
 
             <button
-              onClick={handleRollNewLife}
+              onClick={triggerBirthReel}
               className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-bold text-base transition-all flex items-center justify-center gap-2 mt-2"
             >
               <RotateCcw className="w-4 h-4" />
