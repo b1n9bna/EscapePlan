@@ -2067,16 +2067,16 @@ ${logEntries
                 <div className={`flex items-center justify-between text-xs sm:text-[14px] border-b pb-2.5 font-mono-num ${
                   isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
                 }`}>
-                  <span className={`font-semibold tracking-wide ${isLight ? "text-amber-800 font-bold" : "text-[#D4A359]"}`}>
+                  <span className={`font-semibold tracking-[0.06em] ${isLight ? "text-amber-800 font-bold" : "text-[#D4A359]"}`}>
                     [{entry.age}岁 · {entry.year}年]
                   </span>
-                  <span className={`font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
+                  <span className={`font-reading-sans tracking-[0.05em] ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
                     {entry.stageName}
                   </span>
                 </div>
 
                 {/* Entry Title */}
-                <h3 className={`text-lg sm:text-[21px] font-bold font-narrative-serif tracking-normal leading-snug ${
+                <h3 className={`text-lg sm:text-[21px] font-bold font-narrative-serif tracking-[0.04em] leading-snug ${
                   isLight ? "text-stone-900" : "text-stone-100"
                 }`}>
                   {entry.title}
@@ -2092,7 +2092,7 @@ ${logEntries
                   <div className="flex flex-wrap gap-2 pt-1 text-xs sm:text-[13px]">
                     {entry.statDelta.health !== undefined && entry.statDelta.health !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border tracking-wide ${
                           entry.statDelta.health > 0
                             ? isLight
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-medium'
@@ -2107,7 +2107,7 @@ ${logEntries
                     )}
                     {entry.statDelta.cognition !== undefined && entry.statDelta.cognition !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border tracking-wide ${
                           entry.statDelta.cognition > 0
                             ? isLight
                               ? 'bg-sky-50 text-sky-800 border-sky-300 font-medium'
@@ -2122,7 +2122,7 @@ ${logEntries
                     )}
                     {entry.statDelta.social !== undefined && entry.statDelta.social !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border tracking-wide ${
                           entry.statDelta.social > 0
                             ? isLight
                               ? 'bg-purple-50 text-purple-800 border-purple-300 font-medium'
@@ -2137,7 +2137,7 @@ ${logEntries
                     )}
                     {entry.statDelta.savings !== undefined && entry.statDelta.savings !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border tracking-wide ${
                           entry.statDelta.savings > 0
                             ? isLight
                               ? 'bg-amber-50 text-amber-900 border-amber-300 font-medium'
@@ -2152,7 +2152,7 @@ ${logEntries
                     )}
                     {entry.statDelta.familySavings !== undefined && entry.statDelta.familySavings !== 0 && (
                       <span
-                        className={`font-mono-num px-2.5 py-0.5 rounded-md border ${
+                        className={`font-mono-num px-2.5 py-0.5 rounded-md border tracking-wide ${
                           entry.statDelta.familySavings > 0
                             ? isLight
                               ? 'bg-teal-50 text-teal-900 border-teal-300 font-medium'
@@ -2175,14 +2175,14 @@ ${logEntries
                       ? "bg-amber-50/70 border border-amber-200/80 text-stone-800"
                       : "border-white/[0.06] bg-[#161822] text-stone-100"
                   }`}>
-                    <div className={`text-sm sm:text-[15px] font-semibold flex items-center gap-1.5 font-reading-sans ${
+                    <div className={`text-sm sm:text-[15px] font-semibold flex items-center gap-1.5 font-reading-sans tracking-[0.05em] ${
                       isLight ? "text-amber-900 font-bold" : "text-[#D4A359]"
                     }`}>
                       <span>抉择印记：</span>
                       <span>{entry.chosenOptionText}</span>
                     </div>
                     {entry.chosenReaction && (
-                      <div className={`text-[13.5px] sm:text-[14.5px] leading-relaxed pl-3.5 border-l-2 font-reading-sans ${
+                      <div className={`text-[13.5px] sm:text-[14.5px] leading-relaxed pl-3.5 border-l-2 font-reading-sans tracking-[0.055em] ${
                         isLight ? "text-stone-700 border-amber-500/60 font-normal" : "text-stone-300 border-[#D4A359]/40"
                       }`}>
                         {entry.chosenReaction}
@@ -2193,7 +2193,7 @@ ${logEntries
 
                 {/* If milestone reflection present */}
                 {entry.reflection && (
-                  <div className={`mt-2.5 text-[13.5px] sm:text-[14.5px] pt-2.5 border-t flex items-start gap-2 p-3.5 rounded-xl font-reading-sans leading-relaxed ${
+                  <div className={`mt-2.5 text-[13.5px] sm:text-[14.5px] pt-2.5 border-t flex items-start gap-2 p-3.5 rounded-xl font-reading-sans leading-relaxed tracking-[0.055em] ${
                     isLight
                       ? "bg-amber-100/70 text-amber-950 border border-amber-300 font-medium"
                       : "text-[#D4A359]/90 border-white/[0.06] bg-[#D4A359]/10"
@@ -2459,7 +2459,7 @@ ${logEntries
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className={`flex items-center gap-2 text-sm sm:text-base font-bold ${isLight ? "text-amber-900" : "text-amber-400"}`}>
                     <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
-                    <span className="tracking-wide">宿命抉择时刻 · 请斟酌你的人生航道</span>
+                    <span className="tracking-[0.06em]">宿命抉择时刻 · 请斟酌你的人生航道</span>
                   </div>
                   {isAutoPlaying && (
                     <span className={`text-xs font-normal flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
@@ -2542,7 +2542,7 @@ ${logEntries
                         {/* Main Action Text - clear, upright, prominent font size */}
                         <div
                           style={{ fontSize: 'var(--choice-title-size, 17px)' }}
-                          className={`font-semibold leading-relaxed tracking-normal ${
+                          className={`font-semibold leading-relaxed tracking-[0.055em] ${
                             isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
                           }`}
                         >
@@ -2553,7 +2553,7 @@ ${logEntries
                         {p.detail && (
                           <div
                             style={{ fontSize: 'var(--choice-desc-size, 14px)' }}
-                            className={`leading-relaxed line-clamp-3 pt-0.5 ${
+                            className={`leading-relaxed line-clamp-3 pt-0.5 tracking-[0.05em] ${
                               isLight ? "text-stone-600" : "text-stone-400"
                             }`}
                           >
@@ -2690,7 +2690,7 @@ ${logEntries
                   <div className="sm:absolute sm:left-1/2 sm:-translate-x-1/2 flex items-center justify-center w-full sm:w-auto z-10 py-1 sm:py-0">
                     <button
                       onClick={handleNextNaturalYear}
-                      className="w-full sm:w-auto px-8 sm:px-10 py-3 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30 hover:shadow-lg active:scale-[0.98] font-narrative-serif tracking-wide"
+                      className="w-full sm:w-auto px-8 sm:px-10 py-3 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30 hover:shadow-lg active:scale-[0.98] font-narrative-serif tracking-[0.06em]"
                     >
                       <span>
                         {!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)

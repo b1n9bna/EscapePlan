@@ -19,46 +19,53 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 人文阅读统一采用清晰无衬线字体 */
+/* 人文阅读统一采用清晰无衬线字体与舒朗字距 */
 .font-narrative-serif {
   font-family: var(--font-sans);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.04em;
 }
 
 /* 舒适阅读正文 */
 .font-reading-sans {
   font-family: var(--font-sans);
+  letter-spacing: 0.045em;
 }
 
 /* 精确等宽数值 */
 .font-mono-num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
-/* 中文长文本护眼阅读行距与适度字距 */
+/* 中文长文本护眼阅读行距与舒朗字距（告别方块字黏连，提供极佳通透呼吸感） */
 .prose-reading {
   font-family: var(--font-sans);
   font-size: var(--prose-size, 17px);
   line-height: var(--prose-line-height, 1.88);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--prose-tracking, 0.07em);
   color: #DDE2EE;
   font-weight: 400;
+  text-rendering: optimizeLegibility;
+  word-break: break-word;
 }
 
 @media (min-width: 640px) {
   .prose-reading {
     font-size: var(--prose-size-sm, 18.5px);
     line-height: var(--prose-line-height-sm, 1.95);
+    letter-spacing: var(--prose-tracking-sm, 0.08em);
   }
 }
 
-/* 阅读器字号档位微调 (默认采用大号护眼字号) */
+/* 阅读器字号档位微调 (默认采用大号护眼字号，字符间距疏朗透气) */
 .font-scale-normal {
   --prose-size: 15.5px;
   --prose-size-sm: 16.5px;
   --prose-line-height: 1.84;
   --prose-line-height-sm: 1.88;
+  --prose-tracking: 0.055em;
+  --prose-tracking-sm: 0.065em;
   --choice-title-size: 15px;
   --choice-title-size-sm: 16px;
   --choice-desc-size: 13px;
@@ -70,6 +77,8 @@ body {
   --prose-size-sm: 18.5px;
   --prose-line-height: 1.88;
   --prose-line-height-sm: 1.95;
+  --prose-tracking: 0.07em;
+  --prose-tracking-sm: 0.08em;
   --choice-title-size: 16.5px;
   --choice-title-size-sm: 18px;
   --choice-desc-size: 14px;
@@ -81,6 +90,8 @@ body {
   --prose-size-sm: 21px;
   --prose-line-height: 1.95;
   --prose-line-height-sm: 2.02;
+  --prose-tracking: 0.085em;
+  --prose-tracking-sm: 0.095em;
   --choice-title-size: 18.5px;
   --choice-title-size-sm: 20.5px;
   --choice-desc-size: 15.5px;
