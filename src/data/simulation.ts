@@ -1358,28 +1358,28 @@ export const AGE_EVENT_POOLS: Record<number, LifeEventNode[]> = {
       type: "choice",
       choices: [
         {
-          stanceBadge: "书生骨气",
-          text: "站在母亲身旁朗声背诵课文，以出类拔萃的才学打动主任特批缓缴！",
-          detail: "用清脆响亮的读书声为窘迫的母亲筑起尊严的防线，展现出无可挑剔的求学天资。",
-          reaction: "教导主任路过赞叹‘这娃是个读书的料’，大笔一挥特批免除借读滞纳金缓交入学！",
-          delta: { academicCapital: 10, cognition: 8, resilience: 8, inferiority: -10 },
-          addTags: ["以读卫尊", "神童资质"]
+          stanceBadge: "替母跪求",
+          text: "冲上去抱住教导主任的腿哭求给个机会，用童年的卑微换取宝贵的读书名额！",
+          detail: "引来走廊几十名城里家长指点围观，主任为平息影响勉强收下批条，换来了学籍，但在开学第一天被贴上‘下跪要名额的泥腿子’标签。",
+          reaction: "母亲把你拉起来死死搂在怀里失声痛哭，你保住了读书的机会，但自尊在这一天被踩得稀碎。",
+          delta: { academicCapital: 12, inferiority: 25, happiness: -15, resilience: 10 },
+          addTags: ["屈辱求学", "童年烙印"]
         },
         {
-          stanceBadge: "手艺抵资",
-          text: "掏出自己雕刻的精美木刻生肖和帮门卫修好的手电筒折抵勤工！",
-          detail: "“老师，我能帮学校修课桌修理水龙头！”超常的动手天赋让校领导赞叹不已破格录用。",
-          reaction: "校长当场宣布让你担任红领巾劳动标兵，免除了全部借读费，母亲含泪欣慰不已！",
-          delta: { savings: 50, social: 10, resilience: 10, cognition: 8 },
-          addTags: ["动手立身", "巧手破局"]
+          stanceBadge: "傲骨宁折",
+          text: "死死拉起满头大汗、不断作揖的母亲：“妈，咱不求人，我们走！”",
+          detail: "保住了少年傲骨，但只能转入西郊泥泞无资质的城中村打工棚户小学，优质教育的大门就此关闭。",
+          reaction: "走在暴晒的马路牙子上，母亲一路抹泪，你的眼神却像狼崽一样淬出了野草般的凶狠与自立。",
+          delta: { rebellion: 25, resilience: 20, inferiority: -10, academicCapital: -8 },
+          addTags: ["傲骨宁折", "野草生根"]
         },
         {
-          stanceBadge: "旷野温情",
-          text: "紧紧牵着母亲的手在夕阳台阶温声安慰，成为母亲最坚实的依靠！",
-          detail: "“妈，咱不丢人，我往后一定出息让你过上好日子！”用稚嫩却坚定的怀抱温暖母亲。",
-          reaction: "母亲抹去眼泪紧紧搂住你，家庭的凝聚力与深情在患难中被淬炼得无坚不摧！",
-          delta: { happiness: 14, familySavings: 1000, resilience: 10, health: 10 },
-          addTags: ["孝道暖炉", "深情淬炼"]
+          stanceBadge: "典当凑资",
+          text: "母亲咬碎后槽牙，从内衣口袋掏出原本用来治胃病的陪嫁银镯子抵押给传达室！",
+          detail: "看着母亲颤抖着把银镯子递给别人换来三百块发票，深刻体会到匮乏作为原罪在至亲身上的血肉剥夺。",
+          reaction: "顺利拿到了注册红章，你坐在教室课桌前死死攥紧拳头，发誓将来用命也要给母亲挣回体面。",
+          delta: { kinshipGuilt: 25, resilience: 15, academicCapital: 8, savings: -300 },
+          addTags: ["典当求学", "至亲负重"]
         }
       ]
     }

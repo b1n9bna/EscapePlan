@@ -982,12 +982,21 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     if (currentNode.age === 27) {
       const isEmigrate =
         choice.text.includes('出海') ||
+        choice.text.includes('海外') ||
+        choice.text.includes('波斯湾') ||
+        choice.text.includes('中东') ||
         choice.text.includes('异邦') ||
         choice.text.includes('跨国') ||
         choice.text.includes('异国') ||
+        choice.text.includes('劳务') ||
         (choice.addTags &&
           choice.addTags.some(
-            (t) => t.includes('出海') || t.includes('异邦') || t.includes('大工匠')
+            (t) =>
+              t.includes('出海') ||
+              t.includes('海外') ||
+              t.includes('异邦') ||
+              t.includes('大工匠') ||
+              t.includes('血汗还债')
           ));
       const path: 'emigrate' | 'stay' = isEmigrate ? 'emigrate' : 'stay';
       setChosenPath(path);
