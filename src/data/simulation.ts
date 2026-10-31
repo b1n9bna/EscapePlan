@@ -5686,11 +5686,16 @@ export interface LifetimeVerdict {
 }
 
 export function evaluateLifetimeEnding(
-  _track: "985_211" | "double_non" | "junior_college",
+  track: "985_211" | "double_non" | "junior_college",
   _path: "emigrate" | "stay",
   attrs: CharacterAttributes,
   tags: string[] = []
 ): EndingDef {
+  // 0. 全球卓越 · 拓疆智者 (ED-01) 顶级海外判定
+  if (_path === "emigrate" && (track === "985_211" || attrs.cognition >= 48 || tags.some((t) => t.includes("全球") || t.includes("跨洋") || t.includes("出海") || t.includes("海外")))) {
+    return ENDING_CODEX_DEFS[0]; // ED-01 全球卓越 · 拓疆智者
+  }
+
   // 1. 致命悲壮/悲剧提前终局判定（最高优先级）
   if (tags.some((t) => t.includes("抗洪殉职") || t.includes("殉职英烈"))) {
     return ENDING_CODEX_DEFS[14]; // ED-15 浩气长存
