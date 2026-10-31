@@ -1997,7 +1997,7 @@ ${logEntries
       {/* ================================================================= */}
       {/* 4. MAIN STAGE THEATRE (核心单幕剧场 · 时代动态光影与宣纸/黑曜材质)     */}
       {/* ================================================================= */}
-      <main className={`flex-1 overflow-y-auto flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative pb-28 sm:pb-32 transition-colors duration-700 ${getEpochAuraStyle()}`}>
+      <main className={`flex-1 overflow-y-auto flex flex-col items-center p-3 sm:p-6 lg:p-8 relative pb-40 sm:pb-48 transition-colors duration-700 ${getEpochAuraStyle()}`}>
         {/* =============================================================== */}
         {/* VIEW A: 终局人生纪念卡 (80亿分之一 标志性生平画卷)                */}
         {/* =============================================================== */}
@@ -2419,7 +2419,7 @@ ${logEntries
           /* =============================================================== */
           <div
             key={`${currentEntry.id}_${currentEntry.age}`}
-            className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-11 space-y-6 shadow-2xl transition-all duration-300 my-auto animate-year-enter relative overflow-hidden ${
+            className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-4 sm:p-7 lg:p-9 space-y-4 sm:space-y-5 shadow-2xl transition-all duration-300 my-auto animate-year-enter relative overflow-hidden mb-6 sm:mb-8 ${
               isLight
                 ? "bg-[#FCFAF7]/95 border-amber-900/15 shadow-[0_20px_50px_-10px_rgba(180,140,80,0.12)] text-stone-900"
                 : "bg-[#0E1019]/95 border-[#D4A359]/25 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_30px_rgba(212,163,89,0.06)] text-stone-100"
@@ -2542,7 +2542,9 @@ ${logEntries
             {/* INTERACTIVE DILEMMA CHOICES (命运对决张力 · 鲜明立意光晕)         */}
             {/* ============================================================= */}
             {isWaitingCurrentChoice && currentNode.choices && (
-              <div className={`mt-5 p-5 sm:p-7 rounded-2xl border space-y-4 relative z-10 transition-all ${
+              <div
+                ref={choiceCardRef}
+                className={`mt-4 sm:mt-5 p-4 sm:p-6 rounded-2xl border space-y-3 sm:space-y-4 relative z-10 transition-all ${
                 currentNode.type === 'destiny'
                   ? isLight
                     ? "bg-gradient-to-b from-amber-50/90 via-amber-100/40 to-stone-50 border-2 border-amber-600/60 shadow-xl shadow-amber-950/10 animate-destiny-pulse"
@@ -2580,13 +2582,34 @@ ${logEntries
                       </p>
                     )}
                   </div>
-                  <span className="hidden sm:inline-block text-[11px] text-stone-400 font-mono-num shrink-0 ml-3">
-                    按 1 / 2 / 3 键选定
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <button
+                      onClick={() => setShowMemoirDrawer(true)}
+                      className={`px-2 py-0.5 rounded text-[11px] font-narrative-serif border flex items-center gap-1 transition-colors ${
+                        isLight ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900" : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
+                      }`}
+                      title="查看之前经历的人生岁月"
+                    >
+                      <BookOpen className="w-3 h-3" />
+                      <span>生平忆录</span>
+                    </button>
+                    <span className="text-[11px] text-[#D4A359] font-mono-num bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                      共 {currentNode.choices.length} 项 (可上下滑动)
+                    </span>
+                    <span className="hidden sm:inline-block text-[11px] text-stone-400 font-mono-num">
+                      按 1 / 2 / 3
+                    </span>
+                  </div>
                 </div>
 
-                {/* Option Cards */}
-                <div className="grid grid-cols-1 gap-3">
+                {/* Option Cards - Explicit scrollable viewport for Mac 13" and mobile */}
+                <div
+                  className="max-h-[38vh] sm:max-h-[46vh] overflow-y-auto pr-1.5 sm:pr-2 space-y-2.5 sm:space-y-3 overscroll-contain focus:outline-none"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: isLight ? '#D4A359 #F3F4F6' : '#D4A359 #181B26'
+                  }}
+                >
                   {currentNode.choices.map((choice, cIdx) => {
                     const p = getChoicePresentation(choice, cIdx);
                     return (
@@ -2754,7 +2777,11 @@ ${logEntries
       {/* ================================================================= */}
       {/* 5. FLOATING FROSTED CAPSULE DOCK (居中悬浮磨砂玻璃胶囊坞)             */}
       {/* ================================================================= */}
-      <div className="fixed bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+      <div className={`fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 pointer-events-auto transition-all duration-300 ${
+        isWaitingCurrentChoice
+          ? "opacity-0 pointer-events-none translate-y-8"
+          : "opacity-100 translate-y-0"
+      }`}>
         <div className={`flex items-center gap-2 sm:gap-3 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-300 max-w-[94vw] ${
           isLight
             ? "bg-white/85 border-stone-200/90 text-stone-800 shadow-stone-900/10"
