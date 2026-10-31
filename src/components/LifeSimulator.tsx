@@ -98,7 +98,8 @@ const isPrematureMortality = (entries: ChronicleLogEntry[]) =>
           t.includes('抗洪殉职') ||
           t.includes('矽肺病故') ||
           t.includes('遁入空门') ||
-          t.includes('铁窗残生')
+          t.includes('铁窗残生') ||
+          t.includes('境外泥潭')
       )
   );
 
@@ -2290,7 +2291,8 @@ ${logEntries
                 t.includes('心梗猝死') ||
                 t.includes('矽肺病故') ||
                 t.includes('遁入空门') ||
-                t.includes('铁窗残生')
+                t.includes('铁窗残生') ||
+                t.includes('境外泥潭')
             ) || '提前终局';
 
             let tragedyWatermark = '绝唱';
@@ -2313,10 +2315,10 @@ ${logEntries
               tragedyWatermark = '空门';
               tragedyBadge = '【青灯古佛 · 遁入空门】';
               tragedyTribute = '“看破红尘浮华，古刹钟声沉淀平生。自此斩断尘缘，此心安处即是吾乡。”';
-            } else if (tragedyTag.includes('铁窗残生')) {
-              tragedyWatermark = '高墙';
-              tragedyBadge = '【高墙铁窗 · 铁窗残生】';
-              tragedyTribute = '“一步行差踏错，高墙铁窗残生。红尘繁华已成过眼云烟，在静默反思中度过余生。”';
+            } else if (tragedyTag.includes('铁窗残生') || tragedyTag.includes('境外泥潭') || currentEntry.scene.includes('境外园区') || currentEntry.scene.includes('高墙')) {
+              tragedyWatermark = '深渊';
+              tragedyBadge = '【境外泥潭 · 铁窗残生】';
+              tragedyTribute = '“一念之差误入深渊，高墙铁窗空叹白发。虽为至孝之躯，终成法律之惩。人世沧桑，警钟长鸣。”';
             }
 
             return (
