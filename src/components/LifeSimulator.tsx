@@ -87,10 +87,9 @@ interface ChronicleLogEntry {
   reflection?: string;
 }
 
-const isSimulationEnded = (entries: ChronicleLogEntry[]) =>
+const isPrematureMortality = (entries: ChronicleLogEntry[]) =>
   entries.some(
     (e) =>
-      e.age === 63 ||
       e.type === 'mortality' ||
       e.tagsAdded?.some(
         (t) =>
@@ -102,6 +101,9 @@ const isSimulationEnded = (entries: ChronicleLogEntry[]) =>
           t.includes('铁窗残生')
       )
   );
+
+const isSimulationEnded = (entries: ChronicleLogEntry[]) =>
+  entries.some((e) => e.age === 63) || isPrematureMortality(entries);
 
 
 // ============================================================================
@@ -586,10 +588,25 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const [epitaphInput, setEpitaphInput] = useState('');
   const [epitaphConfirmed, setEpitaphConfirmed] = useState(false);
 
+  // 早逝悲歌（抗洪殉职/心梗猝死/矽肺病故等）绝唱谢幕舞台确认状态
+  // 彻底杜绝“0毫秒吞没早逝悲歌剧本文本”的心流致命Bug！
+  const [mortalityAcknowledged, setMortalityAcknowledged] = useState(false);
+
+  // Derived current age strictly driven by active timeline node
+  const currentAge =
+    gamePhase === 'setup'
+      ? 0
+      : timeline[timelineIndex]?.age ?? (logEntries[logEntries.length - 1]?.age || 0);
+
+  // 终局与悲歌绝唱谢幕心流状态衍生（彻底避免早逝高光文本被 0 毫秒吞没）
+  const isPremature = isPrematureMortality(logEntries);
+  const isShowingMortalityClimax = isPremature && !mortalityAcknowledged;
+  const isRetired = isSimulationEnded(logEntries) && (!isPremature || mortalityAcknowledged);
+
   // Confetti trigger once at Age 63 or non-tragic finale
   const confettiFiredRef = useRef(false);
   useEffect(() => {
-    if (isSimulationEnded(logEntries) && !confettiFiredRef.current) {
+    if (isRetired && !confettiFiredRef.current) {
       const isTragic = tags.some(
         (t) =>
           t.includes('心梗猝死') ||
@@ -608,12 +625,12 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         } catch {}
       }
     }
-  }, [logEntries, tags]);
+  }, [isRetired, tags]);
 
 
   // Register newly unlocked ending into LocalStorage
   useEffect(() => {
-    if (isSimulationEnded(logEntries)) {
+    if (isRetired) {
       const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
       const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries);
       if (!unlockedEndings.includes(finalVerdict.ending.id)) {
@@ -624,13 +641,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         } catch {}
       }
     }
-  }, [logEntries.length, chosenPath, gaokaoCalc, attrs, tags]);
-
-  // Derived current age strictly driven by active timeline node
-  const currentAge =
-    gamePhase === 'setup'
-      ? 0
-      : timeline[timelineIndex]?.age ?? (logEntries[logEntries.length - 1]?.age || 0);
+  }, [isRetired, chosenPath, gaokaoCalc, attrs, tags]);
 
   // 3-Slot Soul Imprints (人生核心灵魂烙印：少年精神底色 · 青年代价与执念 · 岁月终局归宿)
   const soulImprints = React.useMemo(() => {
@@ -952,12 +963,14 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
     // ★★★ 二十一岁大四毕业抉择：精准定制后续 22~27 岁专属职场/学术轨迹 ★★★
     // 彻底杜绝“本科工作两年又突然硕士毕业签约”的严重逻辑矛盾！
+    const allCurrentTags = Array.from(new Set([...tags, ...(choice.addTags || [])]));
     if (currentNode.age === 21) {
       const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
       const tailoredNodes = getTailoredCareerSubtrackNodes(
         currentTrack,
         choice.text,
-        charData.family
+        charData.family,
+        allCurrentTags
       );
       if (tailoredNodes && tailoredNodes.length > 0) {
         const upTo21 = timeline.slice(0, timelineIndex + 1);
@@ -980,7 +993,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setChosenPath(path);
 
       const track = gaokaoCalc?.degreeTrack || 'double_non';
-      const allCurrentTags = Array.from(new Set([...tags, ...(choice.addTags || [])]));
       const careerSub = getCareerSubtrack(allCurrentTags);
       const adultMilestones = generateAdultMilestones(track, path, charData.family, careerSub, allCurrentTags);
 
@@ -990,7 +1002,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     }
 
     // ★★★ 成年篇章（28~63岁）因果分支拦截：彻底消除“选了大集团维保督导，下一步却变成工坊被查封”等严重逻辑矛盾！★★★
-    const allCurrentTags = Array.from(new Set([...tags, ...(choice.addTags || [])]));
     const tailoredAdultNodes = getTailoredAdultChoiceBranch(
       currentNode.id,
       choice.text,
@@ -1107,6 +1118,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setEpitaphInput('');
     setEpitaphConfirmed(false);
     setShowMemoirDrawer(false);
+    setMortalityAcknowledged(false);
   };
 
   // =========================================================================
@@ -1118,8 +1130,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setIsAutoPlaying(false);
       return;
     }
-    // Fully completed at 63 years old
-    if (isSimulationEnded(logEntries)) {
+    // Fully completed or at mortality climax: suspend immediately
+    if (isSimulationEnded(logEntries) || isShowingMortalityClimax) {
       setIsAutoPlaying(false);
       return;
     }
@@ -1133,7 +1145,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     }, autoPlaySpeed * 1000);
 
     return () => clearTimeout(timer);
-  }, [isAutoPlaying, autoPlaySpeed, timelineIndex, waitingForChoice, showGaokaoModal, gamePhase, logEntries.length]);
+  }, [isAutoPlaying, autoPlaySpeed, timelineIndex, waitingForChoice, showGaokaoModal, gamePhase, logEntries.length, isShowingMortalityClimax]);
 
   // =========================================================================
   // GLOBAL KEYBOARD SHORTCUTS (Space: Next / 1-4: Choice / A: Auto-play)
@@ -1151,11 +1163,18 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         return;
       }
 
-      // Space / Enter: Advance year or stop auto-play
+      // Space / Enter: Advance year or acknowledge mortality or stop auto-play
       if (e.code === 'Space' || e.key === 'Enter') {
         e.preventDefault();
         if (isAutoPlaying) {
           setIsAutoPlaying(false);
+          return;
+        }
+        if (isShowingMortalityClimax) {
+          setMortalityAcknowledged(true);
+          try {
+            confetti({ particleCount: 65, spread: 75, origin: { y: 0.6 } });
+          } catch {}
           return;
         }
         if (!waitingForChoice && !showGaokaoModal && !isSimulationEnded(logEntries)) {
@@ -1167,7 +1186,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       // Key 'a' or 'A': Toggle Auto Play
       if (e.key === 'a' || e.key === 'A') {
         e.preventDefault();
-        if (!waitingForChoice && !showGaokaoModal && !isSimulationEnded(logEntries)) {
+        if (!waitingForChoice && !showGaokaoModal && !isSimulationEnded(logEntries) && !isShowingMortalityClimax) {
           setIsAutoPlaying((prev) => !prev);
         }
         return;
@@ -1191,7 +1210,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gamePhase, waitingForChoice, showGaokaoModal, isAutoPlaying, timelineIndex, currentNode, gaokaoCalc, logEntries.length]);
+  }, [gamePhase, waitingForChoice, showGaokaoModal, isAutoPlaying, timelineIndex, currentNode, gaokaoCalc, logEntries.length, isShowingMortalityClimax]);
 
 
   const handleCopyRecord = () => {
@@ -1680,8 +1699,7 @@ ${logEntries
     return { stance, cleanText, detail: choice.detail, archetype, tradeOffs };
   };
 
-// Derived state for 1-in-8-billion (十四亿分之一) single-stage memoir theatre
-  const isRetired = isSimulationEnded(logEntries);
+  // Derived state for 1-in-8-billion (十四亿分之一) single-stage memoir theatre
   const currentEntry: ChronicleLogEntry =
     logEntries[logEntries.length - 1] || {
       id: currentNode?.id || 'age_0',
@@ -1692,21 +1710,77 @@ ${logEntries
       scene: currentNode?.scene || '时间的齿轮缓缓转动...',
       type: 'natural'
     };
-  const isWaitingCurrentChoice = !isRetired && waitingForChoice;
+  const isWaitingCurrentChoice = !isRetired && !isShowingMortalityClimax && waitingForChoice;
   const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
   const finalVerdict = isRetired
     ? generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries)
     : null;
 
   const getChapterName = (age: number) => {
-    if (age <= 6) return '启蒙韶华';
-    if (age <= 12) return '故土童年';
-    if (age <= 18) return '应试分流';
-    if (age <= 22) return '象牙塔尖';
-    if (age <= 30) return '初入社会';
-    if (age <= 45) return '中流砥柱';
-    if (age <= 55) return '天命不惑';
-    return '从心之年';
+    if (age <= 6) return '启蒙韶华 · 故土暖阳';
+    if (age <= 12) return '故土童年 · 金色麦浪';
+    if (age <= 18) return '应试青衿 · 寒窗苦读';
+    if (age <= 22) return '象牙塔尖 · 青年求索';
+    if (age <= 30) return '初入社会 · 奋斗风云';
+    if (age <= 48) return '中流砥柱 · 沉浮现实';
+    if (age <= 55) return '天命不惑 · 炉火微光';
+    return '从心之年 · 暮雪残阳';
+  };
+
+  // 时代与心境五大年代动态光影呼吸系统（沉浸烘托时代重量）
+  const getEpochAuraStyle = () => {
+    if (isShowingMortalityClimax) {
+      return isLight
+        ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(254,226,226,0.85),rgba(248,244,240,1))]"
+        : "bg-[radial-gradient(ellipse_90%_70%_at_50%_40%,rgba(65,12,18,0.45),rgba(7,7,12,1))]";
+    }
+    if (currentAge <= 12) {
+      // 0~12 故土暖阳 (Warm Amber Sunlight)
+      return isLight
+        ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(254,243,199,0.7),rgba(248,245,238,1))]"
+        : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(55,38,18,0.45),rgba(8,7,10,1))]";
+    }
+    if (currentAge <= 18) {
+      // 13~18 应试青衿 (Deep Slate & Ink Blue)
+      return isLight
+        ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(224,242,254,0.7),rgba(245,247,250,1))]"
+        : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(18,30,52,0.5),rgba(6,8,14,1))]";
+    }
+    if (currentAge <= 30) {
+      // 19~30 奋斗风云 (Dynamic Career Atmosphere)
+      const hasOverseas = tags.some((t) => t.includes('海外') || t.includes('苦力') || t.includes('大工匠'));
+      const hasTech = tags.some((t) => t.includes('大厂') || t.includes('研发') || t.includes('算法') || t.includes('做题家'));
+      const hasGov = tags.some((t) => t.includes('选调') || t.includes('体制') || t.includes('公职') || t.includes('政务'));
+
+      if (hasOverseas) {
+        return isLight
+          ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(254,235,200,0.75),rgba(248,242,232,1))]"
+          : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(60,36,14,0.5),rgba(12,8,6,1))]";
+      }
+      if (hasTech) {
+        return isLight
+          ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(224,231,255,0.65),rgba(246,247,252,1))]"
+          : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(18,28,68,0.52),rgba(5,7,14,1))]";
+      }
+      if (hasGov) {
+        return isLight
+          ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(254,226,226,0.6),rgba(248,245,242,1))]"
+          : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(48,20,22,0.45),rgba(10,7,9,1))]";
+      }
+      return isLight
+        ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(240,243,250,0.7),rgba(248,246,242,1))]"
+        : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(22,28,48,0.5),rgba(7,8,14,1))]";
+    }
+    if (currentAge <= 48) {
+      // 31~48 中流砥柱 (Smoky Charcoal & Brass Reality)
+      return isLight
+        ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(245,240,235,0.8),rgba(245,243,240,1))]"
+        : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(32,28,26,0.55),rgba(7,7,8,1))]";
+    }
+    // 49~63 暮雪残阳 (Twilight Hearth & Winter Embers)
+    return isLight
+      ? "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(254,242,242,0.65),rgba(247,245,245,1))]"
+      : "bg-[radial-gradient(ellipse_85%_65%_at_50%_40%,rgba(40,30,35,0.45),rgba(8,7,9,1))]";
   };
 
   const formatMoney = (val: number) => {
@@ -1911,13 +1985,9 @@ ${logEntries
       </header>
 
       {/* ================================================================= */}
-      {/* 4. MAIN STAGE THEATRE (核心单幕剧场 · 聚光灯深邃留白与宣纸/黑曜材质)     */}
+      {/* 4. MAIN STAGE THEATRE (核心单幕剧场 · 时代动态光影与宣纸/黑曜材质)     */}
       {/* ================================================================= */}
-      <main className={`flex-1 overflow-y-auto flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative pb-28 sm:pb-32 ${
-        isLight
-          ? "bg-[radial-gradient(ellipse_80%_60%_at_50%_45%,rgba(255,255,255,0.85),rgba(244,240,233,0.95))]"
-          : "bg-[radial-gradient(ellipse_85%_65%_at_50%_45%,rgba(20,24,38,0.5),rgba(6,7,11,1))]"
-      }`}>
+      <main className={`flex-1 overflow-y-auto flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative pb-28 sm:pb-32 transition-colors duration-700 ${getEpochAuraStyle()}`}>
         {/* =============================================================== */}
         {/* VIEW A: 终局人生纪念卡 (80亿分之一 标志性生平画卷)                */}
         {/* =============================================================== */}
@@ -2148,14 +2218,14 @@ ${logEntries
                     </div>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-xl border border-red-700/50 bg-red-950/30 flex items-center justify-between">
-                    <div className="space-y-1">
-                      <div className="text-xs text-red-400 font-mono-num font-semibold">【朱砂印讫 · 一生圆满】</div>
+                  <div className="p-4 rounded-xl border border-red-700/50 bg-red-950/30 flex items-center justify-between gap-4">
+                    <div className="space-y-1 flex-1">
+                      <div className="text-xs text-red-400 font-narrative-serif font-semibold">【朱砂印讫 · 一生圆满】</div>
                       <div className="text-sm sm:text-base font-narrative-serif text-amber-200 italic font-semibold">
                         “{epitaphInput || '不虚此生，无怨无悔。'}”
                       </div>
                     </div>
-                    <div className="w-12 h-12 rounded-lg border-2 border-red-600 text-red-500 flex items-center justify-center font-serif text-sm font-bold rotate-6 shrink-0 shadow-inner">
+                    <div className="seal-stamp-box w-13 h-13 rounded-sm flex items-center justify-center text-xs font-black rotate-3 shrink-0 animate-stamp-press animate-ink-bleed select-none">
                       印讫
                     </div>
                   </div>
@@ -2200,6 +2270,138 @@ ${logEntries
               </button>
             </div>
           </div>
+        ) : isShowingMortalityClimax ? (
+          /* =============================================================== */
+          /* VIEW C: 早逝悲歌 · 绝唱谢幕舞台 (浩气长存 / 星陨子夜 / 血汗洗尘)    */
+          /* =============================================================== */
+          (() => {
+            const tragedyTag = currentEntry.tagsAdded?.find(
+              (t) =>
+                t.includes('抗洪殉职') ||
+                t.includes('心梗猝死') ||
+                t.includes('矽肺病故') ||
+                t.includes('遁入空门') ||
+                t.includes('铁窗残生')
+            ) || '提前终局';
+
+            let tragedyWatermark = '绝唱';
+            let tragedyBadge = '【绝唱 · 提前终局】';
+            let tragedyTribute = '生如夏花之绚烂，死如秋叶之静美。虽未能走至花甲之年，此生傲骨与热血已长留人间。';
+
+            if (tragedyTag.includes('抗洪殉职') || currentEntry.scene.includes('洪水') || currentEntry.scene.includes('决口')) {
+              tragedyWatermark = '浩气';
+              tragedyBadge = '【浩气长存 · 殉职英烈】';
+              tragedyTribute = '“三十载生命虽短，然化作长堤，护佑万千安澜。省委追授人民英雄，英魂不朽，浩气长存！”';
+            } else if (tragedyTag.includes('心梗猝死') || currentEntry.scene.includes('心梗') || currentEntry.scene.includes('抢救')) {
+              tragedyWatermark = '星陨';
+              tragedyBadge = '【星陨子夜 · 过劳长眠】';
+              tragedyTribute = '“写字楼深处三十八岁的深夜长眠，全行业为你亮起悼念烛光。燃烧了自己，照亮过时代的微光。”';
+            } else if (tragedyTag.includes('矽肺病故') || currentEntry.scene.includes('矽肺') || currentEntry.scene.includes('矿井')) {
+              tragedyWatermark = '洗尘';
+              tragedyBadge = '【血汗洗尘 · 苦尽魂归】';
+              tragedyTribute = '“虽千磨万击，你用铮铮铁骨换来了家族的重生。债已还清，房已盖好，一生硬骨，无愧此世！”';
+            } else if (tragedyTag.includes('遁入空门')) {
+              tragedyWatermark = '空门';
+              tragedyBadge = '【青灯古佛 · 遁入空门】';
+              tragedyTribute = '“看破红尘浮华，古刹钟声沉淀平生。自此斩断尘缘，此心安处即是吾乡。”';
+            } else if (tragedyTag.includes('铁窗残生')) {
+              tragedyWatermark = '高墙';
+              tragedyBadge = '【高墙铁窗 · 铁窗残生】';
+              tragedyTribute = '“一步行差踏错，高墙铁窗残生。红尘繁华已成过眼云烟，在静默反思中度过余生。”';
+            }
+
+            return (
+              <div
+                key={`mortality_${currentEntry.id}_${currentEntry.age}`}
+                className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-11 space-y-7 shadow-2xl transition-all duration-300 my-auto animate-year-enter relative overflow-hidden ${
+                  isLight
+                    ? "bg-[#FFFBF7] border-red-900/30 text-stone-900 shadow-red-950/15"
+                    : "bg-[#090A10] border-red-800/40 text-stone-100 shadow-[0_0_80px_rgba(185,28,28,0.25)] animate-elegiac-aura"
+                }`}
+              >
+                {/* Giant Calligraphy Watermark */}
+                <div className="absolute top-2 right-4 text-8xl sm:text-9xl md:text-[11rem] font-serif font-black select-none pointer-events-none opacity-[0.06] dark:opacity-[0.08] text-red-600 tracking-tighter">
+                  {tragedyWatermark}
+                </div>
+
+                {/* Top Stage Header */}
+                <div className="flex items-center justify-between border-b pb-4 border-red-500/25 relative z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold font-narrative-serif bg-red-950/60 border border-red-700/60 text-red-300 shadow-inner">
+                      {tragedyBadge}
+                    </span>
+                    <span className="text-xs text-stone-500 font-narrative-serif">
+                      享年 {currentEntry.age} 岁 · 公历 {currentEntry.year} 年
+                    </span>
+                  </div>
+                  <div className="text-xs font-mono-num text-red-400 font-semibold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                    <span className="font-narrative-serif">生命谢幕绝唱</span>
+                  </div>
+                </div>
+
+                {/* Title */}
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-narrative-serif text-red-500 tracking-wide relative z-10">
+                  “{currentEntry.title}”
+                </h2>
+
+                {/* Scene Narrative */}
+                <div className={`space-y-4 font-reading-sans relative z-10 ${getFontSizeClass()} ${
+                  isLight ? "text-stone-800" : "text-stone-200"
+                }`}>
+                  {currentEntry.scene.split('\n\n').map((paragraph, pIdx) => (
+                    <p key={pIdx} className="leading-relaxed whitespace-pre-line">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+
+                {/* Consequence reaction */}
+                {(currentEntry.chosenOptionText || currentEntry.chosenReaction) && (
+                  <div className="p-4 sm:p-5 rounded-2xl border border-red-800/40 bg-red-950/25 relative z-10 space-y-2">
+                    {currentEntry.chosenOptionText && (
+                      <div className="text-xs sm:text-sm font-bold font-narrative-serif text-red-400 flex items-center gap-1.5">
+                        <span className="seal-stamp-box px-1.5 py-0.2 text-[10px]">决断</span>
+                        <span>{currentEntry.chosenOptionText}</span>
+                      </div>
+                    )}
+                    {currentEntry.chosenReaction && (
+                      <p className="text-xs sm:text-sm italic font-reading-sans text-amber-100/90 leading-relaxed">
+                        “{currentEntry.chosenReaction}”
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Monumental Tribute Quote */}
+                <div className="p-4 sm:p-5 rounded-2xl border border-amber-500/30 bg-amber-950/15 text-center relative z-10">
+                  <p className="text-sm sm:text-base font-narrative-serif italic text-amber-200/90 leading-relaxed">
+                    {tragedyTribute}
+                  </p>
+                </div>
+
+                {/* Action: Seal and enter Lifetime Archive */}
+                <div className="pt-3 relative z-10">
+                  <button
+                    onClick={() => {
+                      setMortalityAcknowledged(true);
+                      try {
+                        confetti({ particleCount: 65, spread: 75, origin: { y: 0.6 } });
+                      } catch {}
+                    }}
+                    className="w-full py-4.5 px-6 rounded-2xl bg-gradient-to-r from-red-800 via-red-700 to-amber-900 hover:from-red-700 hover:to-amber-800 text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 shadow-2xl active:scale-[0.99] transition-all font-narrative-serif tracking-widest border border-red-500/40 group cursor-pointer"
+                  >
+                    <div className="seal-stamp-box px-2 py-0.5 text-xs text-white border-white/80">印讫</div>
+                    <span>盖上生平朱砂大印 · 步入终生生平档案</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    <span className="text-[11px] font-normal opacity-75 hidden sm:inline ml-1 font-mono-num">
+                      (按空格 Space 盖印)
+                    </span>
+                  </button>
+                </div>
+              </div>
+            );
+          })()
         ) : (
           /* =============================================================== */
           /* VIEW B: 聚焦单卡剧场 (当前岁月 · 宣纸黑曜双材质与巨型暗印)         */
@@ -2329,18 +2531,24 @@ ${logEntries
             {/* INTERACTIVE DILEMMA CHOICES (命运对决张力 · 鲜明立意光晕)         */}
             {/* ============================================================= */}
             {isWaitingCurrentChoice && currentNode.choices && (
-              <div className={`mt-5 p-4 sm:p-6 rounded-2xl border space-y-4 relative z-10 ${
-                isLight ? "bg-amber-50/50 border-amber-300/70" : "bg-[#141724]/90 border-[#D4A359]/40"
+              <div className={`mt-5 p-5 sm:p-7 rounded-2xl border space-y-4 relative z-10 transition-all ${
+                currentNode.type === 'destiny'
+                  ? isLight
+                    ? "bg-gradient-to-b from-amber-50/90 via-amber-100/40 to-stone-50 border-2 border-amber-600/60 shadow-xl shadow-amber-950/10 animate-destiny-pulse"
+                    : "bg-gradient-to-b from-[#18141F]/95 via-[#120F1A]/95 to-[#0B0912] border-2 border-[#D4A359]/70 shadow-2xl shadow-black animate-destiny-pulse"
+                  : isLight
+                  ? "bg-amber-50/50 border-amber-300/70"
+                  : "bg-[#141724]/90 border-[#D4A359]/40"
               }`}>
                 {/* Prompt Header */}
                 <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     <span className="text-xs font-bold text-[#D4A359] font-narrative-serif flex items-center gap-1.5">
                       {currentNode.type === 'destiny' ? (
-                        <>
-                          <Scale className="w-3.5 h-3.5 text-amber-500" />
-                          天命定夺 · 时代风云 · 第 {currentAge} 岁
-                        </>
+                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border bg-amber-500/15 border-amber-500/35 text-amber-400">
+                          <Scale className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                          <span>天命定夺 · 历史狂澜避无可避 · 第 {currentAge} 岁</span>
+                        </div>
                       ) : (
                         <>
                           <Sparkles className="w-3.5 h-3.5" />
@@ -2348,15 +2556,20 @@ ${logEntries
                         </>
                       )}
                     </span>
-                    <h3 className={`text-sm sm:text-base font-bold font-narrative-serif ${
+                    <h3 className={`text-sm sm:text-base font-extrabold font-narrative-serif ${
                       isLight ? "text-stone-900" : "text-stone-100"
                     }`}>
                       {currentNode.type === 'destiny'
-                        ? "面对命运的巨浪与时代的风暴，避无可避："
+                        ? "时代巨浪迎面拍下，不可抗力之下你唯有迎难定夺："
                         : "站在人生的十字路口，你需要做出决断："}
                     </h3>
+                    {currentNode.type === 'destiny' && (
+                      <p className="text-xs text-stone-500 dark:text-stone-400 font-reading-sans italic">
+                        “时代的一粒沙，落在个人头上便是一座山。不可抗力降临，每个选择皆是一生的重量。”
+                      </p>
+                    )}
                   </div>
-                  <span className="hidden sm:inline-block text-[11px] text-stone-400 font-mono-num">
+                  <span className="hidden sm:inline-block text-[11px] text-stone-400 font-mono-num shrink-0 ml-3">
                     按 1 / 2 / 3 键选定
                   </span>
                 </div>
@@ -2369,8 +2582,12 @@ ${logEntries
                       <button
                         key={cIdx}
                         onClick={() => handleSelectChoice(choice)}
-                        className={`p-4 sm:p-4.5 rounded-xl border text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between ${
-                          p.archetype === 'merit'
+                        className={`p-4 sm:p-5 rounded-xl border text-left transition-all active:scale-[0.98] group shadow-sm flex items-start justify-between cursor-pointer ${
+                          currentNode.type === 'destiny'
+                            ? isLight
+                              ? "border-amber-400/80 bg-white hover:border-amber-600 hover:bg-amber-50/70 text-stone-900 shadow-amber-950/5"
+                              : "border-[#D4A359]/40 bg-[#1A1624] hover:border-[#D4A359] hover:bg-[#221D30] text-stone-100 shadow-black/40"
+                            : p.archetype === 'merit'
                             ? isLight
                               ? "border-amber-300 bg-white hover:border-amber-500 hover:bg-amber-50/50 text-stone-900"
                               : "border-amber-500/30 bg-[#1A1D2B] hover:border-amber-400 hover:bg-amber-950/20 text-stone-100 shadow-amber-950/10"
@@ -2469,18 +2686,21 @@ ${logEntries
             {/* SEALED CHOICE CONSEQUENCE FEEDBACK (朱砂印讫动效仪式)             */}
             {/* ============================================================= */}
             {currentEntry.chosenOptionText && (
-              <div className={`p-4 sm:p-5 rounded-2xl border relative overflow-hidden transition-all duration-300 z-10 ${
+              <div className={`p-4 sm:p-5 rounded-2xl border relative overflow-hidden transition-all duration-300 z-10 flex items-center justify-between gap-4 ${
                 isLight ? "bg-red-50/70 border-red-300/80 text-stone-900" : "bg-red-950/20 border-red-800/40 text-stone-100"
               }`}>
                 {/* Background Seal Watermark */}
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-5xl font-serif text-red-600/10 select-none pointer-events-none font-bold rotate-12">
-                  印
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-6xl font-serif text-red-600/10 select-none pointer-events-none font-black rotate-12">
+                  印讫
                 </div>
-                <div className="relative z-10 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+                <div className="relative z-10 space-y-1.5 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
                     <span className="text-xs font-bold font-narrative-serif text-red-500 tracking-wider">
-                      【朱砂印讫 · {currentEntry.chosenOptionText}】
+                      【朱砂印讫 · 命运定分】
+                    </span>
+                    <span className="text-xs font-semibold font-narrative-serif text-stone-800 dark:text-stone-200">
+                      {currentEntry.chosenOptionText}
                     </span>
                   </div>
                   {currentEntry.chosenReaction && (
@@ -2490,6 +2710,11 @@ ${logEntries
                       “{currentEntry.chosenReaction}”
                     </p>
                   )}
+                </div>
+
+                {/* Classical Square Cinnabar Seal Stamp */}
+                <div className="seal-stamp-box w-12 h-12 rounded-sm flex items-center justify-center text-xs font-black rotate-3 shrink-0 animate-stamp-press animate-ink-bleed select-none">
+                  印讫
                 </div>
               </div>
             )}
