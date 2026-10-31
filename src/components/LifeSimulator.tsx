@@ -1514,6 +1514,27 @@ ${logEntries
   // VIEW 2: 3-COLUMN COCKPIT INTERACTIVE SIMULATION
   // =========================================================================
 
+  const getNextStepLabel = () => {
+    if (!gaokaoCalc && (currentNode?.age === 17 || currentAge === 17)) {
+      return "十八岁 · 高考放榜与成人分流";
+    }
+    const nextNode = timeline[timelineIndex + 1];
+    if (nextNode) {
+      if (nextNode.age === 18 && !gaokaoCalc) {
+        return "十八岁 · 高考放榜与成人分流";
+      }
+      const cleanStage = nextNode.stageName ? nextNode.stageName.split('·')[0].trim() : '';
+      if (nextNode.age > currentAge + 1) {
+        return `迈向 ${nextNode.age} 岁 · ${cleanStage || nextNode.title || '新征途'}`;
+      }
+      return `迈入下一岁 · ${currentAge + 1} 岁`;
+    }
+    if (currentNode?.age === 27 && !logEntries.some((e) => e.age === 63)) {
+      return "迈向三十岁 · 而立之年";
+    }
+    return "从容启程，迈向下一岁";
+  };
+
   const getChoicePresentation = (choice: LifeChoice, cIdx: number) => {
     let stance = choice.stanceBadge || '';
     let cleanText = choice.text;
@@ -2192,31 +2213,64 @@ ${logEntries
               </div>
             )}
             {logEntries.map((entry, idx) => {
-              const isWaitingCurrentChoice = idx === logEntries.length - 1 && waitingForChoice;
+              const isLatestActiveCard = idx === logEntries.length - 1;
+              const isWaitingCurrentChoice = isLatestActiveCard && waitingForChoice;
+              const isRetired = logEntries.some((e) => e.age === 63);
 
               return (
               <div
                 key={entry.id + idx}
+                ref={isWaitingCurrentChoice ? choiceCardRef : undefined}
                 className={`border rounded-2xl p-5 sm:p-6 shadow-sm space-y-3.5 transition-all animate-year-enter ${
                   isWaitingCurrentChoice
                     ? isLight
-                      ? "bg-white border-amber-400 ring-2 ring-amber-400/50 text-stone-900 shadow-amber-900/10"
-                      : "bg-[#141622] border-amber-500/60 ring-2 ring-amber-500/30 text-stone-100 shadow-stone-950/80"
+                      ? "bg-white border-amber-400 ring-2 ring-amber-400/50 text-stone-900 shadow-xl shadow-amber-900/10"
+                      : "bg-[#141624] border-amber-500/70 ring-2 ring-amber-500/40 text-stone-100 shadow-2xl shadow-black/80"
+                    : isLatestActiveCard
+                    ? isLight
+                      ? "bg-white border-amber-400/80 ring-2 ring-amber-400/25 text-stone-900 shadow-lg shadow-amber-900/5"
+                      : "bg-[#131520] border-amber-500/50 ring-2 ring-amber-500/25 text-stone-100 shadow-xl shadow-black/60"
                     : isLight
-                    ? "bg-white border-stone-200/90 hover:border-stone-300 text-stone-900 shadow-stone-200/50"
-                    : "bg-[#12141C] border-white/[0.07] hover:border-white/[0.12] text-stone-100"
+                    ? "bg-white/95 border-stone-200/90 hover:border-stone-300 text-stone-800 opacity-80 hover:opacity-100 transition-opacity"
+                    : "bg-[#10121A] border-white/[0.06] hover:border-white/[0.12] text-stone-200 opacity-80 hover:opacity-100 transition-opacity"
                 }`}
               >
                 {/* Entry Header */}
                 <div className={`flex items-center justify-between text-xs sm:text-[14px] border-b pb-2.5 font-mono-num ${
                   isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
                 }`}>
-                  <span className={`font-semibold tracking-[0.06em] ${isLight ? "text-amber-800 font-bold" : "text-[#D4A359]"}`}>
-                    [{entry.age}岁 · {entry.year}年]
-                  </span>
-                  <span className={`font-reading-sans tracking-[0.05em] ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
-                    {entry.stageName}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-semibold tracking-[0.06em] ${isLight ? "text-amber-800 font-bold" : "text-[#D4A359]"}`}>
+                      [{entry.age}岁 · {entry.year}年]
+                    </span>
+                    <span className={`font-reading-sans tracking-[0.05em] ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>
+                      {entry.stageName}
+                    </span>
+                  </div>
+
+                  {/* Status Indicator Badge */}
+                  <div>
+                    {isWaitingCurrentChoice ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500 text-stone-950 flex items-center gap-1.5 animate-pulse shadow-sm">
+                        <Compass className="w-3.5 h-3.5 animate-spin-slow shrink-0" />
+                        <span>命运关隘 · 等待抉择</span>
+                      </span>
+                    ) : isLatestActiveCard && !isRetired ? (
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium border flex items-center gap-1.5 ${
+                        isLight
+                          ? "bg-amber-100/80 text-amber-900 border-amber-300"
+                          : "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                      }`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping shrink-0" />
+                        <span>当下纪事</span>
+                      </span>
+                    ) : (
+                      <span className="text-[11px] opacity-60 flex items-center gap-1 font-mono">
+                        <Check className="w-3 h-3 text-stone-400" />
+                        <span>已载入生平</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Entry Title */}
@@ -2231,25 +2285,131 @@ ${logEntries
                   {entry.scene}
                 </p>
 
-                {/* If actively waiting for choice on this current card */}
-                {isWaitingCurrentChoice && (
-                  <button
-                    type="button"
-                    onClick={() => choiceCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-                    className={`w-full mt-2 py-2 px-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-between transition-all active:scale-[0.99] ${
-                      isLight
-                        ? "bg-amber-100 hover:bg-amber-200/80 text-amber-950 border-amber-300 shadow-sm"
-                        : "bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40 shadow-sm"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Compass className="w-4 h-4 text-amber-500 animate-spin-slow shrink-0" />
-                      <span>正在等候你在此关隘做出人生抉择...</span>
-                    </span>
-                    <span className="text-xs font-mono underline flex items-center gap-1 font-bold">
-                      前往下方选项 ↓
-                    </span>
-                  </button>
+                {/* 🌟 核心关隘抉择区：直接内嵌在纪事卡片正下方，彻底消灭叙事与选项的割裂感 🌟 */}
+                {isWaitingCurrentChoice && currentNode.choices && (
+                  <div className="mt-4 pt-3.5 space-y-3 border-t border-amber-500/25 animate-year-enter">
+                    {/* Prompt Divider */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className={`text-xs sm:text-[13px] font-bold flex items-center gap-1.5 ${
+                        isLight ? "text-amber-950 font-bold" : "text-amber-400"
+                      }`}>
+                        <Compass className="w-4 h-4 text-amber-500 animate-spin-slow shrink-0" />
+                        <span className="tracking-wide">命运之秤已在你手中 · 请做出决断：</span>
+                      </div>
+                      {isAutoPlaying && (
+                        <span className={`text-[11px] font-normal flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
+                          isLight
+                            ? "bg-amber-100/70 text-amber-900 border-amber-300"
+                            : "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isLight ? "bg-amber-600" : "bg-amber-400"}`} />
+                          自动流转挂起中 · 选定后自动继续
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Choices Grid */}
+                    <div className="grid grid-cols-1 gap-3 pt-1">
+                      {currentNode.choices.map((choice, cIdx) => {
+                        const p = getChoicePresentation(choice, cIdx);
+
+                        return (
+                          <button
+                            key={cIdx}
+                            type="button"
+                            onClick={() => handleSelectChoice(choice)}
+                            className={`p-4 sm:p-4.5 rounded-xl border text-left transition-all duration-150 active:scale-[0.99] group shadow-sm flex flex-col gap-2 relative ${
+                              isLight
+                                ? "bg-amber-50/50 hover:bg-amber-100/80 border-amber-200/90 hover:border-amber-400 text-stone-900"
+                                : "bg-[#181B28] hover:bg-[#202436] border-amber-500/20 hover:border-amber-500/50 text-stone-100"
+                            }`}
+                          >
+                            {/* Top row: Number + Stance Badge + TradeOff Pills */}
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className={`w-5 h-5 rounded-md border font-mono text-xs font-bold flex items-center justify-center shrink-0 ${
+                                  isLight
+                                    ? "bg-white text-stone-800 border-amber-300"
+                                    : "bg-stone-800 text-stone-200 border-stone-700"
+                                }`}>
+                                  {cIdx + 1}
+                                </span>
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold border tracking-wider ${
+                                  isLight
+                                    ? "bg-amber-100 text-amber-950 border-amber-300"
+                                    : "bg-amber-500/20 text-amber-300 border-amber-500/35"
+                                }`}>
+                                  【{p.stance}】
+                                </span>
+                              </div>
+
+                              {/* Trade-off Lens Pills */}
+                              <div className="flex flex-wrap items-center gap-1.5 ml-auto">
+                                {p.tradeOffs.map((to, toIdx) => {
+                                  let pillColor = isLight
+                                    ? "bg-stone-100 text-stone-700 border-stone-200"
+                                    : "bg-stone-800/80 text-stone-300 border-stone-700/60";
+                                  if (to.tone === 'danger') {
+                                    pillColor = isLight
+                                      ? "bg-rose-50 text-rose-800 border-rose-200"
+                                      : "bg-rose-950/40 text-rose-300 border-rose-800/40";
+                                  } else if (to.tone === 'cash') {
+                                    pillColor = isLight
+                                      ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                      : "bg-emerald-950/40 text-emerald-300 border-emerald-800/40";
+                                  }
+                                  return (
+                                    <span
+                                      key={toIdx}
+                                      className={`text-[11px] font-medium px-2 py-0.5 rounded-full border tracking-[0.03em] ${pillColor}`}
+                                    >
+                                      {to.label}
+                                    </span>
+                                  );
+                                })}
+                                <span className={`hidden sm:inline-block text-[11px] font-mono ml-0.5 opacity-60 ${
+                                  isLight ? "text-stone-500" : "text-stone-400"
+                                }`}>
+                                  [{cIdx + 1}]
+                                </span>
+                                <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-500 transition-transform group-hover:translate-x-1 shrink-0" />
+                              </div>
+                            </div>
+
+                            {/* Main Action Text */}
+                            <div
+                              style={{
+                                fontSize: 'var(--choice-title-size, 16px)',
+                                letterSpacing: 'var(--choice-letter-spacing, 0.08em)',
+                                lineHeight: '1.65'
+                              }}
+                              className={`font-semibold ${
+                                isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
+                              }`}
+                            >
+                              {p.cleanText}
+                            </div>
+
+                            {/* Detail text */}
+                            {p.detail && (
+                              <div
+                                style={{
+                                  fontSize: 'var(--choice-desc-size, 13.5px)',
+                                  letterSpacing: 'var(--choice-desc-letter-spacing, 0.06em)',
+                                  lineHeight: '1.75'
+                                }}
+                                className={`line-clamp-3 pt-0.5 ${
+                                  isLight ? "text-stone-600" : "text-stone-400"
+                                }`}
+                              >
+                                “{p.detail}”
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
 
                 {/* If Stat Delta present */}
@@ -2333,24 +2493,36 @@ ${logEntries
                   </div>
                 )}
 
-                {/* If a choice was made */}
+                {/* If a choice was made: Gilded Destiny Seal */}
                 {entry.chosenOptionText && (
-                  <div className={`mt-3 pt-3 border-t p-3.5 sm:p-4 rounded-xl space-y-2 ${
+                  <div className={`mt-3 pt-3 border-t p-3.5 sm:p-4 rounded-xl space-y-2.5 ${
                     isLight
-                      ? "bg-amber-50/70 border border-amber-200/80 text-stone-800"
-                      : "border-white/[0.06] bg-[#161822] text-stone-100"
+                      ? "bg-amber-50/80 border border-amber-200 text-stone-800"
+                      : "border-amber-500/30 bg-[#161824] text-stone-100"
                   }`}>
-                    <div className={`text-sm sm:text-[15px] font-semibold flex items-center gap-1.5 font-reading-sans tracking-[0.05em] ${
-                      isLight ? "text-amber-900 font-bold" : "text-[#D4A359]"
-                    }`}>
-                      <span>抉择印记：</span>
-                      <span>{entry.chosenOptionText}</span>
-                    </div>
-                    {entry.chosenReaction && (
-                      <div className={`text-[13.5px] sm:text-[14.5px] leading-relaxed pl-3.5 border-l-2 font-reading-sans tracking-[0.055em] ${
-                        isLight ? "text-stone-700 border-amber-500/60 font-normal" : "text-stone-300 border-[#D4A359]/40"
+                    <div className="flex items-center justify-between pb-1.5 border-b border-amber-500/20">
+                      <div className={`text-xs font-bold flex items-center gap-1.5 tracking-wider ${
+                        isLight ? "text-amber-900" : "text-amber-400"
                       }`}>
-                        {entry.chosenReaction}
+                        <Check className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>【宿命抉择已落定】</span>
+                      </div>
+                      <span className={`text-[11px] font-mono ${isLight ? "text-stone-500" : "text-stone-400"}`}>
+                        因果已烙印于此生
+                      </span>
+                    </div>
+
+                    <div className={`text-sm sm:text-[15px] font-bold font-reading-sans tracking-[0.04em] ${
+                      isLight ? "text-amber-950" : "text-amber-200"
+                    }`}>
+                      {entry.chosenOptionText}
+                    </div>
+
+                    {entry.chosenReaction && (
+                      <div className={`text-[13px] sm:text-[14px] leading-relaxed pl-3.5 border-l-2 font-reading-sans tracking-[0.04em] italic ${
+                        isLight ? "text-stone-700 border-amber-500 font-normal" : "text-stone-300 border-amber-400"
+                      }`}>
+                        “{entry.chosenReaction}”
                       </div>
                     )}
                   </div>
@@ -2365,6 +2537,38 @@ ${logEntries
                   }`}>
                     <Sparkles className={`w-4 h-4 shrink-0 mt-0.5 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
                     <span>体悟：{entry.reflection}</span>
+                  </div>
+                )}
+
+                {/* ★★★ 视线终点 · 岁月启程主推板 (Inline Primary Next Action) ★★★ */}
+                {isLatestActiveCard && !waitingForChoice && !isRetired && !showGaokaoModal && (
+                  <div className={`mt-4 pt-3.5 border-t border-dashed flex flex-col sm:flex-row items-center justify-between gap-3 ${
+                    isLight ? "border-amber-200" : "border-white/[0.12]"
+                  }`}>
+                    <div className={`text-xs flex items-center gap-2 ${
+                      isLight ? "text-stone-600 font-medium" : "text-stone-400"
+                    }`}>
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>
+                        {entry.chosenOptionText
+                          ? "抉择已定，此间因果将延展至往后岁月"
+                          : "此岁历程已收录，新的纪元徐徐展开"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <span className="hidden md:inline-block text-[11px] font-mono opacity-60">
+                        [Space]
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleNextNaturalYear}
+                        className="w-full sm:w-auto px-6 sm:px-8 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/20 hover:shadow-lg active:scale-[0.98] group font-narrative-serif tracking-wide"
+                      >
+                        <span>{getNextStepLabel()}</span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -2650,192 +2854,6 @@ ${logEntries
               );
             })()}
 
-            {/* Active Choice Card (if waiting for choice) */}
-            {waitingForChoice && currentNode.choices && (
-              <div
-                ref={choiceCardRef}
-                className={`rounded-2xl p-4 sm:p-6 shadow-xl space-y-4 animate-year-enter transition-all border ${
-                  isLight
-                    ? "bg-white border-amber-300 text-stone-900 shadow-amber-900/10 ring-2 ring-amber-300/60"
-                    : "bg-[#11131B] border-amber-500/50 text-stone-100 shadow-stone-950/80 ring-2 ring-amber-500/30"
-                }`}
-              >
-                {/* 1. Header Bar with Destiny Marker */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-stone-200 dark:border-white/[0.08]">
-                  <div className={`flex items-center gap-2 text-sm sm:text-base font-bold ${isLight ? "text-amber-950" : "text-amber-400"}`}>
-                    <Compass className="w-5 h-5 text-amber-500 shrink-0 animate-spin-slow" />
-                    <span className="tracking-[0.06em]">宿命抉择时刻 · 请斟酌你的人生航道</span>
-                  </div>
-                  {isAutoPlaying && (
-                    <span className={`text-xs font-normal flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border ${
-                      isLight
-                        ? "bg-amber-100/70 text-amber-900 border-amber-300"
-                        : "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isLight ? "bg-amber-600" : "bg-amber-400"}`} />
-                      自动流转挂起中 · 选定后自动继续
-                    </span>
-                  )}
-                </div>
-
-                {/* 🌟 2. 核心剧情与当前抉择境遇：直观呈现这一岁发生的故事，彻底解决“不知道这一岁描述在哪”的问题！ 🌟 */}
-                <div className={`p-4 sm:p-5 rounded-xl border relative overflow-hidden transition-all shadow-sm ${
-                  isLight
-                    ? "bg-gradient-to-br from-amber-50/90 via-stone-50 to-amber-50/40 border-amber-200/90 text-stone-900"
-                    : "bg-gradient-to-br from-[#171924] via-[#13151F] to-[#10121A] border-amber-500/30 text-stone-100"
-                }`}>
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2 font-mono-num">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-bold border tracking-wider ${
-                        isLight
-                          ? "bg-amber-100 text-amber-950 border-amber-300"
-                          : "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                      }`}>
-                        【{currentNode.age}岁 · {birthYear + currentNode.age}年】
-                      </span>
-                      <span className={`text-xs sm:text-[13px] font-medium tracking-wide ${
-                        isLight ? "text-stone-700 font-semibold" : "text-stone-300"
-                      }`}>
-                        {currentNode.stageName}
-                      </span>
-                    </div>
-                    <span className={`text-xs font-semibold flex items-center gap-1.5 ${
-                      isLight ? "text-amber-800" : "text-amber-400"
-                    }`}>
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>重大关隘情境</span>
-                    </span>
-                  </div>
-
-                  <h3 className={`text-base sm:text-[19px] font-bold font-narrative-serif tracking-[0.03em] leading-snug mb-2.5 ${
-                    isLight ? "text-stone-900" : "text-amber-200"
-                  }`}>
-                    {currentNode.title}
-                  </h3>
-
-                  <p className={`text-sm sm:text-[15px] font-reading-sans leading-relaxed whitespace-pre-line pl-3.5 border-l-2 ${
-                    isLight
-                      ? "text-stone-800 border-amber-500/70 font-normal"
-                      : "text-stone-200 border-amber-500/50"
-                  }`}>
-                    {currentNode.scene}
-                  </p>
-                </div>
-
-                {/* 3. Choice Guidance Divider */}
-                <div className="flex items-center gap-3 pt-1">
-                  <div className={`h-px flex-1 ${isLight ? "bg-amber-200" : "bg-amber-500/20"}`} />
-                  <span className={`text-xs sm:text-[13px] font-semibold tracking-wider flex items-center gap-1.5 ${
-                    isLight ? "text-amber-900 font-bold" : "text-amber-400"
-                  }`}>
-                    <Compass className="w-4 h-4 text-amber-500" />
-                    <span>命运之秤已在你手中 · 请做出决断：</span>
-                  </span>
-                  <div className={`h-px flex-1 ${isLight ? "bg-amber-200" : "bg-amber-500/20"}`} />
-                </div>
-
-                <div className="grid grid-cols-1 gap-3.5 sm:gap-4 pt-1">
-                  {currentNode.choices.map((choice, cIdx) => {
-                    const p = getChoicePresentation(choice, cIdx);
-
-                    return (
-                      <button
-                        key={cIdx}
-                        onClick={() => handleSelectChoice(choice)}
-                        className={`p-4 sm:p-5 rounded-xl border text-left transition-all duration-150 active:scale-[0.99] group shadow-sm flex flex-col gap-2.5 sm:gap-3 relative ${
-                          isLight
-                            ? "bg-white hover:bg-amber-50/40 border-stone-200 hover:border-amber-400 text-stone-900"
-                            : "bg-[#161824] hover:bg-[#1D2030] border-stone-800 hover:border-amber-500/50 text-stone-100"
-                        }`}
-                      >
-                        {/* Top row: Number + Stance Badge + TradeOff Pills */}
-                        <div className="flex flex-wrap items-center justify-between gap-2.5">
-                          <div className="flex items-center gap-2.5">
-                            <span className={`w-6 h-6 rounded-md border font-mono text-xs sm:text-sm font-bold flex items-center justify-center shrink-0 ${
-                              isLight
-                                ? "bg-stone-100 text-stone-800 border-stone-300"
-                                : "bg-stone-800 text-stone-200 border-stone-700"
-                            }`}>
-                              {cIdx + 1}
-                            </span>
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-semibold border tracking-[0.06em] ${
-                              isLight
-                                ? "bg-amber-50 text-amber-900 border-amber-200"
-                                : "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                            }`}>
-                              <span>【{p.stance}】</span>
-                            </span>
-                          </div>
-
-                          {/* Trade-off Lens Pills */}
-                          <div className="flex flex-wrap items-center gap-1.5 ml-auto">
-                            {p.tradeOffs.map((to, toIdx) => {
-                              let pillColor = isLight
-                                ? "bg-stone-100 text-stone-700 border-stone-200"
-                                : "bg-stone-800/80 text-stone-300 border-stone-700/60";
-                              if (to.tone === 'danger') {
-                                pillColor = isLight
-                                  ? "bg-rose-50 text-rose-800 border-rose-200"
-                                  : "bg-rose-950/40 text-rose-300 border-rose-800/40";
-                              } else if (to.tone === 'cash') {
-                                pillColor = isLight
-                                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                                  : "bg-emerald-950/40 text-emerald-300 border-emerald-800/40";
-                              }
-                              return (
-                                <span
-                                  key={toIdx}
-                                  className={`text-[11.5px] sm:text-xs font-medium px-2.5 py-0.5 rounded-full border tracking-[0.04em] ${pillColor}`}
-                                >
-                                  {to.label}
-                                </span>
-                              );
-                            })}
-                            <span className={`hidden sm:inline-block text-xs font-mono ml-1 opacity-60 ${
-                              isLight ? "text-stone-500" : "text-stone-400"
-                            }`}>
-                              [{cIdx + 1}]
-                            </span>
-                            <ChevronRight className="w-4 h-4 text-stone-400 group-hover:text-amber-500 transition-transform group-hover:translate-x-1 shrink-0 ml-1" />
-                          </div>
-                        </div>
-
-                        {/* Main Action Text - clear, upright, prominent font size, generous letter-spacing & line-height */}
-                        <div
-                          style={{
-                            fontSize: 'var(--choice-title-size, 17px)',
-                            letterSpacing: 'var(--choice-letter-spacing, 0.09em)',
-                            lineHeight: '1.76'
-                          }}
-                          className={`font-semibold ${
-                            isLight ? "text-stone-900 group-hover:text-amber-950" : "text-stone-100 group-hover:text-white"
-                          }`}
-                        >
-                          {p.cleanText}
-                        </div>
-
-                        {/* Detail text - clean, upright, generous letter-spacing & line-height */}
-                        {p.detail && (
-                          <div
-                            style={{
-                              fontSize: 'var(--choice-desc-size, 14px)',
-                              letterSpacing: 'var(--choice-desc-letter-spacing, 0.08em)',
-                              lineHeight: '1.82'
-                            }}
-                            className={`line-clamp-3 pt-0.5 ${
-                              isLight ? "text-stone-600" : "text-stone-400"
-                            }`}
-                          >
-                            “{p.detail}”
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Bottom Sentinel */}
             <div ref={feedBottomRef} className="h-2" />
             </div>
@@ -2955,25 +2973,13 @@ ${logEntries
                     </button>
                   </div>
 
-                  {/* ★★★ CENTERED PRIMARY STEP BUTTON (绝对居中 / 视觉焦点) ★★★ */}
+                  {/* ★★★ CENTERED COMPANION STEP BUTTON (与卡片内主推板双锚定协同) ★★★ */}
                   <div className="sm:absolute sm:left-1/2 sm:-translate-x-1/2 flex items-center justify-center w-full sm:w-auto z-10 py-1 sm:py-0">
                     <button
                       onClick={handleNextNaturalYear}
-                      className="w-full sm:w-auto px-8 sm:px-10 py-3 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30 hover:shadow-lg active:scale-[0.98] font-narrative-serif tracking-[0.06em]"
+                      className="w-full sm:w-auto px-7 sm:px-9 py-2.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30 hover:shadow-lg active:scale-[0.98] font-narrative-serif tracking-[0.06em]"
                     >
-                      <span>
-                        {!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)
-                          ? "十八岁 · 高考放榜与成人分流"
-                          : timeline[timelineIndex + 1]
-                          ? timeline[timelineIndex + 1].age === 18
-                            ? "十八岁 · 高考放榜与成人分流"
-                            : timeline[timelineIndex + 1].age > currentAge + 1
-                            ? `迈向${timeline[timelineIndex + 1].age}岁（${timeline[timelineIndex + 1].title}）`
-                            : `迈入下一岁（${currentAge + 1}岁）`
-                          : currentNode.age === 27 && !logEntries.some((e) => e.age === 63)
-                          ? "迈向三十岁（而立之年）"
-                          : "继续前行"}
-                      </span>
+                      <span>{getNextStepLabel()}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
