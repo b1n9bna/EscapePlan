@@ -2752,11 +2752,11 @@ ${logEntries
           {/* Auto-play Engine */}
           <button
             onClick={() => {
-              if (!waitingForChoice && !showGaokaoModal && !isRetired) {
+              if (!waitingForChoice && !showGaokaoModal && !isRetired && !isShowingMortalityClimax) {
                 setIsAutoPlaying((prev) => !prev);
               }
             }}
-            disabled={waitingForChoice || showGaokaoModal || isRetired}
+            disabled={waitingForChoice || showGaokaoModal || isRetired || isShowingMortalityClimax}
             className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
               isAutoPlaying
                 ? "bg-amber-500 text-stone-950 border-amber-400 font-bold shadow-sm"
@@ -2795,7 +2795,12 @@ ${logEntries
           <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
 
           {/* Quick Skip or Status prompt */}
-          {isWaitingCurrentChoice ? (
+          {isShowingMortalityClimax ? (
+            <span className="text-red-400 font-bold text-xs flex items-center gap-1.5 animate-pulse font-narrative-serif px-1">
+              <span className="seal-stamp-box px-1.5 py-0.2 text-[10px]">绝唱</span>
+              <span>请盖上生平朱砂大印</span>
+            </span>
+          ) : isWaitingCurrentChoice ? (
             <span className="text-amber-500 font-semibold text-xs flex items-center gap-1 animate-pulse font-narrative-serif px-1">
               <Sparkles className="w-3.5 h-3.5 shrink-0" />
               <span>请定夺去向 (1/2/3)</span>

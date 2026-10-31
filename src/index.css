@@ -4,9 +4,10 @@
 
 :root {
   color-scheme: dark;
-  /* 现代高清晰度抗疲劳无衬线字体栈：彻底消除宋体毛刺、散光重影与视疲劳 */
+  /* 现代高清晰度抗疲劳无衬线字体栈（长篇生平沉浸阅读，清晰锐利） */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
-  --font-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  /* 人文典籍明朝/宋体高阶衬线栈（章节名、历史天命、生平档案、金石印章、终局绝唱） */
+  --font-serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "FZShuSong-Z01S", "Georgia", serif;
   --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -19,10 +20,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 人文阅读统一采用清晰无衬线字体与舒朗字距 */
+/* 人文叙事、纪年章节与金石印章排版：采用高雅典籍宋体与舒朗字距 */
 .font-narrative-serif {
-  font-family: var(--font-sans);
-  letter-spacing: 0.04em;
+  font-family: var(--font-serif);
+  letter-spacing: 0.045em;
 }
 
 /* 舒适阅读正文 */
@@ -116,6 +117,86 @@ body {
 
 .animate-year-enter {
   animation: yearCardEnter 0.22s ease-out forwards;
+}
+
+/* 朱砂金石印章微物理压盖动效 */
+@keyframes stampPress {
+  0% {
+    transform: scale(1.4) rotate(-5deg);
+    opacity: 0;
+    filter: blur(1.5px);
+  }
+  60% {
+    transform: scale(0.96) rotate(1deg);
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* 宣纸朱砂墨晕微扩散 */
+@keyframes inkBleed {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.65);
+  }
+  100% {
+    box-shadow: 0 0 20px 6px rgba(220, 38, 38, 0);
+  }
+}
+
+.animate-stamp-press {
+  animation: stampPress 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-ink-bleed {
+  animation: inkBleed 0.6s ease-out forwards;
+}
+
+/* 悲歌绝唱幕布呼吸微光与暗红唁墨沉浸感 */
+@keyframes elegiacAura {
+  0%, 100% {
+    box-shadow: inset 0 0 60px rgba(185, 28, 28, 0.15), 0 25px 60px -15px rgba(0, 0, 0, 0.9);
+  }
+  50% {
+    box-shadow: inset 0 0 100px rgba(185, 28, 28, 0.26), 0 25px 70px -10px rgba(120, 15, 25, 0.35);
+  }
+}
+
+.animate-elegiac-aura {
+  animation: elegiacAura 4s ease-in-out infinite;
+}
+
+/* 天命巨浪金石边框流光 */
+@keyframes destinyPulse {
+  0%, 100% {
+    border-color: rgba(212, 163, 89, 0.4);
+    box-shadow: 0 0 15px rgba(212, 163, 89, 0.12);
+  }
+  50% {
+    border-color: rgba(224, 178, 106, 0.85);
+    box-shadow: 0 0 28px rgba(212, 163, 89, 0.3);
+  }
+}
+
+.animate-destiny-pulse {
+  animation: destinyPulse 3.5s ease-in-out infinite;
+}
+
+/* 真实汉印双框与金石阴阳文印泥质感 */
+.seal-stamp-box {
+  border: 2px solid #DC2626;
+  outline: 1.5px solid rgba(220, 38, 38, 0.5);
+  outline-offset: -4px;
+  background-color: rgba(220, 38, 38, 0.08);
+  color: #DC2626;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 1px rgba(220, 38, 38, 0.4);
+  box-shadow: inset 0 0 8px rgba(220, 38, 38, 0.15);
 }
 
 /* Custom scrollbar */
