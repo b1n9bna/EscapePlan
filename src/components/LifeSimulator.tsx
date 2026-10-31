@@ -1705,33 +1705,61 @@ ${logEntries
 
   return (
     <div className={`h-[calc(100vh-64px)] flex flex-col font-reading-sans overflow-hidden transition-colors duration-300 relative select-none ${
-      isLight ? "bg-[#F7F5F0] text-stone-900" : "bg-[#0A0B0E] text-stone-100"
+      isLight ? "bg-[#FAF8F5] text-stone-900" : "bg-[#06070B] text-stone-100"
     }`}>
       {/* ================================================================= */}
-      {/* 1. TOP AMBIENT NAVIGATION BAR (顶部微光长廊与全局控制)                */}
+      {/* 1. UNIFIED HORIZON HUD (流光天际线 · 导航与微光长廊与生命态势融为一体)   */}
       {/* ================================================================= */}
-      <header className={`h-13 border-b px-3 sm:px-6 flex items-center justify-between shrink-0 text-xs transition-colors duration-200 z-20 ${
-        isLight ? "bg-white/95 border-stone-200 text-stone-700 shadow-2xs backdrop-blur-md" : "bg-[#0E1017]/95 border-white/[0.07] text-stone-300 backdrop-blur-md"
+      <header className={`h-15 sm:h-16 px-3 sm:px-6 flex items-center justify-between shrink-0 text-xs transition-colors duration-200 z-20 relative backdrop-blur-md ${
+        isLight ? "bg-white/85 text-stone-700 shadow-2xs" : "bg-[#0A0C14]/85 text-stone-300"
       }`}>
+        {/* Horizon 0~63 Lifeline Progress Track as Header Bottom Line */}
+        <div className={`absolute bottom-0 left-0 right-0 h-[2.5px] overflow-visible ${
+          isLight ? "bg-stone-200/60" : "bg-white/[0.06]"
+        }`}>
+          <div
+            className="h-full bg-gradient-to-r from-amber-500 via-[#D4A359] to-[#F3C87A] transition-all duration-300 relative shadow-[0_0_8px_rgba(212,163,89,0.5)]"
+            style={{ width: `${Math.min(100, Math.max(0, (currentAge / 63) * 100))}%` }}
+          >
+            {/* Glowing Head Pin */}
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-amber-400 ring-2 ring-white dark:ring-stone-900 shadow-md animate-pulse" />
+          </div>
+
+          {/* Milestone tick marks along bottom border */}
+          {[18, 21, 27, 35, 52].map((age) => {
+            const leftPct = (age / 63) * 100;
+            const isPassed = currentAge >= age;
+            return (
+              <span
+                key={age}
+                className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full pointer-events-none transition-all ${
+                  isPassed ? "bg-amber-400 scale-100" : isLight ? "bg-stone-300 scale-75" : "bg-stone-700 scale-75"
+                }`}
+                style={{ left: `${leftPct}%` }}
+              />
+            );
+          })}
+        </div>
+
         {/* Left: Brand & Identity Dossier Pill */}
         <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#D4A359]/20 to-[#C29348]/10 border border-[#D4A359]/30 text-[#D4A359] font-bold shrink-0">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-[#D4A359]/20 to-[#C29348]/10 border border-[#D4A359]/30 text-[#D4A359] font-bold shrink-0">
             <Sparkles className="w-3.5 h-3.5" />
             <span className="font-narrative-serif tracking-wider text-[11px] sm:text-xs">十四亿分之一</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-1.5 text-[11px] font-reading-sans truncate">
-            <span className={`px-2 py-0.5 rounded border ${
-              isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-white/[0.04] border-white/[0.08] text-stone-300"
+          <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-reading-sans truncate">
+            <span className={`px-2 py-0.5 rounded-md border ${
+              isLight ? "bg-stone-100/80 border-stone-300/80 text-stone-700" : "bg-white/[0.04] border-white/[0.08] text-stone-300"
             }`}>
               {charData.family.province || charData.family.region.split('·')[0].trim()} · {charData.family.cityOrCounty}
             </span>
-            <span className={`px-2 py-0.5 rounded border ${
-              isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-white/[0.04] border-white/[0.08] text-stone-300"
+            <span className={`px-2 py-0.5 rounded-md border ${
+              isLight ? "bg-stone-100/80 border-stone-300/80 text-stone-700" : "bg-white/[0.04] border-white/[0.08] text-stone-300"
             }`}>
               {charData.gender}
             </span>
-            <span className={`px-2 py-0.5 rounded border ${
+            <span className={`px-2 py-0.5 rounded-md border ${
               isLight ? "bg-amber-50 border-amber-200 text-amber-900" : "bg-[#D4A359]/10 border-[#D4A359]/25 text-[#D4A359]"
             }`}>
               {charData.family.wealthTier}
@@ -1739,50 +1767,71 @@ ${logEntries
           </div>
         </div>
 
-        {/* Center: Current Year & Chapter */}
-        <div className="flex items-center gap-2">
-          <span className={`font-semibold flex items-center gap-1.5 font-narrative-serif text-xs sm:text-sm ${
-            isLight ? "text-stone-900" : "text-stone-100"
-          }`}>
-            <Calendar className="w-3.5 h-3.5 text-[#E0B26A]" />
-            公历 {birthYear + currentAge} 年 · {currentAge} 岁
-          </span>
-          <span className={`text-[11px] px-2 py-0.5 rounded font-narrative-serif border ${
-            isLight
-              ? "bg-stone-100 border-stone-200 text-stone-600"
-              : "bg-white/[0.04] border-white/[0.08] text-stone-400"
-          }`}>
-            {getChapterName(currentAge)}
-          </span>
+        {/* Center: Current Year & Integrated Vital Indicators */}
+        <div className="flex flex-col items-center justify-center gap-0.5">
+          <div className="flex items-center gap-2">
+            <span className={`font-semibold flex items-center gap-1.5 font-narrative-serif text-xs sm:text-sm ${
+              isLight ? "text-stone-900" : "text-stone-100"
+            }`}>
+              <Calendar className="w-3.5 h-3.5 text-[#E0B26A]" />
+              公历 {birthYear + currentAge} 年 · {currentAge} 岁
+            </span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded font-narrative-serif border ${
+              isLight
+                ? "bg-stone-100 border-stone-200 text-stone-600"
+                : "bg-white/[0.04] border-white/[0.08] text-stone-400"
+            }`}>
+              {getChapterName(currentAge)}
+            </span>
+          </div>
+
+          {/* Micro Ambient Vital Signs Ribbon */}
+          <div className="flex items-center gap-x-2.5 sm:gap-x-3.5 text-[10px] sm:text-[11px] font-mono-num text-stone-400">
+            <div className="flex items-center gap-1" title={`体魄 ${attrs.health}/100`}>
+              <HeartPulse className="w-3 h-3 text-rose-500" />
+              <span className="font-semibold text-stone-600 dark:text-stone-300">{attrs.health}</span>
+            </div>
+            <div className="flex items-center gap-1" title={`见识 ${attrs.cognition}/100`}>
+              <Brain className="w-3 h-3 text-sky-400" />
+              <span className="font-semibold text-stone-600 dark:text-stone-300">{attrs.cognition}</span>
+            </div>
+            <div className="flex items-center gap-1" title={`幸福 ${attrs.happiness}/100`}>
+              <Smile className="w-3 h-3 text-amber-400" />
+              <span className="font-semibold text-stone-600 dark:text-stone-300">{attrs.happiness}</span>
+            </div>
+            <div className="flex items-center gap-1" title={`人脉 ${attrs.social}/100`}>
+              <Users className="w-3 h-3 text-indigo-400" />
+              <span className="font-semibold text-stone-600 dark:text-stone-300">{attrs.social}</span>
+            </div>
+            <div className="flex items-center gap-1" title="个人当前现金">
+              <Coins className="w-3 h-3 text-emerald-500" />
+              <span className={`font-semibold ${attrs.savings < 0 ? "text-rose-500 font-bold" : "text-emerald-600 dark:text-emerald-400"}`}>
+                {formatMoney(attrs.savings)}
+              </span>
+            </div>
+            <div className="hidden sm:flex items-center gap-1" title="老家父母节余/底资">
+              <Home className="w-3 h-3 text-amber-500" />
+              <span className="font-semibold text-stone-600 dark:text-stone-300">{formatMoney(attrs.familySavings)}</span>
+            </div>
+
+            {/* Crisis Warning Pill */}
+            {crisisWarning && (
+              <span className="flex items-center gap-1 px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-500 text-[10px] font-sans font-medium animate-pulse">
+                <AlertTriangle className="w-2.5 h-2.5" />
+                <span>{crisisWarning.title}</span>
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Right: Controls & Memoir Drawer Trigger */}
+        {/* Right: Controls & Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Memoir Drawer Trigger */}
-          <button
-            onClick={() => setShowMemoirDrawer(true)}
-            className={`px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs ${
-              isLight
-                ? "bg-amber-50/80 hover:bg-amber-100/80 border-amber-300 text-amber-900"
-                : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
-            }`}
-            title="查看完整生平岁月忆录抽屉"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>岁月忆录</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono-num font-bold ${
-              isLight ? "bg-amber-200 text-amber-950" : "bg-[#D4A359]/30 text-amber-300"
-            }`}>
-              {logEntries.length}
-            </span>
-          </button>
-
           {/* Ending Codex Trigger */}
           <button
             onClick={() => setShowCodexModal(true)}
             className={`px-2 sm:px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               isLight
-                ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-700"
+                ? "bg-stone-100/80 hover:bg-stone-200 border-stone-300 text-stone-700"
                 : "bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.08] text-stone-300"
             }`}
             title="16种终局图鉴"
@@ -1797,7 +1846,7 @@ ${logEntries
             onClick={() => handleSetFontSize(readerFontSize === 'normal' ? 'large' : readerFontSize === 'large' ? 'huge' : 'normal')}
             className={`p-1.5 sm:px-2 sm:py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               isLight
-                ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-700"
+                ? "bg-stone-100/80 hover:bg-stone-200 border-stone-300 text-stone-700"
                 : "bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.08] text-stone-300"
             }`}
             title="切换字号（标准 / 大字 / 特大）"
@@ -1811,7 +1860,7 @@ ${logEntries
             onClick={handleToggleTheme}
             className={`p-1.5 rounded-lg border transition-colors ${
               isLight
-                ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-700"
+                ? "bg-stone-100/80 hover:bg-stone-200 border-stone-300 text-stone-700"
                 : "bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.08] text-stone-300"
             }`}
             title="切换明暗主题"
@@ -1824,7 +1873,7 @@ ${logEntries
             onClick={() => handleRestart()}
             className={`p-1.5 sm:px-2 sm:py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               isLight
-                ? "bg-stone-100 hover:bg-rose-50 border-stone-300 text-stone-700 hover:text-rose-700 hover:border-rose-300"
+                ? "bg-stone-100/80 hover:bg-rose-50 border-stone-300 text-stone-700 hover:text-rose-700 hover:border-rose-300"
                 : "bg-white/[0.05] hover:bg-rose-950/30 border-white/[0.08] text-stone-300 hover:text-rose-400 hover:border-rose-800/40"
             }`}
             title="重新投胎轮回"
@@ -1836,147 +1885,21 @@ ${logEntries
       </header>
 
       {/* ================================================================= */}
-      {/* 2. 0~63 LIFELINE PROGRESS TRACK (0~63岁生命微光长廊)                */}
+      {/* 4. MAIN STAGE THEATRE (核心单幕剧场 · 聚光灯深邃留白与宣纸/黑曜材质)     */}
       {/* ================================================================= */}
-      <div className={`h-7 px-4 sm:px-8 border-b flex items-center gap-3 shrink-0 text-[10px] sm:text-[11px] font-mono-num transition-colors duration-200 z-10 ${
-        isLight ? "bg-stone-50 border-stone-200 text-stone-500" : "bg-[#0B0D13] border-white/[0.05] text-stone-400"
+      <main className={`flex-1 overflow-y-auto flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative pb-28 sm:pb-32 ${
+        isLight
+          ? "bg-[radial-gradient(ellipse_80%_60%_at_50%_45%,rgba(255,255,255,0.85),rgba(244,240,233,0.95))]"
+          : "bg-[radial-gradient(ellipse_85%_65%_at_50%_45%,rgba(20,24,38,0.5),rgba(6,7,11,1))]"
       }`}>
-        <span className="shrink-0 font-narrative-serif text-[#D4A359]">0岁 降生</span>
-        <div className="flex-1 relative flex items-center">
-          {/* Base track */}
-          <div className={`w-full h-1.5 rounded-full overflow-hidden ${
-            isLight ? "bg-stone-200" : "bg-white/[0.08]"
-          }`}>
-            <div
-              className="h-full bg-gradient-to-r from-amber-500 via-[#D4A359] to-[#E0B26A] transition-all duration-300 rounded-full"
-              style={{ width: `${Math.min(100, Math.max(0, (currentAge / 63) * 100))}%` }}
-            />
-          </div>
-
-          {/* Key Milestone Markers */}
-          {[
-            { age: 18, label: '18岁 成人' },
-            { age: 21, label: '21岁 毕业' },
-            { age: 27, label: '27岁 岔路' },
-            { age: 35, label: '35岁 中流' },
-            { age: 52, label: '52岁 知天命' },
-          ].map((m) => {
-            const leftPct = (m.age / 63) * 100;
-            const isPassed = currentAge >= m.age;
-            return (
-              <div
-                key={m.age}
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center group pointer-events-none"
-                style={{ left: `${leftPct}%` }}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full border transition-all ${
-                    isPassed
-                      ? "bg-amber-400 border-amber-500 scale-110 shadow-xs"
-                      : isLight
-                        ? "bg-stone-300 border-stone-400"
-                        : "bg-stone-700 border-stone-600"
-                  }`}
-                />
-              </div>
-            );
-          })}
-
-          {/* Current Pinpoint Indicator */}
-          <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-300 pointer-events-none flex flex-col items-center"
-            style={{ left: `${Math.min(100, Math.max(0, (currentAge / 63) * 100))}%` }}
-          >
-            <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-[#D4A359] to-[#F3C87A] border-2 border-white shadow-md flex items-center justify-center animate-pulse" />
-          </div>
-        </div>
-        <span className="shrink-0 font-narrative-serif text-[#D4A359]">63岁 终局</span>
-      </div>
-
-      {/* ================================================================= */}
-      {/* 3. VITAL ATTRIBUTES AMBIENT RIBBON (生命态势条 HUD)                  */}
-      {/* ================================================================= */}
-      <div className={`py-1.5 px-3 sm:px-6 border-b flex flex-wrap items-center justify-between gap-y-1 text-xs shrink-0 transition-colors duration-200 z-10 ${
-        isLight ? "bg-[#FAF9F5] border-stone-200 text-stone-700" : "bg-[#0D0F16] border-white/[0.05] text-stone-300"
-      }`}>
-        {/* Core Attributes */}
-        <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-1">
-          {/* Health */}
-          <div className="flex items-center gap-1.5" title={`体魄 ${attrs.health}/100 · ${getHealthDesc(attrs.health)}`}>
-            <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
-            <span className="text-[11px] text-stone-500">体魄</span>
-            <span className="font-mono-num font-bold text-xs">{attrs.health}</span>
-          </div>
-
-          {/* Cognition */}
-          <div className="flex items-center gap-1.5" title={`见识 ${attrs.cognition}/100 · ${getCognitionDesc(attrs.cognition)}`}>
-            <Brain className="w-3.5 h-3.5 text-sky-400" />
-            <span className="text-[11px] text-stone-500">见识</span>
-            <span className="font-mono-num font-bold text-xs">{attrs.cognition}</span>
-          </div>
-
-          {/* Happiness */}
-          <div className="flex items-center gap-1.5" title={`幸福 ${attrs.happiness}/100 · ${getHappinessDesc(attrs.happiness)}`}>
-            <Smile className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-[11px] text-stone-500">幸福</span>
-            <span className="font-mono-num font-bold text-xs">{attrs.happiness}</span>
-          </div>
-
-          {/* Social */}
-          <div className="flex items-center gap-1.5" title={`人脉 ${attrs.social}/100 · ${getSocialDesc(attrs.social)}`}>
-            <Users className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="text-[11px] text-stone-500">人脉</span>
-            <span className="font-mono-num font-bold text-xs">{attrs.social}</span>
-          </div>
-
-          {/* Personal Savings */}
-          <div className="flex items-center gap-1.5" title="个人当前现金总积蓄">
-            <Coins className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-[11px] text-stone-500">个人现金</span>
-            <span className={`font-mono-num font-bold text-xs ${
-              attrs.savings < 0
-                ? "text-rose-500 font-extrabold"
-                : isLight ? "text-emerald-800" : "text-emerald-400"
-            }`}>
-              {formatMoney(attrs.savings)}
-            </span>
-          </div>
-
-          {/* Family Savings */}
-          <div className="flex items-center gap-1.5" title="老家父母节余/底资">
-            <Home className="w-3.5 h-3.5 text-amber-500" />
-            <span className="text-[11px] text-stone-500">原生家庭</span>
-            <span className={`font-mono-num font-bold text-xs ${
-              attrs.familySavings < 0
-                ? "text-rose-500 font-extrabold"
-                : isLight ? "text-stone-700" : "text-stone-300"
-            }`}>
-              {formatMoney(attrs.familySavings)}
-            </span>
-          </div>
-        </div>
-
-        {/* Crisis Warning Banner */}
-        {crisisWarning && (
-          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-500 text-[11px] font-medium animate-pulse">
-            <AlertTriangle className="w-3 h-3 shrink-0" />
-            <span>{crisisWarning.title}</span>
-          </div>
-        )}
-      </div>
-
-      {/* ================================================================= */}
-      {/* 4. MAIN STAGE THEATRE (核心单幕剧场 · 绝不向下堆叠卡片)               */}
-      {/* ================================================================= */}
-      <main className="flex-1 overflow-y-auto flex flex-col items-center justify-center p-3 sm:p-6 lg:p-8 relative">
         {/* =============================================================== */}
         {/* VIEW A: 终局人生纪念卡 (80亿分之一 标志性生平画卷)                */}
         {/* =============================================================== */}
         {isRetired && finalVerdict ? (
-          <div className={`w-full max-w-3xl rounded-3xl border p-6 sm:p-9 space-y-7 shadow-2xl relative transition-all duration-300 my-auto animate-year-enter ${
+          <div className={`w-full max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-10 space-y-7 shadow-2xl relative transition-all duration-300 my-auto animate-year-enter overflow-hidden ${
             isLight
-              ? "bg-[#FAF8F5] border-amber-900/25 shadow-amber-950/10 text-stone-900"
-              : "bg-[#0F111A] border-[#D4A359]/30 shadow-black/80 text-stone-100"
+              ? "bg-[#FAF8F5]/98 border-amber-900/20 shadow-amber-950/10 text-stone-900"
+              : "bg-[#0E1019]/98 border-[#D4A359]/30 shadow-black/90 text-stone-100"
           }`}>
             {/* Top Ornamental Ribbon */}
             <div className="flex items-center justify-between border-b pb-4 border-amber-500/20">
@@ -1999,7 +1922,7 @@ ${logEntries
 
             {/* Grand Summary Title & Tagline */}
             <div className="text-center space-y-2">
-              <h1 className={`text-2xl sm:text-3xl font-extrabold font-narrative-serif tracking-wide ${
+              <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-extrabold font-narrative-serif tracking-wide ${
                 isLight ? "text-stone-900" : "text-[#D4A359]"
               }`}>
                 “{finalVerdict.summaryTitle}”
@@ -2253,18 +2176,23 @@ ${logEntries
           </div>
         ) : (
           /* =============================================================== */
-          /* VIEW B: 聚焦单卡剧场 (当前岁月 · 零向下堆叠)                    */
+          /* VIEW B: 聚焦单卡剧场 (当前岁月 · 宣纸黑曜双材质与巨型暗印)         */
           /* =============================================================== */
           <div
             key={`${currentEntry.id}_${currentEntry.age}`}
-            className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-5 sm:p-8 lg:p-10 space-y-6 shadow-2xl transition-all duration-300 my-auto animate-year-enter relative ${
+            className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-11 space-y-6 shadow-2xl transition-all duration-300 my-auto animate-year-enter relative overflow-hidden ${
               isLight
-                ? "bg-white/95 border-amber-900/15 shadow-stone-300/40 text-stone-900"
-                : "bg-[#11131C]/95 border-[#D4A359]/25 shadow-black/70 text-stone-100"
+                ? "bg-[#FCFAF7]/95 border-amber-900/15 shadow-[0_20px_50px_-10px_rgba(180,140,80,0.12)] text-stone-900"
+                : "bg-[#0E1019]/95 border-[#D4A359]/25 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_30px_rgba(212,163,89,0.06)] text-stone-100"
             }`}
           >
+            {/* Giant Subtle Watermark of the current Age in the top-right background */}
+            <div className="absolute top-1 right-3 text-7xl sm:text-8xl md:text-9xl font-serif font-black select-none pointer-events-none opacity-[0.03] dark:opacity-[0.045] tracking-tighter text-amber-900 dark:text-[#E0B26A]">
+              {currentEntry.age}
+            </div>
+
             {/* Top Stage Header */}
-            <div className="flex items-center justify-between border-b pb-4 border-amber-500/20">
+            <div className="flex items-center justify-between border-b pb-4 border-amber-500/20 relative z-10">
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold font-mono-num border ${
                   isLight
@@ -2289,14 +2217,14 @@ ${logEntries
             </div>
 
             {/* Year Narrative Title */}
-            <h2 className={`text-xl sm:text-2xl md:text-3xl font-extrabold font-narrative-serif tracking-wide ${
+            <h2 className={`text-xl sm:text-2xl md:text-3xl font-extrabold font-narrative-serif tracking-wide relative z-10 ${
               isLight ? "text-stone-900" : "text-stone-100"
             }`}>
               {currentEntry.title}
             </h2>
 
             {/* Year Scene Story Narrative */}
-            <div className={`space-y-3 font-reading-sans ${getFontSizeClass()} ${
+            <div className={`space-y-3 font-reading-sans relative z-10 ${getFontSizeClass()} ${
               isLight ? "text-stone-800" : "text-stone-200"
             }`}>
               {currentEntry.scene.split('\n\n').map((paragraph, pIdx) => (
@@ -2308,7 +2236,7 @@ ${logEntries
 
             {/* Stat Deltas & Tags Pill */}
             {(currentEntry.statDelta || (currentEntry.tagsAdded && currentEntry.tagsAdded.length > 0)) && (
-              <div className="pt-2 flex flex-wrap items-center gap-1.5 border-t border-dashed border-stone-200 dark:border-white/[0.08]">
+              <div className="pt-2 flex flex-wrap items-center gap-1.5 border-t border-dashed border-stone-200 dark:border-white/[0.08] relative z-10">
                 {currentEntry.statDelta && (
                   <>
                     {currentEntry.statDelta.health !== undefined && (
@@ -2372,11 +2300,11 @@ ${logEntries
             )}
 
             {/* ============================================================= */}
-            {/* INTERACTIVE DILEMMA CHOICES (当前处于待抉择状态)                 */}
+            {/* INTERACTIVE DILEMMA CHOICES (命运对决张力 · 鲜明立意光晕)         */}
             {/* ============================================================= */}
             {isWaitingCurrentChoice && currentNode.choices && (
-              <div className={`mt-5 p-4 sm:p-6 rounded-2xl border space-y-4 ${
-                isLight ? "bg-amber-50/40 border-amber-300/60" : "bg-[#161824] border-[#D4A359]/40"
+              <div className={`mt-5 p-4 sm:p-6 rounded-2xl border space-y-4 relative z-10 ${
+                isLight ? "bg-amber-50/50 border-amber-300/70" : "bg-[#141724]/90 border-[#D4A359]/40"
               }`}>
                 {/* Prompt Header */}
                 <div className="flex items-center justify-between">
@@ -2388,7 +2316,7 @@ ${logEntries
                     <h3 className={`text-sm sm:text-base font-bold font-narrative-serif ${
                       isLight ? "text-stone-900" : "text-stone-100"
                     }`}>
-                      站在人生的分水岭，你需要做出抉择：
+                      站在人生的十字路口，你需要做出决断：
                     </h3>
                   </div>
                   <span className="hidden sm:inline-block text-[11px] text-stone-400 font-mono-num">
@@ -2404,10 +2332,22 @@ ${logEntries
                       <button
                         key={cIdx}
                         onClick={() => handleSelectChoice(choice)}
-                        className={`p-4 sm:p-4.5 rounded-xl border text-left transition-all active:scale-[0.99] group shadow-xs flex items-start justify-between ${
-                          isLight
-                            ? "border-stone-200 bg-white hover:border-amber-500/80 hover:bg-amber-50/60 text-stone-900"
-                            : "border-white/[0.08] bg-[#1C1F2E] hover:border-[#D4A359] hover:bg-[#222638] text-stone-100"
+                        className={`p-4 sm:p-4.5 rounded-xl border text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between ${
+                          p.archetype === 'merit'
+                            ? isLight
+                              ? "border-amber-300 bg-white hover:border-amber-500 hover:bg-amber-50/50 text-stone-900"
+                              : "border-amber-500/30 bg-[#1A1D2B] hover:border-amber-400 hover:bg-amber-950/20 text-stone-100 shadow-amber-950/10"
+                            : p.archetype === 'hustle'
+                            ? isLight
+                              ? "border-emerald-300 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 text-stone-900"
+                              : "border-emerald-500/30 bg-[#1A1D2B] hover:border-emerald-400 hover:bg-emerald-950/20 text-stone-100 shadow-emerald-950/10"
+                            : p.archetype === 'global'
+                            ? isLight
+                              ? "border-purple-300 bg-white hover:border-purple-500 hover:bg-purple-50/50 text-stone-900"
+                              : "border-purple-500/30 bg-[#1A1D2B] hover:border-purple-400 hover:bg-purple-950/20 text-stone-100 shadow-purple-950/10"
+                            : isLight
+                            ? "border-sky-300 bg-white hover:border-sky-500 hover:bg-sky-50/50 text-stone-900"
+                            : "border-sky-500/30 bg-[#1A1D2B] hover:border-sky-400 hover:bg-sky-950/20 text-stone-100 shadow-sky-950/10"
                         }`}
                       >
                         <div className="flex items-start gap-3">
@@ -2489,33 +2429,39 @@ ${logEntries
             )}
 
             {/* ============================================================= */}
-            {/* SEALED CHOICE CONSEQUENCE FEEDBACK (刚做完抉择的岁月反馈)         */}
+            {/* SEALED CHOICE CONSEQUENCE FEEDBACK (朱砂印讫动效仪式)             */}
             {/* ============================================================= */}
             {currentEntry.chosenOptionText && (
-              <div className={`p-4 sm:p-5 rounded-2xl border space-y-2 transition-all ${
-                isLight ? "bg-amber-50/70 border-amber-300/80 text-stone-900" : "bg-[#181B28] border-[#D4A359]/40 text-stone-100"
+              <div className={`p-4 sm:p-5 rounded-2xl border relative overflow-hidden transition-all duration-300 z-10 ${
+                isLight ? "bg-red-50/70 border-red-300/80 text-stone-900" : "bg-red-950/20 border-red-800/40 text-stone-100"
               }`}>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-                  <span className="text-xs font-bold font-narrative-serif text-[#D4A359]">
-                    【抉择印讫 · {currentEntry.chosenOptionText}】
-                  </span>
+                {/* Background Seal Watermark */}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-5xl font-serif text-red-600/10 select-none pointer-events-none font-bold rotate-12">
+                  印
                 </div>
-                {currentEntry.chosenReaction && (
-                  <p className={`text-xs sm:text-sm italic font-reading-sans leading-relaxed ${
-                    isLight ? "text-stone-700" : "text-stone-300"
-                  }`}>
-                    “{currentEntry.chosenReaction}”
-                  </p>
-                )}
+                <div className="relative z-10 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+                    <span className="text-xs font-bold font-narrative-serif text-red-500 tracking-wider">
+                      【朱砂印讫 · {currentEntry.chosenOptionText}】
+                    </span>
+                  </div>
+                  {currentEntry.chosenReaction && (
+                    <p className={`text-xs sm:text-sm italic font-reading-sans leading-relaxed ${
+                      isLight ? "text-stone-700" : "text-amber-100/90"
+                    }`}>
+                      “{currentEntry.chosenReaction}”
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 
             {/* ============================================================= */}
-            {/* PRIMARY NEXT STEP FORWARD BUTTON (推进下一岁，绝无堆叠)           */}
+            {/* PRIMARY NEXT STEP FORWARD BUTTON (推进下一岁)                    */}
             {/* ============================================================= */}
             {!isWaitingCurrentChoice && (
-              <div className="pt-2">
+              <div className="pt-2 relative z-10">
                 <button
                   onClick={handleNextNaturalYear}
                   className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 shadow-xl shadow-amber-950/20 active:scale-[0.99] transition-all font-narrative-serif tracking-wide group"
@@ -2533,13 +2479,15 @@ ${logEntries
       </main>
 
       {/* ================================================================= */}
-      {/* 5. BOTTOM FLOATING CONTROL DOCK (底部沉浸控制坞)                     */}
+      {/* 5. FLOATING FROSTED CAPSULE DOCK (居中悬浮磨砂玻璃胶囊坞)             */}
       {/* ================================================================= */}
-      <footer className={`h-14 sm:h-15 border-t px-3 sm:px-6 flex items-center justify-between shrink-0 text-xs transition-colors duration-200 z-20 ${
-        isLight ? "bg-white/95 border-stone-200 text-stone-700 shadow-2xs backdrop-blur-md" : "bg-[#0E1017]/95 border-white/[0.07] text-stone-300 backdrop-blur-md"
-      }`}>
-        {/* Left: Auto-play Engine Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+      <div className="fixed bottom-5 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+        <div className={`flex items-center gap-2 sm:gap-3 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-300 max-w-[94vw] ${
+          isLight
+            ? "bg-white/85 border-stone-200/90 text-stone-800 shadow-stone-900/10"
+            : "bg-[#0E1019]/85 border-white/[0.12] text-stone-200 shadow-black/80"
+        }`}>
+          {/* Auto-play Engine */}
           <button
             onClick={() => {
               if (!waitingForChoice && !showGaokaoModal && !isRetired) {
@@ -2547,7 +2495,7 @@ ${logEntries
               }
             }}
             disabled={waitingForChoice || showGaokaoModal || isRetired}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+            className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
               isAutoPlaying
                 ? "bg-amber-500 text-stone-950 border-amber-400 font-bold shadow-sm"
                 : isLight
@@ -2557,11 +2505,11 @@ ${logEntries
             title="快捷键: A 键切换自动播放"
           >
             {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
-            <span>{isAutoPlaying ? '暂停' : '自动流转'}</span>
+            <span>{isAutoPlaying ? '暂停' : '流转'}</span>
             <span className="text-[10px] opacity-75 font-mono-num">(A)</span>
           </button>
 
-          {/* Speed Preset Buttons */}
+          {/* Speed Presets */}
           <div className="hidden sm:flex items-center gap-1">
             {[
               { val: 2.0, label: '0.8x' },
@@ -2571,9 +2519,9 @@ ${logEntries
               <button
                 key={sp.label}
                 onClick={() => setAutoPlaySpeed(sp.val)}
-                className={`px-2 py-1 rounded-md text-[11px] font-mono-num transition-colors ${
+                className={`px-2 py-0.5 rounded-full text-[11px] font-mono-num transition-colors ${
                   Math.abs(autoPlaySpeed - sp.val) < 0.1
-                    ? isLight ? "bg-stone-300 text-stone-900 font-bold" : "bg-white/[0.15] text-[#D4A359] font-bold"
+                    ? isLight ? "bg-stone-300 text-stone-900 font-bold" : "bg-white/[0.18] text-[#D4A359] font-bold"
                     : isLight ? "text-stone-500 hover:text-stone-800" : "text-stone-400 hover:text-stone-200"
                 }`}
               >
@@ -2581,19 +2529,19 @@ ${logEntries
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Center: Quick Skip to Next Milestone / Decision */}
-        <div className="flex items-center justify-center">
+          <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
+
+          {/* Quick Skip or Status prompt */}
           {isWaitingCurrentChoice ? (
-            <div className="flex items-center gap-1.5 text-amber-500 font-semibold text-xs animate-pulse font-narrative-serif">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>请在上方面板做出你的抉择 (1/2/3 键)</span>
-            </div>
+            <span className="text-amber-500 font-semibold text-xs flex items-center gap-1 animate-pulse font-narrative-serif px-1">
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <span>请定夺去向 (1/2/3)</span>
+            </span>
           ) : !isRetired ? (
             <button
               onClick={handleSkipToNextDecision}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+              className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
                 isLight
                   ? "bg-stone-50 hover:bg-stone-100 border-stone-300 text-stone-700 hover:border-amber-400"
                   : "bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] text-stone-300 hover:border-[#D4A359]/50"
@@ -2601,20 +2549,20 @@ ${logEntries
               title="一键直接快进到下一个有分支选择的年龄或高考节点"
             >
               <FastForward className="w-3.5 h-3.5 text-amber-400" />
-              <span>直达关键抉择</span>
+              <span>快进抉择</span>
             </button>
           ) : (
-            <div className="text-xs text-[#D4A359] font-narrative-serif">
-              ✨ 一生圆满落幕 · 岁月长卷已定格
-            </div>
+            <span className="text-xs text-[#D4A359] font-narrative-serif px-1">
+              ✨ 一生圆满落幕
+            </span>
           )}
-        </div>
 
-        {/* Right: Memoir Drawer & Keyboard hints */}
-        <div className="flex items-center gap-2">
+          <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
+
+          {/* Memoir Drawer Trigger */}
           <button
             onClick={() => setShowMemoirDrawer(true)}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
               isLight
                 ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
                 : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
@@ -2624,13 +2572,8 @@ ${logEntries
             <span className="hidden sm:inline">岁月忆录</span>
             <span className="font-mono-num font-bold">({logEntries.length})</span>
           </button>
-          <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-mono-num text-stone-500">
-            <span>空格:推进</span>
-            <span>·</span>
-            <span>1~4:选定</span>
-          </div>
         </div>
-      </footer>
+      </div>
 
       {/* ================================================================= */}
       {/* 6. MEMOIR DRAWER (岁月忆录抽屉 · 随时查阅全卷生平)                    */}
