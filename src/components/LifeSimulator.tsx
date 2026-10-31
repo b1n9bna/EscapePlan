@@ -31,6 +31,7 @@ import type {
 import {
   RotateCcw,
   Sparkles,
+  Scale,
   ArrowRight,
   HeartPulse,
   Brain,
@@ -78,13 +79,29 @@ interface ChronicleLogEntry {
   stageName: string;
   title: string;
   scene: string;
-  type: 'natural' | 'choice' | 'milestone';
+  type: 'natural' | 'choice' | 'milestone' | 'destiny' | 'mortality';
   chosenOptionText?: string;
   chosenReaction?: string;
   statDelta?: Partial<CharacterAttributes>;
   tagsAdded?: string[];
   reflection?: string;
 }
+
+const isSimulationEnded = (entries: ChronicleLogEntry[]) =>
+  entries.some(
+    (e) =>
+      e.age === 63 ||
+      e.type === 'mortality' ||
+      e.tagsAdded?.some(
+        (t) =>
+          t.includes('提前终局') ||
+          t.includes('心梗猝死') ||
+          t.includes('抗洪殉职') ||
+          t.includes('矽肺病故') ||
+          t.includes('遁入空门') ||
+          t.includes('铁窗残生')
+      )
+  );
 
 
 // ============================================================================
@@ -569,25 +586,34 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const [epitaphInput, setEpitaphInput] = useState('');
   const [epitaphConfirmed, setEpitaphConfirmed] = useState(false);
 
-  // Confetti trigger once at Age 63
+  // Confetti trigger once at Age 63 or non-tragic finale
   const confettiFiredRef = useRef(false);
   useEffect(() => {
-    if (logEntries.some((e) => e.age === 63) && !confettiFiredRef.current) {
-      confettiFiredRef.current = true;
-      try {
-        confetti({
-          particleCount: 90,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-      } catch {}
+    if (isSimulationEnded(logEntries) && !confettiFiredRef.current) {
+      const isTragic = tags.some(
+        (t) =>
+          t.includes('心梗猝死') ||
+          t.includes('抗洪殉职') ||
+          t.includes('矽肺病故') ||
+          t.includes('铁窗残生')
+      );
+      if (!isTragic) {
+        confettiFiredRef.current = true;
+        try {
+          confetti({
+            particleCount: 90,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
+        } catch {}
+      }
     }
-  }, [logEntries]);
+  }, [logEntries, tags]);
 
 
   // Register newly unlocked ending into LocalStorage
   useEffect(() => {
-    if (logEntries.some((e) => e.age === 63)) {
+    if (isSimulationEnded(logEntries)) {
       const currentTrack = gaokaoCalc?.degreeTrack || 'double_non';
       const finalVerdict = generateFinalLifetimeVerdict(chosenPath, currentTrack, attrs, tags, logEntries);
       if (!unlockedEndings.includes(finalVerdict.ending.id)) {
@@ -770,10 +796,10 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     const nextIdx = timelineIndex + 1;
     if (nextIdx >= timeline.length) {
       // 检查27岁是否需要挂载成年里程碑（兜底容错）
-      if (currentNode.age === 27 && !logEntries.some((e) => e.age === 63)) {
+      if (currentNode.age === 27 && !isSimulationEnded(logEntries)) {
         const track = gaokaoCalc?.degreeTrack || 'double_non';
         const careerSub = getCareerSubtrack(tags);
-        const adultMilestones = generateAdultMilestones(track, chosenPath, charData.family, careerSub);
+        const adultMilestones = generateAdultMilestones(track, chosenPath, charData.family, careerSub, tags);
         const currentNodes = timeline.slice(0, timelineIndex + 1);
         setTimeline([...currentNodes, ...adultMilestones]);
         return;
@@ -830,7 +856,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   // =========================================================================
   const handleSkipToNextDecision = () => {
     if (waitingForChoice) return;
-    if (logEntries.some((e) => e.age === 63)) return;
+    if (isSimulationEnded(logEntries)) return;
     if (isAutoPlaying) setIsAutoPlaying(false);
 
     // If currently at 17yo or gaokao not resolved, trigger Gaokao directly
@@ -956,7 +982,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       const track = gaokaoCalc?.degreeTrack || 'double_non';
       const allCurrentTags = Array.from(new Set([...tags, ...(choice.addTags || [])]));
       const careerSub = getCareerSubtrack(allCurrentTags);
-      const adultMilestones = generateAdultMilestones(track, path, charData.family, careerSub);
+      const adultMilestones = generateAdultMilestones(track, path, charData.family, careerSub, allCurrentTags);
 
       // 将后续30, 35, 42, 52, 63岁里程碑直接串接进时间线，三栏交互彻底统一！
       const currentNodes = timeline.slice(0, timelineIndex + 1);
@@ -1093,7 +1119,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       return;
     }
     // Fully completed at 63 years old
-    if (logEntries.some((e) => e.age === 63)) {
+    if (isSimulationEnded(logEntries)) {
       setIsAutoPlaying(false);
       return;
     }
@@ -1132,7 +1158,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
           setIsAutoPlaying(false);
           return;
         }
-        if (!waitingForChoice && !showGaokaoModal && !logEntries.some((entry) => entry.age === 63)) {
+        if (!waitingForChoice && !showGaokaoModal && !isSimulationEnded(logEntries)) {
           handleNextNaturalYear();
         }
         return;
@@ -1141,7 +1167,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       // Key 'a' or 'A': Toggle Auto Play
       if (e.key === 'a' || e.key === 'A') {
         e.preventDefault();
-        if (!waitingForChoice && !showGaokaoModal && !logEntries.some((entry) => entry.age === 63)) {
+        if (!waitingForChoice && !showGaokaoModal && !isSimulationEnded(logEntries)) {
           setIsAutoPlaying((prev) => !prev);
         }
         return;
@@ -1527,7 +1553,7 @@ ${logEntries
       }
       return `迈入下一岁 · ${currentAge + 1} 岁`;
     }
-    if (currentNode?.age === 27 && !logEntries.some((e) => e.age === 63)) {
+    if (currentNode?.age === 27 && !isSimulationEnded(logEntries)) {
       return "迈向三十岁 · 而立之年";
     }
     return "从容启程，迈向下一岁";
@@ -1655,7 +1681,7 @@ ${logEntries
   };
 
 // Derived state for 1-in-8-billion (十四亿分之一) single-stage memoir theatre
-  const isRetired = logEntries.some((e) => e.age === 63);
+  const isRetired = isSimulationEnded(logEntries);
   const currentEntry: ChronicleLogEntry =
     logEntries[logEntries.length - 1] || {
       id: currentNode?.id || 'age_0',
@@ -1917,7 +1943,7 @@ ${logEntries
                   终局 No.{finalVerdict.ending.number < 10 ? '0' : ''}{finalVerdict.ending.number} · {finalVerdict.ending.title}
                 </span>
               </div>
-              <span className="text-xs text-stone-500 font-reading-sans">0 ~ 63岁 完整生平盖印</span>
+              <span className="text-xs text-stone-500 font-reading-sans">0 ~ {lastLogEntry?.age || currentAge}岁 生平盖印</span>
             </div>
 
             {/* Grand Summary Title & Tagline */}
@@ -2310,13 +2336,24 @@ ${logEntries
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <span className="text-xs font-bold text-[#D4A359] font-narrative-serif flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      重大抉择时刻 · 第 {currentAge} 岁
+                      {currentNode.type === 'destiny' ? (
+                        <>
+                          <Scale className="w-3.5 h-3.5 text-amber-500" />
+                          天命定夺 · 时代风云 · 第 {currentAge} 岁
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-3.5 h-3.5" />
+                          重大抉择时刻 · 第 {currentAge} 岁
+                        </>
+                      )}
                     </span>
                     <h3 className={`text-sm sm:text-base font-bold font-narrative-serif ${
                       isLight ? "text-stone-900" : "text-stone-100"
                     }`}>
-                      站在人生的十字路口，你需要做出决断：
+                      {currentNode.type === 'destiny'
+                        ? "面对命运的巨浪与时代的风暴，避无可避："
+                        : "站在人生的十字路口，你需要做出决断："}
                     </h3>
                   </div>
                   <span className="hidden sm:inline-block text-[11px] text-stone-400 font-mono-num">
