@@ -1588,125 +1588,11 @@ ${logEntries
     return "从容启程，迈向下一岁";
   };
 
-  const getChoicePresentation = (choice: LifeChoice, cIdx: number) => {
-    let stance = choice.stanceBadge || '';
-    let cleanText = choice.text;
-
-    const bracketMatch = choice.text.match(/^【(.*?)】\s*(.*)$/);
-    if (bracketMatch) {
-      if (!stance) stance = bracketMatch[1];
-      cleanText = bracketMatch[2];
-    }
-
-    let archetype: 'merit' | 'hustle' | 'zen' | 'global' = 'merit';
-    if (stance) {
-      if (
-        stance.includes('苦修') ||
-        stance.includes('登顶') ||
-        stance.includes('做题') ||
-        stance.includes('考场') ||
-        stance.includes('狂徒') ||
-        stance.includes('书香') ||
-        stance.includes('争优') ||
-        stance.includes('硬拼') ||
-        stance.includes('透支') ||
-        stance.includes('硬骨') ||
-        stance.includes('顺从') ||
-        stance.includes('夺冠')
-      ) {
-        archetype = 'merit';
-      } else if (
-        stance.includes('偏锋') ||
-        stance.includes('商') ||
-        stance.includes('极客') ||
-        stance.includes('法理') ||
-        stance.includes('手艺') ||
-        stance.includes('野性') ||
-        stance.includes('创富') ||
-        stance.includes('工匠') ||
-        stance.includes('机变') ||
-        stance.includes('领袖') ||
-        stance.includes('电竞') ||
-        stance.includes('统筹')
-      ) {
-        archetype = 'hustle';
-      } else if (
-        stance.includes('旷野') ||
-        stance.includes('自洽') ||
-        stance.includes('浪游') ||
-        stance.includes('逍遥') ||
-        stance.includes('生活') ||
-        stance.includes('哲思') ||
-        stance.includes('坦然') ||
-        stance.includes('松弛') ||
-        stance.includes('科学') ||
-        stance.includes('乐天') ||
-        stance.includes('温情') ||
-        stance.includes('风骨') ||
-        stance.includes('草莽')
-      ) {
-        archetype = 'zen';
-      } else if (
-        stance.includes('出海') ||
-        stance.includes('降维') ||
-        stance.includes('世界') ||
-        stance.includes('海外') ||
-        stance.includes('破局') ||
-        stance.includes('外语')
-      ) {
-        archetype = 'global';
-      } else {
-        archetype = cIdx === 0 ? 'merit' : cIdx === 1 ? 'hustle' : 'zen';
-      }
-    } else {
-      const d = choice.delta || {};
-      const tags = choice.addTags || [];
-      if (
-        (d.rebellion ?? 0) >= 20 ||
-        cleanText.includes('出海') ||
-        cleanText.includes('海外') ||
-        cleanText.includes('外语')
-      ) {
-        archetype = 'global';
-        stance = '降维出海';
-      } else if (
-        (d.savings ?? 0) > 80 ||
-        tags.some((t) => t.includes('商') || t.includes('市井') || t.includes('手艺') || t.includes('实操'))
-      ) {
-        archetype = 'hustle';
-        stance = '偏锋破局';
-      } else if ((d.happiness ?? 0) >= 15 || (d.health ?? 0) >= 10) {
-        archetype = 'zen';
-        stance = '旷野自洽';
-      } else {
-        archetype = 'merit';
-        stance = '苦修登顶';
-      }
-    }
-
-    const tradeOffs: { label: string; tone: 'danger' | 'cash' | 'academic' | 'zen' | 'social' | 'global' }[] = [];
-    const d = choice.delta || {};
-
-    if ((d.health ?? 0) <= -10 || (d.happiness ?? 0) <= -10) {
-      tradeOffs.push({ label: '⚠️ 身心透支', tone: 'danger' });
-    }
-    if ((d.savings ?? 0) >= 80) {
-      tradeOffs.push({ label: `💰 现金 +¥${d.savings}`, tone: 'cash' });
-    }
-    if ((d.academicCapital ?? 0) >= 15 || (d.cognition ?? 0) >= 20) {
-      tradeOffs.push({ label: '📚 学术/应试跃升', tone: 'academic' });
-    }
-    if ((d.happiness ?? 0) >= 15 || (d.health ?? 0) >= 10) {
-      tradeOffs.push({ label: '🌿 充盈自洽', tone: 'zen' });
-    }
-    if ((d.social ?? 0) >= 15) {
-      tradeOffs.push({ label: '🤝 四海人脉', tone: 'social' });
-    }
-    if ((d.rebellion ?? 0) >= 20 || cleanText.includes('出海') || cleanText.includes('海外')) {
-      tradeOffs.push({ label: '🌐 出海潜能', tone: 'global' });
-    }
-
-    return { stance, cleanText, detail: choice.detail, archetype, tradeOffs };
+  const getChoicePresentation = (choice: LifeChoice) => {
+    return {
+      text: choice.text,
+      detail: choice.detail,
+    };
   };
 
   // Derived state for 1-in-8-billion (十四亿分之一) single-stage memoir theatre
@@ -2611,7 +2497,7 @@ ${logEntries
                   }}
                 >
                   {currentNode.choices.map((choice, cIdx) => {
-                    const p = getChoicePresentation(choice, cIdx);
+                    const p = getChoicePresentation(choice);
                     return (
                       <button
                         key={cIdx}
@@ -2632,56 +2518,21 @@ ${logEntries
                             {cIdx + 1}
                           </span>
 
-                          <div className="space-y-1.5 flex-1 min-w-0">
-                            {/* Stance Badge & Title */}
-                            <div className="flex flex-wrap items-center gap-2">
-                              {p.stance && (
-                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold font-narrative-serif border ${
-                                  isLight
-                                    ? "bg-stone-100 text-stone-700 border-stone-200 group-hover:border-amber-300 group-hover:bg-amber-50 group-hover:text-amber-900"
-                                    : "bg-white/5 text-stone-300 border-white/10 group-hover:border-amber-400/40 group-hover:bg-amber-950/30 group-hover:text-amber-300"
-                                }`}>
-                                  【{p.stance}】
-                                </span>
-                              )}
-                              <span className={`text-sm sm:text-base font-bold font-reading-sans ${
-                                isLight ? "text-stone-900 group-hover:text-amber-900" : "text-stone-100 group-hover:text-[#D4A359]"
-                              }`}>
-                                {p.cleanText}
-                              </span>
+                          <div className="space-y-1 flex-1 min-w-0">
+                            {/* Choice Headline Text */}
+                            <div className={`text-sm sm:text-base font-bold font-reading-sans leading-snug ${
+                              isLight ? "text-stone-900 group-hover:text-amber-900" : "text-stone-100 group-hover:text-[#D4A359]"
+                            }`}>
+                              {p.text}
                             </div>
 
-                            {/* Detail */}
+                            {/* Detail narrative (if present) */}
                             {p.detail && (
                               <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans ${
                                 isLight ? "text-stone-600" : "text-stone-400"
                               }`}>
                                 {p.detail}
                               </p>
-                            )}
-
-                            {/* Tradeoff Pills */}
-                            {p.tradeOffs.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5 pt-1">
-                                {p.tradeOffs.map((to, tIdx) => (
-                                  <span
-                                    key={tIdx}
-                                    className={`text-[10px] px-2 py-0.5 rounded border font-medium ${
-                                      to.tone === 'danger'
-                                        ? isLight ? "bg-rose-50 text-rose-800 border-rose-300" : "bg-rose-950/40 text-rose-400 border-rose-800/40"
-                                        : to.tone === 'cash'
-                                        ? isLight ? "bg-emerald-50 text-emerald-800 border-emerald-300" : "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
-                                        : to.tone === 'academic'
-                                        ? isLight ? "bg-amber-50 text-amber-900 border-amber-300" : "bg-amber-950/40 text-amber-400 border-amber-800/40"
-                                        : to.tone === 'global'
-                                        ? isLight ? "bg-purple-50 text-purple-900 border-purple-300" : "bg-purple-950/40 text-purple-400 border-purple-800/40"
-                                        : isLight ? "bg-sky-50 text-sky-900 border-sky-300" : "bg-sky-950/40 text-sky-400 border-sky-800/40"
-                                    }`}
-                                  >
-                                    {to.label}
-                                  </span>
-                                ))}
-                              </div>
                             )}
                           </div>
                         </div>
