@@ -1997,12 +1997,12 @@ ${logEntries
       {/* ================================================================= */}
       {/* 4. MAIN STAGE THEATRE (核心单幕剧场 · 时代动态光影与宣纸/黑曜材质)     */}
       {/* ================================================================= */}
-      <main className={`flex-1 overflow-y-auto flex flex-col items-center p-3 sm:p-6 lg:p-8 relative pb-40 sm:pb-48 transition-colors duration-700 ${getEpochAuraStyle()}`}>
+      <main className={`flex-1 overflow-y-auto flex flex-col items-center justify-start p-3 sm:p-6 lg:p-8 pt-1 sm:pt-2 pb-48 sm:pb-56 relative transition-colors duration-700 ${getEpochAuraStyle()}`}>
         {/* =============================================================== */}
         {/* VIEW A: 终局人生纪念卡 (80亿分之一 标志性生平画卷)                */}
         {/* =============================================================== */}
         {isRetired && finalVerdict ? (
-          <div className={`w-full max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-10 space-y-7 shadow-2xl relative transition-all duration-300 my-auto animate-year-enter overflow-hidden ${
+          <div className={`w-full max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-10 space-y-7 shadow-2xl relative transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter overflow-hidden ${
             isLight
               ? "bg-[#FAF8F5]/98 border-amber-900/20 shadow-amber-950/10 text-stone-900"
               : "bg-[#0E1019]/98 border-[#D4A359]/30 shadow-black/90 text-stone-100"
@@ -2324,7 +2324,7 @@ ${logEntries
             return (
               <div
                 key={`mortality_${currentEntry.id}_${currentEntry.age}`}
-                className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-11 space-y-7 shadow-2xl transition-all duration-300 my-auto animate-year-enter relative overflow-hidden ${
+                className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-11 space-y-7 shadow-2xl transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter relative overflow-hidden ${
                   isLight
                     ? "bg-[#FFFBF7] border-red-900/30 text-stone-900 shadow-red-950/15"
                     : "bg-[#090A10] border-red-800/40 text-stone-100 shadow-[0_0_80px_rgba(185,28,28,0.25)] animate-elegiac-aura"
@@ -2419,7 +2419,7 @@ ${logEntries
           /* =============================================================== */
           <div
             key={`${currentEntry.id}_${currentEntry.age}`}
-            className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-4 sm:p-7 lg:p-9 space-y-4 sm:space-y-5 shadow-2xl transition-all duration-300 my-auto animate-year-enter relative overflow-hidden mb-6 sm:mb-8 ${
+            className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-4 sm:p-6 lg:p-8 space-y-3.5 sm:space-y-4 shadow-2xl transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter relative overflow-hidden ${
               isLight
                 ? "bg-[#FCFAF7]/95 border-amber-900/15 shadow-[0_20px_50px_-10px_rgba(180,140,80,0.12)] text-stone-900"
                 : "bg-[#0E1019]/95 border-[#D4A359]/25 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_30px_rgba(212,163,89,0.06)] text-stone-100"
@@ -2616,50 +2616,30 @@ ${logEntries
                       <button
                         key={cIdx}
                         onClick={() => handleSelectChoice(choice)}
-                        className={`p-4 sm:p-5 rounded-xl border text-left transition-all active:scale-[0.98] group shadow-sm flex items-start justify-between cursor-pointer ${
-                          currentNode.type === 'destiny'
-                            ? isLight
-                              ? "border-amber-400/80 bg-white hover:border-amber-600 hover:bg-amber-50/70 text-stone-900 shadow-amber-950/5"
-                              : "border-[#D4A359]/40 bg-[#1A1624] hover:border-[#D4A359] hover:bg-[#221D30] text-stone-100 shadow-black/40"
-                            : p.archetype === 'merit'
-                            ? isLight
-                              ? "border-amber-300 bg-white hover:border-amber-500 hover:bg-amber-50/50 text-stone-900"
-                              : "border-amber-500/30 bg-[#1A1D2B] hover:border-amber-400 hover:bg-amber-950/20 text-stone-100 shadow-amber-950/10"
-                            : p.archetype === 'hustle'
-                            ? isLight
-                              ? "border-emerald-300 bg-white hover:border-emerald-500 hover:bg-emerald-50/50 text-stone-900"
-                              : "border-emerald-500/30 bg-[#1A1D2B] hover:border-emerald-400 hover:bg-emerald-950/20 text-stone-100 shadow-emerald-950/10"
-                            : p.archetype === 'global'
-                            ? isLight
-                              ? "border-purple-300 bg-white hover:border-purple-500 hover:bg-purple-50/50 text-stone-900"
-                              : "border-purple-500/30 bg-[#1A1D2B] hover:border-purple-400 hover:bg-purple-950/20 text-stone-100 shadow-purple-950/10"
-                            : isLight
-                            ? "border-sky-300 bg-white hover:border-sky-500 hover:bg-sky-50/50 text-stone-900"
-                            : "border-sky-500/30 bg-[#1A1D2B] hover:border-sky-400 hover:bg-sky-950/20 text-stone-100 shadow-sky-950/10"
+                        className={`w-full p-3.5 sm:p-4 rounded-xl border text-left transition-all active:scale-[0.98] group shadow-sm flex items-start justify-between cursor-pointer ${
+                          isLight
+                            ? "border-stone-200 bg-white hover:border-amber-400 hover:bg-amber-50/40 text-stone-900 shadow-stone-900/5"
+                            : "border-white/[0.12] bg-[#141724] hover:border-amber-400/80 hover:bg-[#1A1E2E] text-stone-100 shadow-black/40"
                         }`}
                       >
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
                           {/* Number badge */}
                           <span className={`w-6 h-6 rounded-md border font-mono-num text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                             isLight
-                              ? "bg-stone-100 border-stone-300 text-stone-800"
-                              : "bg-[#11131C] border-white/[0.1] text-[#D4A359]"
+                              ? "bg-stone-100 border-stone-300 text-stone-800 group-hover:border-amber-400 group-hover:bg-amber-100"
+                              : "bg-[#11131C] border-white/[0.1] text-stone-300 group-hover:border-amber-400/60 group-hover:text-amber-400"
                           }`}>
                             {cIdx + 1}
                           </span>
 
-                          <div className="space-y-1.5">
+                          <div className="space-y-1.5 flex-1 min-w-0">
                             {/* Stance Badge & Title */}
                             <div className="flex flex-wrap items-center gap-2">
                               {p.stance && (
-                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold font-narrative-serif ${
-                                  p.archetype === 'merit'
-                                    ? isLight ? "bg-amber-100 text-amber-900 border border-amber-300" : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                                    : p.archetype === 'hustle'
-                                    ? isLight ? "bg-emerald-100 text-emerald-900 border border-emerald-300" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                    : p.archetype === 'global'
-                                    ? isLight ? "bg-purple-100 text-purple-900 border border-purple-300" : "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                                    : isLight ? "bg-sky-100 text-sky-900 border border-sky-300" : "bg-sky-500/20 text-sky-300 border border-sky-500/30"
+                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold font-narrative-serif border ${
+                                  isLight
+                                    ? "bg-stone-100 text-stone-700 border-stone-200 group-hover:border-amber-300 group-hover:bg-amber-50 group-hover:text-amber-900"
+                                    : "bg-white/5 text-stone-300 border-white/10 group-hover:border-amber-400/40 group-hover:bg-amber-950/30 group-hover:text-amber-300"
                                 }`}>
                                   【{p.stance}】
                                 </span>
