@@ -33,7 +33,6 @@ import type {
 import {
   RotateCcw,
   Sparkles,
-  Scale,
   ArrowRight,
   HeartPulse,
   Brain,
@@ -293,7 +292,7 @@ const EndingCodexModal: React.FC<{
   isLight?: boolean;
 }> = ({ isOpen, onClose, unlockedIds, isLight }) => {
   return (
-    <SpringOverlay open={isOpen} onClose={onClose} label="一生结局图鉴"
+    <SpringOverlay open={isOpen} onClose={onClose} label="结局图鉴"
       className={`border rounded-2xl max-w-4xl w-full max-h-[88dvh] flex flex-col overflow-hidden shadow-2xl ${
         isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#0E1017] border-white/[0.08] text-stone-100"
       }`}>
@@ -306,18 +305,13 @@ const EndingCodexModal: React.FC<{
               <h2 className={`text-base sm:text-lg font-bold flex flex-wrap items-center gap-2 font-narrative-serif ${
                 isLight ? "text-stone-900" : "text-stone-100"
               }`}>
-                <span>一生结局图鉴</span>
+                <span>结局图鉴</span>
                 <span className={`text-xs px-2.5 py-0.5 rounded-full font-mono-num font-semibold ${
                   isLight ? "bg-amber-100 text-amber-900 border border-amber-300" : "bg-[#D4A359]/15 border border-[#D4A359]/30 text-[#D4A359]"
                 }`}>
                   已收集 {unlockedIds.length} / 16
                 </span>
               </h2>
-              <p className={`text-xs font-reading-sans mt-0.5 ${
-                isLight ? "text-stone-600 font-medium" : "text-stone-400"
-              }`}>
-                探索不同阶层起点、求学分流与出海抉择，集齐全部 16 大宿命篇章
-              </p>
             </div>
           </div>
           <SpringButton
@@ -436,7 +430,7 @@ const EndingCodexModal: React.FC<{
         <div className={`px-6 py-3 border-t flex flex-wrap items-center justify-between gap-3 text-xs shrink-0 font-reading-sans ${
           isLight ? "bg-stone-50 border-stone-200 text-stone-600" : "bg-[#0E1017] border-white/[0.07] text-stone-400"
         }`}>
-          <span>图鉴记录已持久化保存在当前浏览器</span>
+          <span>记录保存在当前浏览器</span>
           <SpringButton
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold transition-colors shadow-md shadow-amber-950/30"
@@ -1292,25 +1286,10 @@ ${logEntries
         BIRTHPLACE_SLIDES[0];
 
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12 animate-year-enter">
-        <div className="text-center mb-8">
-          <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs sm:text-sm mb-3 font-narrative-serif ${
-            isLight ? "bg-amber-50 border-amber-200 text-amber-900" : "bg-[#13151F] border-white/[0.08] text-stone-300"
-          }`}>
-            <Sparkles className="w-4 h-4 text-[#D4A359]" />
-            人生模拟 · 原生家庭档案
-          </div>
-          <h1 className={`text-2xl sm:text-4xl font-bold tracking-normal mb-2.5 font-narrative-serif ${
-            isLight ? "text-stone-900" : "text-stone-100"
-          }`}>
-            随机投胎 · 抽取人生底牌
-          </h1>
-          <p className={`text-sm sm:text-base max-w-xl mx-auto leading-relaxed font-reading-sans ${
-            isLight ? "text-stone-600" : "text-stone-300"
-          }`}>
-            人无法自主挑选起点。每一个随机生成的家庭，都对应着一段真实的成长轨迹与社会现实。
-          </p>
-        </div>
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 animate-year-enter">
+        <h1 className={`text-xl sm:text-2xl font-semibold mb-6 ${isLight ? "text-stone-900" : "text-stone-100"}`}>
+          人生模拟
+        </h1>
 
         {/* Slot Reel */}
         <div className={`border rounded-2xl p-5 sm:p-7 shadow-xl mb-6 transition-colors ${
@@ -1355,9 +1334,6 @@ ${logEntries
           <div className={`mt-4 pt-3 border-t flex flex-wrap items-center justify-between gap-2.5 font-reading-sans ${
             isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
           }`}>
-            <span className="text-xs sm:text-sm">
-              {isSpinning ? "齿轮飞速运转中..." : "全国34省级行政区全覆盖 · 107套专属风土人生剧本 · 投胎由命"}
-            </span>
             <div className="flex items-center gap-2">
               <SpringButton
                 onClick={handleToggleTheme}
@@ -1366,7 +1342,7 @@ ${logEntries
                     ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
                     : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] text-stone-200"
                 }`}
-                title={isLight ? "切换为深色模式" : "切换为浅色护眼模式"}
+                title={isLight ? "切换为深色模式" : "切换为浅色模式"}
               >
                 {isLight ? (
                   <>
@@ -1390,7 +1366,7 @@ ${logEntries
                 }`}
               >
                 <RotateCcw className={`w-3.5 h-3.5 text-amber-400 ${isSpinning ? "animate-spin" : ""}`} />
-                随机轮盘
+                重新生成
               </SpringButton>
             </div>
           </div>
@@ -1405,7 +1381,7 @@ ${logEntries
           }`}>
             <div>
               <span className="text-xs font-mono-num text-[#D4A359] uppercase tracking-wider block mb-1">
-                【生平档案编号 · 0岁】
+                初始档案 · 0 岁
               </span>
               <h2 className={`text-xl sm:text-2xl font-bold flex flex-wrap items-center gap-3 font-narrative-serif ${
                 isLight ? "text-stone-900" : "text-stone-100"
@@ -1419,7 +1395,7 @@ ${logEntries
               </h2>
             </div>
             <div className="text-left sm:text-right">
-              <span className={`text-xs block font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>阶层水位 · 家庭底资</span>
+              <span className={`text-xs block font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>家庭资产</span>
               <span className={`text-xs sm:text-sm font-semibold font-narrative-serif ${isLight ? "text-amber-900" : "text-[#D4A359]"}`}>
                 {charData.family.wealthTier}
               </span>
@@ -1459,7 +1435,7 @@ ${logEntries
                 title="同省重抽：切换到本省另一个截然不同的出生地、医院与家庭背景"
               >
                 <RotateCcw className="w-3 h-3 text-amber-500" />
-                <span>换本省剧本</span>
+                <span>同省重抽</span>
               </SpringButton>
             </div>
           </div>
@@ -1538,7 +1514,7 @@ ${logEntries
                 <div className="w-6 h-6 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
                   <Shield className="w-3.5 h-3.5 text-sky-600" />
                 </div>
-                <span>同胞与情感底色</span>
+                <span>家庭成员</span>
               </div>
               <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-[34px] ${
                 isLight ? "text-stone-700" : "text-stone-300"
@@ -1558,7 +1534,7 @@ ${logEntries
               onClick={startSimulation}
               className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-950/40  font-narrative-serif tracking-wide"
             >
-              <span>开启人生</span>
+              <span>开始模拟</span>
               <ArrowRight className="w-4 h-4" />
             </SpringButton>
           </div>
@@ -1589,7 +1565,7 @@ ${logEntries
     if (currentNode?.age === 27 && !isSimulationEnded(logEntries)) {
       return "迈向三十岁 · 而立之年";
     }
-    return "从容启程，迈向下一岁";
+    return "下一年";
   };
 
   const getChoicePresentation = (choice: LifeChoice) => {
@@ -1745,7 +1721,7 @@ ${logEntries
         <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-[#D4A359]/20 to-[#C29348]/10 border border-[#D4A359]/30 text-[#D4A359] font-bold shrink-0">
             <Sparkles className="w-3.5 h-3.5" />
-            <span className="font-narrative-serif tracking-wider text-[11px] sm:text-xs">十四亿分之一</span>
+            <span className="font-narrative-serif tracking-wider text-[11px] sm:text-xs">{charData.name}</span>
           </div>
 
           <div className="hidden min-w-0 lg:flex items-center gap-1.5 text-[11px] font-reading-sans">
@@ -1876,7 +1852,7 @@ ${logEntries
                 ? "bg-stone-100/80 hover:bg-rose-50 border-stone-300 text-stone-700 hover:text-rose-700 hover:border-rose-300"
                 : "bg-white/[0.05] hover:bg-rose-950/30 border-white/[0.08] text-stone-300 hover:text-rose-400 hover:border-rose-800/40"
             }`}
-            title="重新投胎轮回"
+            title="重新生成角色"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">重开</span>
@@ -2028,7 +2004,7 @@ ${logEntries
             </div>
 
             {/* ============================================================= */}
-            {/* 80-BILLION-STYLE EPITAPH TO ONESELF (终局对自己的寄语 · 朱砂印讫)  */}
+            {/* 80-BILLION-STYLE EPITAPH TO ONESELF (终局对自己的寄语 · 确认)  */}
             {/* ============================================================= */}
             <div className={`p-5 sm:p-6 rounded-2xl border relative overflow-hidden transition-all ${
               epitaphConfirmed
@@ -2090,7 +2066,7 @@ ${logEntries
                         }}
                         className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold text-xs sm:text-sm font-narrative-serif tracking-wide shadow-md  transition-colors shrink-0"
                       >
-                        朱砂印讫
+                        确认
                       </SpringButton>
                     </div>
 
@@ -2120,7 +2096,7 @@ ${logEntries
                 ) : (
                   <div className="p-4 rounded-xl border border-red-700/50 bg-red-950/30 flex items-center justify-between gap-4">
                     <div className="space-y-1 flex-1">
-                      <div className="text-xs text-red-400 font-narrative-serif font-semibold">【朱砂印讫 · 一生圆满】</div>
+                      <div className="text-xs text-red-400 font-narrative-serif font-semibold">已确认</div>
                       <div className="text-sm sm:text-base font-narrative-serif text-amber-200 italic font-semibold">
                         “{epitaphInput || '不虚此生，无怨无悔。'}”
                       </div>
@@ -2293,7 +2269,7 @@ ${logEntries
                     className="w-full py-[1.125rem] px-6 rounded-2xl bg-gradient-to-r from-red-800 via-red-700 to-amber-900 hover:from-red-700 hover:to-amber-800 text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 shadow-2xl  transition-colors font-narrative-serif tracking-widest border border-red-500/40 group cursor-pointer"
                   >
                     <div className="seal-stamp-box px-2 py-0.5 text-xs text-white border-white/80">印讫</div>
-                    <span>盖上生平朱砂大印 · 步入终生生平档案</span>
+                    <span>查看结局</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     <span className="text-[11px] font-normal opacity-75 hidden sm:inline ml-1 font-mono-num">
                       (按空格 Space 盖印)
@@ -2445,33 +2421,9 @@ ${logEntries
               }`}>
                 {/* Prompt Header */}
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <span className="text-xs font-bold text-[#D4A359] font-narrative-serif flex items-center gap-1.5">
-                      {currentNode.type === 'destiny' ? (
-                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border bg-amber-500/15 border-amber-500/35 text-amber-400">
-                          <Scale className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                          <span>天命定夺 · 历史狂澜避无可避 · 第 {currentAge} 岁</span>
-                        </div>
-                      ) : (
-                        <>
-                          <Sparkles className="w-3.5 h-3.5" />
-                          重大抉择时刻 · 第 {currentAge} 岁
-                        </>
-                      )}
-                    </span>
-                    <h3 className={`text-sm sm:text-base font-extrabold font-narrative-serif ${
-                      isLight ? "text-stone-900" : "text-stone-100"
-                    }`}>
-                      {currentNode.type === 'destiny'
-                        ? "时代巨浪迎面拍下，不可抗力之下你唯有迎难定夺："
-                        : "站在人生的十字路口，你需要做出决断："}
-                    </h3>
-                    {currentNode.type === 'destiny' && (
-                      <p className="text-xs text-stone-500 dark:text-stone-400 font-reading-sans italic">
-                        “时代的一粒沙，落在个人头上便是一座山。不可抗力降临，每个选择皆是一生的重量。”
-                      </p>
-                    )}
-                  </div>
+                  <h3 className={`text-sm sm:text-base font-semibold ${isLight ? "text-stone-900" : "text-stone-100"}`}>
+                    选择下一步
+                  </h3>
                   <div className="flex items-center gap-2 shrink-0 ml-3">
                     <span className="text-[11px] text-[#D4A359] font-mono-num bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
                       共 {currentNode.choices.length} 项
@@ -2542,7 +2494,7 @@ ${logEntries
             )}
 
             {/* ============================================================= */}
-            {/* SEALED CHOICE CONSEQUENCE FEEDBACK (朱砂印讫动效仪式)             */}
+            {/* SEALED CHOICE CONSEQUENCE FEEDBACK (确认动效仪式)             */}
             {/* ============================================================= */}
             {currentEntry.chosenOptionText && (
               <div className={`p-4 sm:p-5 rounded-2xl border relative overflow-hidden transition-all duration-300 z-10 flex items-center justify-between gap-4 ${
@@ -2556,7 +2508,7 @@ ${logEntries
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
                     <span className="text-xs font-bold font-narrative-serif text-red-500 tracking-wider">
-                      【朱砂印讫 · 命运定分】
+                      选择已记录
                     </span>
                     <span className="text-xs font-semibold font-narrative-serif text-stone-800 dark:text-stone-200">
                       {currentEntry.chosenOptionText}
@@ -2596,7 +2548,7 @@ ${logEntries
             isWaitingCurrentChoice ? (
               <div className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-amber-500/15 border border-amber-500/35 text-amber-400 font-bold text-xs sm:text-sm flex items-center gap-1.5 font-narrative-serif tracking-wide shrink-0 animate-pulse select-none">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>请在上方定夺 (按 1/2/3)</span>
+                <span>请选择选项（1/2/3）</span>
               </div>
             ) : (
               <SpringButton
@@ -2667,7 +2619,7 @@ ${logEntries
           {isShowingMortalityClimax ? (
             <span className="text-red-400 font-bold text-xs flex items-center gap-1.5 animate-pulse font-narrative-serif px-1">
               <span className="seal-stamp-box px-1.5 py-[0.05rem] text-[10px]">绝唱</span>
-              <span>请盖上生平朱砂大印</span>
+              <span>请确认结局</span>
             </span>
           ) : !isRetired ? (
             <SpringButton
@@ -2685,7 +2637,7 @@ ${logEntries
             </SpringButton>
           ) : (
             <span className="text-xs text-[#D4A359] font-narrative-serif px-1">
-              ✨ 一生落幕
+              模拟结束
             </span>
           )}
 
@@ -2699,10 +2651,10 @@ ${logEntries
                 ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
                 : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
             }`}
-            title="查阅全卷生平履历"
+            title="查看模拟记录"
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">岁月忆录</span>
+            <span className="hidden sm:inline">模拟记录</span>
             <span className="font-mono-num font-bold">({logEntries.length})</span>
           </SpringButton>
 
@@ -2716,7 +2668,7 @@ ${logEntries
                 ? "bg-stone-100 hover:bg-rose-50 border-stone-300 text-stone-600 hover:text-rose-700 hover:border-rose-300"
                 : "bg-white/[0.04] hover:bg-rose-950/30 border-white/[0.08] text-stone-400 hover:text-rose-400 hover:border-rose-800/40"
             }`}
-            title="重新投胎轮回"
+            title="重新生成角色"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">重开</span>
@@ -2725,12 +2677,12 @@ ${logEntries
       </div>
 
       {/* ================================================================= */}
-      {/* 6. MEMOIR DRAWER (岁月忆录抽屉 · 随时查阅全卷生平)                    */}
+      {/* 6. MEMOIR DRAWER (模拟记录抽屉 · 随时查阅全卷生平)                    */}
       {/* ================================================================= */}
       <SpringOverlay
         open={showMemoirDrawer}
         drawer
-        label="岁月忆录 · 生平全卷"
+        label="模拟记录"
         onClose={() => setShowMemoirDrawer(false)}
         className={`w-full max-w-xl h-full shadow-2xl flex flex-col ${
           isLight ? "bg-[#FAF9F5] text-stone-900" : "bg-[#0E1017] text-stone-100"
@@ -2742,7 +2694,7 @@ ${logEntries
             }`}>
               <div className="flex flex-wrap items-center gap-2 font-narrative-serif font-bold text-sm sm:text-base">
                 <BookOpen className="w-4 h-4 text-[#D4A359]" />
-                <span>岁月忆录 · 生平全卷</span>
+                <span>模拟记录</span>
                 <span className={`text-xs px-2 py-0.5 rounded-full font-mono-num ${
                   isLight ? "bg-amber-100 text-amber-900" : "bg-[#D4A359]/20 text-[#D4A359]"
                 }`}>
@@ -2779,7 +2731,7 @@ ${logEntries
                 isLight ? "bg-white border-stone-200 shadow-sm" : "bg-[#141622] border-white/[0.08]"
               }`}>
                 <div className="text-xs font-bold text-[#D4A359] font-narrative-serif">
-                  【命盘起点 · 原生家庭档案】
+                  初始档案
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-stone-500">
                   <div>出生地域：<span className="text-stone-800 dark:text-stone-200 font-medium">{charData.family.province || charData.family.region.split('·')[0].trim()} · {charData.family.cityOrCounty}</span></div>
@@ -2833,7 +2785,7 @@ ${logEntries
                     {entry.chosenOptionText && (
                       <div className="pt-1.5 border-t border-dashed border-amber-500/30 space-y-1">
                         <div className="text-[11px] font-bold text-[#D4A359] font-narrative-serif flex items-center gap-1">
-                          <span>【抉择印讫】</span>
+                          <span>已选</span>
                           <span>{entry.chosenOptionText}</span>
                         </div>
                         {entry.chosenReaction && (
@@ -2860,7 +2812,7 @@ ${logEntries
                     : "bg-white/[0.06] hover:bg-white/[0.1] border-white/[0.1] text-stone-200"
                 }`}
               >
-                收起岁月忆录
+                收起模拟记录
               </SpringButton>
             </div>
       </SpringOverlay>

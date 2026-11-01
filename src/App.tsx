@@ -33,6 +33,11 @@ export function App() {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
+  const handleTabChange = (tab: 'sim' | 'guide') => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
   const handleNavigateToGuide = (countryId?: string) => {
     if (countryId) {
       setGuideCountry(countryId);
@@ -51,7 +56,7 @@ export function App() {
         {/* Navigation Header */}
         <Header
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setActiveTab={handleTabChange}
           theme={theme}
           onToggleTheme={toggleTheme}
         />

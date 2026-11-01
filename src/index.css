@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --app-header-height: 104px;
+  --app-header-height: 56px;
   color-scheme: dark;
   /* 现代高清晰度抗疲劳无衬线字体栈（长篇生平沉浸阅读，清晰锐利） */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
@@ -18,9 +18,10 @@
 
 .app-header-layout {
   height: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: minmax(0, 1fr) 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .simulator-viewport {
@@ -55,11 +56,6 @@
 }
 
 @media (min-width: 1024px) {
-  :root { --app-header-height: 64px; }
-  .app-header-layout {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
-  }
   .simulator-hud {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     min-height: 64px;

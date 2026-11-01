@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatedDisclosure, SpringButton } from './MotionPrimitives';
 import {
-  Compass,
   Calculator,
   ShieldCheck,
   CheckCircle2,
@@ -102,7 +101,7 @@ const OFFICIAL_PORTALS: Record<
       title: 'Comprehensive Ranking System (CRS) 官方打分工具',
       authority: '加拿大联邦政府官方直测',
       url: 'https://ircc.canada.ca/english/immigrate/skilled/crs-tool.asp',
-      desc: '无中介加价，直接输入年龄、语言成绩与学历，实时计算联邦池内得分。'
+      desc: '输入年龄、语言成绩与学历，计算联邦池内得分。'
     }
   ],
   usa: [
@@ -312,9 +311,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
 
   // 导出 Markdown 备忘清单
   const handleExportMarkdown = () => {
-    let md = `# 逃离指北 · 我的手搓移居备忘录 - ${country.name} (${country.englishName})\n\n`;
-    md += `> 生成时间：${new Date().toLocaleDateString()} | 来源：EscapePlan 逃跑计划\n\n`;
-    md += `## 1. 真实生活成本参考基准\n`;
+    let md = `# 移居准备清单 - ${country.name} (${country.englishName})\n\n`;
+    md += `> 生成时间：${new Date().toLocaleDateString()} | 来源：EscapePlan\n\n`;
+    md += `## 1. 生活成本参考\n`;
     md += `- 目标城市：${cityBenchmark.city}\n`;
     md += `- 测算税前年薪：${effectiveSalary.toLocaleString()} ${cityBenchmark.currency}\n`;
     md += `- 扣除个税/社保后月到手：约 ${netTakeHomeMonthly.toLocaleString()} ${cityBenchmark.currency} (约 ¥${netTakeHomeRMB.toLocaleString()} RMB)\n`;
@@ -326,7 +325,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
       md += `- 当前自测总分：${totalPoints} 分 (合格基准线：${currentSubclass.pointCalculator.threshold} 分)\n\n`;
     }
 
-    md += `## 3. 手搓待办清单进度\n`;
+    md += `## 3. 待办清单进度\n`;
     diyRoadmap.stages.forEach((stage) => {
       md += `\n### ${stage.stageName} - ${stage.stageSubtitle}\n`;
       stage.tasks.forEach((t) => {
@@ -350,30 +349,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
       {/* =================================================================== */}
       {/* 1. TOP HEADER & PROMISE                                             */}
       {/* =================================================================== */}
-      <div className="text-center space-y-2.5">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border text-xs font-semibold font-narrative-serif bg-amber-500/10 border-amber-500/30 text-amber-500">
-          <Compass className="w-4 h-4" />
-          <span>实操指南 · 击碎中介信息差 · 真实底线账本</span>
-        </div>
-        <h1
-          className={`text-2xl sm:text-4xl font-extrabold tracking-tight font-narrative-serif ${
-            isLight ? 'text-stone-900' : 'text-stone-100'
-          }`}
-        >
-          逃离指北：普通人的现实自救与移居手册
-        </h1>
-        <p
-          className={`text-xs sm:text-sm max-w-3xl mx-auto leading-relaxed font-reading-sans ${
-            isLight ? 'text-stone-600' : 'text-stone-400'
-          }`}
-        >
-          不编造“海外遍地黄金”的幻象，也不宣扬非理性的盲目逃跑。直面五大核心追问：
-          <span className="font-semibold text-amber-500">
-            『去哪里？怎么拿签证？最低花费多少？几年后能不能留？今天开始怎么动手？』
-          </span>
-          全部数据锚定各国移民局法条与真实购买力。
-        </p>
-      </div>
+      <h1 className={`text-xl sm:text-2xl font-semibold ${isLight ? 'text-stone-900' : 'text-stone-100'}`}>
+        移居指南
+      </h1>
 
       {/* =================================================================== */}
       {/* 2. COUNTRY SELECTION DOCK                                           */}
@@ -414,7 +392,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                   </span>
                 </div>
                 <div>
-                  <div className="text-sm font-bold font-narrative-serif leading-tight">
+                  <div className="text-sm font-bold font-sans leading-tight">
                     {c.name}
                   </div>
                   <div className="text-[11px] opacity-75 font-mono-num truncate">
@@ -440,16 +418,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             <span className="text-4xl">{country.flag}</span>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl sm:text-2xl font-extrabold font-narrative-serif">
-                  {country.name} · 生存档案
+                <h2 className="text-xl sm:text-2xl font-semibold font-sans">
+                  {country.name}
                 </h2>
-                <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold border bg-amber-500/10 border-amber-500/30 text-amber-500">
-                  {country.badge}
-                </span>
               </div>
-              <p className="text-xs text-stone-400 font-reading-sans mt-0.5">
-                {country.tagline}
-              </p>
             </div>
           </div>
 
@@ -460,10 +432,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 ? 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800'
                 : 'bg-white/[0.06] hover:bg-white/[0.12] border-white/[0.1] text-stone-200'
             }`}
-            title="一键导出为本地 Markdown Checklist"
+            title="导出 Markdown 清单"
           >
             <Download className="w-3.5 h-3.5 text-amber-400" />
-            <span>导出本国手搓清单 (.md)</span>
+            <span>导出清单 (.md)</span>
           </SpringButton>
         </div>
 
@@ -482,7 +454,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               isLight ? 'bg-stone-50 border-stone-200' : 'bg-white/[0.03] border-white/[0.05]'
             }`}
           >
-            <span className="text-stone-400 block text-[11px] mb-0.5">语言门槛现实</span>
+            <span className="text-stone-400 block text-[11px] mb-0.5">语言要求</span>
             <span className="font-bold">{country.languageRequirement}</span>
           </div>
           <div
@@ -524,16 +496,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
-                Q1
-              </span>
               <div>
-                <h3 className="text-sm sm:text-base font-extrabold font-narrative-serif">
-                  我适合去【{country.name}】吗？有哪些中介绝口不提的硬性代价？
+                <h3 className="text-sm sm:text-base font-semibold font-sans">
+                  适用条件
                 </h3>
-                <p className="text-xs text-stone-400 font-reading-sans">
-                  客观看清自身底牌，拒绝盲目跟风
-                </p>
               </div>
             </div>
             <ChevronDown
@@ -554,9 +520,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                       : 'bg-emerald-950/20 border-emerald-800/40 text-stone-200'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 font-bold text-emerald-500 font-narrative-serif">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-500 font-sans">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>极其适合以下人群：</span>
+                    <span>适合人群</span>
                   </div>
                   <ul className="list-disc list-inside space-y-1 text-xs leading-relaxed">
                     {cityBenchmark.pros.map((pro, pIdx) => (
@@ -573,9 +539,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                       : 'bg-rose-950/20 border-rose-800/40 text-stone-200'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 font-bold text-rose-500 font-narrative-serif">
+                  <div className="flex items-center gap-1.5 font-bold text-rose-500 font-sans">
                     <AlertTriangle className="w-4 h-4" />
-                    <span>以下情况强烈建议劝退：</span>
+                    <span>不适合的情况</span>
                   </div>
                   <ul className="list-disc list-inside space-y-1 text-xs leading-relaxed">
                     {cityBenchmark.cons.map((con, cIdx) => (
@@ -593,7 +559,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               >
                 <HelpCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div className="text-xs text-stone-400 leading-relaxed">
-                  <span className="font-bold text-stone-200">语言真实真相：</span>
+                  <span className="font-bold text-stone-200">语言说明：</span>
                   {selectedCountryId === 'japan'
                     ? '纯英语只在外资IT大厂（如 Mercari、LINE）行得通；要过上舒服的生活、融入租房、办手续并进入传统本土企业，N2 是绝对底线，N1 才是舒适圈。'
                     : selectedCountryId === 'germany'
@@ -623,16 +589,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
-                Q2
-              </span>
               <div>
-                <h3 className="text-sm sm:text-base font-extrabold font-narrative-serif">
-                  怎么拿到签证？求学、直聘、游民各通道怎么选？内嵌官方积分测算
+                <h3 className="text-sm sm:text-base font-semibold font-sans">
+                  签证与积分
                 </h3>
-                <p className="text-xs text-stone-400 font-reading-sans">
-                  拆解主流合法签证类别，公开官方打分机制
-                </p>
               </div>
             </div>
             <ChevronDown
@@ -686,7 +646,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3 border-amber-500/15">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-sm sm:text-base font-narrative-serif text-[#D4A359]">
+                      <span className="font-semibold text-sm sm:text-base font-sans text-[#D4A359]">
                         {currentSubclass.name}
                       </span>
                       <span className="text-xs text-stone-400 font-mono-num">
@@ -708,7 +668,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 {/* 核心申请条件 */}
                 <div className="space-y-1.5">
                   <span className="text-xs font-bold text-stone-300 block">
-                    【官方硬性门槛与申请资格】
+                    申请条件
                   </span>
                   <ul className="list-disc list-inside space-y-1 text-xs text-stone-400 leading-relaxed">
                     {currentSubclass.requirements.map((req, rIdx) => (
@@ -729,8 +689,8 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-2.5 border-amber-500/20">
                       <div className="flex items-center gap-2">
                         <Calculator className="w-4 h-4 text-amber-400" />
-                        <span className="font-bold text-sm font-narrative-serif text-amber-500">
-                          官方打分系统实时测算 (在线勾选测算)
+                        <span className="font-bold text-sm font-sans text-amber-500">
+                          积分测算
                         </span>
                       </div>
                       <div className="flex items-center gap-2 font-mono-num text-xs">
@@ -794,7 +754,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                       <div className="flex items-center gap-2">
                         <Award className="w-5 h-5 text-amber-400 shrink-0" />
                         <div>
-                          <div className="text-xs font-bold font-narrative-serif">
+                          <div className="text-xs font-bold font-sans">
                             当前自测总积分：
                             <span className="text-lg font-mono-num text-amber-400 ml-1">
                               {totalPoints}
@@ -837,16 +797,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
-                Q3
-              </span>
               <div>
-                <h3 className="text-sm sm:text-base font-extrabold font-narrative-serif">
-                  最低花费到底是多少？每月税后真实能剩多少钱？（真实收支沙盒）
+                <h3 className="text-sm sm:text-base font-semibold font-sans">
+                  预算与月度收支
                 </h3>
-                <p className="text-xs text-stone-400 font-reading-sans">
-                  打破年薪汇率滤镜，扣除税费、房租与医保后的底线数字
-                </p>
               </div>
             </div>
             <ChevronDown
@@ -860,9 +814,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             <div className="p-4 sm:p-6 pt-0 border-t border-amber-500/10 space-y-5 text-xs sm:text-sm font-reading-sans">
               {/* 最低启动资金硬指标 */}
               <div className="pt-4 space-y-2">
-                <span className="text-xs font-bold text-amber-400 font-narrative-serif flex items-center gap-1.5">
+                <span className="text-xs font-bold text-amber-400 font-sans flex items-center gap-1.5">
                   <Flame className="w-3.5 h-3.5" />
-                  <span>【启动底线】：落地该国必须准备的最低真金白银</span>
+                  <span>启动资金参考</span>
                 </span>
                 <div
                   className={`p-4 rounded-xl border space-y-2 leading-relaxed ${
@@ -874,7 +828,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                   {selectedCountryId === 'japan' ? (
                     <div>
                       <p className="font-bold text-sm text-amber-400">
-                        去日本最低启动资金底线：8 ~ 10 万元人民币
+                        日本启动资金参考：8 ~ 10 万元人民币
                       </p>
                       <p className="text-xs text-stone-400 mt-1">
                         • 语校学费首期：约 80 万日元/年（折合约 3.7 万 RMB）
@@ -889,7 +843,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                   ) : selectedCountryId === 'germany' ? (
                     <div>
                       <p className="font-bold text-sm text-amber-400">
-                        去德国最低启动资金底线：8.8 ~ 10 万元人民币
+                        德国启动资金参考：8.8 ~ 10 万元人民币
                       </p>
                       <p className="text-xs text-stone-400 mt-1">
                         • 公立大学免学费：每学期仅收 250~350 欧元的学期杂费（含市内公交学期票）。
@@ -902,7 +856,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                   ) : selectedCountryId === 'thailand' ? (
                     <div>
                       <p className="font-bold text-sm text-amber-400">
-                        去泰国最低启动资金底线：1.5 ~ 3 万元人民币
+                        泰国启动资金参考：1.5 ~ 3 万元人民币
                       </p>
                       <p className="text-xs text-stone-400 mt-1">
                         • DTV 签证费：约 10,000 泰铢（约 2,100 RMB），单次签发 5 年多次往返。
@@ -932,8 +886,8 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-2.5 border-amber-500/15">
-                  <span className="font-bold text-sm font-narrative-serif text-[#D4A359]">
-                    当地真实月度税后收支沙盒 ({cityBenchmark.city})
+                  <span className="font-bold text-sm font-sans text-[#D4A359]">
+                    月度收支估算 ({cityBenchmark.city})
                   </span>
                   <span className="text-xs text-stone-400 font-mono-num">
                     当前汇率基准: 1 {cityBenchmark.currency} ≈ {cityBenchmark.currencyRateToRMB} RMB
@@ -1041,16 +995,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
-                Q4
-              </span>
               <div>
-                <h3 className="text-sm sm:text-base font-extrabold font-narrative-serif">
-                  待几年再回来？还是能彻底留下？（签证升级阶梯 Visa Ladder）
+                <h3 className="text-sm sm:text-base font-semibold font-sans">
+                  长期居留路径
                 </h3>
-                <p className="text-xs text-stone-400 font-reading-sans">
-                  两种心态的退路与成本核算：回国的损耗 vs 转绿卡的硬指标
-                </p>
               </div>
             </div>
             <ChevronDown
@@ -1069,9 +1017,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                     isLight ? 'bg-stone-50 border-stone-200' : 'bg-[#151722] border-white/[0.08]'
                   }`}
                 >
-                  <div className="font-bold text-amber-400 font-narrative-serif flex items-center gap-1.5">
+                  <div className="font-bold text-amber-400 font-sans flex items-center gap-1.5">
                     <Clock className="w-4 h-4" />
-                    <span>【模式一】：体验 1 ~ 3 年后回国</span>
+                    <span>短期居留：1 ~ 3 年后回国</span>
                   </div>
                   <div className="space-y-1.5 text-xs text-stone-400 leading-relaxed">
                     <p>
@@ -1091,9 +1039,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                     isLight ? 'bg-stone-50 border-stone-200' : 'bg-[#151722] border-white/[0.08]'
                   }`}
                 >
-                  <div className="font-bold text-emerald-400 font-narrative-serif flex items-center gap-1.5">
+                  <div className="font-bold text-emerald-400 font-sans flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4" />
-                    <span>【模式二】：彻底留居（永住 / 绿卡路径）</span>
+                    <span>长期居留：永居 / 绿卡</span>
                   </div>
                   <div className="space-y-1.5 text-xs text-stone-400 leading-relaxed">
                     {selectedCountryId === 'japan' ? (
@@ -1213,16 +1161,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
-                Q5
-              </span>
               <div>
-                <h3 className="text-sm sm:text-base font-extrabold font-narrative-serif">
-                  我现在（今天）要准备什么？怎么零中介手搓 DIY？可交互 Checklist
+                <h3 className="text-sm sm:text-base font-semibold font-sans">
+                  准备清单
                 </h3>
-                <p className="text-xs text-stone-400 font-reading-sans">
-                  分阶段时序推进表，直接勾选进度并保存至当前浏览器
-                </p>
               </div>
             </div>
             <ChevronDown
@@ -1236,7 +1178,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             <div className="p-4 sm:p-6 pt-0 border-t border-amber-500/10 space-y-5 text-xs sm:text-sm font-reading-sans">
               <div className="pt-4 flex items-center justify-between">
                 <span className="font-bold text-stone-300">
-                  【{country.name} · 手搓推进总进度】：
+                  清单进度：
                   <span className="text-amber-400 font-mono-num ml-1">
                     {diyRoadmap.stages.reduce(
                       (acc, s) => acc + s.tasks.filter((t) => completedTasks[t.id]).length,
@@ -1264,7 +1206,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                         <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center">
                           {sIdx + 1}
                         </span>
-                        <span className="font-bold font-narrative-serif text-stone-200 text-sm">
+                        <span className="font-bold font-sans text-stone-200 text-sm">
                           {stage.stageName}
                         </span>
                       </div>
@@ -1320,7 +1262,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                               </p>
                               {task.warningTip && (
                                 <p className="text-[11px] text-rose-400 font-medium">
-                                  ⚠️ 避坑提醒: {task.warningTip}
+                                  注意事项： {task.warningTip}
                                 </p>
                               )}
                             </div>
@@ -1347,12 +1289,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
         <div className="flex items-center gap-2 border-b pb-3 border-amber-500/20">
           <ShieldCheck className="w-5 h-5 text-amber-400" />
           <div>
-            <h3 className="text-base sm:text-lg font-extrabold font-narrative-serif">
-              官方权威直达专栏 · 【{country.name}】移民局与法条官方信源
+            <h3 className="text-base sm:text-lg font-semibold font-sans">
+              官方链接
             </h3>
-            <p className="text-xs text-stone-400 font-reading-sans">
-              全站坚决剔除任何第三方中介广告与营销推广，所有规程请以以下主权国家官方发布为准
-            </p>
           </div>
         </div>
 
@@ -1376,7 +1315,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                   </span>
                   <ExternalLink className="w-3.5 h-3.5 text-stone-400 group-hover:text-amber-400 transition-colors" />
                 </div>
-                <div className="font-bold text-xs sm:text-sm font-narrative-serif group-hover:text-amber-400 transition-colors">
+                <div className="font-bold text-xs sm:text-sm font-sans group-hover:text-amber-400 transition-colors">
                   {portal.title}
                 </div>
                 <p className="text-[11px] text-stone-400 leading-relaxed">{portal.desc}</p>
@@ -1394,8 +1333,8 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             isLight ? 'bg-amber-50/50 border-amber-200' : 'bg-black/30 border-white/[0.06]'
           }`}
         >
-          <span className="text-xs font-bold text-amber-400 font-narrative-serif block">
-            【国内材料准备权威官方通道】
+          <span className="text-xs font-bold text-amber-400 font-sans block">
+            国内材料办理
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             {CHINESE_OFFICIAL_RESOURCES.map((res, rIdx) => (
