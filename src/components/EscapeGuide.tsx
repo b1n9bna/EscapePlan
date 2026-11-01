@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AnimatedDisclosure, SpringButton } from './MotionPrimitives';
 import {
   Compass,
   Calculator,
@@ -385,10 +386,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
           {COUNTRIES_DATA.map((c) => {
             const isSelected = c.id === selectedCountryId;
             return (
-              <button
+              <SpringButton
                 key={c.id}
                 onClick={() => setSelectedCountryId(c.id)}
-                className={`p-3 rounded-2xl border text-left transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between ${
+                className={`p-3 rounded-2xl border text-left transition-colors  cursor-pointer flex flex-col justify-between ${
                   isSelected
                     ? isLight
                       ? 'bg-amber-50/90 border-amber-500 text-stone-900 shadow-md ring-2 ring-amber-400/20'
@@ -401,7 +402,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="text-2xl">{c.flag}</span>
                   <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded font-mono-num font-semibold ${
+                    className={`text-[10px] px-1.5 py-[0.05rem] rounded font-mono-num font-semibold ${
                       isSelected
                         ? 'bg-amber-500 text-stone-950 font-bold'
                         : isLight
@@ -420,7 +421,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                     {c.englishName}
                   </div>
                 </div>
-              </button>
+              </SpringButton>
             );
           })}
         </div>
@@ -435,7 +436,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
         }`}
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 border-amber-500/20">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <span className="text-4xl">{country.flag}</span>
             <div>
               <div className="flex items-center gap-2">
@@ -452,9 +453,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
             </div>
           </div>
 
-          <button
+          <SpringButton
             onClick={handleExportMarkdown}
-            className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0 ${
+            className={`px-3.5 py-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors  shrink-0 ${
               isLight
                 ? 'bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800'
                 : 'bg-white/[0.06] hover:bg-white/[0.12] border-white/[0.1] text-stone-200'
@@ -463,7 +464,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
           >
             <Download className="w-3.5 h-3.5 text-amber-400" />
             <span>导出本国手搓清单 (.md)</span>
-          </button>
+          </SpringButton>
         </div>
 
         {/* 关键基础参数 */}
@@ -511,15 +512,18 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
         {/* Q1: 我适不适合去？（门槛、适合谁、不适合谁）                            */}
         {/* ----------------------------------------------------------------- */}
         <div
-          className={`border rounded-2xl transition-all overflow-hidden ${
+          className={`border rounded-2xl transition-colors overflow-hidden ${
             isLight ? 'bg-white border-stone-200' : 'bg-[#10121B] border-white/[0.08]'
           }`}
         >
-          <button
+          <SpringButton
+            id="guide-question-0"
+            aria-expanded={activeFaqIndex === 0}
+            aria-controls="guide-panel-0"
             onClick={() => setActiveFaqIndex(activeFaqIndex === 0 ? null : 0)}
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
                 Q1
               </span>
@@ -533,13 +537,13 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               </div>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-stone-400 transition-transform ${
+              className={`w-5 h-5 shrink-0 ml-3 text-stone-400 transition-transform ${
                 activeFaqIndex === 0 ? 'rotate-180 text-amber-400' : ''
               }`}
             />
-          </button>
+          </SpringButton>
 
-          {activeFaqIndex === 0 && (
+          <AnimatedDisclosure open={activeFaqIndex === 0} id="guide-panel-0" labelledBy="guide-question-0">
             <div className="p-4 sm:p-6 pt-0 border-t border-amber-500/10 space-y-4 text-xs sm:text-sm font-reading-sans">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                 {/* 适合人群 */}
@@ -600,22 +604,25 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          </AnimatedDisclosure>
         </div>
 
         {/* ----------------------------------------------------------------- */}
         {/* Q2: 怎么拿签证？三大通道（求学/工作/游民）怎么申请？内嵌积分算分器       */}
         {/* ----------------------------------------------------------------- */}
         <div
-          className={`border rounded-2xl transition-all overflow-hidden ${
+          className={`border rounded-2xl transition-colors overflow-hidden ${
             isLight ? 'bg-white border-stone-200' : 'bg-[#10121B] border-white/[0.08]'
           }`}
         >
-          <button
+          <SpringButton
+            id="guide-question-1"
+            aria-expanded={activeFaqIndex === 1}
+            aria-controls="guide-panel-1"
             onClick={() => setActiveFaqIndex(activeFaqIndex === 1 ? null : 1)}
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
                 Q2
               </span>
@@ -629,13 +636,13 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               </div>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-stone-400 transition-transform ${
+              className={`w-5 h-5 shrink-0 ml-3 text-stone-400 transition-transform ${
                 activeFaqIndex === 1 ? 'rotate-180 text-amber-400' : ''
               }`}
             />
-          </button>
+          </SpringButton>
 
-          {activeFaqIndex === 1 && (
+          <AnimatedDisclosure open={activeFaqIndex === 1} id="guide-panel-1" labelledBy="guide-question-1">
             <div className="p-4 sm:p-6 pt-0 border-t border-amber-500/10 space-y-5 text-xs sm:text-sm font-reading-sans">
               {/* 子签证通道切换 Pill */}
               <div className="pt-4">
@@ -646,13 +653,13 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                   {country.subclasses.map((sub) => {
                     const isSelected = sub.id === currentSubclass.id;
                     return (
-                      <button
+                      <SpringButton
                         key={sub.id}
                         onClick={() => {
                           setSelectedSubclassId(sub.id);
                           setCalcSelections({});
                         }}
-                        className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors  cursor-pointer flex items-center gap-1.5 ${
                           isSelected
                             ? 'bg-amber-500 text-stone-950 border-amber-400 font-bold shadow-sm'
                             : isLight
@@ -664,7 +671,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                         <span className="text-[10px] opacity-75 font-mono-num">
                           [{sub.difficulty}]
                         </span>
-                      </button>
+                      </SpringButton>
                     );
                   })}
                 </div>
@@ -752,10 +759,10 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                               {rule.options.map((opt, oIdx) => {
                                 const isChecked = currentPoints === opt.points;
                                 return (
-                                  <button
+                                  <SpringButton
                                     key={oIdx}
                                     onClick={() => handleSelectRuleOption(rule.id, opt.points)}
-                                    className={`p-2 rounded-lg border text-left transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between ${
+                                    className={`p-2 rounded-lg border text-left transition-colors  cursor-pointer flex items-center justify-between ${
                                       isChecked
                                         ? 'bg-amber-500/20 border-amber-400 text-amber-300 font-bold'
                                         : isLight
@@ -767,7 +774,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                                     <span className="font-mono-num shrink-0 text-amber-400 font-bold">
                                       +{opt.points}
                                     </span>
-                                  </button>
+                                  </SpringButton>
                                 );
                               })}
                             </div>
@@ -811,22 +818,25 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 )}
               </div>
             </div>
-          )}
+          </AnimatedDisclosure>
         </div>
 
         {/* ----------------------------------------------------------------- */}
         {/* Q3: 真实成本与最低花费？（去滤镜真实账本）                                */}
         {/* ----------------------------------------------------------------- */}
         <div
-          className={`border rounded-2xl transition-all overflow-hidden ${
+          className={`border rounded-2xl transition-colors overflow-hidden ${
             isLight ? 'bg-white border-stone-200' : 'bg-[#10121B] border-white/[0.08]'
           }`}
         >
-          <button
+          <SpringButton
+            id="guide-question-2"
+            aria-expanded={activeFaqIndex === 2}
+            aria-controls="guide-panel-2"
             onClick={() => setActiveFaqIndex(activeFaqIndex === 2 ? null : 2)}
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
                 Q3
               </span>
@@ -840,13 +850,13 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               </div>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-stone-400 transition-transform ${
+              className={`w-5 h-5 shrink-0 ml-3 text-stone-400 transition-transform ${
                 activeFaqIndex === 2 ? 'rotate-180 text-amber-400' : ''
               }`}
             />
-          </button>
+          </SpringButton>
 
-          {activeFaqIndex === 2 && (
+          <AnimatedDisclosure open={activeFaqIndex === 2} id="guide-panel-2" labelledBy="guide-question-2">
             <div className="p-4 sm:p-6 pt-0 border-t border-amber-500/10 space-y-5 text-xs sm:text-sm font-reading-sans">
               {/* 最低启动资金硬指标 */}
               <div className="pt-4 space-y-2">
@@ -1012,22 +1022,25 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          </AnimatedDisclosure>
         </div>
 
         {/* ----------------------------------------------------------------- */}
         {/* Q4: 留还是回？过几年能留下来吗？（签证升级阶梯 Visa Ladder）                */}
         {/* ----------------------------------------------------------------- */}
         <div
-          className={`border rounded-2xl transition-all overflow-hidden ${
+          className={`border rounded-2xl transition-colors overflow-hidden ${
             isLight ? 'bg-white border-stone-200' : 'bg-[#10121B] border-white/[0.08]'
           }`}
         >
-          <button
+          <SpringButton
+            id="guide-question-3"
+            aria-expanded={activeFaqIndex === 3}
+            aria-controls="guide-panel-3"
             onClick={() => setActiveFaqIndex(activeFaqIndex === 3 ? null : 3)}
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
                 Q4
               </span>
@@ -1041,13 +1054,13 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               </div>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-stone-400 transition-transform ${
+              className={`w-5 h-5 shrink-0 ml-3 text-stone-400 transition-transform ${
                 activeFaqIndex === 3 ? 'rotate-180 text-amber-400' : ''
               }`}
             />
-          </button>
+          </SpringButton>
 
-          {activeFaqIndex === 3 && (
+          <AnimatedDisclosure open={activeFaqIndex === 3} id="guide-panel-3" labelledBy="guide-question-3">
             <div className="p-4 sm:p-6 pt-0 border-t border-amber-500/10 space-y-4 text-xs sm:text-sm font-reading-sans">
               <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 选项 A：待 1~3 年回国 */}
@@ -1181,22 +1194,25 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          </AnimatedDisclosure>
         </div>
 
         {/* ----------------------------------------------------------------- */}
         {/* Q5: 我现在要准备什么？怎么零中介 DIY？可勾选推进清单                       */}
         {/* ----------------------------------------------------------------- */}
         <div
-          className={`border rounded-2xl transition-all overflow-hidden ${
+          className={`border rounded-2xl transition-colors overflow-hidden ${
             isLight ? 'bg-white border-stone-200' : 'bg-[#10121B] border-white/[0.08]'
           }`}
         >
-          <button
+          <SpringButton
+            id="guide-question-4"
+            aria-expanded={activeFaqIndex === 4}
+            aria-controls="guide-panel-4"
             onClick={() => setActiveFaqIndex(activeFaqIndex === 4 ? null : 4)}
             className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-white/[0.02]"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <span className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono-num font-bold text-xs flex items-center justify-center shrink-0">
                 Q5
               </span>
@@ -1210,13 +1226,13 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               </div>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-stone-400 transition-transform ${
+              className={`w-5 h-5 shrink-0 ml-3 text-stone-400 transition-transform ${
                 activeFaqIndex === 4 ? 'rotate-180 text-amber-400' : ''
               }`}
             />
-          </button>
+          </SpringButton>
 
-          {activeFaqIndex === 4 && (
+          <AnimatedDisclosure open={activeFaqIndex === 4} id="guide-panel-4" labelledBy="guide-question-4">
             <div className="p-4 sm:p-6 pt-0 border-t border-amber-500/10 space-y-5 text-xs sm:text-sm font-reading-sans">
               <div className="pt-4 flex items-center justify-between">
                 <span className="font-bold text-stone-300">
@@ -1262,7 +1278,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                           <div
                             key={task.id}
                             onClick={() => toggleTask(task.id)}
-                            className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                            className={`p-3 rounded-xl border transition-colors cursor-pointer flex items-start gap-3 select-none ${
                               isDone
                                 ? 'bg-emerald-500/10 border-emerald-500/30 text-stone-300'
                                 : isLight
@@ -1316,7 +1332,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                 ))}
               </div>
             </div>
-          )}
+          </AnimatedDisclosure>
         </div>
       </div>
 
@@ -1347,9 +1363,9 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
               href={portal.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between group hover:-translate-y-0.5 ${
+              className={`p-3.5 rounded-xl border transition-colors flex flex-col justify-between group hover:-translate-y-0.5 ${
                 isLight
-                  ? 'bg-stone-50 hover:bg-white border-stone-200 hover:border-amber-400 text-stone-800 shadow-2xs'
+                  ? 'bg-stone-50 hover:bg-white border-stone-200 hover:border-amber-400 text-stone-800 shadow-sm'
                   : 'bg-[#151722] hover:bg-[#1A1D2B] border-white/[0.08] hover:border-amber-400/50 text-stone-200'
               }`}
             >

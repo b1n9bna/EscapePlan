@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { MotionConfig, useReducedMotion } from 'motion/react';
 import { Header } from './components/Header';
 import { LifeSimulator } from './components/LifeSimulator';
 import { EscapeGuide } from './components/EscapeGuide';
 import { Footer } from './components/Footer';
 
 export function App() {
+  const reduceMotion = useReducedMotion();
   const [activeTab, setActiveTab] = useState<'sim' | 'guide'>('sim');
   const [guideCountry, setGuideCountry] = useState<string>('japan');
 
@@ -28,6 +30,7 @@ export function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.documentElement.classList.toggle('light', theme === 'light');
+    document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
   const handleNavigateToGuide = (countryId?: string) => {
@@ -35,45 +38,47 @@ export function App() {
       setGuideCountry(countryId);
     }
     setActiveTab('guide');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' });
   };
 
   return (
-    <div
-      className={`min-h-screen ${
-        theme === 'light' ? 'bg-[#F5F4F0] text-stone-900' : 'bg-[#0B0F17] text-slate-100'
-      } flex flex-col font-sans selection:bg-amber-500 selection:text-white transition-colors duration-200`}
-    >
-      {/* Navigation Header */}
-      <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
+    <MotionConfig reducedMotion="user">
+      <div
+        className={`min-h-screen ${
+          theme === 'light' ? 'bg-[#F5F4F0] text-stone-900' : 'bg-[#0B0F17] text-slate-100'
+        } flex flex-col font-sans selection:bg-amber-500 selection:text-white transition-colors duration-200`}
+      >
+        {/* Navigation Header */}
+        <Header
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
 
-      {/* Main Content Area */}
-      <main className="flex-1">
-        {activeTab === 'sim' && (
-          <LifeSimulator
-            onNavigateToSubclasses={handleNavigateToGuide}
-            onNavigateToDIY={handleNavigateToGuide}
-            theme={theme}
-            onToggleTheme={toggleTheme}
-          />
-        )}
+        {/* Main Content Area */}
+        <main className="flex-1">
+          {activeTab === 'sim' && (
+            <LifeSimulator
+              onNavigateToSubclasses={handleNavigateToGuide}
+              onNavigateToDIY={handleNavigateToGuide}
+              theme={theme}
+              onToggleTheme={toggleTheme}
+            />
+          )}
 
-        {activeTab === 'guide' && (
-          <EscapeGuide
-            initialCountryId={guideCountry}
-            theme={theme}
-          />
-        )}
-      </main>
+          {activeTab === 'guide' && (
+            <EscapeGuide
+              initialCountryId={guideCountry}
+              theme={theme}
+            />
+          )}
+        </main>
 
-      {/* Global Footer */}
-      {activeTab !== 'sim' && <Footer />}
-    </div>
+        {/* Global Footer */}
+        {activeTab !== 'sim' && <Footer />}
+      </div>
+    </MotionConfig>
   );
 }
 

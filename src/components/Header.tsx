@@ -1,4 +1,5 @@
 import React from 'react';
+import { SpringButton } from './MotionPrimitives';
 import { Gamepad2, Compass, ShieldCheck, Sun, Moon } from 'lucide-react';
 
 interface HeaderProps {
@@ -18,18 +19,18 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`sticky top-0 z-50 backdrop-blur-md transition-colors duration-200 ${
+      className={`app-header sticky top-0 z-50 backdrop-blur-md transition-colors duration-200 ${
         isLight
-          ? 'bg-white/90 border-b border-stone-200 text-stone-900 shadow-xs'
+          ? 'bg-white/90 border-b border-stone-200 text-stone-900 shadow-sm'
           : 'bg-[#0B0F17]/85 border-b border-slate-800 text-slate-100'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="app-header-layout">
           {/* Logo & Slogan */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('sim')}>
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3 cursor-pointer" onClick={() => setActiveTab('sim')}>
             <span
-              className={`text-2xl p-2 rounded-xl border shadow-sm ${
+              className={`text-2xl p-2 rounded-xl shrink-0 border shadow-sm ${
                 isLight ? 'bg-amber-50 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'
               }`}
             >
@@ -41,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
                   EscapePlan
                 </span>
                 <span
-                  className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                  className={`hidden sm:inline-flex text-xs font-semibold px-2 py-0.5 rounded-full border ${
                     isLight
                       ? 'bg-stone-100 text-stone-700 border-stone-300'
                       : 'bg-slate-800 text-slate-300 border-slate-700'
@@ -50,17 +51,18 @@ export const Header: React.FC<HeaderProps> = ({
                   逃跑计划
                 </span>
               </div>
-              <p className={`text-[11px] hidden sm:block ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>
+              <p className={`text-[11px] hidden xl:block ${isLight ? 'text-stone-500' : 'text-slate-400'}`}>
                 面向大众的全球移居双城生活手记与手搓 DIY 路线图
               </p>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar py-2">
-            <button
+          <nav className="self-center col-span-2 row-start-2 grid grid-cols-2 gap-2 pb-2 lg:col-span-1 lg:row-start-1 lg:flex lg:pb-0">
+            <SpringButton
               onClick={() => setActiveTab('sim')}
-              className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+              aria-current={activeTab === 'sim' ? 'page' : undefined}
+              className={`flex min-h-10 items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === 'sim'
                   ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
                   : isLight
@@ -70,11 +72,12 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Gamepad2 className={`w-4 h-4 ${activeTab === 'sim' ? 'text-white' : 'text-amber-500'}`} />
               <span>人生模拟</span>
-            </button>
+            </SpringButton>
 
-            <button
+            <SpringButton
               onClick={() => setActiveTab('guide')}
-              className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+              aria-current={activeTab === 'guide' ? 'page' : undefined}
+              className={`flex min-h-10 items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === 'guide'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                   : isLight
@@ -84,18 +87,18 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Compass className={`w-4 h-4 ${activeTab === 'guide' ? 'text-white' : 'text-blue-400'}`} />
               <span>逃离指北</span>
-            </button>
+            </SpringButton>
           </nav>
 
           {/* Right GitHub & Privacy Badge & Theme Toggle */}
-          <div className="flex items-center space-x-2 sm:space-x-2.5">
+          <div className="col-start-2 row-start-1 flex items-center justify-end gap-1.5 sm:gap-2.5 lg:col-start-3">
             {/* Theme Toggle Button */}
             {onToggleTheme && (
-              <button
+              <SpringButton
                 onClick={onToggleTheme}
-                className={`flex items-center space-x-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                className={`flex min-h-10 min-w-10 items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
                   isLight
-                    ? 'bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-300 shadow-2xs'
+                    ? 'bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-300 shadow-sm'
                     : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
                 }`}
                 title={isLight ? '切换为深色古砚墨香模式' : '切换为浅色素雅宣纸模式'}
@@ -111,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <span className="hidden sm:inline">浅色</span>
                   </>
                 )}
-              </button>
+              </SpringButton>
             )}
 
             <div
@@ -129,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
               href="https://github.com/b1n9bna/EscapePlan"
               target="_blank"
               rel="noreferrer"
-              className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition ${
+              className={`flex min-h-10 min-w-10 items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs font-medium rounded-lg border transition ${
                 isLight
                   ? 'bg-stone-100 hover:bg-stone-200 text-stone-800 border-stone-300'
                   : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
@@ -140,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
               </svg>
               <span className="hidden sm:inline">Star on GitHub</span>
-              <span className="sm:hidden">Star</span>
+              <span className="sr-only sm:hidden">GitHub</span>
             </a>
           </div>
         </div>

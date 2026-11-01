@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useReducedMotion } from 'motion/react';
+import { SpringButton, SpringOverlay } from './MotionPrimitives';
 import {
   generateRandomFamily,
   BIRTHPLACE_SLIDES,
@@ -290,20 +292,18 @@ const EndingCodexModal: React.FC<{
   unlockedIds: string[];
   isLight?: boolean;
 }> = ({ isOpen, onClose, unlockedIds, isLight }) => {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-year-enter">
-      <div className={`border rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl transition-colors ${
+    <SpringOverlay open={isOpen} onClose={onClose} label="一生结局图鉴"
+      className={`border rounded-2xl max-w-4xl w-full max-h-[88dvh] flex flex-col overflow-hidden shadow-2xl ${
         isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#0E1017] border-white/[0.08] text-stone-100"
       }`}>
-        <div className={`px-5 sm:px-6 py-4 border-b flex items-center justify-between shrink-0 transition-colors ${
+        <div className={`px-5 sm:px-6 py-4 border-b flex items-center justify-between gap-3 shrink-0 transition-colors ${
           isLight ? "bg-stone-50 border-stone-200" : "bg-[#13151F] border-white/[0.07]"
         }`}>
           <div className="flex items-center gap-2.5">
             <BookOpen className={`w-5 h-5 ${isLight ? "text-amber-700" : "text-[#D4A359]"}`} />
             <div>
-              <h2 className={`text-base sm:text-lg font-bold flex items-center gap-2 font-narrative-serif ${
+              <h2 className={`text-base sm:text-lg font-bold flex flex-wrap items-center gap-2 font-narrative-serif ${
                 isLight ? "text-stone-900" : "text-stone-100"
               }`}>
                 <span>一生结局图鉴</span>
@@ -320,14 +320,15 @@ const EndingCodexModal: React.FC<{
               </p>
             </div>
           </div>
-          <button
+          <SpringButton
             onClick={onClose}
-            className={`p-1.5 rounded-lg transition-colors ${
+            aria-label="关闭结局图鉴"
+            className={`min-h-10 min-w-10 shrink-0 flex items-center justify-center p-1.5 rounded-lg transition-colors ${
               isLight ? "text-stone-500 hover:text-stone-900 hover:bg-stone-200" : "text-stone-400 hover:text-stone-100 hover:bg-[#1E2230]"
             }`}
           >
             <X className="w-5 h-5" />
-          </button>
+          </SpringButton>
         </div>
 
         <div className={`p-4 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3.5 flex-1 transition-colors ${
@@ -350,7 +351,7 @@ const EndingCodexModal: React.FC<{
                         ? 'bg-purple-50/70 border-purple-300'
                         : 'bg-[#161324] border-purple-500/50'
                       : isLight
-                      ? 'bg-white border-stone-200 shadow-2xs'
+                      ? 'bg-white border-stone-200 shadow-sm'
                       : 'bg-[#13151F] border-white/[0.08]'
                     : isLight
                     ? 'bg-stone-100/70 border-stone-200 opacity-60'
@@ -432,19 +433,18 @@ const EndingCodexModal: React.FC<{
           })}
         </div>
 
-        <div className={`px-6 py-3 border-t flex items-center justify-between text-xs shrink-0 font-reading-sans ${
+        <div className={`px-6 py-3 border-t flex flex-wrap items-center justify-between gap-3 text-xs shrink-0 font-reading-sans ${
           isLight ? "bg-stone-50 border-stone-200 text-stone-600" : "bg-[#0E1017] border-white/[0.07] text-stone-400"
         }`}>
           <span>图鉴记录已持久化保存在当前浏览器</span>
-          <button
+          <SpringButton
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold transition-all shadow-md shadow-amber-950/30"
+            className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold transition-colors shadow-md shadow-amber-950/30"
           >
             返回模拟
-          </button>
+          </SpringButton>
         </div>
-      </div>
-    </div>
+    </SpringOverlay>
   );
 };
 
@@ -462,6 +462,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     return 'dark';
   });
 
+  const reduceMotion = useReducedMotion();
   const activeTheme = propTheme || localTheme;
   const isLight = activeTheme === 'light';
 
@@ -529,16 +530,16 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
   const scrollToFeedBottom = () => {
     setTimeout(() => {
-      feedBottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      feedBottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'nearest' });
     }, 60);
   };
 
   const scrollToChoiceCard = () => {
     setTimeout(() => {
       if (choiceCardRef.current) {
-        choiceCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        choiceCardRef.current.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'center' });
       } else {
-        feedBottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        feedBottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'nearest' });
       }
     }, 80);
   };
@@ -618,7 +619,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       if (!isTragic) {
         confettiFiredRef.current = true;
         try {
-          confetti({
+          confetti({ disableForReducedMotion: true,
             particleCount: 90,
             spread: 80,
             origin: { y: 0.6 }
@@ -1146,7 +1147,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       return;
     }
     // Suspend timer while waiting for user choice or Gaokao decision, WITHOUT turning off auto-play!
-    if (waitingForChoice || showGaokaoModal) {
+    if (waitingForChoice || showGaokaoModal || showMemoirDrawer || showCodexModal) {
       return;
     }
 
@@ -1155,7 +1156,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     }, autoPlaySpeed * 1000);
 
     return () => clearTimeout(timer);
-  }, [isAutoPlaying, autoPlaySpeed, timelineIndex, waitingForChoice, showGaokaoModal, gamePhase, logEntries.length, isShowingMortalityClimax]);
+  }, [isAutoPlaying, autoPlaySpeed, timelineIndex, waitingForChoice, showGaokaoModal, gamePhase, logEntries.length, isShowingMortalityClimax, showMemoirDrawer, showCodexModal]);
 
   // =========================================================================
   // GLOBAL KEYBOARD SHORTCUTS (Space: Next / 1-4: Choice / A: Auto-play)
@@ -1164,10 +1165,13 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     if (gamePhase !== 'cockpit') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (showMemoirDrawer || showCodexModal) return;
       // Ignore if user is inside an input/textarea
       if (
         document.activeElement &&
-        (document.activeElement.tagName === 'INPUT' ||
+        (document.activeElement.tagName === 'BUTTON' ||
+          document.activeElement.tagName === 'A' ||
+          document.activeElement.tagName === 'INPUT' ||
           document.activeElement.tagName === 'TEXTAREA')
       ) {
         return;
@@ -1183,7 +1187,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
         if (isShowingMortalityClimax) {
           setMortalityAcknowledged(true);
           try {
-            confetti({ particleCount: 65, spread: 75, origin: { y: 0.6 } });
+            confetti({ disableForReducedMotion: true, particleCount: 65, spread: 75, origin: { y: 0.6 } });
           } catch {}
           return;
         }
@@ -1220,7 +1224,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gamePhase, waitingForChoice, showGaokaoModal, isAutoPlaying, timelineIndex, currentNode, gaokaoCalc, logEntries.length, isShowingMortalityClimax]);
+  }, [gamePhase, waitingForChoice, showGaokaoModal, isAutoPlaying, timelineIndex, currentNode, gaokaoCalc, logEntries.length, isShowingMortalityClimax, showMemoirDrawer, showCodexModal]);
 
 
   const handleCopyRecord = () => {
@@ -1312,10 +1316,10 @@ ${logEntries
         <div className={`border rounded-2xl p-5 sm:p-7 shadow-xl mb-6 transition-colors ${
           isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#12141C] border-white/[0.07] text-stone-100"
         }`}>
-          <div className={`flex items-center justify-between text-xs sm:text-sm mb-4 border-b pb-3 font-reading-sans ${
+          <div className={`flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between text-xs sm:text-sm mb-4 border-b pb-3 font-reading-sans ${
             isLight ? "text-stone-500 border-stone-200" : "text-stone-400 border-white/[0.06]"
           }`}>
-            <span className="flex items-center gap-2 text-[#D4A359] font-medium">
+            <span className="flex shrink-0 items-center gap-2 text-[#D4A359] font-medium">
               <span
                 className={`inline-block w-2.5 h-2.5 rounded-full bg-[#D4A359] ${
                   isSpinning ? "animate-pulse" : ""
@@ -1328,7 +1332,7 @@ ${logEntries
             </span>
           </div>
 
-          <div className={`relative overflow-hidden h-28 sm:h-32 rounded-xl border flex items-center justify-center ${
+          <div className={`relative overflow-hidden min-h-[7rem] sm:min-h-[8rem] px-3 py-4 rounded-xl border flex items-center justify-center ${
             isLight ? "bg-stone-50 border-stone-200" : "bg-[#0A0B0E] border-white/[0.08]"
           }`}>
             <div
@@ -1355,9 +1359,9 @@ ${logEntries
               {isSpinning ? "齿轮飞速运转中..." : "全国34省级行政区全覆盖 · 107套专属风土人生剧本 · 投胎由命"}
             </span>
             <div className="flex items-center gap-2">
-              <button
+              <SpringButton
                 onClick={handleToggleTheme}
-                className={`px-3 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 active:scale-[0.98] ${
+                className={`px-3 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5  ${
                   isLight
                     ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
                     : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] text-stone-200"
@@ -1375,11 +1379,11 @@ ${logEntries
                     <span>浅色</span>
                   </>
                 )}
-              </button>
-              <button
+              </SpringButton>
+              <SpringButton
                 onClick={spinReel}
                 disabled={isSpinning}
-                className={`px-4 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-all flex items-center gap-2 disabled:opacity-50 active:scale-[0.98] ${
+                className={`px-4 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-50  ${
                   isLight
                     ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
                     : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] text-stone-200"
@@ -1387,7 +1391,7 @@ ${logEntries
               >
                 <RotateCcw className={`w-3.5 h-3.5 text-amber-400 ${isSpinning ? "animate-spin" : ""}`} />
                 随机轮盘
-              </button>
+              </SpringButton>
             </div>
           </div>
         </div>
@@ -1396,25 +1400,25 @@ ${logEntries
         <div className={`border rounded-2xl p-5 sm:p-7 shadow-xl space-y-5 transition-colors ${
           isLight ? "bg-white border-stone-200 text-stone-800" : "bg-[#12141C] border-white/[0.07] text-stone-100"
         }`}>
-          <div className={`flex items-center justify-between border-b pb-4 ${
+          <div className={`flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between border-b pb-4 ${
             isLight ? "border-stone-200" : "border-white/[0.06]"
           }`}>
             <div>
               <span className="text-xs font-mono-num text-[#D4A359] uppercase tracking-wider block mb-1">
                 【生平档案编号 · 0岁】
               </span>
-              <h2 className={`text-xl sm:text-2xl font-bold flex items-center gap-3 font-narrative-serif ${
+              <h2 className={`text-xl sm:text-2xl font-bold flex flex-wrap items-center gap-3 font-narrative-serif ${
                 isLight ? "text-stone-900" : "text-stone-100"
               }`}>
-                <span>{charData.name}</span>
-                <span className={`text-xs px-2.5 py-1 rounded-md border font-reading-sans font-normal ${
+                <span className="whitespace-nowrap">{charData.name}</span>
+                <span className={`text-xs px-2.5 py-1 rounded-md border font-reading-sans font-normal whitespace-nowrap ${
                   isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-[#181B26] border-white/[0.08] text-stone-300"
                 }`}>
                   {charData.gender} · 1998年生
                 </span>
               </h2>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <span className={`text-xs block font-reading-sans ${isLight ? "text-stone-600 font-medium" : "text-stone-400"}`}>阶层水位 · 家庭底资</span>
               <span className={`text-xs sm:text-sm font-semibold font-narrative-serif ${isLight ? "text-amber-900" : "text-[#D4A359]"}`}>
                 {charData.family.wealthTier}
@@ -1445,9 +1449,9 @@ ${logEntries
               </div>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <button
+              <SpringButton
                 onClick={() => handleRestart(charData.family.province)}
-                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all flex items-center gap-1 active:scale-95 ${
+                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors flex items-center gap-1  ${
                   isLight
                     ? "bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-950 shadow-sm font-semibold"
                     : "bg-amber-500/20 hover:bg-amber-500/30 border-amber-500/40 text-amber-300 shadow-sm font-semibold"
@@ -1456,7 +1460,7 @@ ${logEntries
               >
                 <RotateCcw className="w-3 h-3 text-amber-500" />
                 <span>换本省剧本</span>
-              </button>
+              </SpringButton>
             </div>
           </div>
 
@@ -1472,7 +1476,7 @@ ${logEntries
                 </div>
                 <span>父亲：{charData.family.fatherAge}岁 · {charData.family.fatherJob}</span>
               </div>
-              <p className={`leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8 ${
+              <p className={`leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-[34px] ${
                 isLight ? "text-stone-700" : "text-stone-300"
               }`}>
                 {charData.family.fatherTrait}
@@ -1490,7 +1494,7 @@ ${logEntries
                 </div>
                 <span>母亲：{charData.family.motherAge}岁 · {charData.family.motherJob}</span>
               </div>
-              <p className={`leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-8 ${
+              <p className={`leading-relaxed text-xs sm:text-[13px] font-reading-sans pl-[34px] ${
                 isLight ? "text-stone-700" : "text-stone-300"
               }`}>
                 {charData.family.motherTrait}
@@ -1515,12 +1519,12 @@ ${logEntries
                   底蓄 ¥{charData.family.initialFamilySavings.toLocaleString()}
                 </span>
               </div>
-              <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8 ${
+              <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-[34px] ${
                 isLight ? "text-stone-700" : "text-stone-300"
               }`}>
                 {charData.family.housing}
               </p>
-              <p className={`text-xs mt-1 font-reading-sans pl-8 ${
+              <p className={`text-xs mt-1 font-reading-sans pl-[34px] ${
                 isLight ? "text-stone-600" : "text-stone-400"
               }`}>{charData.family.wealthDetail}</p>
             </div>
@@ -1536,12 +1540,12 @@ ${logEntries
                 </div>
                 <span>同胞与情感底色</span>
               </div>
-              <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-8 ${
+              <p className={`text-xs sm:text-[13px] leading-relaxed font-reading-sans pl-[34px] ${
                 isLight ? "text-stone-700" : "text-stone-300"
               }`}>
                 {charData.family.siblings} — {charData.family.siblingsDetail}
               </p>
-              <p className={`text-xs mt-1 font-reading-sans pl-8 ${
+              <p className={`text-xs mt-1 font-reading-sans pl-[34px] ${
                 isLight ? "text-amber-800 font-medium" : "text-[#D4A359]/90"
               }`}>{charData.family.emotionalTone}</p>
             </div>
@@ -1550,13 +1554,13 @@ ${logEntries
           <div className={`pt-3 border-t flex justify-end ${
             isLight ? "border-stone-200" : "border-white/[0.06]"
           }`}>
-            <button
+            <SpringButton
               onClick={startSimulation}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-950/40 active:scale-[0.99] font-narrative-serif tracking-wide"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-950/40  font-narrative-serif tracking-wide"
             >
               <span>开启人生</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </SpringButton>
           </div>
         </div>
       </div>
@@ -1700,14 +1704,14 @@ ${logEntries
   };
 
   return (
-    <div className={`h-[calc(100vh-64px)] flex flex-col font-reading-sans overflow-hidden transition-colors duration-300 relative select-none ${
+    <div className={`simulator-viewport flex flex-col font-reading-sans overflow-hidden transition-colors duration-300 relative select-none ${
       isLight ? "bg-[#FAF8F5] text-stone-900" : "bg-[#06070B] text-stone-100"
     }`}>
       {/* ================================================================= */}
       {/* 1. UNIFIED HORIZON HUD (流光天际线 · 导航与微光长廊与生命态势融为一体)   */}
       {/* ================================================================= */}
-      <header className={`h-15 sm:h-16 px-3 sm:px-6 flex items-center justify-between shrink-0 text-xs transition-colors duration-200 z-20 relative backdrop-blur-md ${
-        isLight ? "bg-white/85 text-stone-700 shadow-2xs" : "bg-[#0A0C14]/85 text-stone-300"
+      <header className={`simulator-hud shrink-0 text-xs transition-colors duration-200 z-20 relative backdrop-blur-md ${
+        isLight ? "bg-white/85 text-stone-700 shadow-sm" : "bg-[#0A0C14]/85 text-stone-300"
       }`}>
         {/* Horizon 0~63 Lifeline Progress Track as Header Bottom Line */}
         <div className={`absolute bottom-0 left-0 right-0 h-[2.5px] overflow-visible ${
@@ -1744,18 +1748,18 @@ ${logEntries
             <span className="font-narrative-serif tracking-wider text-[11px] sm:text-xs">十四亿分之一</span>
           </div>
 
-          <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-reading-sans truncate">
-            <span className={`px-2 py-0.5 rounded-md border ${
+          <div className="hidden min-w-0 lg:flex items-center gap-1.5 text-[11px] font-reading-sans">
+            <span title={`${charData.family.province || charData.family.region.split('·')[0].trim()} · ${charData.family.cityOrCounty}`} className={`min-w-0 truncate px-2 py-0.5 rounded-md border ${
               isLight ? "bg-stone-100/80 border-stone-300/80 text-stone-700" : "bg-white/[0.04] border-white/[0.08] text-stone-300"
             }`}>
               {charData.family.province || charData.family.region.split('·')[0].trim()} · {charData.family.cityOrCounty}
             </span>
-            <span className={`px-2 py-0.5 rounded-md border ${
+            <span className={`shrink-0 px-2 py-0.5 rounded-md border ${
               isLight ? "bg-stone-100/80 border-stone-300/80 text-stone-700" : "bg-white/[0.04] border-white/[0.08] text-stone-300"
             }`}>
               {charData.gender}
             </span>
-            <span className={`px-2 py-0.5 rounded-md border ${
+            <span className={`shrink-0 px-2 py-0.5 rounded-md border ${
               isLight ? "bg-amber-50 border-amber-200 text-amber-900" : "bg-[#D4A359]/10 border-[#D4A359]/25 text-[#D4A359]"
             }`}>
               {charData.family.wealthTier}
@@ -1764,7 +1768,7 @@ ${logEntries
         </div>
 
         {/* Center: Current Year & Integrated Vital Indicators */}
-        <div className="flex flex-col items-center justify-center gap-0.5">
+        <div className="simulator-status flex flex-col items-center justify-center gap-0.5">
           <div className="flex items-center gap-2">
             <span className={`font-semibold flex items-center gap-1.5 font-narrative-serif text-xs sm:text-sm ${
               isLight ? "text-stone-900" : "text-stone-100"
@@ -1772,7 +1776,7 @@ ${logEntries
               <Calendar className="w-3.5 h-3.5 text-[#E0B26A]" />
               公历 {birthYear + currentAge} 年 · {currentAge} 岁
             </span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded font-narrative-serif border ${
+            <span className={`text-[10px] px-1.5 py-[0.05rem] rounded font-narrative-serif border ${
               isLight
                 ? "bg-stone-100 border-stone-200 text-stone-600"
                 : "bg-white/[0.04] border-white/[0.08] text-stone-400"
@@ -1812,7 +1816,7 @@ ${logEntries
 
             {/* Crisis Warning Pill */}
             {crisisWarning && (
-              <span className="flex items-center gap-1 px-1.5 py-0.2 rounded bg-rose-500/10 text-rose-500 text-[10px] font-sans font-medium animate-pulse">
+              <span className="flex items-center gap-1 px-1.5 py-[0.05rem] rounded bg-rose-500/10 text-rose-500 text-[10px] font-sans font-medium animate-pulse">
                 <AlertTriangle className="w-2.5 h-2.5" />
                 <span>{crisisWarning.title}</span>
               </span>
@@ -1821,9 +1825,9 @@ ${logEntries
         </div>
 
         {/* Right: Controls & Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0">
           {/* Ending Codex Trigger */}
-          <button
+          <SpringButton
             onClick={() => setShowCodexModal(true)}
             className={`px-2 sm:px-2.5 py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               isLight
@@ -1835,10 +1839,10 @@ ${logEntries
             <Award className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden sm:inline">终局</span>
             <span className="font-mono-num">{unlockedEndings.length}/16</span>
-          </button>
+          </SpringButton>
 
           {/* Font Size Toggle */}
-          <button
+          <SpringButton
             onClick={() => handleSetFontSize(readerFontSize === 'normal' ? 'large' : readerFontSize === 'large' ? 'huge' : 'normal')}
             className={`p-1.5 sm:px-2 sm:py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               isLight
@@ -1849,10 +1853,10 @@ ${logEntries
           >
             <Type className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{readerFontSize === 'normal' ? '标准' : readerFontSize === 'large' ? '大字' : '特大'}</span>
-          </button>
+          </SpringButton>
 
           {/* Theme Toggle */}
-          <button
+          <SpringButton
             onClick={handleToggleTheme}
             className={`p-1.5 rounded-lg border transition-colors ${
               isLight
@@ -1862,10 +1866,10 @@ ${logEntries
             title="切换明暗主题"
           >
             {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5 text-amber-300" />}
-          </button>
+          </SpringButton>
 
           {/* Restart */}
-          <button
+          <SpringButton
             onClick={() => handleRestart()}
             className={`p-1.5 sm:px-2 sm:py-1 rounded-lg border text-xs font-medium flex items-center gap-1 transition-colors ${
               isLight
@@ -1876,7 +1880,7 @@ ${logEntries
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">重开</span>
-          </button>
+          </SpringButton>
         </div>
       </header>
 
@@ -2045,12 +2049,12 @@ ${logEntries
                     <span>走完这波澜壮阔的一生，你可以对这个自己说一句话：</span>
                   </div>
                   {epitaphConfirmed && (
-                    <button
+                    <SpringButton
                       onClick={() => setEpitaphConfirmed(false)}
                       className="text-[11px] text-stone-400 hover:text-amber-400 underline transition-colors"
                     >
                       修改寄语
-                    </button>
+                    </SpringButton>
                   )}
                 </div>
 
@@ -2072,22 +2076,22 @@ ${logEntries
                           if (e.key === 'Enter' && epitaphInput.trim()) {
                             setEpitaphConfirmed(true);
                             try {
-                              confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+                              confetti({ disableForReducedMotion: true, particleCount: 60, spread: 60, origin: { y: 0.7 } });
                             } catch {}
                           }
                         }}
                       />
-                      <button
+                      <SpringButton
                         onClick={() => {
                           setEpitaphConfirmed(true);
                           try {
-                            confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } });
+                            confetti({ disableForReducedMotion: true, particleCount: 60, spread: 60, origin: { y: 0.7 } });
                           } catch {}
                         }}
-                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold text-xs sm:text-sm font-narrative-serif tracking-wide shadow-md active:scale-95 transition-all shrink-0"
+                        className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white font-bold text-xs sm:text-sm font-narrative-serif tracking-wide shadow-md  transition-colors shrink-0"
                       >
                         朱砂印讫
-                      </button>
+                      </SpringButton>
                     </div>
 
                     {/* Quick suggestion tags */}
@@ -2099,7 +2103,7 @@ ${logEntries
                         '谢谢你一直没有放弃',
                         '此心光明，亦复何言'
                       ].map((preset) => (
-                        <button
+                        <SpringButton
                           key={preset}
                           onClick={() => setEpitaphInput(preset)}
                           className={`px-2 py-0.5 rounded-md border text-[11px] transition-colors ${
@@ -2109,7 +2113,7 @@ ${logEntries
                           }`}
                         >
                           “{preset}”
-                        </button>
+                        </SpringButton>
                       ))}
                     </div>
                   </div>
@@ -2121,7 +2125,7 @@ ${logEntries
                         “{epitaphInput || '不虚此生，无怨无悔。'}”
                       </div>
                     </div>
-                    <div className="seal-stamp-box w-13 h-13 rounded-sm flex items-center justify-center text-xs font-black rotate-3 shrink-0 animate-stamp-press animate-ink-bleed select-none">
+                    <div className="seal-stamp-box w-[52px] h-[52px] rounded-sm flex items-center justify-center text-xs font-black rotate-3 shrink-0 animate-stamp-press animate-ink-bleed select-none">
                       印讫
                     </div>
                   </div>
@@ -2131,9 +2135,9 @@ ${logEntries
 
             {/* Grand Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-              <button
+              <SpringButton
                 onClick={handleCopyRecord}
-                className={`w-full sm:flex-1 py-3.5 px-4 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.99] ${
+                className={`w-full sm:flex-1 py-3.5 px-4 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-colors  ${
                   copied
                     ? "bg-emerald-600 text-white border-emerald-500"
                     : isLight
@@ -2143,11 +2147,11 @@ ${logEntries
               >
                 {copied ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-amber-400" />}
                 <span>{copied ? '生平录已复制' : '复制人生全卷 (含寄语)'}</span>
-              </button>
+              </SpringButton>
 
-              <button
+              <SpringButton
                 onClick={() => setShowMemoirDrawer(true)}
-                className={`w-full sm:flex-1 py-3.5 px-4 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.99] ${
+                className={`w-full sm:flex-1 py-3.5 px-4 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-colors  ${
                   isLight
                     ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
                     : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
@@ -2155,15 +2159,15 @@ ${logEntries
               >
                 <BookOpen className="w-4 h-4" />
                 <span>展开生平完整回忆录</span>
-              </button>
+              </SpringButton>
 
-              <button
+              <SpringButton
                 onClick={() => handleRestart()}
-                className="w-full sm:flex-1 py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all font-narrative-serif"
+                className="w-full sm:flex-1 py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg  transition-colors font-narrative-serif"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>开启全新轮回</span>
-              </button>
+              </SpringButton>
             </div>
           </div>
         ) : isShowingMortalityClimax ? (
@@ -2258,7 +2262,7 @@ ${logEntries
                   <div className="p-4 sm:p-5 rounded-2xl border border-red-800/40 bg-red-950/25 relative z-10 space-y-2">
                     {currentEntry.chosenOptionText && (
                       <div className="text-xs sm:text-sm font-bold font-narrative-serif text-red-400 flex items-center gap-1.5">
-                        <span className="seal-stamp-box px-1.5 py-0.2 text-[10px]">决断</span>
+                        <span className="seal-stamp-box px-1.5 py-[0.05rem] text-[10px]">决断</span>
                         <span>{currentEntry.chosenOptionText}</span>
                       </div>
                     )}
@@ -2279,14 +2283,14 @@ ${logEntries
 
                 {/* Action: Seal and enter Lifetime Archive */}
                 <div className="pt-3 relative z-10">
-                  <button
+                  <SpringButton
                     onClick={() => {
                       setMortalityAcknowledged(true);
                       try {
-                        confetti({ particleCount: 65, spread: 75, origin: { y: 0.6 } });
+                        confetti({ disableForReducedMotion: true, particleCount: 65, spread: 75, origin: { y: 0.6 } });
                       } catch {}
                     }}
-                    className="w-full py-4.5 px-6 rounded-2xl bg-gradient-to-r from-red-800 via-red-700 to-amber-900 hover:from-red-700 hover:to-amber-800 text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 shadow-2xl active:scale-[0.99] transition-all font-narrative-serif tracking-widest border border-red-500/40 group cursor-pointer"
+                    className="w-full py-[1.125rem] px-6 rounded-2xl bg-gradient-to-r from-red-800 via-red-700 to-amber-900 hover:from-red-700 hover:to-amber-800 text-white font-extrabold text-sm sm:text-base flex items-center justify-center gap-3 shadow-2xl  transition-colors font-narrative-serif tracking-widest border border-red-500/40 group cursor-pointer"
                   >
                     <div className="seal-stamp-box px-2 py-0.5 text-xs text-white border-white/80">印讫</div>
                     <span>盖上生平朱砂大印 · 步入终生生平档案</span>
@@ -2294,7 +2298,7 @@ ${logEntries
                     <span className="text-[11px] font-normal opacity-75 hidden sm:inline ml-1 font-mono-num">
                       (按空格 Space 盖印)
                     </span>
-                  </button>
+                  </SpringButton>
                 </div>
               </div>
             );
@@ -2489,10 +2493,10 @@ ${logEntries
                   {currentNode.choices.map((choice, cIdx) => {
                     const p = getChoicePresentation(choice);
                     return (
-                      <button
+                      <SpringButton
                         key={cIdx}
                         onClick={() => handleSelectChoice(choice)}
-                        className={`w-full p-3.5 sm:p-4 rounded-xl border text-left transition-all active:scale-[0.98] group shadow-sm flex items-start justify-between cursor-pointer ${
+                        className={`w-full p-3.5 sm:p-4 rounded-xl border text-left transition-colors  group shadow-sm flex items-start justify-between cursor-pointer ${
                           isLight
                             ? "border-stone-200 bg-white hover:border-amber-400 hover:bg-amber-50/40 text-stone-900 shadow-stone-900/5"
                             : "border-white/[0.12] bg-[#141724] hover:border-amber-400/80 hover:bg-[#1A1E2E] text-stone-100 shadow-black/40"
@@ -2530,7 +2534,7 @@ ${logEntries
                         <ChevronRight className={`w-4 h-4 shrink-0 mt-1 ml-2 transition-transform group-hover:translate-x-1 ${
                           isLight ? "text-stone-400 group-hover:text-amber-800" : "text-stone-400 group-hover:text-amber-300"
                         }`} />
-                      </button>
+                      </SpringButton>
                     );
                   })}
                 </div>
@@ -2581,8 +2585,8 @@ ${logEntries
       {/* ================================================================= */}
       {/* 5. ALL-IN-ONE FIXED CAPSULE DOCK (全部功能一网打尽 · 终极固定底栏控制台) */}
       {/* ================================================================= */}
-      <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto transition-all duration-300">
-        <div className={`flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2 pl-2 sm:pl-3 pr-2.5 sm:pr-3.5 rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-300 max-w-[96vw] ${
+      <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] sm:bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+        <div className={`simulator-dock flex items-center gap-1.5 sm:gap-2.5 p-2 sm:p-2.5 rounded-2xl sm:rounded-full border shadow-2xl backdrop-blur-xl transition-colors duration-300 ${
           isLight
             ? "bg-white/95 border-stone-200 text-stone-800 shadow-stone-900/15"
             : "bg-[#0E1019]/95 border-white/[0.12] text-stone-200 shadow-black/80"
@@ -2595,10 +2599,10 @@ ${logEntries
                 <span>请在上方定夺 (按 1/2/3)</span>
               </div>
             ) : (
-              <button
+              <SpringButton
                 onClick={handleNextNaturalYear}
                 disabled={waitingForChoice || showGaokaoModal}
-                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-md shadow-amber-950/20 active:scale-95 transition-all font-narrative-serif tracking-wide shrink-0 cursor-pointer group disabled:opacity-50"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-md shadow-amber-950/20  transition-colors font-narrative-serif tracking-wide shrink-0 cursor-pointer group disabled:opacity-50"
                 title="按空格键 Space 也可推进"
               >
                 <span>{getNextStepLabel()}</span>
@@ -2606,7 +2610,7 @@ ${logEntries
                 <span className="text-[10px] font-normal opacity-75 hidden md:inline ml-0.5 font-mono-num">
                   (空格)
                 </span>
-              </button>
+              </SpringButton>
             )
           )}
 
@@ -2615,14 +2619,14 @@ ${logEntries
           )}
 
           {/* Auto-play Engine */}
-          <button
+          <SpringButton
             onClick={() => {
               if (!waitingForChoice && !showGaokaoModal && !isRetired && !isShowingMortalityClimax) {
                 setIsAutoPlaying((prev) => !prev);
               }
             }}
             disabled={waitingForChoice || showGaokaoModal || isRetired || isShowingMortalityClimax}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors  ${
               isAutoPlaying
                 ? "bg-amber-500 text-stone-950 border-amber-400 font-bold shadow-sm"
                 : isLight
@@ -2632,9 +2636,9 @@ ${logEntries
             title="快捷键: A 键切换自动播放"
           >
             {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
-            <span className="hidden xs:inline">{isAutoPlaying ? '暂停' : '流转'}</span>
+            <span className="hidden sm:inline">{isAutoPlaying ? '暂停' : '流转'}</span>
             <span className="text-[10px] opacity-75 font-mono-num">(A)</span>
-          </button>
+          </SpringButton>
 
           {/* Speed Presets */}
           <div className="hidden sm:flex items-center gap-1">
@@ -2643,7 +2647,7 @@ ${logEntries
               { val: 1.2, label: '1.0x' },
               { val: 0.8, label: '1.5x' },
             ].map((sp) => (
-              <button
+              <SpringButton
                 key={sp.label}
                 onClick={() => setAutoPlaySpeed(sp.val)}
                 className={`px-2 py-0.5 rounded-full text-[11px] font-mono-num transition-colors ${
@@ -2653,7 +2657,7 @@ ${logEntries
                 }`}
               >
                 {sp.label}
-              </button>
+              </SpringButton>
             ))}
           </div>
 
@@ -2662,14 +2666,14 @@ ${logEntries
           {/* Quick Skip or Status prompt */}
           {isShowingMortalityClimax ? (
             <span className="text-red-400 font-bold text-xs flex items-center gap-1.5 animate-pulse font-narrative-serif px-1">
-              <span className="seal-stamp-box px-1.5 py-0.2 text-[10px]">绝唱</span>
+              <span className="seal-stamp-box px-1.5 py-[0.05rem] text-[10px]">绝唱</span>
               <span>请盖上生平朱砂大印</span>
             </span>
           ) : !isRetired ? (
-            <button
+            <SpringButton
               onClick={handleSkipToNextDecision}
               disabled={isWaitingCurrentChoice}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-40 ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors  disabled:opacity-40 ${
                 isLight
                   ? "bg-stone-50 hover:bg-stone-100 border-stone-300 text-stone-700 hover:border-amber-400"
                   : "bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] text-stone-300 hover:border-[#D4A359]/50"
@@ -2677,8 +2681,8 @@ ${logEntries
               title="一键直接快进到下一个有分支选择的年龄或高考节点"
             >
               <FastForward className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden xs:inline">快进抉择</span>
-            </button>
+              <span className="hidden sm:inline">快进抉择</span>
+            </SpringButton>
           ) : (
             <span className="text-xs text-[#D4A359] font-narrative-serif px-1">
               ✨ 一生落幕
@@ -2688,9 +2692,9 @@ ${logEntries
           <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
 
           {/* Memoir Drawer Trigger */}
-          <button
+          <SpringButton
             onClick={() => setShowMemoirDrawer(true)}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors  ${
               isLight
                 ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
                 : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
@@ -2700,14 +2704,14 @@ ${logEntries
             <BookOpen className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">岁月忆录</span>
             <span className="font-mono-num font-bold">({logEntries.length})</span>
-          </button>
+          </SpringButton>
 
           <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
 
           {/* Quick Restart in Capsule */}
-          <button
+          <SpringButton
             onClick={() => handleRestart()}
-            className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-full border text-xs font-medium flex items-center gap-1 transition-all active:scale-95 ${
+            className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-full border text-xs font-medium flex items-center gap-1 transition-colors  ${
               isLight
                 ? "bg-stone-100 hover:bg-rose-50 border-stone-300 text-stone-600 hover:text-rose-700 hover:border-rose-300"
                 : "bg-white/[0.04] hover:bg-rose-950/30 border-white/[0.08] text-stone-400 hover:text-rose-400 hover:border-rose-800/40"
@@ -2716,23 +2720,27 @@ ${logEntries
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">重开</span>
-          </button>
+          </SpringButton>
         </div>
       </div>
 
       {/* ================================================================= */}
       {/* 6. MEMOIR DRAWER (岁月忆录抽屉 · 随时查阅全卷生平)                    */}
       {/* ================================================================= */}
-      {showMemoirDrawer && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end animate-fade-in">
-          <div className={`w-full max-w-xl h-full shadow-2xl flex flex-col z-50 transition-colors duration-200 ${
-            isLight ? "bg-[#FAF9F5] text-stone-900" : "bg-[#0E1017] text-stone-100"
-          }`}>
+      <SpringOverlay
+        open={showMemoirDrawer}
+        drawer
+        label="岁月忆录 · 生平全卷"
+        onClose={() => setShowMemoirDrawer(false)}
+        className={`w-full max-w-xl h-full shadow-2xl flex flex-col ${
+          isLight ? "bg-[#FAF9F5] text-stone-900" : "bg-[#0E1017] text-stone-100"
+        }`}
+      >
             {/* Drawer Header */}
-            <div className={`h-14 border-b px-5 flex items-center justify-between shrink-0 ${
+            <div className={`min-h-14 border-b px-3 py-3 sm:px-5 flex flex-wrap items-center justify-between gap-3 shrink-0 ${
               isLight ? "bg-white border-stone-200" : "bg-[#12141F] border-white/[0.08]"
             }`}>
-              <div className="flex items-center gap-2 font-narrative-serif font-bold text-base">
+              <div className="flex flex-wrap items-center gap-2 font-narrative-serif font-bold text-sm sm:text-base">
                 <BookOpen className="w-4 h-4 text-[#D4A359]" />
                 <span>岁月忆录 · 生平全卷</span>
                 <span className={`text-xs px-2 py-0.5 rounded-full font-mono-num ${
@@ -2742,7 +2750,7 @@ ${logEntries
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <SpringButton
                   onClick={handleCopyRecord}
                   className={`p-1.5 rounded-lg border text-xs flex items-center gap-1 transition-colors ${
                     isLight ? "bg-stone-100 border-stone-300 text-stone-700" : "bg-white/[0.05] border-white/[0.08] text-stone-300"
@@ -2751,8 +2759,8 @@ ${logEntries
                 >
                   <Copy className="w-3.5 h-3.5 text-amber-400" />
                   <span className="text-[11px]">{copied ? '已复制' : '复制'}</span>
-                </button>
-                <button
+                </SpringButton>
+                <SpringButton
                   onClick={() => setShowMemoirDrawer(false)}
                   className={`p-1.5 rounded-lg border transition-colors ${
                     isLight ? "bg-stone-100 border-stone-300 text-stone-700 hover:bg-stone-200" : "bg-white/[0.05] border-white/[0.08] text-stone-300 hover:bg-white/[0.1]"
@@ -2760,7 +2768,7 @@ ${logEntries
                   title="关闭抽屉"
                 >
                   <X className="w-4 h-4" />
-                </button>
+                </SpringButton>
               </div>
             </div>
 
@@ -2768,7 +2776,7 @@ ${logEntries
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
               {/* Family Origin Dossier Card */}
               <div className={`p-4 rounded-2xl border space-y-2 text-xs font-reading-sans ${
-                isLight ? "bg-white border-stone-200 shadow-2xs" : "bg-[#141622] border-white/[0.08]"
+                isLight ? "bg-white border-stone-200 shadow-sm" : "bg-[#141622] border-white/[0.08]"
               }`}>
                 <div className="text-xs font-bold text-[#D4A359] font-narrative-serif">
                   【命盘起点 · 原生家庭档案】
@@ -2797,7 +2805,7 @@ ${logEntries
                           ? "bg-amber-50/50 border-amber-300/60"
                           : "bg-[#161926] border-[#D4A359]/30"
                         : isLight
-                        ? "bg-white border-stone-200 shadow-2xs"
+                        ? "bg-white border-stone-200 shadow-sm"
                         : "bg-[#131520] border-white/[0.06]"
                     }`}
                   >
@@ -2844,7 +2852,7 @@ ${logEntries
             <div className={`p-4 border-t flex justify-end shrink-0 ${
               isLight ? "bg-white border-stone-200" : "bg-[#12141F] border-white/[0.08]"
             }`}>
-              <button
+              <SpringButton
                 onClick={() => setShowMemoirDrawer(false)}
                 className={`w-full py-2.5 rounded-xl border text-xs font-semibold font-narrative-serif transition-colors ${
                   isLight
@@ -2853,11 +2861,9 @@ ${logEntries
                 }`}
               >
                 收起岁月忆录
-              </button>
+              </SpringButton>
             </div>
-          </div>
-        </div>
-      )}
+      </SpringOverlay>
 
       {/* ================================================================= */}
       {/* 16 种终局图鉴弹窗 (ENDING CODEX MODAL)                            */}
@@ -2872,9 +2878,9 @@ ${logEntries
       {/* ================================================================= */}
       {/* MODAL: 18yo GAOKAO CALCULATED OUTCOME MODAL                       */}
       {/* ================================================================= */}
-      {showGaokaoModal && gaokaoCalc && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className={`border rounded-2xl max-w-xl w-full p-5 sm:p-7 shadow-2xl space-y-5 animate-year-enter max-h-[90vh] overflow-y-auto transition-colors ${
+      {gaokaoCalc && (
+        <SpringOverlay open={showGaokaoModal} label="高考放榜与学业结算"
+          className={`border rounded-2xl max-w-xl w-full p-5 sm:p-7 shadow-2xl space-y-5 max-h-[90dvh] overflow-y-auto ${
             isLight
               ? "bg-white border-amber-600/40 text-stone-900 shadow-stone-900/15"
               : "bg-[#0E1017] border-[#D4A359]/60 text-stone-100 shadow-2xl"
@@ -2933,10 +2939,10 @@ ${logEntries
               </span>
               <div className="grid grid-cols-1 gap-3 sm:gap-3.5">
                 {gaokaoCalc.firstStepChoice.options.map((opt, oIdx) => (
-                  <button
+                  <SpringButton
                     key={oIdx}
                     onClick={() => handleConfirmGaokaoStep(opt)}
-                    className={`p-4 sm:p-5 rounded-xl border text-left transition-all active:scale-[0.99] group shadow-sm flex items-start justify-between ${
+                    className={`p-4 sm:p-5 rounded-xl border text-left transition-colors  group shadow-sm flex items-start justify-between ${
                       isLight
                         ? "border-stone-200 bg-stone-50 hover:border-amber-500/70 hover:bg-amber-50/50 text-stone-900"
                         : "border-white/[0.08] bg-[#181B26] hover:border-[#D4A359]/70 hover:bg-[#1E2232] text-stone-100"
@@ -2972,12 +2978,11 @@ ${logEntries
                     <ChevronRight className={`w-4 h-4 shrink-0 mt-1 ml-3 transition-transform group-hover:translate-x-1 ${
                       isLight ? "text-stone-400 group-hover:text-amber-700" : "text-stone-400 group-hover:text-amber-300"
                     }`} />
-                  </button>
+                  </SpringButton>
                 ))}
               </div>
             </div>
-          </div>
-        </div>
+        </SpringOverlay>
       )}
 
       {/* ================================================================= */}
