@@ -2469,18 +2469,8 @@ ${logEntries
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-3">
-                    <button
-                      onClick={() => setShowMemoirDrawer(true)}
-                      className={`px-2 py-0.5 rounded text-[11px] font-narrative-serif border flex items-center gap-1 transition-colors ${
-                        isLight ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900" : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
-                      }`}
-                      title="查看之前经历的人生岁月"
-                    >
-                      <BookOpen className="w-3 h-3" />
-                      <span>生平忆录</span>
-                    </button>
-                    <span className="text-[11px] text-[#D4A359] font-mono-num bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                      共 {currentNode.choices.length} 项 (可上下滑动)
+                    <span className="text-[11px] text-[#D4A359] font-mono-num bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                      共 {currentNode.choices.length} 项
                     </span>
                     <span className="hidden sm:inline-block text-[11px] text-stone-400 font-mono-num">
                       按 1 / 2 / 3
@@ -2584,56 +2574,40 @@ ${logEntries
               </div>
             )}
 
-            {/* ============================================================= */}
-            {/* YEAR READY SUBTLE CUE & QUICK TRIGGER (岁序就绪轻量触发提示)       */}
-            {/* ============================================================= */}
-            {!isWaitingCurrentChoice && (
-              <div
-                onClick={handleNextNaturalYear}
-                className="pt-2.5 pb-1 border-t border-amber-500/10 flex items-center justify-between text-[11px] text-stone-400 dark:text-stone-500 font-narrative-serif cursor-pointer hover:text-[#D4A359] transition-colors group select-none"
-                title="点击此处或按空格 Space 亦可推进下一岁"
-              >
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500/80 animate-pulse" />
-                  <span>岁序就绪 · 点击底栏【{getNextStepLabel()}】继续</span>
-                </span>
-                <span className="hidden sm:flex items-center gap-1 font-mono-num opacity-70 group-hover:opacity-100">
-                  <span>按空格 Space</span>
-                  <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
-                </span>
-              </div>
-            )}
           </div>
         )}
       </main>
 
       {/* ================================================================= */}
-      {/* 5. FLOATING FROSTED CAPSULE DOCK (固定底栏控制台 · 永不跳跃的定点操作坞)  */}
+      {/* 5. ALL-IN-ONE FIXED CAPSULE DOCK (全部功能一网打尽 · 终极固定底栏控制台) */}
       {/* ================================================================= */}
-      <div className={`fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 pointer-events-auto transition-all duration-300 ${
-        isWaitingCurrentChoice
-          ? "opacity-0 pointer-events-none translate-y-8"
-          : "opacity-100 translate-y-0"
-      }`}>
-        <div className={`flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 pl-2 sm:pl-2.5 pr-3 sm:pr-4 rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-300 max-w-[96vw] ${
+      <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto transition-all duration-300">
+        <div className={`flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2 pl-2 sm:pl-3 pr-2.5 sm:pr-3.5 rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-300 max-w-[96vw] ${
           isLight
             ? "bg-white/95 border-stone-200 text-stone-800 shadow-stone-900/15"
             : "bg-[#0E1019]/95 border-white/[0.12] text-stone-200 shadow-black/80"
         }`}>
-          {/* PRIMARY ADVANCE BUTTON: PERMANENTLY FIXED COORDINATE */}
+          {/* PRIMARY ACTION SLOT */}
           {!isRetired && !isShowingMortalityClimax && (
-            <button
-              onClick={handleNextNaturalYear}
-              disabled={waitingForChoice || showGaokaoModal}
-              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-md shadow-amber-950/20 active:scale-95 transition-all font-narrative-serif tracking-wide shrink-0 cursor-pointer group disabled:opacity-50"
-              title="按空格键 Space 也可推进"
-            >
-              <span>{getNextStepLabel()}</span>
-              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-1" />
-              <span className="text-[10px] font-normal opacity-75 hidden md:inline ml-0.5 font-mono-num">
-                (空格)
-              </span>
-            </button>
+            isWaitingCurrentChoice ? (
+              <div className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-amber-500/15 border border-amber-500/35 text-amber-400 font-bold text-xs sm:text-sm flex items-center gap-1.5 font-narrative-serif tracking-wide shrink-0 animate-pulse select-none">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>请在上方定夺 (按 1/2/3)</span>
+              </div>
+            ) : (
+              <button
+                onClick={handleNextNaturalYear}
+                disabled={waitingForChoice || showGaokaoModal}
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-md shadow-amber-950/20 active:scale-95 transition-all font-narrative-serif tracking-wide shrink-0 cursor-pointer group disabled:opacity-50"
+                title="按空格键 Space 也可推进"
+              >
+                <span>{getNextStepLabel()}</span>
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-1" />
+                <span className="text-[10px] font-normal opacity-75 hidden md:inline ml-0.5 font-mono-num">
+                  (空格)
+                </span>
+              </button>
+            )
           )}
 
           {!isRetired && !isShowingMortalityClimax && (
@@ -2648,7 +2622,7 @@ ${logEntries
               }
             }}
             disabled={waitingForChoice || showGaokaoModal || isRetired || isShowingMortalityClimax}
-            className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
               isAutoPlaying
                 ? "bg-amber-500 text-stone-950 border-amber-400 font-bold shadow-sm"
                 : isLight
@@ -2658,7 +2632,7 @@ ${logEntries
             title="快捷键: A 键切换自动播放"
           >
             {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
-            <span>{isAutoPlaying ? '暂停' : '流转'}</span>
+            <span className="hidden xs:inline">{isAutoPlaying ? '暂停' : '流转'}</span>
             <span className="text-[10px] opacity-75 font-mono-num">(A)</span>
           </button>
 
@@ -2691,15 +2665,11 @@ ${logEntries
               <span className="seal-stamp-box px-1.5 py-0.2 text-[10px]">绝唱</span>
               <span>请盖上生平朱砂大印</span>
             </span>
-          ) : isWaitingCurrentChoice ? (
-            <span className="text-amber-500 font-semibold text-xs flex items-center gap-1 animate-pulse font-narrative-serif px-1">
-              <Sparkles className="w-3.5 h-3.5 shrink-0" />
-              <span>请定夺去向 (1/2/3)</span>
-            </span>
           ) : !isRetired ? (
             <button
               onClick={handleSkipToNextDecision}
-              className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+              disabled={isWaitingCurrentChoice}
+              className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-40 ${
                 isLight
                   ? "bg-stone-50 hover:bg-stone-100 border-stone-300 text-stone-700 hover:border-amber-400"
                   : "bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] text-stone-300 hover:border-[#D4A359]/50"
@@ -2707,11 +2677,11 @@ ${logEntries
               title="一键直接快进到下一个有分支选择的年龄或高考节点"
             >
               <FastForward className="w-3.5 h-3.5 text-amber-400" />
-              <span>快进抉择</span>
+              <span className="hidden xs:inline">快进抉择</span>
             </button>
           ) : (
             <span className="text-xs text-[#D4A359] font-narrative-serif px-1">
-              ✨ 一生圆满落幕
+              ✨ 一生落幕
             </span>
           )}
 
@@ -2720,15 +2690,32 @@ ${logEntries
           {/* Memoir Drawer Trigger */}
           <button
             onClick={() => setShowMemoirDrawer(true)}
-            className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 ${
               isLight
                 ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
                 : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
             }`}
+            title="查阅全卷生平履历"
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">岁月忆录</span>
             <span className="font-mono-num font-bold">({logEntries.length})</span>
+          </button>
+
+          <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
+
+          {/* Quick Restart in Capsule */}
+          <button
+            onClick={() => handleRestart()}
+            className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-full border text-xs font-medium flex items-center gap-1 transition-all active:scale-95 ${
+              isLight
+                ? "bg-stone-100 hover:bg-rose-50 border-stone-300 text-stone-600 hover:text-rose-700 hover:border-rose-300"
+                : "bg-white/[0.04] hover:bg-rose-950/30 border-white/[0.08] text-stone-400 hover:text-rose-400 hover:border-rose-800/40"
+            }`}
+            title="重新投胎轮回"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">重开</span>
           </button>
         </div>
       </div>
