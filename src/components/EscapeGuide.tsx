@@ -56,6 +56,122 @@ const OFFICIAL_PORTALS: Record<
       desc: '在华申请就劳签、留学签、在留资格认定证明书 (COE) 换签流程。'
     }
   ],
+  australia: [
+    {
+      title: 'Department of Home Affairs (内政部官网)',
+      authority: '澳大利亚联邦政府',
+      url: 'https://immi.homeaffairs.gov.au/',
+      desc: '澳大利亚所有技术移民、州担保、打工度假签 (WHV 462) 官方唯一法规与签证系统。'
+    },
+    {
+      title: 'SkillSelect 积分制移民打分系统',
+      authority: '澳大利亚内政部官方在线系统',
+      url: 'https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect',
+      desc: '189/190/491 技术移民的职业清单 (SOL) 与意向书 (EOI) 官方递交入口。'
+    }
+  ],
+  newzealand: [
+    {
+      title: 'Immigration New Zealand (新西兰移民局官方门户)',
+      authority: '新西兰商业、创新与就业部 (MBIE)',
+      url: 'https://www.immigration.govt.nz/',
+      desc: '新西兰 SMC 6分制技术移民、绿色清单快速通道与认证雇员工签官方唯一法规源头。'
+    },
+    {
+      title: 'Green List 绿色清单官方紧缺职业库与学历比对',
+      authority: '新西兰移民局官方标准',
+      url: 'https://www.immigration.govt.nz/new-zealand-visas/preparing-a-visa-application/working-in-nz/qualifications-for-work/green-list-occupations',
+      desc: '直通居留 (Tier 1) 与工作转居留 (Tier 2) 的对应职业、中位数时薪标准与资格核对。'
+    },
+    {
+      title: 'NZQA 海外学历认证服务 (IQA)',
+      authority: '新西兰学历资格认证局',
+      url: 'https://www.nzqa.govt.nz/',
+      desc: '非豁免中国高等院校学历对等新西兰 Level 7 / Level 9 官方认证唯一评估机构。'
+    }
+  ],
+  canada: [
+    {
+      title: 'Immigration, Refugees and Citizenship Canada (IRCC)',
+      authority: '加拿大联邦移民局官网',
+      url: 'https://www.canada.ca/en/services/immigration-citizenship.html',
+      desc: '加拿大联邦快速通道 (Express Entry)、学签、毕业工签 (PGWP) 官方唯一申请入口。'
+    },
+    {
+      title: 'Comprehensive Ranking System (CRS) 官方打分工具',
+      authority: '加拿大联邦政府官方直测',
+      url: 'https://ircc.canada.ca/english/immigrate/skilled/crs-tool.asp',
+      desc: '无中介加价，直接输入年龄、语言成绩与学历，实时计算联邦池内得分。'
+    }
+  ],
+  usa: [
+    {
+      title: 'U.S. Citizenship and Immigration Services (USCIS 美国移民局)',
+      authority: '美国国土安全部 (DHS)',
+      url: 'https://www.uscis.gov/',
+      desc: 'Form I-140 (职业移民请愿)、I-485 (身份调整)、NIW 国家利益豁免全套官方指南与审理规费。'
+    },
+    {
+      title: 'Visa Bulletin 官方签证公告牌 (排期表)',
+      authority: '美国国务院领事事务局 (travel.state.gov)',
+      url: 'https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin.html',
+      desc: '每月权威公布中国大陆出生申请人 EB-1、EB-2 (含NIW)、EB-3 优先日表 A 与表 B 官方排期。'
+    },
+    {
+      title: 'Foreign Labor Application Gateway (FLAG 系统)',
+      authority: '美国联邦劳工部 (U.S. Department of Labor)',
+      url: 'https://flag.dol.gov/',
+      desc: '查询 PERM 劳工证现行工资 (Prevailing Wage) 与各州各代码真实薪资标准。'
+    }
+  ],
+  singapore: [
+    {
+      title: 'Ministry of Manpower (MOM 新加坡人力部)',
+      authority: '新加坡法定政府机构',
+      url: 'https://www.mom.gov.sg/',
+      desc: 'COMPASS 互补专才评估框架、EP、ONE Pass 及 S Pass 准证官方政策与行业薪资基准。'
+    },
+    {
+      title: 'Self-Assessment Tool (SAT 在线评估系统)',
+      authority: '新加坡人力部官方自测',
+      url: 'https://www.mom.gov.sg/eservices/services/employment-s-pass-self-assessment-tool',
+      desc: '输入薪资与学历即时获得 EP/COMPASS 获批可能性的官方预先判定，准确度极高。'
+    },
+    {
+      title: 'Immigration & Checkpoints Authority (ICA 移民与关卡局)',
+      authority: '新加坡内政部',
+      url: 'https://www.ica.gov.sg/',
+      desc: '新加坡永久居民 (Permanent Resident / PR) 及公民身份官方唯一下发与递交系统。'
+    }
+  ],
+  thailand: [
+    {
+      title: 'Thai E-Visa Official Portal',
+      authority: '泰王国驻外使领馆官方电子签证平台',
+      url: 'https://www.thaievisa.go.th/',
+      desc: '中国公民办理目的地泰国签证 (DTV - 数字游民签 5年期) 的官方正规直申网站。'
+    },
+    {
+      title: '泰国领事事务局 (Department of Consular Affairs)',
+      authority: '泰国外交部',
+      url: 'https://consular.mfa.go.th/',
+      desc: 'DTV 签证、养老签证 (Non-OA/OX) 资金流水审核与出入境合规指南。'
+    }
+  ],
+  spain: [
+    {
+      title: 'Ministerio de Inclusión, Seguridad Social y Migraciones',
+      authority: '西班牙包容、社会保障与移民部',
+      url: 'https://www.inclusion.gob.es/',
+      desc: '西班牙非盈利居留 (Residencia no lucrativa) 与移民法条官方网站。'
+    },
+    {
+      title: '初创企业法案 · 数字游民签证 (DNV) 官方指南',
+      authority: '西班牙外交、欧盟与合作部',
+      url: 'https://www.exteriores.gob.es/',
+      desc: '远程工作者与自由职业者在西合法居留与贝克汉姆税收法案官方细则。'
+    }
+  ],
   germany: [
     {
       title: 'Make it in Germany (联邦官方工作与移民门户)',
@@ -74,62 +190,6 @@ const OFFICIAL_PORTALS: Record<
       authority: '德国联邦内政部',
       url: 'https://www.bamf.de/',
       desc: '欧盟蓝卡 (EU Blue Card) 发放标准与定居许可证 (Niederlassungserlaubnis) 永居法条。'
-    }
-  ],
-  canada: [
-    {
-      title: 'Immigration, Refugees and Citizenship Canada (IRCC)',
-      authority: '加拿大联邦移民局官网',
-      url: 'https://www.canada.ca/en/services/immigration-citizenship.html',
-      desc: '加拿大联邦快速通道 (Express Entry)、学签、毕业工签 (PGWP) 官方唯一申请入口。'
-    },
-    {
-      title: 'Comprehensive Ranking System (CRS) 官方打分工具',
-      authority: '加拿大联邦政府官方直测',
-      url: 'https://ircc.canada.ca/english/immigrate/skilled/crs-tool.asp',
-      desc: '无中介加价，直接输入年龄、语言成绩与学历，实时计算联邦池内得分。'
-    }
-  ],
-  australia: [
-    {
-      title: 'Department of Home Affairs (内政部官网)',
-      authority: '澳大利亚联邦政府',
-      url: 'https://immi.homeaffairs.gov.au/',
-      desc: '澳大利亚所有技术移民、州担保、打工度假签 (WHV 462) 官方唯一法规与签证系统。'
-    },
-    {
-      title: 'SkillSelect 积分制移民打分系统',
-      authority: '澳大利亚内政部官方在线系统',
-      url: 'https://immi.homeaffairs.gov.au/visas/working-in-australia/skillselect',
-      desc: '189/190/491 技术移民的职业清单 (SOL) 与意向书 (EOI) 官方递交入口。'
-    }
-  ],
-  spain: [
-    {
-      title: 'Ministerio de Inclusión, Seguridad Social y Migraciones',
-      authority: '西班牙包容、社会保障与移民部',
-      url: 'https://www.inclusion.gob.es/',
-      desc: '西班牙非盈利居留 (Residencia no lucrativa) 与移民法条官方网站。'
-    },
-    {
-      title: '初创企业法案 · 数字游民签证 (DNV) 官方指南',
-      authority: '西班牙外交、欧盟与合作部',
-      url: 'https://www.exteriores.gob.es/',
-      desc: '远程工作者与自由职业者在西合法居留与贝克汉姆税收法案官方细则。'
-    }
-  ],
-  thailand: [
-    {
-      title: 'Thai E-Visa Official Portal',
-      authority: '泰王国驻外使领馆官方电子签证平台',
-      url: 'https://www.thaievisa.go.th/',
-      desc: '中国公民办理目的地泰国签证 (DTV - 数字游民签 5年期) 的官方正规直申网站。'
-    },
-    {
-      title: '泰国领事事务局 (Department of Consular Affairs)',
-      authority: '泰国外交部',
-      url: 'https://consular.mfa.go.th/',
-      desc: 'DTV 签证、养老签证 (Non-OA/OX) 资金流水审核与出入境合规指南。'
     }
   ]
 };
@@ -177,20 +237,21 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
   const country: CountryData =
     COUNTRIES_DATA.find((c) => c.id === selectedCountryId) || COUNTRIES_DATA[0];
 
+  const COUNTRY_TO_CITY_MAP: Record<string, string> = {
+    japan: 'tokyo',
+    australia: 'sydney',
+    newzealand: 'auckland',
+    canada: 'vancouver',
+    usa: 'seattle',
+    singapore: 'singapore',
+    thailand: 'chiangmai',
+    spain: 'valencia',
+    germany: 'berlin'
+  };
+
   const cityBenchmark: CityCostBenchmark =
-    CITY_BENCHMARKS[
-      selectedCountryId === 'japan'
-        ? 'tokyo'
-        : selectedCountryId === 'germany'
-        ? 'berlin'
-        : selectedCountryId === 'canada'
-        ? 'vancouver'
-        : selectedCountryId === 'australia'
-        ? 'sydney'
-        : selectedCountryId === 'spain'
-        ? 'valencia'
-        : 'chiangmai'
-    ] || CITY_BENCHMARKS['tokyo'];
+    CITY_BENCHMARKS[COUNTRY_TO_CITY_MAP[selectedCountryId] || 'tokyo'] ||
+    CITY_BENCHMARKS['tokyo'];
 
   const diyRoadmap: CountryRoadmap =
     DIY_ROADMAPS[selectedCountryId] || DIY_ROADMAPS['japan'];
@@ -320,7 +381,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
         <span className="text-xs font-semibold text-stone-400 font-mono-num uppercase tracking-wider block">
           目标国家 / 地区选择
         </span>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-2.5">
+        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 sm:gap-2.5">
           {COUNTRIES_DATA.map((c) => {
             const isSelected = c.id === selectedCountryId;
             return (
@@ -1033,28 +1094,87 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
                           </li>
                         </ol>
                       </div>
-                    ) : selectedCountryId === 'germany' ? (
+                    ) : selectedCountryId === 'australia' ? (
                       <div>
-                        <strong className="text-stone-200">德国永居升级阶梯：</strong>
+                        <strong className="text-stone-200">澳大利亚永居升级阶梯：</strong>
                         <ol className="list-decimal list-inside space-y-0.5 mt-1">
-                          <li>留学 / 机会卡 (Chancenkarte) 找工作</li>
-                          <li>获得对口工作合同 ➔ 换发欧盟蓝卡 (EU Blue Card)</li>
-                          <li>蓝卡持有者缴满 21 个月法定养老金 + 德语达到 B1 水平 ➔ 直接申请德国永居许可证！</li>
+                          <li>WHV 462 打工度假 / 留学生 485 毕业生工签入境</li>
+                          <li>积累澳洲本地工作经验，冲刺 PTE 65/79 分（四炸）并完成职业评估</li>
+                          <li>
+                            递交 SkillSelect EOI ➔ 189 独立技术或 190 州担保获邀 ➔ 一步到位全家获得澳洲永久居留权 (PR 绿卡) ➔ 居住满 4 年可申请入籍。
+                          </li>
+                        </ol>
+                      </div>
+                    ) : selectedCountryId === 'newzealand' ? (
+                      <div>
+                        <strong className="text-stone-200">新西兰永居与【永久回头签】阶梯：</strong>
+                        <ol className="list-decimal list-inside space-y-0.5 mt-1">
+                          <li>通过 WHV 或海外招聘锁定 Accredited Employer 认证雇主 Job Offer</li>
+                          <li>绿色清单直接获批居民签，或通过 SMC 6 分制获批居民签 (Resident Visa)</li>
+                          <li>
+                            持有居民签在新西兰住满 2 年（每年满 184 天）➔ 换领全球独一无二的【永久回头签 (Permanent Resident Visa)】！终身不再有任何移民监，回国多久绿卡永远有效！
+                          </li>
+                        </ol>
+                      </div>
+                    ) : selectedCountryId === 'canada' ? (
+                      <div>
+                        <strong className="text-stone-200">加拿大枫叶卡晋级阶梯：</strong>
+                        <ol className="list-decimal list-inside space-y-0.5 mt-1">
+                          <li>公立学院/大学毕业获得 1~3 年毕业工签 (PGWP) 或持有雇主 LMIA 工签</li>
+                          <li>积累 TEER 0/1/2/3 类工作经验，将英语考至 CLB 9（雅思 8777）</li>
+                          <li>
+                            Express Entry 联邦池内按 CRS 分数捞选，或走 BC PNP Tech 等省提名获 600 分保送加分 ➔ 获批加拿大永久居民 (PR 枫叶卡) ➔ 5 年内住满 3 年可入籍。
+                          </li>
+                        </ol>
+                      </div>
+                    ) : selectedCountryId === 'usa' ? (
+                      <div>
+                        <strong className="text-stone-200">美国职业移民绿卡阶梯：</strong>
+                        <ol className="list-decimal list-inside space-y-0.5 mt-1">
+                          <li>留学生通过 F-1 STEM OPT (最长 3 年) 就业，期间由雇主抽签 H-1B 工作签证；跨国企业员工走 L-1 调派</li>
+                          <li>具有行业客观影响力者可随时独立递交 EB-2 NIW (国家利益豁免)，免去雇主担保，加急 45 天锁定优先日 (Priority Date)</li>
+                          <li>
+                            雇主赞助 PERM 劳工证 ➔ 获批 I-140 ➔ 跟踪排期公告牌 (Visa Bulletin) ➔ 优先日到达后递交 I-485 或广领馆面签，全家落袋美国永久绿卡。
+                          </li>
+                        </ol>
+                      </div>
+                    ) : selectedCountryId === 'singapore' ? (
+                      <div>
+                        <strong className="text-stone-200">新加坡准证与 PR 申请路径：</strong>
+                        <ol className="list-decimal list-inside space-y-0.5 mt-1">
+                          <li>通过 COMPASS 40 分评估获得人力部颁发的就业准证 (Employment Pass - EP)</li>
+                          <li>月薪达 6,000 SGD 为配偶子女办理家属准证 (DP)，全家迁居新加坡</li>
+                          <li>
+                            在新加坡工作纳税满 1~2 年后，向移民与关卡局 (ICA) 线上提交新加坡永久居民 (PR) 申请 ➔ ICA 综合评估学历、纳税、家庭融入度后发放蓝卡。
+                          </li>
                         </ol>
                       </div>
                     ) : selectedCountryId === 'thailand' ? (
                       <div>
                         <strong className="text-stone-200">泰国居留现状：</strong>
                         <p className="mt-1">
-                          泰国不属于移民国家，无常规普通技术绿卡通道。DTV 签最长支持 5 年（每 180 天出境一次或延期），适合作为自由职业与被动收入者的长期避寒/缓冲基地。
+                          泰国不属于传统移民国家，无常规普通技术绿卡通道。DTV 签最长支持 5 年（每 180 天出境一次或境内延期），适合作为自由职业与离岸收入者的长期旅居/避寒降维基地。
                         </p>
+                      </div>
+                    ) : selectedCountryId === 'spain' ? (
+                      <div>
+                        <strong className="text-stone-200">西班牙永居与欧盟护照阶梯：</strong>
+                        <ol className="list-decimal list-inside space-y-0.5 mt-1">
+                          <li>以非盈利性居留 (No Lucrativa) 或数字游民签证 (DNV) 登陆，按 1+2+2 年模式续签居留卡 (TIE)</li>
+                          <li>持合法居留满 5 年（期间单次离境不超过 6 个月，累计不超过 10 个月）➔ 直接换领西班牙永久居留 / 欧盟长久居留 (Residencia de larga duración)</li>
+                          <li>合法居住满 10 年并通过 DELE A2 西班牙语及 CCSE 文化常识考试 ➔ 可申请加入西班牙国籍，取得欧盟护照。</li>
+                        </ol>
                       </div>
                     ) : (
                       <div>
-                        <strong className="text-stone-200">传统移民国家留居阶梯：</strong>
-                        <p className="mt-1">
-                          留学生工签 (如加拿大 PGWP) ➔ 积累本国合法全职经验 ➔ 提交省提名或联邦技术池捞选 ➔ 获批枫叶卡/绿卡。请特别警惕近两年英澳加政策收紧门槛。
-                        </p>
+                        <strong className="text-stone-200">德国永居与新国籍法升级阶梯：</strong>
+                        <ol className="list-decimal list-inside space-y-0.5 mt-1">
+                          <li>留学毕业工签 / 机会卡 (Chancenkarte) 赴德实地找工作</li>
+                          <li>获得对口专业合同 ➔ 换发欧盟蓝卡 (EU Blue Card)</li>
+                          <li>
+                            蓝卡持有者足额缴纳 21 个月法定养老保险 + 德语达 B1 水平（或缴满 27 个月 + 德语 A1）➔ 直接换取德国永居许可证 (Niederlassungserlaubnis)！新国籍法下居住满 5 年更可申请入籍。
+                          </li>
+                        </ol>
                       </div>
                     )}
                   </div>

@@ -356,5 +356,196 @@ export const DIY_ROADMAPS: Record<string, CountryRoadmap> = {
         ]
       }
     ]
+  },
+  newzealand: {
+    countryId: "newzealand",
+    countryName: "新西兰 (6分制技术移民 / 绿色清单)",
+    flag: "🇳🇿",
+    overallTimeEst: "资质与EOI 3 ~ 6 个月 ➜ 获邀审理 6 个月 ➜ 2年转终身永久回头签",
+    stages: [
+      {
+        id: "nz-s1",
+        stageName: "阶段一：资质评估、英语备考与材料海牙认证",
+        stageSubtitle: "准备好新西兰移民局认可的法定证据链",
+        icon: "FileCheck",
+        tasks: [
+          {
+            id: "nz-t1",
+            title: "NZQA 新西兰学历认证 (IQA) 或免认证名单核查",
+            duration: "1 ~ 2 个月",
+            costEst: "NZQA 申请费约 445 ~ 745 NZD",
+            isCrucial: true,
+            description: "如果毕业大学未在新西兰免认证豁免高校清单中，需通过 NZQA 官方递交学历海外认证 (International Qualifications Assessment)，取得 Level 7 (学士) 或 Level 9 (硕士) 认定。",
+            officialLinks: [{ label: "NZQA 官方学历认证系统", url: "https://www.nzqa.govt.nz/" }],
+            warningTip: "中国部分名校在免评估名单内，先查名单可省下几百纽币与两个月等待时间！"
+          },
+          {
+            id: "nz-t2",
+            title: "雅思 G 类 6.5 或 PTE Academic 58 分实考",
+            duration: "1 ~ 3 个月",
+            costEst: "约 2,100 RMB",
+            isCrucial: true,
+            description: "新西兰 SMC 6分制和绿色清单对英语的硬性要求，PTE 认可度极高且机考出分迅速。",
+            warningTip: "成绩单有效期为 2 年，递交 EOI 时必须在有效期内。"
+          },
+          {
+            id: "nz-t3",
+            title: "涉外无犯罪公证与海牙认证 (Apostille) 及 eMedical 体检",
+            duration: "2 ~ 3 周",
+            costEst: "公证认证约 300 RMB + 体检约 1,800 RMB",
+            isCrucial: true,
+            description: "必须在移民局指定 Panel Physician 合作医院完成 1007/1025 全套电子体检 (eMedical)，系统直传新西兰移民局。",
+            officialLinks: [{ label: "新西兰移民局指定体检医院查询", url: "https://www.immigration.govt.nz/new-zealand-visas/apply-for-a-visa/tools-and-information/medical-info/find-a-doctor" }]
+          }
+        ]
+      },
+      {
+        id: "nz-s2",
+        stageName: "阶段二：认证雇主 (AEWV) Offer 与居民签 (Resident Visa) 获批",
+        stageSubtitle: "锁定认证雇主并一步到位拿到新西兰居民身份",
+        icon: "CheckCircle",
+        tasks: [
+          {
+            id: "nz-t4",
+            title: "通过 Seek / LinkedIn 锁定 Accredited Employer 认证雇主 Job Offer",
+            duration: "1 ~ 4 个月",
+            costEst: "免费",
+            isCrucial: true,
+            description: "雇主必须在新西兰移民局完成 AEWV 资质认证，且时薪不低于中位数 (31.61 NZD/时)。绿色清单 Tier 1 职业更可免去打分直接递签。",
+            officialLinks: [{ label: "Seek 新西兰官方招聘", url: "https://www.seek.co.nz/" }]
+          },
+          {
+            id: "nz-t5",
+            title: "在线递交 SMC 6分制 EOI 申请并获批居民签",
+            duration: "3 ~ 6 个月",
+            costEst: "签证规费约 4,880 NZD",
+            isCrucial: true,
+            description: "满 6 分后线上即时受邀，上传全部证明材料，审理通过后直接发放 Resident Visa。",
+            warningTip: "拿到 Resident Visa 住满 2 年后，记得向移民局申请换发全球唯一的 Permanent Resident Visa (永久回头签)，从此终身免去任何移民监！"
+          }
+        ]
+      }
+    ]
+  },
+  usa: {
+    countryId: "usa",
+    countryName: "美国 (NIW 国家利益豁免 / EB-2 职业移民)",
+    flag: "🇺🇸",
+    overallTimeEst: "材料整理 2 ~ 4 个月 ➜ I-140 加急 45 天 ➜ 排期到达广领馆面签拿绿卡",
+    stages: [
+      {
+        id: "usa-s1",
+        stageName: "阶段一：独立举证证据链与推荐信准备 (免雇主担保)",
+        stageSubtitle: "立足 Matter of Dhanasar 判例，确立个人在行业中的核心影响力",
+        icon: "FileCheck",
+        tasks: [
+          {
+            id: "usa-t1",
+            title: "梳理 Google Scholar 引用、专利、开源贡献或重大商业工程项目",
+            duration: "3 ~ 4 周",
+            costEst: "免费",
+            isCrucial: true,
+            description: "挖掘个人在软件研发、算法、AI、数据、工业设计等领域的客观影响（如顶会论文引用次数、开源项目百 Star 以上应用、企业关键技术攻坚带来的巨额营收数据）。",
+            warningTip: "重点不是证明‘我很优秀’，而是证明‘我所做的事具有重大国家级利益，且我有能力推进该事业’！"
+          },
+          {
+            id: "usa-t2",
+            title: "索取 3 ~ 5 封行业权威独立推荐信 (Independent Reference Letters)",
+            duration: "1 ~ 2 个月",
+            costEst: "免费 (自己草拟后请专家签署)",
+            isCrucial: true,
+            description: "邀请未与自己直接共事过的业界大牛、顶会主席、行业协会理事长签署独立推荐信，背书你的技术成果在全行业的标杆价值。",
+            warningTip: "独立推荐人（非同校导师、非同组同事）的说服力远高于有利益关联的熟人！"
+          }
+        ]
+      },
+      {
+        id: "usa-s2",
+        stageName: "阶段二：递交 Form I-140 锁定排期与广领馆面签",
+        stageSubtitle: "向 USCIS 正式请愿，锁定全球优先日 (Priority Date)",
+        icon: "CheckCircle",
+        tasks: [
+          {
+            id: "usa-t3",
+            title: "向美国移民局 (USCIS) 递交 I-140 与 ETA-750B (可申 Premium Processing 加急)",
+            duration: "常规 4 ~ 8 个月 / 加急 45 天出结果",
+            costEst: "申请费 $715 + 庇护费 $300 (加急费 $2,805 可选)",
+            isCrucial: true,
+            description: "通过 USCIS 官方邮寄或线上系统递交请愿书，获得 I-797 收据通知函，函上的 Receive Date 即为你终生锁定的 Priority Date (优先日)。",
+            officialLinks: [{ label: "USCIS 官方 I-140 指南", url: "https://www.uscis.gov/i-140" }]
+          },
+          {
+            id: "usa-t4",
+            title: "跟踪国务院 Visa Bulletin 排期，到达后广州领事馆面签登陆收绿卡",
+            duration: "排期到达后 3 ~ 6 个月",
+            costEst: "NVC 签证费 $345/人 + 移民体检约 1,800 RMB",
+            isCrucial: true,
+            description: "每月查看美国国务院公布的排期表（表 A / 表 B）。优先日到达后，NVC 发出缴费通知，填报 DS-260，在广州领事馆完成移民面签，携全家登陆美国，绿卡实体卡直接邮寄到家！",
+            officialLinks: [{ label: "美国国务院 Visa Bulletin 官方排期表", url: "https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin.html" }]
+          }
+        ]
+      }
+    ]
+  },
+  singapore: {
+    countryId: "singapore",
+    countryName: "新加坡 (COMPASS 就业准证 EP / 顶级专才)",
+    flag: "🇸🇬",
+    overallTimeEst: "资质预评估 2 周 ➜ 雇主递签 10~20 天 ➜ 抵坡录指纹拿 EP 卡",
+    stages: [
+      {
+        id: "sg-s1",
+        stageName: "阶段一：学信网认证与 COMPASS 40分合规自测",
+        stageSubtitle: "确保满足新加坡人力部 (MOM) 最低月薪与打分硬指标",
+        icon: "FileCheck",
+        tasks: [
+          {
+            id: "sg-t1",
+            title: "学信网本科学位认证 + MOM 认可第三方背景调查认证 (Dataflow / CIS)",
+            duration: "1 ~ 3 周",
+            costEst: "约 500 ~ 1,200 RMB (第三方背调机构费用)",
+            isCrucial: true,
+            description: "自 2023 年 9 月起，所有申报 COMPASS 学历分（C2）的申请人，必须通过 MOM 官方认可的全球第三方机构验证学历真实性并生成验证码。",
+            officialLinks: [{ label: "MOM 认可学历核查机构清单", url: "https://www.mom.gov.sg/passes-and-permits/employment-pass/eligibility/compass" }],
+            warningTip: "顶级高校（如清北复交、985/211 顶尖名校）可直接拿下 20 分满分！"
+          },
+          {
+            id: "sg-t2",
+            title: "使用 MOM 官方 Self-Assessment Tool (SAT) 进行免费合规自测",
+            duration: "15 分钟",
+            costEst: "免费",
+            isCrucial: true,
+            description: "在新加坡人力部官网输入职位、月薪、国籍、学历，系统直接给出是否符合 EP 准证下发资格的官方预判结果。",
+            officialLinks: [{ label: "MOM SAT 在线自测系统", url: "https://www.mom.gov.sg/eservices/services/employment-s-pass-self-assessment-tool" }]
+          }
+        ]
+      },
+      {
+        id: "sg-s2",
+        stageName: "阶段二：雇主聘任递签、IPA 获批与全家赴坡",
+        stageSubtitle: "拿下 In-Principle Approval (原则性批准函) 并登录激活",
+        icon: "CheckCircle",
+        tasks: [
+          {
+            id: "sg-t3",
+            title: "雇主向 MOM 提交申请并取得 In-Principle Approval (IPA)",
+            duration: "10 ~ 20 个工作日",
+            costEst: "申请费 105 SGD + 发证费 225 SGD",
+            isCrucial: true,
+            description: "新加坡雇主通过 EP Online 系统递交。获批后下发 IPA 函，该函即为单次入境白条，凭此无需单独办签证即可合法飞抵新加坡！",
+            warningTip: "月薪达到 6,000 SGD 即可在递交时同步勾选配偶及子女的家属准证 (Dependant's Pass - DP)。"
+          },
+          {
+            id: "sg-t4",
+            title: "抵坡预约 MOM 录入指纹面相，换领实体 EP 居留卡并注册 Singpass",
+            duration: "抵坡后 1 周内完成",
+            costEst: "免费",
+            isCrucial: true,
+            description: "前往 Employment Pass Services Centre (EPSC) 完成生物识别录入，3 个工作日内实体 EP 卡顺丰送达。拿到卡后立即下载激活 Singpass (新加坡官方一码通政务 App)。",
+            officialLinks: [{ label: "Singpass 官方注册门户", url: "https://www.singpass.gov.sg/" }]
+          }
+        ]
+      }
+    ]
   }
 };
