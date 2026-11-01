@@ -482,7 +482,7 @@ const FIRST_NAMES = ["陈", "李", "王", "张", "刘", "黄", "周", "徐", "�
 const GIVEN_NAMES_MALE = ["浩然", "宇航", "家辉", "志伟", "建国", "子轩", "博文", "俊杰", "天明"];
 const GIVEN_NAMES_FEMALE = ["晓芸", "婷婷", "佳欣", "若涵", "思敏", "燕妮", "梦洁", "雅琴", "静波"];
 
-export function generateRandomFamily(targetProvinceOrRegion?: string): {
+export function generateRandomFamily(): {
   name: string;
   gender: "男" | "女";
   family: FamilyOrigin;
@@ -495,28 +495,8 @@ export function generateRandomFamily(targetProvinceOrRegion?: string): {
       : GIVEN_NAMES_FEMALE[Math.floor(Math.random() * GIVEN_NAMES_FEMALE.length)];
   const name = `${sur}${given}`;
 
-  // 1. 抽取地域生态（支持指定具体剧本，或按省份随机抽取该省多样化平行剧本）
-  let candidateEcos = REGION_ECOSYSTEMS;
-  if (targetProvinceOrRegion) {
-    const cleanTarget = targetProvinceOrRegion.trim();
-    const exactRegionMatch = REGION_ECOSYSTEMS.filter((e) => e.region === cleanTarget);
-    if (exactRegionMatch.length > 0) {
-      candidateEcos = exactRegionMatch;
-    } else {
-      const matched = REGION_ECOSYSTEMS.filter(
-        (e) =>
-          e.province === cleanTarget ||
-          e.id === cleanTarget ||
-          cleanTarget.includes(e.province) ||
-          e.province.includes(cleanTarget) ||
-          e.region.includes(cleanTarget)
-      );
-      if (matched.length > 0) {
-        candidateEcos = matched;
-      }
-    }
-  }
-  const eco = candidateEcos[Math.floor(Math.random() * candidateEcos.length)];
+  // 1. 从全部地域生态中随机抽取出生背景
+  const eco = REGION_ECOSYSTEMS[Math.floor(Math.random() * REGION_ECOSYSTEMS.length)];
 
   // 2. 严格从该生态中抽取原生父母与居住条件（彻底避免“地级市出生却去县医院工作”的荒谬串台）
   const parent = eco.parents[Math.floor(Math.random() * eco.parents.length)];

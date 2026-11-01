@@ -22,7 +22,7 @@ export function Header({ activeTab, setActiveTab, theme = 'dark', onToggleTheme 
         <nav aria-label="主导航" className="flex min-w-0 items-center gap-1">
           {([
             { id: 'sim', label: '人生模拟' },
-            { id: 'guide', label: '移居指南' }
+            { id: 'guide', label: '出海指北' }
           ] as const).map(({ id, label }) => (
             <SpringButton
               key={id}

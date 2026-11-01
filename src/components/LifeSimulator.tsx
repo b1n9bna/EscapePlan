@@ -1092,11 +1092,10 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     scrollToFeedBottom();
   };
 
-  const handleRestart = (targetProvince?: string | unknown) => {
+  const handleRestart = () => {
     confettiFiredRef.current = false;
     setIsAutoPlaying(false);
-    const prov = typeof targetProvince === 'string' ? targetProvince : undefined;
-    const fresh = generateRandomFamily(prov);
+    const fresh = generateRandomFamily();
     setCharData(fresh);
     setTimeline(generateTimelineForCharacter(fresh.family, fresh.gender));
     const matchIdx = BIRTHPLACE_SLIDES.findIndex((s) => s.region === fresh.family.region);
@@ -1406,7 +1405,7 @@ ${logEntries
           </div>
 
           {/* Birthplace Location Header */}
-          <div className={`p-3.5 sm:p-4 rounded-xl border flex flex-wrap items-center justify-between gap-2 transition-colors ${
+          <div className={`p-3.5 sm:p-4 rounded-xl border transition-colors ${
             isLight ? "bg-stone-50 border-stone-200 text-stone-800" : "bg-[#161822] border-white/[0.06] text-stone-200"
           }`}>
             <div className="flex items-center gap-2.5">
@@ -1423,20 +1422,6 @@ ${logEntries
                   出生医院：{charData.family.hospitalName}
                 </div>
               </div>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <SpringButton
-                onClick={() => handleRestart(charData.family.province)}
-                className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors flex items-center gap-1  ${
-                  isLight
-                    ? "bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-950 shadow-sm font-semibold"
-                    : "bg-amber-500/20 hover:bg-amber-500/30 border-amber-500/40 text-amber-300 shadow-sm font-semibold"
-                }`}
-                title="同省重抽：切换到本省另一个截然不同的出生地、医院与家庭背景"
-              >
-                <RotateCcw className="w-3 h-3 text-amber-500" />
-                <span>同省重抽</span>
-              </SpringButton>
             </div>
           </div>
 
@@ -2937,9 +2922,6 @@ ${logEntries
         </SpringOverlay>
       )}
 
-      {/* ================================================================= */}
-      {/* MODAL: 自主指定投胎省份（34省级行政区全覆盖）                      */}
-      {/* ================================================================= */}
     </div>
   );
 };

@@ -350,7 +350,7 @@ export const EscapeGuide: React.FC<EscapeGuideProps> = ({
       {/* 1. TOP HEADER & PROMISE                                             */}
       {/* =================================================================== */}
       <h1 className={`text-xl sm:text-2xl font-semibold ${isLight ? 'text-stone-900' : 'text-stone-100'}`}>
-        移居指南
+        出海指北
       </h1>
 
       {/* =================================================================== */}
