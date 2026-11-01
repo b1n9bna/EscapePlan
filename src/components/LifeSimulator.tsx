@@ -61,8 +61,6 @@ import {
   Landmark,
   HeartHandshake,
   ShieldAlert,
-  Sun,
-  Moon,
   Type
 } from 'lucide-react';
 
@@ -70,7 +68,6 @@ interface LifeSimulatorProps {
   onNavigateToSubclasses: (countryId?: string) => void;
   onNavigateToDIY: (countryId?: string) => void;
   theme?: 'light' | 'dark';
-  onToggleTheme?: () => void;
 }
 
 interface ChronicleLogEntry {
@@ -445,34 +442,11 @@ const EndingCodexModal: React.FC<{
 export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   onNavigateToSubclasses: _onNavigateToSubclasses,
   onNavigateToDIY: _onNavigateToDIY,
-  theme: propTheme,
-  onToggleTheme: propToggleTheme
+  theme = 'dark'
 }) => {
-  const [localTheme, setLocalTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('escapeplan_theme');
-      if (saved === 'light' || saved === 'dark') return saved;
-    }
-    return 'dark';
-  });
-
   const reduceMotion = useReducedMotion();
-  const activeTheme = propTheme || localTheme;
-  const isLight = activeTheme === 'light';
+  const isLight = theme === 'light';
 
-  const handleToggleTheme = () => {
-    if (propToggleTheme) {
-      propToggleTheme();
-    } else {
-      setLocalTheme((prev) => {
-        const next = prev === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('escapeplan_theme', next);
-        document.documentElement.setAttribute('data-theme', next);
-        document.documentElement.classList.toggle('light', next === 'light');
-        return next;
-      });
-    }
-  };
   // Gameplay View Modes:
   // 'setup' -> Birthplace Reel & Family Card
   // 'cockpit' -> Unified 3-column interactive simulation (Ages 0 to 63!)
@@ -1321,31 +1295,10 @@ ${logEntries
             </div>
           </div>
 
-          <div className={`mt-4 pt-3 border-t flex flex-wrap items-center justify-between gap-2.5 font-reading-sans ${
+          <div className={`mt-4 pt-3 border-t flex flex-wrap items-center justify-end gap-2.5 font-reading-sans ${
             isLight ? "border-stone-200 text-stone-600" : "border-white/[0.06] text-stone-400"
           }`}>
             <div className="flex items-center gap-2">
-              <SpringButton
-                onClick={handleToggleTheme}
-                className={`px-3 py-2 rounded-xl border text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5  ${
-                  isLight
-                    ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-800"
-                    : "bg-[#181B26] hover:bg-[#1E2230] border-white/[0.08] text-stone-200"
-                }`}
-                title={isLight ? "切换为深色模式" : "切换为浅色模式"}
-              >
-                {isLight ? (
-                  <>
-                    <Moon className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>深色</span>
-                  </>
-                ) : (
-                  <>
-                    <Sun className="w-3.5 h-3.5 text-amber-400" />
-                    <span>浅色</span>
-                  </>
-                )}
-              </SpringButton>
               <SpringButton
                 onClick={spinReel}
                 disabled={isSpinning}
@@ -1356,7 +1309,7 @@ ${logEntries
                 }`}
               >
                 <RotateCcw className={`w-3.5 h-3.5 text-amber-400 ${isSpinning ? "animate-spin" : ""}`} />
-                重新生成
+                重新投胎
               </SpringButton>
             </div>
           </div>
@@ -1807,19 +1760,6 @@ ${logEntries
             <span className="hidden sm:inline">{readerFontSize === 'normal' ? '标准' : readerFontSize === 'large' ? '大字' : '特大'}</span>
           </SpringButton>
 
-          {/* Theme Toggle */}
-          <SpringButton
-            onClick={handleToggleTheme}
-            className={`p-1.5 rounded-lg border transition-colors ${
-              isLight
-                ? "bg-stone-100/80 hover:bg-stone-200 border-stone-300 text-stone-700"
-                : "bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.08] text-stone-300"
-            }`}
-            title="切换明暗主题"
-          >
-            {isLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5 text-amber-300" />}
-          </SpringButton>
-
           {/* Restart */}
           <SpringButton
             onClick={() => handleRestart()}
@@ -1828,7 +1768,7 @@ ${logEntries
                 ? "bg-stone-100/80 hover:bg-rose-50 border-stone-300 text-stone-700 hover:text-rose-700 hover:border-rose-300"
                 : "bg-white/[0.05] hover:bg-rose-950/30 border-white/[0.08] text-stone-300 hover:text-rose-400 hover:border-rose-800/40"
             }`}
-            title="重新生成角色"
+            title="重新投胎"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">重开</span>

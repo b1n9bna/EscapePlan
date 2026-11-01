@@ -68,7 +68,6 @@ export function App() {
               onNavigateToSubclasses={handleNavigateToGuide}
               onNavigateToDIY={handleNavigateToGuide}
               theme={theme}
-              onToggleTheme={toggleTheme}
             />
           )}
 
