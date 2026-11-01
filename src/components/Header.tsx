@@ -21,7 +21,7 @@ export function Header({ activeTab, setActiveTab, theme = 'dark', onToggleTheme 
       <div className="app-header-layout max-w-6xl mx-auto px-4 sm:px-6">
         <nav aria-label="主导航" className="flex min-w-0 items-center gap-1">
           {([
-            { id: 'sim', label: '人生模拟' },
+            { id: 'sim', label: '人生重开' },
             { id: 'guide', label: '出海指北' }
           ] as const).map(({ id, label }) => (
             <SpringButton

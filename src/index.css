@@ -29,6 +29,15 @@
   height: calc(100dvh - var(--app-header-height));
 }
 
+.simulator-stage {
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable both-edges;
+}
+
+.simulator-controls {
+  padding: 8px 12px max(8px, env(safe-area-inset-bottom));
+}
+
 .simulator-hud {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -43,16 +52,10 @@
 }
 
 .simulator-dock {
-  width: max-content;
-  max-width: min(48rem, calc(100vw - 24px));
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
   flex-wrap: wrap;
-  justify-content: center;
-}
-
-.simulator-dock > :first-child {
-  max-width: 100%;
-  white-space: normal;
-  text-align: center;
 }
 
 @media (min-width: 1024px) {
@@ -62,11 +65,6 @@
     padding: 8px 24px;
   }
   .simulator-status { grid-column: 2; grid-row: 1; }
-}
-
-@media (max-width: 639px) {
-  .simulator-dock > button { min-height: 40px; min-width: 40px; }
-  .simulator-dock > span { display: none; }
 }
 
 body {

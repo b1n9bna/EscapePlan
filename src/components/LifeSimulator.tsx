@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { SpringButton, SpringOverlay } from './MotionPrimitives';
 import {
@@ -518,24 +518,18 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const [logEntries, setLogEntries] = useState<ChronicleLogEntry[]>([]);
   const [timelineIndex, setTimelineIndex] = useState(0);
 
-  // Auto-scroll anchor for middle column
-  const feedBottomRef = useRef<HTMLDivElement>(null);
+  // Story and options share one scroll container. Jump to options only on request.
+  const stageScrollRef = useRef<HTMLElement>(null);
   const choiceCardRef = useRef<HTMLDivElement>(null);
-
-  const scrollToFeedBottom = () => {
-    setTimeout(() => {
-      feedBottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'nearest' });
-    }, 60);
-  };
+  const choiceOutcomeRef = useRef<HTMLDivElement>(null);
 
   const scrollToChoiceCard = () => {
-    setTimeout(() => {
-      if (choiceCardRef.current) {
-        choiceCardRef.current.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'center' });
-      } else {
-        feedBottomRef.current?.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'nearest' });
-      }
-    }, 80);
+    const stage = stageScrollRef.current;
+    const target = choiceCardRef.current;
+    if (!stage || !target) return;
+    const top = target.getBoundingClientRect().top - stage.getBoundingClientRect().top + stage.scrollTop - 16;
+    stage.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'instant' : 'smooth' });
+    stage.focus({ preventScroll: true });
   };
 
   // Age 18 Gaokao Calculated Outcome state
@@ -676,6 +670,8 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   const currentNode = timeline[timelineIndex] || timeline[0];
   const isChoiceNode = currentNode.type === 'choice' && currentNode.choices && currentNode.choices.length > 0;
   const lastLogEntry = logEntries[logEntries.length - 1];
+  const currentEventKey = lastLogEntry ? `${lastLogEntry.id}:${lastLogEntry.age}` : '';
+  const recordedChoice = lastLogEntry?.chosenOptionText;
   const waitingForChoice = isChoiceNode && lastLogEntry && !lastLogEntry.chosenOptionText;
 
   // =========================================================================
@@ -717,16 +713,19 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     };
   }, []);
 
-  // Smoothly anchor scroll inside middle feed container on entry or choice update
-  useEffect(() => {
-    if (gamePhase === 'cockpit') {
-      if (waitingForChoice) {
-        scrollToChoiceCard();
-      } else {
-        scrollToFeedBottom();
-      }
-    }
-  }, [logEntries.length, waitingForChoice, gamePhase]);
+  // Read new events from the beginning; selecting an option reveals its result.
+  // No timers or scrollIntoView calls may pull the document or a user's manual scroll.
+  useLayoutEffect(() => {
+    if (gamePhase !== 'cockpit') return;
+    const stage = stageScrollRef.current;
+    if (!stage) return;
+    const outcome = recordedChoice && !isRetired && !isShowingMortalityClimax ? choiceOutcomeRef.current : null;
+    const top = outcome
+      ? outcome.getBoundingClientRect().top - stage.getBoundingClientRect().top + stage.scrollTop - 16
+      : 0;
+    stage.scrollTo({ top: Math.max(0, top), behavior: 'instant' });
+    stage.focus({ preventScroll: true });
+  }, [gamePhase, currentEventKey, recordedChoice, isRetired, isShowingMortalityClimax]);
 
   // =========================================================================
   // START SIMULATION FROM 0 YEARS OLD
@@ -768,7 +767,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     setLogEntries([initialLog]);
     setTimelineIndex(0);
     setGamePhase('cockpit');
-    scrollToFeedBottom();
   };
 
   // Helper to apply attribute deltas safely
@@ -855,7 +853,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
     setLogEntries((prev) => [...prev, newLog]);
     setTimelineIndex(nextIdx);
-    scrollToFeedBottom();
   };
 
   // =========================================================================
@@ -925,8 +922,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       if (accumulatedTags.length > 0) setTags((prev) => Array.from(new Set([...prev, ...accumulatedTags])));
       setLogEntries((prev) => [...prev, ...accumulatedLogs]);
       setTimelineIndex(targetIdx);
-      scrollToFeedBottom();
-    } else if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)) {
+      } else if (!gaokaoCalc && (currentNode.age === 17 || currentAge === 17)) {
       const calc = calculateGaokaoOutcome(attrs, tags, charData.family);
       setGaokaoCalc(calc);
       setShowGaokaoModal(true);
@@ -1019,7 +1015,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
     }
 
     // 无论哪个年龄段抉择，都让玩家看清抉择反馈与属性变化，统一通过底部操作栏“迈入下一岁”从容前行
-    scrollToFeedBottom();
   };
 
   // =========================================================================
@@ -1089,7 +1084,6 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       const age19Idx = updatedTimeline.findIndex((n) => n.id === node19.id);
       setTimelineIndex(age19Idx !== -1 ? age19Idx : upTo18.length);
     }
-    scrollToFeedBottom();
   };
 
   const handleRestart = () => {
@@ -1126,7 +1120,7 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
   };
 
   // =========================================================================
-  // AUTO-PLAY ENGINE (PERSISTENT INTENT: SUSPEND ON CHOICE, AUTO-RESUME ON SELECTION)
+  // AUTO-PLAY ENGINE (STOP AT DECISIONS; CONTINUE AFTER READING THE OUTCOME)
   // =========================================================================
   useEffect(() => {
     if (!isAutoPlaying) return;
@@ -1139,10 +1133,12 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
       setIsAutoPlaying(false);
       return;
     }
-    // Suspend timer while waiting for user choice or Gaokao decision, WITHOUT turning off auto-play!
-    if (waitingForChoice || showGaokaoModal || showMemoirDrawer || showCodexModal) {
+    // A decision stops playback so the player can read its outcome before continuing.
+    if (waitingForChoice || showGaokaoModal) {
+      setIsAutoPlaying(false);
       return;
     }
+    if (showMemoirDrawer || showCodexModal) return;
 
     const timer = setTimeout(() => {
       handleNextNaturalYear();
@@ -1159,19 +1155,14 @@ export const LifeSimulator: React.FC<LifeSimulatorProps> = ({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (showMemoirDrawer || showCodexModal) return;
-      // Ignore if user is inside an input/textarea
-      if (
-        document.activeElement &&
-        (document.activeElement.tagName === 'BUTTON' ||
-          document.activeElement.tagName === 'A' ||
-          document.activeElement.tagName === 'INPUT' ||
-          document.activeElement.tagName === 'TEXTAREA')
-      ) {
-        return;
-      }
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement && (
+        ['INPUT', 'TEXTAREA', 'SELECT'].includes(focused.tagName) || focused.isContentEditable
+      )) return;
 
-      // Space / Enter: Advance year or acknowledge mortality or stop auto-play
+      // Focused controls retain native activation; other shortcuts remain available.
       if (e.code === 'Space' || e.key === 'Enter') {
+        if (focused?.closest('button, a')) return;
         e.preventDefault();
         if (isAutoPlaying) {
           setIsAutoPlaying(false);
@@ -1287,7 +1278,7 @@ ${logEntries
     return (
       <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 animate-year-enter">
         <h1 className={`text-xl sm:text-2xl font-semibold mb-6 ${isLight ? "text-stone-900" : "text-stone-100"}`}>
-          人生模拟
+          人生重开
         </h1>
 
         {/* Slot Reel */}
@@ -1519,7 +1510,7 @@ ${logEntries
               onClick={startSimulation}
               className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#D4A359] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 shadow-lg shadow-amber-950/40  font-narrative-serif tracking-wide"
             >
-              <span>开始模拟</span>
+              <span>开启人生</span>
               <ArrowRight className="w-4 h-4" />
             </SpringButton>
           </div>
@@ -1665,7 +1656,7 @@ ${logEntries
   };
 
   return (
-    <div className={`simulator-viewport flex flex-col font-reading-sans overflow-hidden transition-colors duration-300 relative select-none ${
+    <div className={`simulator-viewport flex flex-col font-reading-sans overflow-hidden transition-colors duration-300 relative ${
       isLight ? "bg-[#FAF8F5] text-stone-900" : "bg-[#06070B] text-stone-100"
     }`}>
       {/* ================================================================= */}
@@ -1848,12 +1839,17 @@ ${logEntries
       {/* ================================================================= */}
       {/* 4. MAIN STAGE THEATRE (核心单幕剧场 · 时代动态光影与宣纸/黑曜材质)     */}
       {/* ================================================================= */}
-      <main className={`flex-1 overflow-y-auto flex flex-col items-center justify-start p-3 sm:p-6 lg:p-8 pt-1 sm:pt-2 pb-48 sm:pb-56 relative transition-colors duration-700 ${getEpochAuraStyle()}`}>
+      <section
+        ref={stageScrollRef}
+        aria-label="当前人生事件"
+        tabIndex={0}
+        className={`simulator-stage min-h-0 flex-1 overflow-y-auto overflow-x-hidden touch-pan-y flex flex-col items-center justify-start p-3 sm:p-6 lg:p-8 pt-1 sm:pt-2 relative transition-colors duration-700 focus-visible:outline focus-visible:outline-1 focus-visible:outline-stone-500 focus-visible:outline-offset-[-2px] ${getEpochAuraStyle()}`}
+      >
         {/* =============================================================== */}
         {/* VIEW A: 终局人生纪念卡 (80亿分之一 标志性生平画卷)                */}
         {/* =============================================================== */}
         {isRetired && finalVerdict ? (
-          <div className={`w-full max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-10 space-y-7 shadow-2xl relative transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter overflow-hidden ${
+          <div className={`simulator-event-card shrink-0 w-full max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-10 space-y-7 shadow-2xl relative transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter overflow-hidden ${
             isLight
               ? "bg-[#FAF8F5]/98 border-amber-900/20 shadow-amber-950/10 text-stone-900"
               : "bg-[#0E1019]/98 border-[#D4A359]/30 shadow-black/90 text-stone-100"
@@ -2175,7 +2171,7 @@ ${logEntries
             return (
               <div
                 key={`mortality_${currentEntry.id}_${currentEntry.age}`}
-                className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-11 space-y-7 shadow-2xl transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter relative overflow-hidden ${
+                className={`simulator-event-card shrink-0 w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-6 sm:p-9 lg:p-11 space-y-7 shadow-2xl transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter relative overflow-hidden ${
                   isLight
                     ? "bg-[#FFFBF7] border-red-900/30 text-stone-900 shadow-red-950/15"
                     : "bg-[#090A10] border-red-800/40 text-stone-100 shadow-[0_0_80px_rgba(185,28,28,0.25)] animate-elegiac-aura"
@@ -2270,7 +2266,7 @@ ${logEntries
           /* =============================================================== */
           <div
             key={`${currentEntry.id}_${currentEntry.age}`}
-            className={`w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-4 sm:p-6 lg:p-8 space-y-3.5 sm:space-y-4 shadow-2xl transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter relative overflow-hidden ${
+            className={`simulator-event-card shrink-0 w-full max-w-2xl sm:max-w-3xl rounded-3xl border p-4 sm:p-6 lg:p-8 space-y-3.5 sm:space-y-4 shadow-2xl transition-all duration-300 mt-1 sm:mt-2 mb-8 animate-year-enter relative overflow-hidden ${
               isLight
                 ? "bg-[#FCFAF7]/95 border-amber-900/15 shadow-[0_20px_50px_-10px_rgba(180,140,80,0.12)] text-stone-900"
                 : "bg-[#0E1019]/95 border-[#D4A359]/25 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_30px_rgba(212,163,89,0.06)] text-stone-100"
@@ -2395,6 +2391,7 @@ ${logEntries
             {isWaitingCurrentChoice && currentNode.choices && (
               <div
                 ref={choiceCardRef}
+                id="life-event-choices"
                 className={`mt-4 sm:mt-5 p-4 sm:p-6 rounded-2xl border space-y-3 sm:space-y-4 relative z-10 transition-all ${
                 currentNode.type === 'destiny'
                   ? isLight
@@ -2419,14 +2416,8 @@ ${logEntries
                   </div>
                 </div>
 
-                {/* Option Cards - Explicit scrollable viewport for Mac 13" and mobile */}
-                <div
-                  className="max-h-[38vh] sm:max-h-[46vh] overflow-y-auto pr-1.5 sm:pr-2 space-y-2.5 sm:space-y-3 overscroll-contain focus:outline-none"
-                  style={{
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: isLight ? '#D4A359 #F3F4F6' : '#D4A359 #181B26'
-                  }}
-                >
+                {/* Options remain in the story flow, including long text and larger font sizes. */}
+                <div className="simulator-choices space-y-2.5 sm:space-y-3">
                   {currentNode.choices.map((choice, cIdx) => {
                     const p = getChoicePresentation(choice);
                     return (
@@ -2482,7 +2473,7 @@ ${logEntries
             {/* SEALED CHOICE CONSEQUENCE FEEDBACK (确认动效仪式)             */}
             {/* ============================================================= */}
             {currentEntry.chosenOptionText && (
-              <div className={`p-4 sm:p-5 rounded-2xl border relative overflow-hidden transition-all duration-300 z-10 flex items-center justify-between gap-4 ${
+              <div ref={choiceOutcomeRef} role="status" className={`p-4 sm:p-5 rounded-2xl border relative overflow-hidden transition-all duration-300 z-10 flex items-center justify-between gap-4 ${
                 isLight ? "bg-red-50/70 border-red-300/80 text-stone-900" : "bg-red-950/20 border-red-800/40 text-stone-100"
               }`}>
                 {/* Background Seal Watermark */}
@@ -2517,149 +2508,88 @@ ${logEntries
 
           </div>
         )}
-      </main>
+      </section>
 
-      {/* ================================================================= */}
-      {/* 5. ALL-IN-ONE FIXED CAPSULE DOCK (全部功能一网打尽 · 终极固定底栏控制台) */}
-      {/* ================================================================= */}
-      <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] sm:bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
-        <div className={`simulator-dock flex items-center gap-1.5 sm:gap-2.5 p-2 sm:p-2.5 rounded-2xl sm:rounded-full border shadow-2xl backdrop-blur-xl transition-colors duration-300 ${
-          isLight
-            ? "bg-white/95 border-stone-200 text-stone-800 shadow-stone-900/15"
-            : "bg-[#0E1019]/95 border-white/[0.12] text-stone-200 shadow-black/80"
-        }`}>
-          {/* PRIMARY ACTION SLOT */}
-          {!isRetired && !isShowingMortalityClimax && (
-            isWaitingCurrentChoice ? (
-              <div className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-amber-500/15 border border-amber-500/35 text-amber-400 font-bold text-xs sm:text-sm flex items-center gap-1.5 font-narrative-serif tracking-wide shrink-0 animate-pulse select-none">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>请选择选项（1/2/3）</span>
-              </div>
+      <footer className={`simulator-controls shrink-0 border-t z-30 ${
+        isLight ? "bg-[#FAF8F5] border-stone-200 text-stone-800" : "bg-[#0A0C14] border-white/[0.08] text-stone-200"
+      }`}>
+        <div className="simulator-dock flex items-center gap-2 sm:gap-3">
+          <div className="w-full sm:w-auto sm:flex-1 min-w-0">
+            {!isRetired && !isShowingMortalityClimax ? (
+              isWaitingCurrentChoice ? (
+                <SpringButton
+                  onClick={scrollToChoiceCard}
+                  className="w-full sm:w-auto min-h-10 px-5 py-2 rounded-lg bg-amber-500 text-stone-950 font-semibold text-sm flex items-center justify-center gap-2"
+                  aria-controls="life-event-choices"
+                >
+                  查看选项
+                  <ChevronRight className="w-4 h-4" />
+                </SpringButton>
+              ) : (
+                <SpringButton
+                  onClick={handleNextNaturalYear}
+                  disabled={showGaokaoModal}
+                  className="w-full sm:w-auto min-h-10 px-5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-40"
+                  title="空格键：继续下一年"
+                >
+                  {getNextStepLabel()}
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </SpringButton>
+              )
             ) : (
-              <SpringButton
-                onClick={handleNextNaturalYear}
-                disabled={waitingForChoice || showGaokaoModal}
-                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-md shadow-amber-950/20  transition-colors font-narrative-serif tracking-wide shrink-0 cursor-pointer group disabled:opacity-50"
-                title="按空格键 Space 也可推进"
-              >
-                <span>{getNextStepLabel()}</span>
-                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-1" />
-                <span className="text-[10px] font-normal opacity-75 hidden md:inline ml-0.5 font-mono-num">
-                  (空格)
-                </span>
-              </SpringButton>
-            )
-          )}
-
-          {!isRetired && !isShowingMortalityClimax && (
-            <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
-          )}
-
-          {/* Auto-play Engine */}
-          <SpringButton
-            onClick={() => {
-              if (!waitingForChoice && !showGaokaoModal && !isRetired && !isShowingMortalityClimax) {
-                setIsAutoPlaying((prev) => !prev);
-              }
-            }}
-            disabled={waitingForChoice || showGaokaoModal || isRetired || isShowingMortalityClimax}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors  ${
-              isAutoPlaying
-                ? "bg-amber-500 text-stone-950 border-amber-400 font-bold shadow-sm"
-                : isLight
-                ? "bg-stone-100 hover:bg-stone-200 border-stone-300 text-stone-700 disabled:opacity-40"
-                : "bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.08] text-stone-300 disabled:opacity-40"
-            }`}
-            title="快捷键: A 键切换自动播放"
-          >
-            {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-400" />}
-            <span className="hidden sm:inline">{isAutoPlaying ? '暂停' : '流转'}</span>
-            <span className="text-[10px] opacity-75 font-mono-num">(A)</span>
-          </SpringButton>
-
-          {/* Speed Presets */}
-          <div className="hidden sm:flex items-center gap-1">
-            {[
-              { val: 2.0, label: '0.8x' },
-              { val: 1.2, label: '1.0x' },
-              { val: 0.8, label: '1.5x' },
-            ].map((sp) => (
-              <SpringButton
-                key={sp.label}
-                onClick={() => setAutoPlaySpeed(sp.val)}
-                className={`px-2 py-0.5 rounded-full text-[11px] font-mono-num transition-colors ${
-                  Math.abs(autoPlaySpeed - sp.val) < 0.1
-                    ? isLight ? "bg-stone-300 text-stone-900 font-bold" : "bg-white/[0.18] text-[#D4A359] font-bold"
-                    : isLight ? "text-stone-500 hover:text-stone-800" : "text-stone-400 hover:text-stone-200"
-                }`}
-              >
-                {sp.label}
-              </SpringButton>
-            ))}
+              <span className="text-sm font-medium">{isRetired ? '人生结束' : '请确认结局'}</span>
+            )}
           </div>
 
-          <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
-
-          {/* Quick Skip or Status prompt */}
-          {isShowingMortalityClimax ? (
-            <span className="text-red-400 font-bold text-xs flex items-center gap-1.5 animate-pulse font-narrative-serif px-1">
-              <span className="seal-stamp-box px-1.5 py-[0.05rem] text-[10px]">绝唱</span>
-              <span>请确认结局</span>
-            </span>
-          ) : !isRetired ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <SpringButton
+              onClick={() => setIsAutoPlaying((prev) => !prev)}
+              disabled={isWaitingCurrentChoice || showGaokaoModal || isRetired || isShowingMortalityClimax}
+              aria-pressed={isAutoPlaying}
+              className={`min-h-10 px-3 py-2 rounded-lg border text-xs flex items-center gap-1.5 transition-colors disabled:opacity-40 ${
+                isLight ? "border-stone-300 hover:bg-stone-100" : "border-white/[0.1] hover:bg-white/[0.05]"
+              }`}
+              title="A 键：切换自动播放；遇到选择时停止"
+            >
+              {isAutoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              {isAutoPlaying ? '暂停' : '自动'}
+            </SpringButton>
+            {isAutoPlaying && (
+              <select
+                aria-label="播放速度"
+                value={autoPlaySpeed}
+                onChange={(event) => setAutoPlaySpeed(Number(event.target.value))}
+                className={`min-h-10 rounded-lg border px-2 text-xs ${isLight ? 'bg-white border-stone-300' : 'bg-[#0A0C14] border-white/[0.1]'}`}
+              >
+                <option value={1.5}>0.8x</option>
+                <option value={1.2}>1.0x</option>
+                <option value={0.8}>1.5x</option>
+              </select>
+            )}
             <SpringButton
               onClick={handleSkipToNextDecision}
-              disabled={isWaitingCurrentChoice}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors  disabled:opacity-40 ${
-                isLight
-                  ? "bg-stone-50 hover:bg-stone-100 border-stone-300 text-stone-700 hover:border-amber-400"
-                  : "bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] text-stone-300 hover:border-[#D4A359]/50"
+              disabled={isWaitingCurrentChoice || showGaokaoModal || isRetired || isShowingMortalityClimax}
+              className={`min-h-10 px-3 py-2 rounded-lg border text-xs flex items-center gap-1.5 transition-colors disabled:opacity-40 ${
+                isLight ? "border-stone-300 hover:bg-stone-100" : "border-white/[0.1] hover:bg-white/[0.05]"
               }`}
-              title="一键直接快进到下一个有分支选择的年龄或高考节点"
+              title="快进到下一个选择或高考节点"
             >
-              <FastForward className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">快进抉择</span>
+              <FastForward className="w-3.5 h-3.5" />
+              快进
             </SpringButton>
-          ) : (
-            <span className="text-xs text-[#D4A359] font-narrative-serif px-1">
-              模拟结束
-            </span>
-          )}
-
-          <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
-
-          {/* Memoir Drawer Trigger */}
-          <SpringButton
-            onClick={() => setShowMemoirDrawer(true)}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors  ${
-              isLight
-                ? "bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900"
-                : "bg-[#D4A359]/15 hover:bg-[#D4A359]/25 border-[#D4A359]/40 text-[#D4A359]"
-            }`}
-            title="查看模拟记录"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">模拟记录</span>
-            <span className="font-mono-num font-bold">({logEntries.length})</span>
-          </SpringButton>
-
-          <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
-
-          {/* Quick Restart in Capsule */}
-          <SpringButton
-            onClick={() => handleRestart()}
-            className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-full border text-xs font-medium flex items-center gap-1 transition-colors  ${
-              isLight
-                ? "bg-stone-100 hover:bg-rose-50 border-stone-300 text-stone-600 hover:text-rose-700 hover:border-rose-300"
-                : "bg-white/[0.04] hover:bg-rose-950/30 border-white/[0.08] text-stone-400 hover:text-rose-400 hover:border-rose-800/40"
-            }`}
-            title="重新生成角色"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">重开</span>
-          </SpringButton>
+            <SpringButton
+              onClick={() => setShowMemoirDrawer(true)}
+              className={`min-h-10 px-3 py-2 rounded-lg border text-xs flex items-center gap-1.5 transition-colors ${
+                isLight ? "border-stone-300 hover:bg-stone-100" : "border-white/[0.1] hover:bg-white/[0.05]"
+              }`}
+              title="查看模拟记录"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              记录 <span className="font-mono-num">{logEntries.length}</span>
+            </SpringButton>
+          </div>
         </div>
-      </div>
+      </footer>
 
       {/* ================================================================= */}
       {/* 6. MEMOIR DRAWER (模拟记录抽屉 · 随时查阅全卷生平)                    */}
