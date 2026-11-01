@@ -2734,20 +2734,22 @@ ${logEntries
             )}
 
             {/* ============================================================= */}
-            {/* PRIMARY NEXT STEP FORWARD BUTTON (推进下一岁)                    */}
+            {/* YEAR READY SUBTLE CUE & QUICK TRIGGER (岁序就绪轻量触发提示)       */}
             {/* ============================================================= */}
             {!isWaitingCurrentChoice && (
-              <div className="pt-2 relative z-10">
-                <button
-                  onClick={handleNextNaturalYear}
-                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 shadow-xl shadow-amber-950/20 active:scale-[0.99] transition-all font-narrative-serif tracking-wide group"
-                >
-                  <span>{getNextStepLabel()}</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  <span className="text-[11px] font-normal opacity-75 hidden sm:inline ml-1 font-mono-num">
-                    (按空格 Space 推进)
-                  </span>
-                </button>
+              <div
+                onClick={handleNextNaturalYear}
+                className="pt-2.5 pb-1 border-t border-amber-500/10 flex items-center justify-between text-[11px] text-stone-400 dark:text-stone-500 font-narrative-serif cursor-pointer hover:text-[#D4A359] transition-colors group select-none"
+                title="点击此处或按空格 Space 亦可推进下一岁"
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500/80 animate-pulse" />
+                  <span>岁序就绪 · 点击底栏【{getNextStepLabel()}】继续</span>
+                </span>
+                <span className="hidden sm:flex items-center gap-1 font-mono-num opacity-70 group-hover:opacity-100">
+                  <span>按空格 Space</span>
+                  <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                </span>
               </div>
             )}
           </div>
@@ -2755,18 +2757,38 @@ ${logEntries
       </main>
 
       {/* ================================================================= */}
-      {/* 5. FLOATING FROSTED CAPSULE DOCK (居中悬浮磨砂玻璃胶囊坞)             */}
+      {/* 5. FLOATING FROSTED CAPSULE DOCK (固定底栏控制台 · 永不跳跃的定点操作坞)  */}
       {/* ================================================================= */}
       <div className={`fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-30 pointer-events-auto transition-all duration-300 ${
         isWaitingCurrentChoice
           ? "opacity-0 pointer-events-none translate-y-8"
           : "opacity-100 translate-y-0"
       }`}>
-        <div className={`flex items-center gap-2 sm:gap-3 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-300 max-w-[94vw] ${
+        <div className={`flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 pl-2 sm:pl-2.5 pr-3 sm:pr-4 rounded-full border shadow-2xl backdrop-blur-xl transition-all duration-300 max-w-[96vw] ${
           isLight
-            ? "bg-white/85 border-stone-200/90 text-stone-800 shadow-stone-900/10"
-            : "bg-[#0E1019]/85 border-white/[0.12] text-stone-200 shadow-black/80"
+            ? "bg-white/95 border-stone-200 text-stone-800 shadow-stone-900/15"
+            : "bg-[#0E1019]/95 border-white/[0.12] text-stone-200 shadow-black/80"
         }`}>
+          {/* PRIMARY ADVANCE BUTTON: PERMANENTLY FIXED COORDINATE */}
+          {!isRetired && !isShowingMortalityClimax && (
+            <button
+              onClick={handleNextNaturalYear}
+              disabled={waitingForChoice || showGaokaoModal}
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#D4A359] via-[#E0B26A] to-[#C29348] hover:from-[#E0B26A] hover:to-[#CF9F52] text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-md shadow-amber-950/20 active:scale-95 transition-all font-narrative-serif tracking-wide shrink-0 cursor-pointer group disabled:opacity-50"
+              title="按空格键 Space 也可推进"
+            >
+              <span>{getNextStepLabel()}</span>
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-1" />
+              <span className="text-[10px] font-normal opacity-75 hidden md:inline ml-0.5 font-mono-num">
+                (空格)
+              </span>
+            </button>
+          )}
+
+          {!isRetired && !isShowingMortalityClimax && (
+            <span className={isLight ? "text-stone-300" : "text-white/[0.15]"}>|</span>
+          )}
+
           {/* Auto-play Engine */}
           <button
             onClick={() => {
