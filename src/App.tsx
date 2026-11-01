@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { LifeSimulator } from './components/LifeSimulator';
-import { SubclassMatrix } from './components/SubclassMatrix';
-import { RealityCheckSection } from './components/RealityCheckSection';
-import { DIYGuideSection } from './components/DIYGuideSection';
+import { EscapeGuide } from './components/EscapeGuide';
 import { Footer } from './components/Footer';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'sim' | 'subclasses' | 'reality' | 'diy'>('sim');
-  const [initialSubclassCountry, setInitialSubclassCountry] = useState<string>('japan');
-  const [initialDIYCountry, setInitialDIYCountry] = useState<string>('japan');
+  const [activeTab, setActiveTab] = useState<'sim' | 'guide'>('sim');
+  const [guideCountry, setGuideCountry] = useState<string>('japan');
 
   // 全局明暗主题系统（浅色素雅宣纸模式 ☀️ / 深色古砚墨香模式 🌙）
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -33,19 +30,11 @@ export function App() {
     document.documentElement.classList.toggle('light', theme === 'light');
   }, [theme]);
 
-  const handleNavigateToSubclasses = (countryId?: string) => {
+  const handleNavigateToGuide = (countryId?: string) => {
     if (countryId) {
-      setInitialSubclassCountry(countryId);
+      setGuideCountry(countryId);
     }
-    setActiveTab('subclasses');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleNavigateToDIY = (countryId?: string) => {
-    if (countryId) {
-      setInitialDIYCountry(countryId);
-    }
-    setActiveTab('diy');
+    setActiveTab('guide');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -67,24 +56,18 @@ export function App() {
       <main className="flex-1">
         {activeTab === 'sim' && (
           <LifeSimulator
-            onNavigateToSubclasses={handleNavigateToSubclasses}
-            onNavigateToDIY={handleNavigateToDIY}
+            onNavigateToSubclasses={handleNavigateToGuide}
+            onNavigateToDIY={handleNavigateToGuide}
             theme={theme}
             onToggleTheme={toggleTheme}
           />
         )}
 
-        {activeTab === 'subclasses' && (
-          <SubclassMatrix
-            initialCountryId={initialSubclassCountry}
-            onNavigateToDIY={handleNavigateToDIY}
+        {activeTab === 'guide' && (
+          <EscapeGuide
+            initialCountryId={guideCountry}
+            theme={theme}
           />
-        )}
-
-        {activeTab === 'reality' && <RealityCheckSection />}
-
-        {activeTab === 'diy' && (
-          <DIYGuideSection initialCountryId={initialDIYCountry} />
         )}
       </main>
 

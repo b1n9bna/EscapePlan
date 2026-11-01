@@ -1,9 +1,9 @@
 import React from 'react';
-import { Gamepad2, BookOpen, Calculator, CheckSquare, ShieldCheck, Sun, Moon } from 'lucide-react';
+import { Gamepad2, Compass, ShieldCheck, Sun, Moon } from 'lucide-react';
 
 interface HeaderProps {
-  activeTab: 'sim' | 'subclasses' | 'reality' | 'diy';
-  setActiveTab: (tab: 'sim' | 'subclasses' | 'reality' | 'diy') => void;
+  activeTab: 'sim' | 'guide';
+  setActiveTab: (tab: 'sim' | 'guide') => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
 }
@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
           <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar py-2">
             <button
               onClick={() => setActiveTab('sim')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+              className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'sim'
                   ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
                   : isLight
@@ -73,45 +73,17 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             <button
-              onClick={() => setActiveTab('subclasses')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === 'subclasses'
+              onClick={() => setActiveTab('guide')}
+              className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                activeTab === 'guide'
                   ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
                   : isLight
                   ? 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
               }`}
             >
-              <BookOpen className={`w-4 h-4 ${activeTab === 'subclasses' ? 'text-white' : 'text-sky-500'}`} />
-              <span>政策与算分</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('reality')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === 'reality'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                  : isLight
-                  ? 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
-              }`}
-            >
-              <Calculator className={`w-4 h-4 ${activeTab === 'reality' ? 'text-white' : 'text-amber-500'}`} />
-              <span>税后沙盒</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('diy')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === 'diy'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                  : isLight
-                  ? 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
-              }`}
-            >
-              <CheckSquare className={`w-4 h-4 ${activeTab === 'diy' ? 'text-white' : 'text-emerald-500'}`} />
-              <span>手搓路线</span>
+              <Compass className={`w-4 h-4 ${activeTab === 'guide' ? 'text-white' : 'text-blue-400'}`} />
+              <span>逃离指北</span>
             </button>
           </nav>
 
